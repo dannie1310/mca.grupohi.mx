@@ -30,7 +30,12 @@
                      <tr>
                          <div style="display: none">{{$aux=$usuario->id_proyecto}}</div>
 
-                         <td colspan="7" style="background-color: #dff0d8">{{$usuario->proyecto}}</td>
+                         <td style="background-color: #dff0d8">{{$usuario->proyecto}}</td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
                          </tr>
                      @endif
                  <tr>
@@ -72,31 +77,6 @@
 @section('scripts')
     <script>
 
-        var auth_config = {
-            auto_filter: true,
-            col_0: 'input',
-            col_1: 'select',
-            col_2: 'none',
-            col_3: 'none',
-            col_4: 'select',
-            col_5: 'none',
-            col_6: 'none',
-            base_path: App.tablefilterBasePath,
-            auto_filter: true,
-            paging: false,
-            rows_counter: true,
-            rows_counter_text: 'Usuarios: ',
-            btn_reset: true,
-            btn_reset_text: 'Limpiar',
-            clear_filter_text: 'Limpiar',
-            loader: true,
-            page_text: 'Pagina',
-            of_text: 'de',
-            help_instructions: false,
-            extensions: [{ name: 'sort' }]
-        };
-        var tf = new TableFilter('index_usuario', auth_config);
-        tf.init();
 
 
         function desactivar_usuario(id,estatus) {
