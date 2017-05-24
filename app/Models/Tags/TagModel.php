@@ -8,7 +8,7 @@ class TagModel extends Model
 {
     // Datos de inicio de configuracio
     protected $connection = 'sca';
-    protected $table = 'tags';
+    protected $table = 'sca_configuracion.tags';
     protected $primaryKey = 'id';
 
     //Informacion de campos llenables
