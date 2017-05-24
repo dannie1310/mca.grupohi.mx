@@ -125,7 +125,8 @@ Vue.component('viajes-modificar', {
                         type: response.body.tipo,
                         title : '',
                         text: response.body.message,
-                        showConfirmButton: true
+                        showConfirmButton: true,
+                        html:true
                     });
 
                     viaje.CubicacionCamion = response.body.viaje.CubicacionCamion;
@@ -145,7 +146,12 @@ Vue.component('viajes-modificar', {
                 }, (error) => {
                     _this.guardando = false;
                     viaje.ShowModal = false;
-                    swal('¡Error!', App.errorsToString(error.body), 'error');
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.body),
+                        html: true
+                    });
                 });
             });
         },
