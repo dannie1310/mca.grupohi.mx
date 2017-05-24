@@ -21,6 +21,12 @@
             {!! Form::text('NombreCorto', null, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
         </div>
     </div>
+    <div class="form-group">
+        {!! Form::label('Rfc', 'Rfc', ['class' => 'control-label col-sm-3']) !!}
+        <div class="col-sm-9">
+            {!! Form::text('rfc', null, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+        </div>
+    </div>
 </div>
 {!! Form::close() !!}
 <div class="form-group col-md-12" style="text-align: center; margin-top: 20px">

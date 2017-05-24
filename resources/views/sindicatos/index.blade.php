@@ -13,6 +13,7 @@
       <tr>
         <th>ID Sindicato</th>
         <th>Descripción</th>
+        <th>Rfc</th>
         <th>Nombre Corto</th>
         <th>Estatus</th>
         <th width="160px">Acciones</th>
@@ -25,6 +26,7 @@
             <a href="{{ route('sindicatos.show', $sindicato) }}">#{{ $sindicato->IdSindicato }}</a>
           </td>
           <td>{{ $sindicato->Descripcion }}</td>
+          <td>{{ $sindicato->rfc }}</td>
           <td>{{ $sindicato->NombreCorto }}</td>
           <td>{{ $sindicato->present()->estatus }}</td>
           <td>
