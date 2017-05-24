@@ -16,6 +16,7 @@
             <li class="list-group-item"><strong>PROYECTO:</strong> {{$usuario[0]->proyecto}}</li>
             <li class="list-group-item"><strong>FECHA Y HORA REGISTRO:</strong> {{$usuario[0]->created_at}}</li>
             <li class="list-group-item"><strong>PERSONA QUE REGITRÓ:</strong> {{$usuario[0]->registro}}</li>
+            <li class="list-group-item"><strong>ESTATUS:</strong> @if($usuario[0]->estatus==1)<span>Activado</span>@else <span>Desactivado</span> @endif</li>
         </ul>
     </div>
 @endsection

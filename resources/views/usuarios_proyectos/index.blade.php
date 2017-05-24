@@ -9,16 +9,16 @@
     {!! Breadcrumbs::render('usuario_proyecto.index') !!}
     <hr>
      <div class="table-responsive">
-         <table class="table table-bordered small">
+         <table class="table table-striped small" id="index_usuario">
              <thead>
              <tr>
-                 <th>Id</th>
+
                  <th>Usuario</th>
                  <th>Proyecto</th>
                  <th>Fecha Y Hora Registro</th>
                  <th>Registró</th>
                  <th>Estatus</th>
-                 <th style="width: 100px;">ACCIONES</th>
+                 <th style="width: 100px;">Acciones</th>
              </tr>
              </thead>
              <tbody>
@@ -30,17 +30,22 @@
                      <tr>
                          <div style="display: none">{{$aux=$usuario->id_proyecto}}</div>
 
-                         <th colspan="7" style="background-color: #dff0d8">{{$usuario->proyecto}}</th>
+                         <td style="background-color: #dff0d8">{{$usuario->proyecto}}</td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
+                         <td style="background-color: #dff0d8"></td>
                          </tr>
                      @endif
                  <tr>
-                     <th>{{$usuario->id_usuario}}</th>
-                     <th>{{$usuario->nombre}}</th>
-                     <th>{{$usuario->proyecto}}</th>
-                     <th>{{$usuario->created_at}}</th>
-                     <th>{{$usuario->registro}}</th>
-                     <th>@if($usuario->estatus==1)<span>Activado</span>@else <span>Desactivado</span> @endif</th>
-                     <th style="width: 100px;">
+
+                     <td>{{$usuario->nombre}}</td>
+                     <td>{{$usuario->proyecto}}</td>
+                     <td>{{$usuario->created_at}}</td>
+                     <td>{{$usuario->registro}}</td>
+                     <td>@if($usuario->estatus==1)<span>Activado</span>@else <span>Desactivado</span> @endif</td>
+                     <td style="width: 100px;">
                          <a href="{{ route('usuario_proyecto.show', $usuario->id_usuario) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
                          <a href="{{ route('usuario_proyecto.edit', $usuario->id_usuario) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
                          @if($usuario->estatus == 1)
@@ -50,7 +55,7 @@
                          @endif
 
 
-                     </th>
+                     </td>
                  </tr>
              @endforeach
 
@@ -71,6 +76,9 @@
 
 @section('scripts')
     <script>
+
+
+
         function desactivar_usuario(id,estatus) {
             var url = App.host + '/usuario_proyecto/' + id;
             var form = $('#eliminar_usuario');
