@@ -113,6 +113,7 @@ class UsuarioProyectoController extends Controller
         }
         $usuario = DB::connection('sca')
             ->select('Select up.id_usuario
+
                       from sca_configuracion.usuarios_proyectos  up 
                       where up.id_usuario_intranet=' . $request->id_usuario . ' 
                       and id_proyecto=' . $request->id_proyecto);
@@ -143,15 +144,25 @@ class UsuarioProyectoController extends Controller
     public function show($id)
     {
         $usuarios = DB::connection('sca')
-            ->select('select distinct
-                        u.idusuario,
-                        u.apaterno,
-                        u.amaterno,
-                        u.nombre
+            ->select(' select
+                        up.id_usuario,
+                        up.id_usuario_intranet,
+                        up.id_proyecto, 
+                        concat (u.nombre,\' \',u.apaterno,\' \',u.amaterno) as nombre,
+                        p.descripcion as proyecto,
+                        up.created_at,
+                        up.estatus,
+                        concat (ureg.nombre,\' \',ureg.apaterno,\' \',ureg.amaterno) as registro
                         from 
-                        igh.usuario u where usuario_estado=2
-                        order by u.nombre asc,u.apaterno asc,u.amaterno asc
+                        igh.usuario u
+                        inner join sca_configuracion.usuarios_proyectos up
+                        on(u.idusuario=up.id_usuario_intranet)
+                        inner join sca_configuracion.proyectos p on(up.id_proyecto=p.id_proyecto)
+                        inner join igh.usuario ureg on(ureg.idusuario=up.registro)
+                        where p.nuevo_esquema=1 and up.id_usuario='.$id.'
+                        order by p.descripcion, u.nombre asc,u.apaterno asc,u.amaterno asc 
                            ');
+
 
 
         return view('usuarios_proyectos.show')->with("usuario", $usuarios);
@@ -217,7 +228,7 @@ class UsuarioProyectoController extends Controller
             ->select('Select up.id_usuario_intranet
                       from sca_configuracion.usuarios_proyectos  up 
                       where up.id_usuario_intranet=' . $request->id_usuario . ' 
-                      and id_proyecto=' . $request->id_proyecto . ' and id_usuario!=' . $request->id_usuario_intranet);
+                      and id_proyecto=' . $request->id_proyecto . ' and id_usuario!=' . $request->idUsuario);
         if ($usuario) {
             Flash::Error('¡La configuracion que trata de guardar ya existe!');
             return Redirect::back()
@@ -255,7 +266,7 @@ class UsuarioProyectoController extends Controller
                 'estatus' => 0
             ]
         );
-            flash::success('¡USUARIO DESCATIVADO CORRECTAMENTE!');
+            flash::success('¡USUARIO DESACTIVADO CORRECTAMENTE!');
         }
         else{
             $save = DB::connection('sca')->table('sca_configuracion.usuarios_proyectos')->where('id_usuario', '=', $id)->update([
