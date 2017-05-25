@@ -32,17 +32,14 @@ Vue.component('corte-edit', {
         modified: function() {
             var _this = this;
             return _this.corte.viajes_netos.filter(function(viaje_neto) {
-                if(viaje_neto.corte_cambio) {
-                    return true;
-                }
-                return false;
+                return viaje_neto.corte_cambio;
             });
         },
 
         resultados: function () {
             var _this = this;
             return this.corte.viajes_netos.filter(function (viaje_neto) {
-                if(viaje_neto.codigo == _this.form.busqueda.replace(/ /g,'')) {
+                if(viaje_neto.Code == _this.form.busqueda.replace(/ /g,'')) {
                     return true;
                 } else {
                     return false;
@@ -135,20 +132,20 @@ Vue.component('corte-edit', {
         editar: function (e) {
             e.preventDefault();
             var viaje = this.viaje;
-            if(viaje.corte_cambio) {
-                this.form.data.id_origen = viaje.corte_cambio.origen_nuevo ? viaje.corte_cambio.origen_nuevo.IdOrigen : viaje.id_origen;
-                this.form.data.id_tiro = viaje.corte_cambio.tiro_nuevo ? viaje.corte_cambio.tiro_nuevo.IdTiro : viaje.id_tiro;
-                this.form.data.id_material = viaje.corte_cambio.material_nuevo ? viaje.corte_cambio.material_nuevo.IdMaterial : viaje.id_material;
-                this.form.data.cubicacion = viaje.corte_cambio.cubicacion_nueva ? viaje.corte_cambio.cubicacion_nueva : viaje.cubicacion;
-                this.form.data.justificacion = viaje.corte_cambio.justificacion;
+            if(viaje.corte_cambio == true) {
+                this.form.data.id_origen = viaje.IdOrigenNuevo ? viaje.IdOrigenNuevo : viaje.IdOrigen;
+                this.form.data.id_tiro = viaje.IdTiroNuevo ? viaje.IdTiroNuevo : viaje.IdTiro;
+                this.form.data.id_material = viaje.IdMaterialNuevo ? viaje.IdMaterialNuevo : viaje.IdMaterial;
+                this.form.data.cubicacion = viaje.CubicacionCamionNueva ? viaje.CubicacionCamionNueva : viaje.CubicacionCamion;
+                this.form.data.justificacion = viaje.justificacion;
             } else {
-                this.form.data.id_origen = viaje.id_origen;
-                this.form.data.id_tiro = viaje.id_tiro;
-                this.form.data.id_material = viaje.id_material;
-                this.form.data.cubicacion = viaje.cubicacion;
+                this.form.data.id_origen = viaje.IdOrigen;
+                this.form.data.id_tiro = viaje.IdTiro;
+                this.form.data.id_material = viaje.IdMaterial;
+                this.form.data.cubicacion = viaje.CubicacionCamion;
                 this.form.data.justificacion = '';
             }
-            this.form.data.id = viaje.id;
+            this.form.data.id = viaje.IdViajeNeto;
             this.form.errors = [];
             $('#edit_modal').modal('show');
         },
@@ -213,10 +210,6 @@ Vue.component('corte-edit', {
             });
         },
 
-        formato: function (val) {
-            return numeral(val).format('0,0.00');
-        },
-
         confirmar_descartar: function () {
             e.preventDefault();
             swal({
@@ -233,7 +226,7 @@ Vue.component('corte-edit', {
         descartar: function (e) {
             e.preventDefault();
             var _this = this;
-            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + this.viaje.id + '?action=revertir_modificaciones';
+            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + this.viaje.IdViajeNeto + '?action=revertir_modificaciones';
             
             $.ajax({
                 type : 'POST',
@@ -285,7 +278,7 @@ Vue.component('corte-edit', {
 
         confirmar_viaje: function () {
             var _this = this;
-            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + _this.viaje.id;
+            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + _this.viaje.IdViajeNeto;
             $.ajax({
                 type: 'POST',
                 url: url,

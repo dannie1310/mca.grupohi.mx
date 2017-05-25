@@ -72,7 +72,6 @@
                                 <th style="text-align: center"> Tiro </th>
                                 <th style="text-align: center"> Material </th>
                                 <th style="text-align: center"> Cubicación	</th>
-                                <th style="text-align: center"> Importe </th>
                                 <th style="text-align: center"> Checador Primer Toque </th>
                                 <th style="text-align: center"> Checador Segundo Toque </th>
                                 <th style="text-align: center"> Confirmar </th>
@@ -88,8 +87,7 @@
                                     <td>@{{ viaje.origen }}</td>
                                     <td>@{{ viaje.tiro }}</td>
                                     <td>@{{ viaje.material }}</td>
-                                    <td style="text-align: right">@{{ viaje.cubicacion }} m<sup>3</sup></td>
-                                    <td style="text-align: right">$@{{ formato(viaje.importe) }}</td>
+                                    <td style="text-align: right">@{{ viaje.CubicacionCamion }} m<sup>3</sup></td>
                                     <td>@{{ viaje.registro_primer_toque }}</td>
                                     <td>@{{ viaje.registro }}</td>
                                     <td>
@@ -114,7 +112,6 @@
                         {!! Form::open(['id' => 'form_confirmar']) !!}
                         <div class="modal-body">
                             <app-errors v-bind:form="form"></app-errors>
-                            <div class="row">
                                 <h4 class="text-center">INFORMACIÓN DEL VIAJE</h4>
                                 <div class="table-responsive">
                                     <table class="table table-bordered small">
@@ -129,16 +126,15 @@
                                         </thead>
                                         <tbody>
                                         <tr v-if="viaje">
-                                            <td>@{{ viaje.codigo }}</td>
+                                            <td>@{{ viaje.Code }}</td>
                                             <td>@{{ viaje.origen }}</td>
                                             <td>@{{ viaje.tiro }}</td>
                                             <td>@{{ viaje.material }}</td>
-                                            <td>@{{ viaje.cubicacion }}</td>
+                                            <td>@{{ viaje.CubicacionCamion }}</td>
                                         </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
                             <section v-if="viaje.corte_cambio" id="modificaciones_table">
                                 <hr>
                                 <h4 class="text-center">
@@ -148,22 +144,22 @@
                                     <table class="table table-bordered small">
                                         <thead>
                                         <tr>
-                                            <th v-if="viaje.corte_cambio.origen_nuevo">ORIGEN NUEVO</th>
-                                            <th v-if="viaje.corte_cambio.tiro_nuevo">TIRO NUEVO</th>
-                                            <th v-if="viaje.corte_cambio.material_nuevo">MATERIAL NUEVO</th>
-                                            <th v-if="viaje.corte_cambio.cubicacion_nueva">CUBICACIÓN NUEVA</th>
+                                            <th v-if="viaje.IdOrigenNuevo">ORIGEN NUEVO</th>
+                                            <th v-if="viaje.IdTiroNuevo">TIRO NUEVO</th>
+                                            <th v-if="viaje.IdMaterialNuevo">MATERIAL NUEVO</th>
+                                            <th v-if="viaje.CubicacionCamionNueva">CUBICACIÓN NUEVA</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td v-if="viaje.corte_cambio.origen_nuevo">@{{ viaje.corte_cambio.origen_nuevo.Descripcion }}</td>
-                                            <td v-if="viaje.corte_cambio.tiro_nuevo">@{{ viaje.corte_cambio.tiro_nuevo.Descripcion }}</td>
-                                            <td v-if="viaje.corte_cambio.material_nuevo">@{{ viaje.corte_cambio.material_nuevo.Descripcion }}</td>
-                                            <td v-if="viaje.corte_cambio.cubicacion_nueva">@{{ viaje.corte_cambio.cubicacion_nueva }}</td>
+                                            <td v-if="viaje.origen_nuevo">@{{ viaje.origen_nuevo }}</td>
+                                            <td v-if="viaje.tiro_nuevo">@{{ viaje.tiro_nuevo }}</td>
+                                            <td v-if="viaje.material_nuevo">@{{ viaje.material_nuevo }}</td>
+                                            <td v-if="viaje.CubicacionCamionNueva">@{{ viaje.CubicacionCamionNueva }}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="4">
-                                                <strong>JUSTIFICACIÓN: </strong> @{{ viaje.corte_cambio.justificacion }}
+                                                <strong>JUSTIFICACIÓN: </strong> @{{ viaje.justificacion }}
                                             </td>
                                         </tr>
                                         </tbody>
@@ -174,8 +170,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                            <button type="submit" @click="editar" class="btn btn-primary">Modificar Viaje</button>
-                            <button type="submit" @click="confirmar_confirmacion" class="btn btn-success">Confirmar</button>
+                            <button v-if="!viaje.manual" type="submit" @click="editar" class="btn btn-primary">Modificar Viaje</button>
+                            <button v-if="!viaje.manual" type="submit" @click="confirmar_confirmacion" class="btn btn-success">Confirmar</button>
                         </div>
                         {!! Form::close() !!}
                     </div>

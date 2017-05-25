@@ -31,14 +31,6 @@ class Corte extends Model
         return $this->hasMany(CorteDetalle::class, 'id_corte');
     }
 
-    public function viajes_netos() {
-        $viajes_netos = new Collection();
-        foreach ($this->corte_detalles as $cd) {
-            $viajes_netos->push($cd->viajeNeto);
-        }
-        return $viajes_netos;
-    }
-
     public function viajes_netos_confirmados()
     {
         $result = new Collection();
