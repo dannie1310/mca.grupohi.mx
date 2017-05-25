@@ -263,3 +263,7 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
 });
 Route::resource('usuario_proyecto', 'UsuarioProyectoController');
 Route::get('checkpermission/{permission}', 'UserController@checkpermission');
+//Rutas de solicitud de Ractivación
+//Route::resource('solicitud-reactivacion','SolicitudReactivacionController@index')->name('solicitud-reactivacion.index');
+Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
+Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');

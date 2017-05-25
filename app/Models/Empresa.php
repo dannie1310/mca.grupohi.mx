@@ -13,7 +13,7 @@ class Empresa extends Model
     protected $table = 'empresas';
     protected $primaryKey = 'IdEmpresa';
     protected $fillable = [
-        'razonSocial',
+        'razonKSocial',
         'RFC'
     ];
     protected $presenter = ModelPresenter::class;
