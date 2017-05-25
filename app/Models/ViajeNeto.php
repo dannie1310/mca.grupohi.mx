@@ -696,7 +696,7 @@ class ViajeNeto extends Model
             ->where('viajesnetos.Estatus', 0);
     }
 
-    public function scopeManuales($query){
+    public static function scopeManuales($query){
         return $query->whereIn('viajesnetos.Estatus', [20,21,22,29]);
     }
 

@@ -90,12 +90,14 @@ class CorteViajesController extends Controller
 
         if($request->action == 'revertir_modificaciones') {
             CorteCambio::where('id_viajeneto', $id_viajeneto)->delete();
-            DB::connection('sca')
-                ->table('corte_detalle')
-                ->where('id_corte', $id_corte)
-                ->where('id_viajeneto', $id_viajeneto)
-                ->update(['estatus' => 1]);
-
+            $viajeneto = ViajeNeto::find($id_viajeneto);
+            if(! in_array($viajeneto->Estatus, [20,21,22,29])) {
+                DB::connection('sca')
+                    ->table('corte_detalle')
+                    ->where('id_corte', $id_corte)
+                    ->where('id_viajeneto', $id_viajeneto)
+                    ->update(['estatus' => 1]);
+            }
 
             return response()->json([
                 'viaje_neto' => ViajeNeto::scopeCorteEdit($id_corte)->where('viajesnetos.IdViajeNeto', '=', $id_viajeneto)->first(),

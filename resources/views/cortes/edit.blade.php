@@ -170,7 +170,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                            <button v-if="!viaje.manual" type="submit" @click="editar" class="btn btn-primary">Modificar Viaje</button>
+                            <button type="submit" @click="editar" class="btn btn-primary">Modificar Viaje</button>
                             <button v-if="!viaje.manual" type="submit" @click="confirmar_confirmacion" class="btn btn-success">Confirmar</button>
                         </div>
                         {!! Form::close() !!}
