@@ -22,9 +22,9 @@
         </div>
     </div>
     <div class="form-group">
-        {!! Form::label('Rfc', 'Rfc', ['class' => 'control-label col-sm-3']) !!}
+        {!! Form::label('RFC', 'RFC', ['class' => 'control-label col-sm-3']) !!}
         <div class="col-sm-9">
-            {!! Form::text('rfc', null, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+            {!! Form::text('rfc', null, ['class' => 'form-control', 'disabled' => 'disabled','place-holder'=>'AAAA999999XXX']) !!}
         </div>
     </div>
 </div>

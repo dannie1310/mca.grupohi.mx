@@ -13,7 +13,7 @@
       <tr>
         <th>ID Sindicato</th>
         <th>Descripción</th>
-        <th>Rfc</th>
+        <th>RFC</th>
         <th>Nombre Corto</th>
         <th>Estatus</th>
         <th width="160px">Acciones</th>
