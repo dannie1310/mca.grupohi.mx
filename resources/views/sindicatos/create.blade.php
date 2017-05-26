@@ -21,6 +21,12 @@
             {!! Form::text('NombreCorto', null, ['class' => 'form-control', 'placeholder' => 'Nombre Corto...']) !!}
         </div>
     </div>
+    <div class="form-group">
+        {!! Form::label('RFC', 'RFC', ['class' => 'control-label col-sm-3']) !!}
+        <div class="col-sm-9">
+            {!! Form::text('rfc', null, ['class' => 'form-control', 'placeholder'=>'AAAA999999XXX']) !!}
+        </div>
+    </div>
 </div>
 <div class="form-group col-md-12" style="text-align: center; margin-top: 20px">
     <a class="btn btn-info" href="{{ URL::previous() }}">Regresar</a>        

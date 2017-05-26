@@ -13,6 +13,7 @@
       <tr>
         <th>ID Sindicato</th>
         <th>Descripción</th>
+        <th>RFC</th>
         <th>Nombre Corto</th>
         <th>Fecha Y Hora Registro</th>
         <th>Registró</th>
@@ -27,6 +28,7 @@
             <a href="{{ route('sindicatos.show', $sindicato) }}">#{{ $sindicato->IdSindicato }}</a>
           </td>
           <td>{{ $sindicato->Descripcion }}</td>
+          <td>{{ $sindicato->rfc }}</td>
           <td>{{ $sindicato->NombreCorto }}</td>
           <td>{{ $sindicato->created_at }}</td>
           <td>{{ $sindicato->user_registro->present()->nombreCompleto() }}</td>

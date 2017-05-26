@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Laracasts\Flash\Flash;
 use App\Models\Sindicato;
-
+use Illuminate\Support\Facades\Redirect;
 class SindicatosController extends Controller
 {
 
@@ -52,10 +52,20 @@ class SindicatosController extends Controller
      */
     public function store(Requests\CreateSindicatoRequest $request)
     {
-        $sindicato = Sindicato::create($request->all());
+        if(!preg_match('/^([A-ZÑ\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\d]{3}))?$/', $request->rfc))
+        {
+            Flash::error('El rfc tiene formato incorrecto.');
+            return Redirect::back()
+                ->withInput($request->input());
 
-        Flash::success('¡SINDICATO REGISTRADO CORRECTAMENTE');
-        return redirect()->route('sindicatos.show', $sindicato);
+        }else{
+            $sindicato = Sindicato::create($request->all());
+            Flash::success('¡SINDICATO REGISTRADO CORRECTAMENTE');
+            return redirect()->route('sindicatos.show', $sindicato);
+        }
+
+
+
     }
 
     /**
@@ -91,11 +101,19 @@ class SindicatosController extends Controller
      */
     public function update(Requests\EditSindicatoRequest $request, $id)
     {
+        if(!preg_match('/^([A-ZÑ\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\d]{3}))?$/', $request->rfc))
+        {
+            Flash::error('El rfc tiene formato incorrecto.');
+            return Redirect::back()
+                ->withInput($request->input());
+
+        }else{
         $sindicato = Sindicato::findOrFail($id);
         $sindicato->update($request->all());
 
         Flash::success('¡SINDICATO ACTUALIZADO CORRECTAMENTE!');
         return redirect()->route('sindicatos.show', $sindicato);
+        }
     }
 
     /**
