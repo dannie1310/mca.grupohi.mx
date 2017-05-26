@@ -2,8 +2,9 @@
 
 @section('content')
 <h1>{{ $empresa->razonSocial }}
+    @permission('editar-empresas')
     <a href="{{ route('empresas.edit', $empresa) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
-    <a href="{{ route('empresas.destroy', $empresa) }}" class="btn pull-right element_destroy {{ $empresa->Estatus == 1 ? 'activo btn-danger' : 'inactivo btn-success' }}" style="margin-right: 5px"><i class="fa {{ $empresa->Estatus == 1 ? 'fa-ban' : 'fa-check' }}"></i> {{ $empresa->Estatus == 1 ? 'INHABILITAR' : 'HABILITAR' }}</a>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('empresas.show', $empresa) !!}
 <hr>

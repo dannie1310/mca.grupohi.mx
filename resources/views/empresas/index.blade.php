@@ -2,8 +2,10 @@
 
 @section('content')
 <h1>{{ strtoupper(trans('strings.empresas')) }}
+  @permission('crear-empresas')
   <a href="{{ route('empresas.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> {{ trans('strings.new_empresa') }}</a>
-  <a href="{{ route('csv.empresas') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Descargar</a>
+  @endpermission
+    <a href="{{ route('csv.empresas') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Descargar</a>
 </h1>
 {!! Breadcrumbs::render('empresas.index') !!}
 <hr>
@@ -29,20 +31,20 @@
           <td>{{ $empresa->razonSocial }}</td>
           <td>{{ $empresa->RFC }}</td>
           <td>{{ $empresa->created_at }}</td>
-          <td>{{ $empresa->user_registro->present()->nombreCompleto() }}</td>
+          <td>{{ $empresa->user_registro }}</td>
           <td>{{ $empresa->present()->estatus }}</td>
           <td>
-
-
             <a href="{{ route('empresas.show', $empresa) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
+            @permission('editar-empresas')
             <a href="{{ route('empresas.edit', $empresa) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-
+            @endpermission
+            @permission('desactivar-empresas')
             @if($empresa->Estatus == 1)
               <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_empresa({{$empresa->IdEmpresa}})"><i class="fa fa-remove"></i></button>
             @else
               <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_empresa({{$empresa->IdEmpresa}})"><i class="fa fa-check"></i></button>
             @endif
-
+            @endpermission
           </td>
           </td>
         </tr>

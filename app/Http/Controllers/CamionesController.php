@@ -195,7 +195,7 @@ class CamionesController extends Controller
             $camion->motivo=null;
             $camion->usuario_desactivo=null;
             $camion->usuario_registro=auth()->user()->idusuario;
-            $camion->updated_at=date("Y-m-d H:i:s");
+            $camion->created_at=date("Y-m-d H:i:s");
             $text = '¡CAMIÓN HABILITADO CORRECTAMENTE!';
         }
         $camion->save();
