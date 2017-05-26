@@ -261,3 +261,6 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
 });
 Route::resource('usuario_proyecto', 'UsuarioProyectoController');
 Route::get('checkpermission/{permission}', 'UserController@checkpermission');
+
+
+Route::get('historico/camiones/{id}', 'HistoricoController@camiones');
