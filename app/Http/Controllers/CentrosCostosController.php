@@ -14,7 +14,10 @@ class CentrosCostosController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-centroscostos', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-centroscostos', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-centroscostos', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
     
@@ -41,11 +44,11 @@ class CentrosCostosController extends Controller
             return view('centroscostos.create');
         }
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateCentroCostoRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateCentroCostoRequest $request)
@@ -134,7 +137,6 @@ class CentrosCostosController extends Controller
     public function destroy(Request $request, $id)
     {
 
-
         $centro = CentroCosto::findOrFail($id);
 
         if($request->get('_toggle')) {
@@ -145,7 +147,8 @@ class CentrosCostosController extends Controller
                 $text = '¡Centro de Costo Deshabilitado!';
             } else {
                 $centro->Estatus = 1;
-                $centro->motivo="";
+                $centro->motivo=null;
+                $centro->usuario_desactivo=null;
                 $centro->usuario_registro= auth()->user()->idusuario;
                 $text = '¡Centro de Costo Habilitado!';
             }
