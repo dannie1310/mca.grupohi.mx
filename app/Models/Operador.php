@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
-
+use App\User;
 class Operador extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -30,6 +30,10 @@ class Operador extends Model
     
     public function __toString() {
         return $this->Nombre;
+    }
+
+    public function user_registro() {
+        return $this->belongsTo(User::class, 'usuario_registro', 'idusuario');
     }
 
 }

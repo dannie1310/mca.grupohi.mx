@@ -112,18 +112,24 @@ class OperadoresController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $operador = Operador::findOrFail($id);
         if($operador->Estatus == 1) {
             $operador->Estatus = 0;
-            $text = '¡Operador Inhabilitado!';
-        } else {
+            $operador->usuario_desactivo=auth()->user()->idusuario;
+            $operador->motivo=$request->motivo;
+            $operador->updated_at=date("Y-m-d H:i:s");
+            $text = '¡OPERADOR DESHABILITADO CORRECTAMENTE!';
+         } else {
             $operador->Estatus = 1;
-            $text = '¡Operador Habilitado!';
+            $operador->usuario_desactivo=auth()->user()->idusuario;
+            $operador->motivo="";
+            $operador->created_at=date("Y-m-d H:i:s");
+            $text = '¡OPERADOR DESHABILITADO CORRECTAMENTE!';
         }
         $operador->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

@@ -60,6 +60,7 @@ Route::resource('etapas', 'EtapasController');
 
 //Rutas de centros de costo
 Route::get('centroscostos', 'CentrosCostosController@index')->name('centroscostos.index');
+Route::get('centroscostos/{centroscosto}', 'CentrosCostosController@show')->name('centroscostos.show');
 Route::post('centroscostos', 'CentrosCostosController@store')->name('centroscostos.store');
 Route::get('centroscostos/create/{IdPadre}', 'CentrosCostosController@create')->name('centroscostos.create');
 Route::get('centroscostos/{centroscostos}/edit', 'CentrosCostosController@edit')->name('centroscostos.edit');
