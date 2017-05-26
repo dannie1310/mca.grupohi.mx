@@ -24,6 +24,7 @@ class CorteController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:consultar-cortes-checador', ['only' => ['index']]);
 
         parent::__construct();
     }

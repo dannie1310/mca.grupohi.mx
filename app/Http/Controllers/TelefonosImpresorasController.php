@@ -14,6 +14,7 @@ class TelefonosImpresorasController extends Controller {
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:configuracion-diaria', ['only' => ['index']]);
         parent::__construct();
     }
 

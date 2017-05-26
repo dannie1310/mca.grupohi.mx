@@ -32,15 +32,16 @@ class UsuarioProyectoController extends Controller
      */
     public function index()
     {
-        $user=auth()->user();
-        $isAdmin=$user->hasRole('administrador-sistema');
+        if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
+            $user = auth()->user();
+            $isAdmin = $user->hasRole('administrador-sistema');
 
-        $condic="";
-        if(!$isAdmin){
-            $condic=" and p.id_proyecto=". Context::getId();
-        }
-        $usuarios = DB::connection('sca')
-            ->select(' select
+            $condic = "";
+            if (!$isAdmin) {
+                $condic = " and p.id_proyecto=" . Context::getId();
+            }
+            $usuarios = DB::connection('sca')
+                ->select(' select
                         up.id_usuario,
                         up.id_usuario_intranet,
                         up.id_proyecto, 
@@ -55,12 +56,16 @@ class UsuarioProyectoController extends Controller
                         on(u.idusuario=up.id_usuario_intranet)
                         inner join sca_configuracion.proyectos p on(up.id_proyecto=p.id_proyecto)
                         inner join igh.usuario ureg on(ureg.idusuario=up.registro)
-                        where p.nuevo_esquema=1 '.$condic.'
+                        where p.nuevo_esquema=1 ' . $condic . '
                         order by p.descripcion, u.nombre asc,u.apaterno asc,u.amaterno asc 
                            ');
 
 
-        return view('usuarios_proyectos.index')->with("usuarios", $usuarios);
+            return view('usuarios_proyectos.index')->with("usuarios", $usuarios);
+        } else {
+            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+            return redirect()->back();
+        }
     }
 
     /**

@@ -26,7 +26,7 @@ class EntrustRole extends ER
     {
         if ($this->auth->guest() || !$request->user()->hasRole(explode('|', $roles))) {
             Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
-            return redirect()->back();        }
+            return redirect()->back();               }
 
         return $next($request);
     }

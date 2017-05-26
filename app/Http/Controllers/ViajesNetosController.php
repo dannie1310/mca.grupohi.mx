@@ -17,6 +17,7 @@ use App\Models\Viajes\Viajes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
+use Zizaco\Entrust\Entrust;
 
 class ViajesNetosController extends Controller
 {
@@ -374,6 +375,7 @@ class ViajesNetosController extends Controller
                 $data = $viajes_netos->get();
             }
             return response()->json(['viajes_netos' => $data]);
+
         } else {
             if($request->type =='excel') {
                 if($request->tipo_busqueda == 'fecha') {
@@ -492,14 +494,22 @@ class ViajesNetosController extends Controller
                 return (new Viajes($data))->excel();
             } else
                 if ($request->get('action') == 'en_conflicto') {
+                if(auth()->user()->can('consultar-viajes-conflicto')){
                     return view('viajes_netos.index')
-                        ->withAction('en_conflicto');
-
-                }else{
+                        ->withAction('en_conflicto');}
+                        else{
+                            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                            return redirect()->back();
+                        }
+            } else {
+                if(auth()->user()->can('consulta-viajes')){
                     return view('viajes_netos.index')
                         ->withAction('');
+                }else{
+                    Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                    return redirect()->back();
                 }
-
+            }
         }
     }
 
@@ -510,12 +520,17 @@ class ViajesNetosController extends Controller
      */
     public function create(Request $request)
     {
-        return view('viajes_netos.create')
-            ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
-            ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
-            ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
-            ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
-            ->withAction($request->get('action'));
+        if(auth()->user()->can('ingresar-viajes-manuales')) {
+            return view('viajes_netos.create')
+                ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
+                ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
+                ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
+                ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
+                ->withAction($request->get('action'));
+        }else{
+            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+            return redirect()->back();
+        }
     }
 
     /**
@@ -554,23 +569,38 @@ class ViajesNetosController extends Controller
     public function edit(Request $request)
     {
         if($request->get('action') == 'validar') {
+            if(auth()->user()->can('validar-viajes')) {
             return view('viajes_netos.edit')
                 ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
                 ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
-                ->withAction('validar');
+                ->withAction('validar');}
+                else{
+                    Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                    return redirect()->back();
+                }
         } else if($request->get('action') == 'autorizar') {
-            return view('viajes_netos.edit')
-                ->withViajes(ViajeNeto::registradosManualmente()->get())
-                ->withAction('autorizar');
+            if(auth()->user()->can('autorizar-viajes-manuales')) {
+                return view('viajes_netos.edit')
+                    ->withViajes(ViajeNeto::registradosManualmente()->get())
+                    ->withAction('autorizar');
+            }else{
+                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                return redirect()->back();
+            }
         } else if($request->get('action') == 'modificar') {
-            return view('viajes_netos.edit')
-                ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
-                ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
-                ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
-                ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
-                ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
-                ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
-                ->withAction('modificar');
+            if(auth()->user()->can('modificar-viajes')) {
+                return view('viajes_netos.edit')
+                    ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
+                    ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
+                    ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
+                    ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
+                    ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
+                    ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
+                    ->withAction('modificar');
+            } else {
+                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                return redirect()->back();
+            }
         }
     }
 
