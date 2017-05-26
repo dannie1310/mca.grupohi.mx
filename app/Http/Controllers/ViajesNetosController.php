@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transformers\ViajeNetoTransformer;
-use App\Models\Viaje;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -13,11 +12,9 @@ use App\Models\Material;
 use App\Models\Origen;
 use App\Models\Sindicato;
 use App\Models\Tiro;
-use App\Models\Transformers\ViajeNetoTransformer;
 use App\Models\ViajeNeto;
 use App\Models\Viajes\Viajes;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
 
