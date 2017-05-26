@@ -83,9 +83,10 @@ class HistoricoController extends Controller
     }
     public function empresas($id){
 
-        $encabezado = ["ID", "Razón Social", "RFC", "Estatus", "Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $row = Empresa::
-        leftJoin("igh.usuario as usuario_reg", "empresas.usuario_registro", "=", "usuario_reg.idusuario")
+        $encabezado = ["#", "ID", "Razón Social", "RFC", "Estatus", "Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')
+            ->table('empresas_historicos as empresas')
+            ->leftJoin("igh.usuario as usuario_reg", "empresas.usuario_registro", "=", "usuario_reg.idusuario")
             ->leftJoin("igh.usuario as usuario_elim", "empresas.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select("empresas.IdEmpresa as id", "empresas.razonSocial", "empresas.RFC", "empresas.Estatus",
                 DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
@@ -93,38 +94,52 @@ class HistoricoController extends Controller
                 DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
                 "empresas.updated_at",
                 "empresas.motivo"
-            )->where('IdEmpresa','=',$id)
+            )->where('empresas.IdEmpresa','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
 
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
+
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'EMPRESAS'];
+        return view('historico', $data);
     }
+
     public function etapasproyectos($id){
 
-        $encabezado = ["ID", "Descripción", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Etapa::
-        leftJoin("igh.usuario as usuario_reg", "etapasproyectos.usuario_registro", "=", "usuario_reg.idusuario")
+        $encabezado = ["#", "ID", "Descripción", "Estatus","Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('etapasproyectos_historicos as etapasproyectos')
+            ->leftJoin("igh.usuario as usuario_reg", "etapasproyectos.usuario_registro", "=", "usuario_reg.idusuario")
             ->leftJoin("igh.usuario as usuario_elim", "etapasproyectos.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select("IdEtapaProyecto", "Descripcion", "Estatus",
                 DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
                 "etapasproyectos.created_at",
                 DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
                 "etapasproyectos.updated_at",
-                "etapasproyectos.motivo")->where('IdEtapaProyecto','=',$id)
+                "etapasproyectos.motivo")->where('etapasproyectos.IdEtapaProyecto','=',$id)
             ->get();
 
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
-
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'ETAPAS DEL PROYECTO'];
+        return view('historico', $data);
     }
+
     public function factorabundamiento($id){
-
-
-
-
     }
     public function factorabundamiento_material($id){
 
@@ -148,8 +163,9 @@ class HistoricoController extends Controller
     }
     public function impresoras($id){
 
-        $encabezado = ["ID", "MAC Address", "Marca", "Modelo", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Impresora::leftjoin('igh.usuario as user_registro', 'impresoras.registro', '=', 'user_registro.idusuario')
+        $encabezado = ["#", "ID", "MAC Address", "Marca", "Modelo", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('impresoras_historicos as impresoras')
+            ->leftjoin('igh.usuario as user_registro', 'impresoras.registro', '=', 'user_registro.idusuario')
             ->leftjoin('igh.usuario as user_elimino', 'impresoras.elimino', '=', 'user_elimino.idusuario')
             ->select(
                 "impresoras.id",
@@ -161,35 +177,54 @@ class HistoricoController extends Controller
                 "impresoras.created_at",
                 DB::raw("CONCAT(user_elimino.nombre, ' ', user_elimino.apaterno, ' ', user_elimino.amaterno)"),
                 "impresoras.updated_at",
-                "impresoras.motivo")->where('id','=',$id)->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+                "impresoras.motivo")->where('impresoras.id','=',$id)->get();
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'IMPRESORAS'];
+        return view('historico', $data);
     }
+
     public function marcas($id){
 
-        $encabezado = ["ID", "Descripción", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $encabezado = ["#", "ID", "Descripción", "Estatus","Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
 
-        $rows = Marca::leftJoin("igh.usuario as usuario_reg", "marcas.usuario_registro", "=", "usuario_reg.idusuario")
+        $rows = DB::connection('sca')->table('marcas_historicos as marcas')
+            ->leftJoin("igh.usuario as usuario_reg", "marcas.usuario_registro", "=", "usuario_reg.idusuario")
             ->leftJoin("igh.usuario as usuario_elim", "marcas.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select("IdMarca", "Descripcion", "Estatus",
                 DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
                 "marcas.created_at",
                 DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
                 "marcas.updated_at",
-                "marcas.motivo")->where('IdMarca','=',$id)
+                "marcas.motivo")->where('marcas.IdMarca','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
-
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'MARCAS'];
+        return view('historico', $data);
     }
+
     public function materiales($id){
 
-        $encabezado = ["ID", "Descripción", "Estatus", "Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Material::leftJoin('igh.usuario as user_registro', 'materiales.usuario_registro', '=', 'user_registro.idusuario')
+        $encabezado = ["#", "ID", "Descripción", "Estatus", "Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('materiales_historicos as materiales')
+            ->leftJoin('igh.usuario as user_registro', 'materiales.usuario_registro', '=', 'user_registro.idusuario')
             ->leftJoin('igh.usuario as user_desactivo', 'materiales.usuario_desactivo', '=', 'user_desactivo.idusuario')
             ->select(
                 "IdMaterial",
@@ -200,18 +235,26 @@ class HistoricoController extends Controller
                 DB::raw("CONCAT(user_desactivo.nombre, ' ', user_desactivo.apaterno, ' ', user_desactivo.amaterno)"),
                 DB::raw("IF(materiales.Estatus = 1, '', materiales.updated_at)"),
                 "materiales.motivo"
-            )->where('IdMaterial','=',$id)
+            )->where('materiales.IdMaterial','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
-
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'MATERIALES'];
+        return view('historico', $data);
     }
+
     public function operadores($id){
-        $encabezado = ["ID", "Nombre", "Dirección", "Número de Licencia", "Vigencia de Licencia", "Fecha Registro", "Fecha de Baja", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Operador::
-        leftJoin("igh.usuario as usuario_reg", "operadores.usuario_registro", "=", "usuario_reg.idusuario")
+        $encabezado = ["#", "ID", "Nombre", "Dirección", "Número de Licencia", "Vigencia de Licencia", "Fecha Registro", "Fecha de Baja", "Estatus","Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('operadores_historicos as operadores')
+            ->leftJoin("igh.usuario as usuario_reg", "operadores.usuario_registro", "=", "usuario_reg.idusuario")
             ->leftJoin("igh.usuario as usuario_elim", "operadores.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select(
                 "operadores.IdOperador", "operadores.Nombre",
@@ -221,15 +264,22 @@ class HistoricoController extends Controller
                 "operadores.created_at",
                 DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
                 "operadores.updated_at",
-                "operadores.motivo")->where('IdOperador','=',$id)
+                "operadores.motivo")->where('operadores.IdOperador','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
-
-
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'OPERADORES'];
+        return view('historico', $data);
     }
+
     public function origenes($id){
 
         $encabezado = ["Clave", "Tipo", "Descripción", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
@@ -296,7 +346,7 @@ class HistoricoController extends Controller
     }
     public function sindicatos($id){
 
-        $encabezado = ["ID", "Descripción", "Nombre Corto", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $encabezado = ["ID", "Descripción", "Nombre Corto", "Estatus","Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
         $rows = Sindicato:: leftJoin("igh.usuario as usuario_reg", "sindicatos.usuario_registro", "=", "usuario_reg.idusuario")
             ->leftJoin("igh.usuario as usuario_elim", "sindicatos.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select("IdSindicato", "Descripcion", "NombreCorto", "Estatus",
@@ -405,7 +455,7 @@ class HistoricoController extends Controller
 
     public function tarifas_peso($id)
     {
-        $headers = ["ID", "Material", "Primer KM", "KM Subsecuente", "KM Adicional", "Fecha y Hora Registro", "Estatus", "Registro"];
+        $headers = ["ID", "Material", "Primer KM", "KM Subsecuente", "KM Adicional", "Fecha y Hora Registro", "Estatus", "Registró"];
         $items = TarifaPeso::leftJoin('materiales', 'tarifas_peso.IdMaterial', '=', 'materiales.IdMaterial')
             ->leftJoin('igh.usuario', 'tarifas_peso.Registra', '=', 'igh.usuario.idusuario')
             ->select(

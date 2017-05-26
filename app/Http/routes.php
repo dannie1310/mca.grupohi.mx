@@ -264,3 +264,9 @@ Route::get('checkpermission/{permission}', 'UserController@checkpermission');
 
 
 Route::get('historico/camiones/{id}', 'HistoricoController@camiones');
+Route::get('historico/empresas/{id}', 'HistoricoController@empresas');
+Route::get('historico/etapas/{id}', 'HistoricoController@etapasproyectos');
+Route::get('historico/impresoras/{id}', 'HistoricoController@impresoras');
+Route::get('historico/marcas/{id}', 'HistoricoController@marcas');
+Route::get('historico/materiales/{id}', 'HistoricoController@materiales');
+Route::get('historico/operadores/{id}', 'HistoricoController@operadores');

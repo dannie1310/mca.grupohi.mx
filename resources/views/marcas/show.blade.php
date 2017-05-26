@@ -3,8 +3,11 @@
 @section('content')
 <h1>{{ $marca->Descripcion }}
     @permission('editar-marcas')
-    <a href="{{ route('marcas.edit', $marca) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
+    <a style="margin-left: 5px" href="{{ route('marcas.edit', $marca) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
     @endpermission
+    <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
+        Historico
+    </button>
 </h1>
 {!! Breadcrumbs::render('marcas.show', $marca) !!}
 <hr>
@@ -21,4 +24,21 @@
     {!! link_to_route('marcas.index', 'Regresar', [],  ['class' => 'btn btn-info'])!!}
 </div>
 {!! Form::close() !!}
+<div id="modal_historico">
+</div>
 @stop
+@section('scripts')
+    <script>
+        $('#ver_historico').off().on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: App.host + '/historico/marcas/{{$marca->IdMarca}}',
+                success: function (response) {
+                    $('#modal_historico').html(response);
+                    $('#historicoModal').modal('show');
+                }
+            })
+        });
+    </script>
+@endsection
