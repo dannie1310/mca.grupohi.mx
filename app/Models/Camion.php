@@ -65,6 +65,10 @@ class Camion extends Model
     public function imagenes() {
         return $this->hasMany(ImagenCamion::class, 'IdCamion')->where('Estatus', '=', 1);
     }
+
+    public function imagenes_hist() {
+        return $this->hasMany(ImagenCamion::class, 'IdCamion');
+    }
     
     public function empresa() {
         return $this->belongsTo(Empresa::class, 'IdEmpresa');

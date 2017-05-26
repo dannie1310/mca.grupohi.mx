@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use App\Models\ImagenCamion;
 use Laracasts\Flash\Flash;
 use App\Models\Empresa;
+use Illuminate\Support\Facades\DB;
 
 class CamionesController extends Controller
 {
@@ -148,12 +149,32 @@ class CamionesController extends Controller
             //$ruta = ImagenCamion::baseDir().'/'.$nombre;
 
             $imagen = $camion->imagenes->where('TipoC', $tipoC)->first();
-            
+            $imagenes = $camion->imagenes_hist->where('TipoC', $tipoC);
+
+
             if($imagen) {
-                $imagen->Estatus = 0;
-                $imagen->save();
-            } 
-            
+
+                foreach ($imagenes as $imagen_hist ) {
+                    $idCamion = $imagen_hist->IdCamion;
+                    $insert = DB::connection('sca')->table('camiones_imagenes_historicos')->insert([
+                        'IdCamion' => $imagen_hist->IdCamion,
+                        'TipoC' => $imagen_hist->TipoC,
+                        'Imagen' => $imagen_hist->Imagen,
+                        'Tipo' => $imagen_hist->Tipo,
+                        'Ruta' => $imagen_hist->Ruta,
+                        'Estatus' => $imagen_hist->Estatus,
+                        'Usuario' => auth()->user()->idusuario
+                    ]);
+                }
+
+                $delete = DB::connection('sca')->table('camiones_imagenes')
+                    ->where('IdCamion', $idCamion)
+                    ->where('TipoC', $tipoC)->delete();
+
+               // $imagen->save();
+            }
+
+
             ImagenCamion::create([
                 'IdCamion' => $camion->IdCamion,
                 'TipoC' => $tipoC,
