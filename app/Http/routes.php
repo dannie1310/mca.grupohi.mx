@@ -270,3 +270,8 @@ Route::get('historico/impresoras/{id}', 'HistoricoController@impresoras');
 Route::get('historico/marcas/{id}', 'HistoricoController@marcas');
 Route::get('historico/materiales/{id}', 'HistoricoController@materiales');
 Route::get('historico/operadores/{id}', 'HistoricoController@operadores');
+Route::get('historico/tiros/{id}', 'HistoricoController@tiros');
+Route::get('historico/telefonos/{id}', 'HistoricoController@telefonos');
+Route::get('historico/sindicatos/{id}', 'HistoricoController@sindicatos');
+Route::get('historico/rutas/{id}', 'HistoricoController@rutas');
+Route::get('historico/origenes/{id}', 'HistoricoController@origenes');

@@ -282,9 +282,9 @@ class HistoricoController extends Controller
 
     public function origenes($id){
 
-        $encabezado = ["Clave", "Tipo", "Descripción", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $encabezado = ["#","Clave", "Tipo", "Descripción", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
 
-        $rows = Origen::
+        $rows = DB::connection('sca')->table('origenes_historicos as origenes')->
         leftJoin('igh.usuario as user_registro', 'origenes.usuario_registro', '=', 'user_registro.idusuario')
             ->leftJoin('igh.usuario as user_desactivo', 'origenes.usuario_desactivo', '=', 'user_desactivo.idusuario')
             ->leftJoin('tiposorigenes', 'origenes.IdTipoOrigen', '=', 'tiposorigenes.IdTipoOrigen')
@@ -299,9 +299,19 @@ class HistoricoController extends Controller
                 DB::raw("IF(origenes.Estatus = 1, '', origenes.updated_at)"),
                 "origenes.motivo")->where('IdOrigen','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
+
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'ORIGENES'];
+
+        return view('historico', $data);
 
 
     }
@@ -313,8 +323,8 @@ class HistoricoController extends Controller
     }
     public function rutas($id){
 
-        $encabezado = ['Clave', 'Origen', 'Tiro', 'Tipo de Ruta', '1er. KM', 'KM Subsecuentes', 'KM Adicionales', 'KM Total', 'Tiempo Minimo', 'Tiempo Tolerancia', "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Ruta::leftJoin('origenes', 'rutas.IdOrigen', '=', 'origenes.IdOrigen')
+        $encabezado = ['#','Clave', 'Origen', 'Tiro', 'Tipo de Ruta', '1er. KM', 'KM Subsecuentes', 'KM Adicionales', 'KM Total', 'Tiempo Minimo', 'Tiempo Tolerancia', "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('rutas_historicos as rutas')->leftJoin('origenes', 'rutas.IdOrigen', '=', 'origenes.IdOrigen')
             ->leftJoin('tiros', 'rutas.IdTiro', '=', 'tiros.IdTiro')
             ->leftJoin('tipo_ruta', 'rutas.IdTipoRuta', '=', 'tipo_ruta.IdTipoRuta')
             ->leftJoin('cronometrias', 'rutas.IdRuta', '=', 'cronometrias.IdRuta')
@@ -338,16 +348,25 @@ class HistoricoController extends Controller
                 DB::raw("IF(rutas.Estatus = 1, '', rutas.updated_at)"),
                 "rutas.motivo")->where('IdRuta','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'RUTAS'];
+
+        return view('historico', $data);
 
     }
     public function sindicatos($id){
 
-        $encabezado = ["ID", "Descripción", "Nombre Corto", "Estatus","Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Sindicato:: leftJoin("igh.usuario as usuario_reg", "sindicatos.usuario_registro", "=", "usuario_reg.idusuario")
+        $encabezado = ["#","ID", "Descripción", "Nombre Corto", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows =DB::connection('sca')->table('sindicatos_historicos as sindicatos')->leftJoin("igh.usuario as usuario_reg", "sindicatos.usuario_registro", "=", "usuario_reg.idusuario")
             ->leftJoin("igh.usuario as usuario_elim", "sindicatos.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select("IdSindicato", "Descripcion", "NombreCorto", "Estatus",
                 DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
@@ -356,15 +375,24 @@ class HistoricoController extends Controller
                 "sindicatos.updated_at",
                 "sindicatos.motivo")->where('IdSindicato','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'SINDICATOS'];
+
+        return view('historico', $data);
 
     }
     public function telefonos($id){
-        $encabezado = ["ID", "IMEI Teléfono", "Linea Telefónica", "Marca", "Modelo", "Estatus", "Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Telefono::leftjoin('igh.usuario as user_registro', 'telefonos.registro', '=', 'user_registro.idusuario')
+        $encabezado = ["#","ID", "IMEI Teléfono", "Linea Telefónica", "Marca", "Modelo", "Estatus", "Registró", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('telefonos_historicos as telefonos')->leftjoin('igh.usuario as user_registro', 'telefonos.registro', '=', 'user_registro.idusuario')
             ->leftjoin('igh.usuario as user_elimino', 'telefonos.elimino', '=', 'user_elimino.idusuario')
             ->select(
                 "telefonos.id",
@@ -379,17 +407,26 @@ class HistoricoController extends Controller
                 "telefonos.updated_at",
                 "telefonos.motivo")->where('id','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
 
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'TELEFONOS'];
+
+        return view('historico', $data);
 
 
     }
     public function tiros($id){
 
-        $encabezado = ["Clave", "Descripción", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
-        $rows = Tiro::
+        $encabezado = ["#","Clave", "Descripción", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $rows = DB::connection('sca')->table('tiros_historicos as tiros')->
         leftJoin('igh.usuario as user_registro', 'tiros.usuario_registro', '=', 'user_registro.idusuario')
             ->leftJoin('igh.usuario as user_desactivo', 'tiros.usuario_desactivo', '=', 'user_desactivo.idusuario')
             ->select(
@@ -402,10 +439,20 @@ class HistoricoController extends Controller
                 DB::raw("IF(tiros.Estatus = 1, '', tiros.updated_at)"),
                 "tiros.motivo")->where('IdTiro','=',$id)
             ->get();
-        $data=['encabezado'=>$encabezado,'rows'=>$rows];
-        return view('historico.Historico')
-            ->with('data',$data);
 
+        $datos = [];
+        foreach($rows as $key => $row) {
+            $array = (array) $row;
+            $arr = [];
+            foreach($array as $i => $a) {
+                array_push($arr, $a);
+            }
+            array_push($datos, $arr);
+        }
+
+        $data =['headers'=>$encabezado,'rows'=>$datos, 'catalogo' => 'TIROS'];
+
+        return view('historico', $data);
 
     }
     public function tarifas($id){

@@ -195,10 +195,6 @@ Breadcrumbs::register('operadores.edit', function($breadcrumbs, $operador){
 Breadcrumbs::register('centroscostos.index', function($breadcrumbs){
     $breadcrumbs->push('CENTROS DE COSTO', route('centroscostos.index'));
 });
-Breadcrumbs::register('centroscostos.show', function ($breadcrumbs, $centro) {
-    $breadcrumbs->parent('centroscostos.index');
-    $breadcrumbs->push($centro->IdCentroCosto, route('centroscostos.show', $centro));
-});
 
 //Origenes por Usuario
 Breadcrumbs::register('origenes_usuarios.index', function($breadcrumbs){
@@ -415,4 +411,21 @@ Breadcrumbs::register('usuario_proyecto.edit', function ($breadcrumbs) {
 Breadcrumbs::register('usuario_proyecto.create', function ($breadcrumbs) {
     $breadcrumbs->parent('usuario_proyecto.index');
     $breadcrumbs->push('NUEVO USUARIO', route('usuario_proyecto.create'));
+});    
+Breadcrumbs::register('solicitud-reactivacion.index', function($breadcrumbs) {
+    $breadcrumbs->push('LISTA DE SOLICITUDES', route('solicitud-reactivacion.index'));
+});
+
+Breadcrumbs::register('solicitud-reactivacion.show', function ($breadcrumbs, $solicitud) {
+    $breadcrumbs->parent('solicitud-reactivacion.index');
+    $breadcrumbs->push($solicitud->Economico, route('solicitud-reactivacion.show', $solicitud));
+});
+
+Breadcrumbs::register('solicitud-actualizacion.index', function($breadcrumbs) {
+    $breadcrumbs->push('LISTA DE SOLICITUDES', route('solicitud-actualizacion.index'));
+});
+
+Breadcrumbs::register('solicitud-actualizacion.show', function ($breadcrumbs, $solicitud) {
+    $breadcrumbs->parent('solicitud-actualizacion.index');
+    $breadcrumbs->push($solicitud->Economico, route('solicitud-actualizacion.show', $solicitud));
 });

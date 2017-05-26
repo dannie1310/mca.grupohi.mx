@@ -96,9 +96,9 @@ class CorteController extends Controller
         if($corte->estatus == 1) {
             return view('cortes.edit')
                 ->withCorte($corte)
-                ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
-                ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
-                ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'));
+                ->withOrigenes(Origen::where("origenes.Estatus","=","1")->orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
+                ->withTiros(Tiro::where("tiros.Estatus","=","1")->orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
+                ->withMateriales(Material::where("materiales.Estatus","=","1")->orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'));
         } else if($corte->estatus == 2) {
             return redirect()->route('corte.show', $corte);
         }
