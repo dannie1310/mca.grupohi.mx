@@ -18,7 +18,7 @@
     <div class="form-group">
         {!! Form::label('RFC', 'RFC', ['class' => 'control-label col-sm-3']) !!}
         <div class="col-sm-9">
-            {!! Form::text('RFC', null, ['class' => 'form-control', 'placeholder' => 'RFC...']) !!}
+            {!! Form::text('RFC', null, ['class' => 'form-control','placeholder'=>'AAAA999999XXX']) !!}
         </div>
     </div>
     <div class="form-group">
