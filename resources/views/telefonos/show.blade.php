@@ -4,7 +4,13 @@
         @permission('editar-telefonos')
         <a href="{{ route('telefonos.edit', $telefono) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> Editar</a>
         @endpermission
+        @permission('consultar-historico')
+        <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
+            Historico
+        </button>
+        @endpermission
     </h1>
+
     {!! Breadcrumbs::render('telefonos.show', $telefono) !!}
     <hr>
     <div class="panel panel-default">
@@ -24,4 +30,21 @@
             <li class="list-group-item"><strong>PERSONA QUE REGITRÓ:</strong> {{$telefono->user_registro->present()->nombreCompleto()}}</li>
         </ul>
     </div>
+    <div id="modal_historico">
+    </div>
+@endsection
+@section('scripts')
+    <script>
+        $('#ver_historico').off().on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: App.host + '/historico/telefonos/{{$telefono->id}}',
+                success: function (response) {
+                    $('#modal_historico').html(response);
+                    $('#historicoModal').modal('show');
+                }
+            })
+        });
+    </script>
 @endsection

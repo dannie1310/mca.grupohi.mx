@@ -264,7 +264,20 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
 });
 Route::resource('usuario_proyecto', 'UsuarioProyectoController');
 Route::get('checkpermission/{permission}', 'UserController@checkpermission');
-//Rutas de solicitud de Ractivación
-//Route::resource('solicitud-reactivacion','SolicitudReactivacionController@index')->name('solicitud-reactivacion.index');
+
+
+Route::get('historico/camiones/{id}', 'HistoricoController@camiones');
+Route::get('historico/empresas/{id}', 'HistoricoController@empresas');
+Route::get('historico/etapas/{id}', 'HistoricoController@etapasproyectos');
+Route::get('historico/impresoras/{id}', 'HistoricoController@impresoras');
+Route::get('historico/marcas/{id}', 'HistoricoController@marcas');
+Route::get('historico/materiales/{id}', 'HistoricoController@materiales');
+Route::get('historico/operadores/{id}', 'HistoricoController@operadores');
+Route::get('historico/tiros/{id}', 'HistoricoController@tiros');
+Route::get('historico/telefonos/{id}', 'HistoricoController@telefonos');
+Route::get('historico/sindicatos/{id}', 'HistoricoController@sindicatos');
+Route::get('historico/rutas/{id}', 'HistoricoController@rutas');
+Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
+
 Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
 Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');

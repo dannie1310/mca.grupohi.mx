@@ -32,7 +32,10 @@ class RolesPermisosController extends Controller
     public function init()
     {
        $usuarios=User_1::with('roles')->habilitados()->orderBy('nombre')->orderBy('apaterno')->orderBy('amaterno')->get();
-       $permisos=Permission::all();
+       $permisos=Permission::orderBy('display_name')->get();
+
+
+
        $roles=Role::with('perms')->orderBy('display_name')->get();
        $data = [
            'usuarios'=>UsuarioPerfilesTransformer::transform($usuarios),
@@ -118,7 +121,7 @@ class RolesPermisosController extends Controller
 
 
         $usuarios=User_1::with('roles')->habilitados()->orderBy('nombre')->orderBy('apaterno')->orderBy('amaterno')->get();
-        $permisos=Permission::all();
+        $permisos=Permission::orderBy('display_name')->get();
         $roles=Role::with('perms')->orderBy('display_name')->get();
         $data = [
             'usuarios'=>UsuarioPerfilesTransformer::transform($usuarios),
@@ -156,7 +159,7 @@ class RolesPermisosController extends Controller
             }
         }
         $usuarios=User_1::with('roles')->habilitados()->orderBy('nombre')->orderBy('apaterno')->orderBy('amaterno')->get();
-        $permisos=Permission::all();
+        $permisos=Permission::orderBy('display_name')->get();
         $roles=Role::with('perms')->orderBy('display_name')->get();
         $data = [
             'usuarios'=>UsuarioPerfilesTransformer::transform($usuarios),
