@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConfiguracionDiaria\Configuracion;
 use App\Models\Entrust\Role;
 use App\Models\Telefono;
 use App\User;
@@ -89,8 +90,11 @@ class UserRolesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
+     * @param $id_user
+     * @param $id_role
      * @return \Illuminate\Http\Response
+     * @internal param int $id
      */
     public function destroy(Request $request, $id_user, $id_role)
     {
@@ -103,6 +107,11 @@ class UserRolesController extends Controller
             if($telefono) {
                 $telefono->id_checador = null;
                 $telefono->save();
+            }
+
+            $configuracion = Configuracion::where('id_checador', '=', $id_user)->first();
+            if($configuracion) {
+                $configuracion->delete();
             }
 
             return response()->json([
