@@ -9,17 +9,27 @@
             <hr>
             <h3>BUSCAR VIAJES</h3>
             {!! Form::open(['class' => 'form_buscar']) !!}
+            <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="fecha" checked="checked">BUSCAR POR FECHA</label></h4>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>FECHA INICIAL</label>
+                        <label>FECHA INICIAL (*)</label>
                         <input class="form-control" type="text" name="FechaInicial" v-datepicker>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>FECHA FINAL</label>
+                        <label>FECHA FINAL (*)</label>
                         <input class="form-control" type="text" name="FechaFinal" v-datepicker>
+                    </div>
+                </div>
+            </div>
+            <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="codigo" > BUSCAR POR CÓDIGO</label></h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Ticket (Código) (*)</label>
+                        <input type="text" name="Codigo" class="form-control">
                     </div>
                 </div>
             </div>
@@ -29,6 +39,7 @@
                 <span v-else>Buscar</span>
                 </button>
             </div>
+            <p class="small">Los campos <strong>(*)</strong> son obligatorios.</p>
             {!! Form::close() !!}
             <span v-if="cargando">
                 <div class="text-center">
@@ -41,6 +52,7 @@
                     <table id="viajes_revertir" class="table table-hover small" v-tablefilter>
                         <thead>
                         <tr>
+                            <th>#</th>
                             <th>Fecha de Llegada</th>
                             <th>Hora de Llegada</th>
                             <th>Origen</th>
@@ -53,7 +65,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="viaje in viajes">
+                        <tr v-for="(viaje, index)  in viajes">
+                            <td>@{{ index + 1 }}</td>
                             <td>@{{ viaje.FechaLlegada }}</td>
                             <td>@{{ viaje.HoraLlegada }}</td>
                             <td>@{{ viaje.Origen  }}</td>

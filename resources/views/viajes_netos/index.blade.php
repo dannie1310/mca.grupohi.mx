@@ -160,7 +160,7 @@
                     
                     <div class="table-responsive ">
                         (P) Viaje en conflicto de tiempo pero con aprobación de pago registrada.
-                        <table class="table  table-striped table-bordered small">
+                        <table v-tablefilter id="viajes_netos_index_table" class="table  table-striped table-bordered small">
                             <thead>
                             <tr style="background-color: #f9f9f9">
                                 <th colspan="5" style="text-align: center">INFORMACIÓN GENERAL DEL VIAJE</th>
