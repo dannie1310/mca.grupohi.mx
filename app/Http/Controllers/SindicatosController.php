@@ -16,6 +16,9 @@ class SindicatosController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:desactivar-sindicatos', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-sindicatos', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-sindicatos', ['only' => ['create', 'store']]);
 
         parent::__construct();
     }
@@ -133,8 +136,9 @@ class SindicatosController extends Controller
             $text = '¡SINDICATO DESHABILITADO CORRECTAMENTE!';
         } else {
             $sindicato->Estatus = 1;
-            $sindicato->usuario_desactivo = auth()->user()->idusuario;
-            $sindicato->motivo = "";
+            $sindicato->usuario_registro = auth()->user()->idusuario;
+            $sindicato->usuario_desactivo = null;
+            $sindicato->motivo = null;
             $sindicato->created_at = date("Y-m-d H:i:s");
             $text = '¡SINDICATO HABILITADO CORRECTAMENTE!';
         }
