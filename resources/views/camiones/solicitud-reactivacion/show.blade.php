@@ -45,13 +45,13 @@
         </tr>
         <tr>
             <td><label>No Licnecia:</label></td>
-            <td><input type="text" class="form-control" value="{{ $camion->operador ? $camion->operador->NoLicencia:'' }}" disabled></td>
-            <td><input type="text" class="form-control" value="{{ $solicitud->operador ? $solicitud->operador->NoLicencia:''  }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $camion->operador->NoLicencia }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $solicitud->operador->NoLicencia  }}" disabled></td>
         </tr>
         <tr>
             <td><label>Vigencia:</label></td>
-            <td><input type="text" class="form-control" value="{{ $camion->operador ? $camion->operador->VigenciaLicencia:''  }}" disabled></td>
-            <td><input type="text" class="form-control" value="{{ $solicitud->operador ? $solicitud->operador->VigenciaLicencia:''  }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $camion->operador->VigenciaLicencia  }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $solicitud->operador->VigenciaLicencia  }}" disabled></td>
         </tr>
         <tr>
             <td colspan="3"><hr></td>
@@ -149,8 +149,9 @@
 
 
                     <div class="carousel-inner" role="listbox">
+                        <?php $x = 0; ?>
                         @foreach($camion->Imagenes as $imagen)
-                            <div class="item <?php if($imagen->TipoC == 'i')  echo 'active'; ?>">
+                            <div class="item <?php if($x == 0) { echo 'active'; $x=$x+1;} ?>">
                                 <img src="{{ 'data:image/png;base64,'.$imagen->Imagen }}" alt="...">
                                 <div class="carousel-caption">
                                     {{ $imagen->TipoC_string }}
@@ -188,8 +189,9 @@
 
                     <!-- Wrapper for slides -->
                     <div class="carousel-inner" role="listbox">
+                        <?php $x = 0; ?>
                         @foreach($solicitud->solicitudImagenes as $imagen)
-                            <div class="item <?php if($imagen->TipoC == 'i')  echo 'active'; ?>">
+                            <div class="item <?php if($x == 0) { echo 'active'; $x=$x+1;} ?>">
                                 <img src="{{ 'data:image/png;base64,'.$imagen->Imagen }}" alt="...">
                                 <div class="carousel-caption">
                                     {{ $imagen->tipoc_string }}
