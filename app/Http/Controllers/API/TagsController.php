@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Tags\TagModel;
+use App\Models\Empresa;
+use App\Models\Proyecto;
+use DB;
 
 class TagsController extends Controller
 {
@@ -15,6 +18,26 @@ class TagsController extends Controller
     public function __construct() {
 
         $this->middleware('jwt.auth');
+    }
+
+    public function lista($idusuario)
+    {
+
+        // Validación de que el usuario tiene permisos para utilizar el proyecto de regristro de Tags
+       $permisos = DB::table('sca_configuracion.permisos_alta_tag')
+                    ->whereRaw('(TIMESTAMP(vigencia) > NOW() OR vigencia is null)')
+                    ->where('idusuario',$idusuario )->get();
+        if(!$permisos){
+            return response()->json(['error' => 'No tiene los privilegios para dar de alta tags en los proyectos.', 'code' => 200], 200);
+        }
+
+        
+        $resp = response()->json(array_merge([
+            'proyectos' => Proyecto::select('id_proyecto', 'descripcion')->get()
+        ]
+        ));
+
+        return $resp;
     }
     /**
      * Display a listing of the resource.

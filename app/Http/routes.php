@@ -232,9 +232,12 @@ Route::get('detalle_configuracion', 'DetalleAdministracionController@index')->na
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', ['middleware' => 'cors'], function($api) {
 
-    // Rutas de API
+    // Autenticacion de las Api´s
     $api->post('authenticate', 'App\Http\Controllers\API\AuthController@authenticate');
+
+    // Rutas de API Registro de Tags
     $api->post('tags_nuevos/{usuario}', 'App\Http\Controllers\API\TagsController@store');
+    $api->get('tags_nuevos/{usuario}', 'App\Http\Controllers\API\TagsController@lista');
 
     //Authenticate Routes
     /*$api->post('authenticate', 'Ghi\Http\Controllers\Api\Auth\AuthController@authenticate');
