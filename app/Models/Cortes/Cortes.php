@@ -35,13 +35,13 @@ class Cortes
 
             $corte = $this->creaCorte();
 
-            $viajes_netos = ViajeNeto::corte()->whereRaw("CAST(CONCAT(FechaLlegada,' ',HoraLlegada) AS datetime) between '{$corte->timestamp_inicial}' and '{$corte->timestamp_final}'")
+            $viajes_netos = ViajeNeto::scopeCorte()->whereRaw("CAST(CONCAT(FechaLlegada,' ',HoraLlegada) AS datetime) between '{$corte->timestamp_inicial}' and '{$corte->timestamp_final}'")
                 ->orderBy('viajesnetos.IdViajeNeto', 'DESC')->get();
             foreach ($viajes_netos as $viaje_neto) {
                 CorteDetalle::create([
                     'id_viajeneto' => $viaje_neto->IdViajeNeto,
                     'id_corte' => $corte->id,
-                    'estatus' => 1,
+                    'estatus' => in_array($viaje_neto->Estatus, [20,21,22,29]) ? 2 : 1,
                     'id_usuario' => auth()->user()->idusuario
                 ]);
             }
@@ -165,7 +165,7 @@ class Cortes
                 ->update(['estatus' => 2]);
 
             DB::connection('sca')->commit();
-            return ['viaje_neto' => ViajeNeto::find($id_viajeneto)];
+            return ['viaje_neto' => ViajeNeto::scopeCorteEdit($id_corte)->where('viajesnetos.IdViajeNeto', '=', $id_viajeneto)->first()];
 
         } catch (\Exception $e) {
             DB::connection('sca')->rollback();

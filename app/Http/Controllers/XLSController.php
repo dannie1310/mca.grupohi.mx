@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Conciliacion\Conciliacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Laracasts\Flash\Flash;
 use App\Models\Conciliacion\ConciliacionDetalle;
@@ -100,9 +101,30 @@ class XLSController extends Controller
 
     public function conciliaciones()
     {
-        $conciliaciones = Conciliacion::all();
-        //dd($conciliaciones);
-//dd($conciliacion->viajes());
+        $conciliaciones = DB::connection('sca')->table('conciliacion')
+            ->leftJoin('empresas', 'conciliacion.idempresa', '=', 'empresas.IdEmpresa')
+            ->leftJoin('sindicatos', 'conciliacion.idsindicato', '=', 'sindicatos.IdSindicato')
+            ->select(
+                "conciliacion.*",
+                "empresas.RazonSocial as empresa",
+                "sindicatos.Descripcion as sindicato",
+                DB::raw("(SELECT count(idconciliacion_detalle) FROM conciliacion_detalle where idconciliacion = conciliacion.idconciliacion) as num_viajes"),
+                DB::raw("(select sum(CubicacionCamion) "
+                    . "from conciliacion as conc_vol "
+                    . "left join conciliacion_detalle on conc_vol.idconciliacion = conciliacion_detalle.idconciliacion "
+                    . "left join viajes on conciliacion_detalle.idviaje = viajes.IdViaje where conc_vol.idconciliacion = conciliacion.idconciliacion "
+                    . "and conciliacion_detalle.estado = 1 "
+                    . "group by conc_vol.idconciliacion limit 1) as volumen"),
+                DB::raw("IF(DATE_FORMAT(conciliacion.fecha_conciliacion, '%Y%m%d') <= ".Conciliacion::FECHA_HISTORICO." AND conciliacion.VolumenPagado > 0, 'Pendiente' , conciliacion.VolumenPagado) as volumen_pagado_alert"),
+                DB::raw("(select sum(Importe) "
+                    . "from conciliacion as conc_imp "
+                    . "left join conciliacion_detalle on conc_imp.idconciliacion = conciliacion_detalle.idconciliacion "
+                    . "left join viajes on conciliacion_detalle.idviaje = viajes.IdViaje where conc_imp.idconciliacion = conciliacion.idconciliacion "
+                    . "and conciliacion_detalle.estado = 1 "
+                    . "group by conc_imp.idconciliacion limit 1) as importe"),
+                DB::raw("IF(DATE_FORMAT(conciliacion.fecha_conciliacion, '%Y%m%d') <= ".Conciliacion::FECHA_HISTORICO." AND conciliacion.ImportePagado > 0, 'Pendiente' , conciliacion.ImportePagado) as importe_pagado_alert"),
+                DB::raw("IF(conciliacion.estado = 0, 'Generada', IF(conciliacion.estado = 1, 'Cerrada', IF(conciliacion.estado = 2, 'Aprobada', IF(conciliacion.estado < 0, 'Calcelada', '')))) as estado_str")
+            )->get();
 
         $now = Carbon::now();
         Excel::create('Conciliaciones'.'_'.$now->format("Y-m-d")."__".$now->format("h:i:s"), function($excel) use($conciliaciones) {
@@ -115,16 +137,15 @@ class XLSController extends Controller
                     $sheet->row($i, array(
                         $conciliacion->idconciliacion,
                         $conciliacion->Folio, 
-                        $conciliacion->fecha_conciliacion->format("d-m-Y"),
-                        
-                        ($conciliacion->empresa)?$conciliacion->empresa->razonSocial:'', 
-                        ($conciliacion->sindicato)?$conciliacion->sindicato->Descripcion:'', 
-                        count($conciliacion->viajes())
-                        , $conciliacion->volumen_f
-                    , $conciliacion->volumen_pagado_alert
-                    , $conciliacion->importe_f
-                    , $conciliacion->importe_pagado_alert
-                    ,    $conciliacion->estado_str
+                        $conciliacion->fecha_conciliacion,
+                        $conciliacion->empresa,
+                        $conciliacion->sindicato,
+                        $conciliacion->num_viajes,
+                        number_format($conciliacion->volumen, 2, ".", ","),
+                        is_numeric($conciliacion->volumen_pagado_alert) ? number_format($conciliacion->volumen_pagado_alert, 2, ".",",") : $conciliacion->volumen_pagado_alert,
+                        number_format($conciliacion->importe, 2, ".", ","),
+                        is_numeric($conciliacion->importe_pagado_alert) ? number_format($conciliacion->importe_pagado_alert, 2, ".",",") : $conciliacion->importe_pagado_alert,
+                        $conciliacion->estado_str
                     ));
                     $i++;
                 }
