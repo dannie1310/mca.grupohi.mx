@@ -11,14 +11,15 @@ use App\Models\Sindicato;
 use Illuminate\Support\Facades\Redirect;
 class SindicatosController extends Controller
 {
-    
-    function __construct() {
+
+    function __construct()
+    {
         $this->middleware('auth');
         $this->middleware('context');
-       
+
         parent::__construct();
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -26,11 +27,11 @@ class SindicatosController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return response()->json(Sindicato::all());
         }
         return view('sindicatos.index')
-                ->withSindicatos(Sindicato::all());
+            ->withSindicatos(Sindicato::all());
     }
 
     /**
@@ -46,7 +47,7 @@ class SindicatosController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateSindicatoRequest $request)
@@ -70,32 +71,32 @@ class SindicatosController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         return view('sindicatos.show')
-                ->withSindicato(Sindicato::findOrFail($id));
+            ->withSindicato(Sindicato::findOrFail($id));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         return view('sindicatos.edit')
-                ->withSindicato(Sindicato::findOrFail($id));
+            ->withSindicato(Sindicato::findOrFail($id));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\EditSindicatoRequest $request, $id)
@@ -109,7 +110,7 @@ class SindicatosController extends Controller
         }else{
         $sindicato = Sindicato::findOrFail($id);
         $sindicato->update($request->all());
-        
+
         Flash::success('¡SINDICATO ACTUALIZADO CORRECTAMENTE!');
         return redirect()->route('sindicatos.show', $sindicato);
         }
@@ -118,21 +119,27 @@ class SindicatosController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $sindicato = Sindicato::findOrFail($id);
-        if($sindicato->Estatus == 1) {
+        if ($sindicato->Estatus == 1) {
             $sindicato->Estatus = 0;
-            $text = '¡Sindicato Inhabilitado!';
+            $sindicato->usuario_desactivo = auth()->user()->idusuario;
+            $sindicato->motivo = $request->motivo;
+            $sindicato->updated_at = date("Y-m-d H:i:s");
+            $text = '¡SINDICATO DESHABILITADO CORRECTAMENTE!';
         } else {
             $sindicato->Estatus = 1;
-            $text = '¡Sindicato Habilitado!';
+            $sindicato->usuario_desactivo = auth()->user()->idusuario;
+            $sindicato->motivo = "";
+            $sindicato->created_at = date("Y-m-d H:i:s");
+            $text = '¡SINDICATO HABILITADO CORRECTAMENTE!';
         }
         $sindicato->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

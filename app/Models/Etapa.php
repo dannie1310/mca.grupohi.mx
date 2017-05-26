@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
-
+use App\User;
 class Etapa extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -22,5 +22,8 @@ class Etapa extends Model
 
     public function proyectoLocal() {
         return $this->belongsTo(ProyectoLocal::class, 'IdProyecto');
+    }
+    public function user_registro() {
+        return $this->belongsTo(User::class, 'usuario_registro', 'idusuario');
     }
 }

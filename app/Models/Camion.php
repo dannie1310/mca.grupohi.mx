@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
-
+use App\User;
 class Camion extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -103,5 +103,8 @@ class Camion extends Model
         }
 
         return $this;
+    }
+    public function user_registro() {
+        return $this->belongsTo(User::class, 'usuario_registro', 'idusuario');
     }
 }

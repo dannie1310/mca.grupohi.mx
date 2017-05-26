@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
-
+use App\User;
 class Empresa extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -32,5 +32,8 @@ class Empresa extends Model
 
     public function conciliaciones(){
         return $this->hasMany(Conciliacion::class, "idempresa", "IdEmpresa");
+    }
+    public function user_registro() {
+        return $this->belongsTo(User::class, 'usuario_registro', 'idusuario');
     }
 }
