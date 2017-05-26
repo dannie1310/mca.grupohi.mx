@@ -42,38 +42,70 @@ class ViajesNetosController extends Controller
             if ($request->get('action') == 'modificar') {
 
                 $data = [];
+                if($request->tipo_busqueda == 'fecha') {
+                    $this->validate($request, [
+                        'FechaInicial' => 'required|date_format:"Y-m-d"',
+                        'FechaFinal' => 'required|date_format:"Y-m-d"',
+                    ]);
 
-                $this->validate($request, [
-                    'FechaInicial' => 'required|date_format:"Y-m-d"',
-                    'FechaFinal' => 'required|date_format:"Y-m-d"',
-                ]);
+                    $viajes = ViajeNeto::porValidar()
+                        ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
+                        ->get();
 
-                $viajes = ViajeNeto::porValidar()
-                    ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
-                    ->get();
+                    foreach ($viajes as $viaje) {
+                        $data [] = [
+                            'IdViajeNeto' => $viaje->IdViajeNeto,
+                            'FechaLlegada' => $viaje->FechaLlegada,
+                            'Tiro' => $viaje->tiro->Descripcion,
+                            'IdTiro' => $viaje->tiro->IdTiro,
+                            'Camion' => $viaje->camion->Economico,
+                            'IdCamion' => $viaje->IdCamion,
+                            'HoraLlegada' => $viaje->HoraLlegada,
+                            'CubicacionCamion' => $viaje->CubicacionCamion,
+                            'Origen' => $viaje->origen->Descripcion,
+                            'IdOrigen' => $viaje->origen->IdOrigen,
+                            'Material' => $viaje->material->Descripcion,
+                            'IdMaterial' => $viaje->material->IdMaterial,
+                            'ShowModal' => false,
+                            'IdSindicato' => $viaje->IdSindicato,
+                            'IdEmpresa' => $viaje->IdEmpresa,
+                            'Sindicato' => (String)$viaje->sindicato,
+                            'Empresa' => (String)$viaje->empresa,
+                            'Codigo' => $viaje->Code
+                        ];
+                    }
+                } elseif ($request->tipo_busqueda == 'codigo') {
+                    $this->validate($request, [
+                        'Codigo' => 'required'
+                    ]);
 
-                foreach ($viajes as $viaje) {
-                    $data [] = [
-                        'IdViajeNeto' => $viaje->IdViajeNeto,
-                        'FechaLlegada' => $viaje->FechaLlegada,
-                        'Tiro' => $viaje->tiro->Descripcion,
-                        'IdTiro' => $viaje->tiro->IdTiro,
-                        'Camion' => $viaje->camion->Economico,
-                        'IdCamion' => $viaje->IdCamion,
-                        'HoraLlegada' => $viaje->HoraLlegada,
-                        'CubicacionCamion' => $viaje->CubicacionCamion,
-                        'Origen' => $viaje->origen->Descripcion,
-                        'IdOrigen' => $viaje->origen->IdOrigen,
-                        'Material' => $viaje->material->Descripcion,
-                        'IdMaterial' => $viaje->material->IdMaterial,
-                        'ShowModal' => false,
-                        'IdSindicato' => $viaje->IdSindicato,
-                        'IdEmpresa' => $viaje->IdEmpresa,
-                        'Sindicato' => (String)$viaje->sindicato,
-                        'Empresa' => (String)$viaje->empresa
-                    ];
+                    $viajes = ViajeNeto::porValidar()
+                        ->where('viajesnetos.Code', '=', $request->Codigo)
+                        ->get();
+
+                    foreach ($viajes as $viaje) {
+                        $data [] = [
+                            'IdViajeNeto' => $viaje->IdViajeNeto,
+                            'FechaLlegada' => $viaje->FechaLlegada,
+                            'Tiro' => $viaje->tiro->Descripcion,
+                            'IdTiro' => $viaje->tiro->IdTiro,
+                            'Camion' => $viaje->camion->Economico,
+                            'IdCamion' => $viaje->IdCamion,
+                            'HoraLlegada' => $viaje->HoraLlegada,
+                            'CubicacionCamion' => $viaje->CubicacionCamion,
+                            'Origen' => $viaje->origen->Descripcion,
+                            'IdOrigen' => $viaje->origen->IdOrigen,
+                            'Material' => $viaje->material->Descripcion,
+                            'IdMaterial' => $viaje->material->IdMaterial,
+                            'ShowModal' => false,
+                            'IdSindicato' => $viaje->IdSindicato,
+                            'IdEmpresa' => $viaje->IdEmpresa,
+                            'Sindicato' => (String)$viaje->sindicato,
+                            'Empresa' => (String)$viaje->empresa,
+                            'Codigo' => $viaje->Code
+                        ];
+                    }
                 }
-
             }else if($request->get('action') == 'detalle_conflicto'){
                 $id_conflicto = $request->get("id_conflicto");
                 $id_viaje = $request->get("id_viaje");
