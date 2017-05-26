@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Empresa;
 use Laracasts\Flash\Flash;
+use Illuminate\Support\Facades\Redirect;
 
 class EmpresasController extends Controller
 {
@@ -55,10 +56,17 @@ class EmpresasController extends Controller
      */
     public function store(Requests\CreateEmpresaRequest $request)
     {
-        $empresa = Empresa::create($request->all());
-        
-        Flash::success('¡EMPRESA REGISTRADA CORRECTAMENTE');
-        return redirect()->route('empresas.show', $empresa);
+        if(!preg_match('/^([A-ZÑ\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\d]{3}))?$/', $request->RFC))
+        {
+            Flash::error('El rfc tiene formato incorrecto.');
+            return Redirect::back()
+                ->withInput($request->input());
+
+        }else{
+            $empresa = Empresa::create($request->all());
+            Flash::success('¡EMPRESA REGISTRADA CORRECTAMENTE');
+            return redirect()->route('empresas.show', $empresa);
+        }
     }
 
     /**
@@ -94,11 +102,18 @@ class EmpresasController extends Controller
      */
     public function update(Requests\EditEmpresaRequest $request, $id)
     {
+        if(!preg_match('/^([A-ZÑ\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\d]{3}))?$/', $request->RFC))
+        {
+            Flash::error('El rfc tiene formato incorrecto.');
+            return Redirect::back()
+                ->withInput($request->input());
+
+        }else{
         $empresa = Empresa::findOrFail($id);
         $empresa->update($request->all());
         
         Flash::success('¡EMPRESA ACTUALIZADA CORRECTAMENTE!');
-        return redirect()->route('empresas.show', $empresa);
+        return redirect()->route('empresas.show', $empresa);}
     }
 
     /**
