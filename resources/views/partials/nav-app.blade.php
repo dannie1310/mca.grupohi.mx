@@ -45,16 +45,17 @@
     </ul>
   </li>
   @endif
-  @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']) || Auth::user()->can(['ingresar-viajes-manuales']) || Auth::user()->can(['autorizar-viajes-manuales']) || Auth::user()->can(['ingresar-viajes-manuales-completos']))
+  @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']) || Auth::user()->can(['ingresar-viajes-manuales']) || Auth::user()->can(['autorizar-viajes-manuales']) || Auth::user()->can(['ingresar-viajes-manuales-completos']) || Auth::user()->can(['consulta-viajes']))
   <li class="dropdown">
     <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
         Operación<span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-      @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']) || Auth::user()->can(['consulta-viajes']))
-      @if(Auth::user()->can(['consulta-viajes']))
+      
+        @if(Auth::user()->can(['consulta-viajes']))
         <li><a tabindex="-2" href="{{ route('viajes_netos.index') }}">Viajes</a></li>
         @endif
+        @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']))
         <li class="dropdown-submenu">
             <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Solicitudes para camiones</a> 
             <ul class="dropdown-menu">
@@ -106,7 +107,7 @@
         @if(Auth::user()->can(['consultar-cortes-checador']))
         <li><a href="{{ route('corte.index') }}">Corte de Checador</a> </li>
         @endif
-
+        @if(Auth::user()->can(['configuracion-diaria']))
         <li class="dropdown-submenu">
             <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Configuración Diaria</a>
             <ul class="dropdown-menu">
@@ -116,6 +117,7 @@
                 @endif
             </ul>
         </li>
+        @endif
     </ul>
   </li>
 @endif
