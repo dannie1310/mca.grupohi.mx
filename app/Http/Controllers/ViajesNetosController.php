@@ -2,31 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transformers\ViajeNetoCorteTransformer;
 use App\Models\Transformers\ViajeNetoTransformer;
-use App\Models\Viaje;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use App\Models\Camion;
+use App\Models\Empresa;
+use App\Models\Material;
+use App\Models\Origen;
+use App\Models\Sindicato;
+use App\Models\Tiro;
+use App\Models\ViajeNeto;
+use App\Models\Viajes\Viajes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
-use App\Models\ViajeNeto;
-use App\Models\Empresa;
-use App\Models\Sindicato;
-use App\Models\Origen;
-use App\Models\Tiro;
-use App\Models\Camion;
-use App\Models\Material;
-use App\Models\Viajes\Viajes;
 
 class ViajesNetosController extends Controller
 {
-    
+
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+
         parent::__construct();
     }
 
@@ -43,38 +41,70 @@ class ViajesNetosController extends Controller
             if ($request->get('action') == 'modificar') {
 
                 $data = [];
+                if($request->tipo_busqueda == 'fecha') {
+                    $this->validate($request, [
+                        'FechaInicial' => 'required|date_format:"Y-m-d"',
+                        'FechaFinal' => 'required|date_format:"Y-m-d"',
+                    ]);
 
-                $this->validate($request, [
-                    'FechaInicial' => 'required|date_format:"Y-m-d"',
-                    'FechaFinal' => 'required|date_format:"Y-m-d"',
-                ]);
+                    $viajes = ViajeNeto::porValidar()
+                        ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
+                        ->get();
 
-                $viajes = ViajeNeto::porValidar()
-                    ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
-                    ->get();
+                    foreach ($viajes as $viaje) {
+                        $data [] = [
+                            'IdViajeNeto' => $viaje->IdViajeNeto,
+                            'FechaLlegada' => $viaje->FechaLlegada,
+                            'Tiro' => $viaje->tiro->Descripcion,
+                            'IdTiro' => $viaje->tiro->IdTiro,
+                            'Camion' => $viaje->camion->Economico,
+                            'IdCamion' => $viaje->IdCamion,
+                            'HoraLlegada' => $viaje->HoraLlegada,
+                            'CubicacionCamion' => $viaje->CubicacionCamion,
+                            'Origen' => $viaje->origen->Descripcion,
+                            'IdOrigen' => $viaje->origen->IdOrigen,
+                            'Material' => $viaje->material->Descripcion,
+                            'IdMaterial' => $viaje->material->IdMaterial,
+                            'ShowModal' => false,
+                            'IdSindicato' => $viaje->IdSindicato,
+                            'IdEmpresa' => $viaje->IdEmpresa,
+                            'Sindicato' => (String)$viaje->sindicato,
+                            'Empresa' => (String)$viaje->empresa,
+                            'Codigo' => $viaje->Code
+                        ];
+                    }
+                } elseif ($request->tipo_busqueda == 'codigo') {
+                    $this->validate($request, [
+                        'Codigo' => 'required'
+                    ]);
 
-                foreach ($viajes as $viaje) {
-                    $data [] = [
-                        'IdViajeNeto' => $viaje->IdViajeNeto,
-                        'FechaLlegada' => $viaje->FechaLlegada,
-                        'Tiro' => $viaje->tiro->Descripcion,
-                        'IdTiro' => $viaje->tiro->IdTiro,
-                        'Camion' => $viaje->camion->Economico,
-                        'IdCamion' => $viaje->IdCamion,
-                        'HoraLlegada' => $viaje->HoraLlegada,
-                        'CubicacionCamion' => $viaje->CubicacionCamion,
-                        'Origen' => $viaje->origen->Descripcion,
-                        'IdOrigen' => $viaje->origen->IdOrigen,
-                        'Material' => $viaje->material->Descripcion,
-                        'IdMaterial' => $viaje->material->IdMaterial,
-                        'ShowModal' => false,
-                        'IdSindicato' => $viaje->IdSindicato,
-                        'IdEmpresa' => $viaje->IdEmpresa,
-                        'Sindicato' => (String)$viaje->sindicato,
-                        'Empresa' => (String)$viaje->empresa
-                    ];
+                    $viajes = ViajeNeto::porValidar()
+                        ->where('viajesnetos.Code', '=', $request->Codigo)
+                        ->get();
+
+                    foreach ($viajes as $viaje) {
+                        $data [] = [
+                            'IdViajeNeto' => $viaje->IdViajeNeto,
+                            'FechaLlegada' => $viaje->FechaLlegada,
+                            'Tiro' => $viaje->tiro->Descripcion,
+                            'IdTiro' => $viaje->tiro->IdTiro,
+                            'Camion' => $viaje->camion->Economico,
+                            'IdCamion' => $viaje->IdCamion,
+                            'HoraLlegada' => $viaje->HoraLlegada,
+                            'CubicacionCamion' => $viaje->CubicacionCamion,
+                            'Origen' => $viaje->origen->Descripcion,
+                            'IdOrigen' => $viaje->origen->IdOrigen,
+                            'Material' => $viaje->material->Descripcion,
+                            'IdMaterial' => $viaje->material->IdMaterial,
+                            'ShowModal' => false,
+                            'IdSindicato' => $viaje->IdSindicato,
+                            'IdEmpresa' => $viaje->IdEmpresa,
+                            'Sindicato' => (String)$viaje->sindicato,
+                            'Empresa' => (String)$viaje->empresa,
+                            'Codigo' => $viaje->Code
+                        ];
+                    }
                 }
-
             }else if($request->get('action') == 'detalle_conflicto'){
                 $id_conflicto = $request->get("id_conflicto");
                 $id_viaje = $request->get("id_viaje");
@@ -119,14 +149,14 @@ class ViajesNetosController extends Controller
                     }
 
                 }
-                
+
                 if($request->get("tipo_busqueda") == "fecha"){
                     $query = ViajeNeto::EnConflicto()->Fechas($fechas);
                 }else{
                     $query = ViajeNeto::EnConflicto()->Codigo($codigo);
                 }
 
-                
+
                 $viajes_netos = $query->get();
 
                 $data = ViajeNetoTransformer::transform($viajes_netos);
@@ -184,36 +214,36 @@ class ViajesNetosController extends Controller
                         ->where('viajesnetos.Code', '=', $request->Codigo)
                         ->get();
                     foreach($viajes as $viaje) {
-                    $data [] = [
-                        'Accion' => $viaje->valido() ? 1 : 0,
-                        'IdViajeNeto' => $viaje->IdViajeNeto,
-                        'FechaLlegada' => $viaje->FechaLlegada,
-                        'Tiro' => (String) $viaje->tiro,
-                        'Camion' => (String) $viaje->camion,
-                        'HoraLlegada' => $viaje->HoraLlegada,
-                        'Cubicacion' => $viaje->CubicacionCamion,
-                        'Origen' => (String )$viaje->origen,
-                        'IdOrigen' => $viaje->IdOrigen,
-                        'IdSindicato' => isset($viaje->IdSindicato) ? $viaje->IdSindicato : '',
-                        'IdEmpresa' => isset($viaje->IdEmpresa) ? $viaje->IdEmpresa : '',
-                        'Material' => (String) $viaje->material,
-                        'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
-                        'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
-                        'Code' => isset($viaje->Code) ? $viaje->Code : "",
-                        'Valido' => $viaje->valido(),
-                        'ShowModal' => false,
-                        'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
-                        'Estado' => $viaje->estado(),
-                        'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
-                        'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
-                        'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
-                        'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
-                        'Tara' => 0,
-                        'Bruto' => 0,
-                        'TipoTarifa' => 'm',
-                        'TipoFDA' => 'm',
-                        'Imagenes' => $viaje->imagenes
-                    ];}
+                        $data [] = [
+                            'Accion' => $viaje->valido() ? 1 : 0,
+                            'IdViajeNeto' => $viaje->IdViajeNeto,
+                            'FechaLlegada' => $viaje->FechaLlegada,
+                            'Tiro' => (String) $viaje->tiro,
+                            'Camion' => (String) $viaje->camion,
+                            'HoraLlegada' => $viaje->HoraLlegada,
+                            'Cubicacion' => $viaje->CubicacionCamion,
+                            'Origen' => (String )$viaje->origen,
+                            'IdOrigen' => $viaje->IdOrigen,
+                            'IdSindicato' => isset($viaje->IdSindicato) ? $viaje->IdSindicato : '',
+                            'IdEmpresa' => isset($viaje->IdEmpresa) ? $viaje->IdEmpresa : '',
+                            'Material' => (String) $viaje->material,
+                            'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
+                            'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
+                            'Code' => isset($viaje->Code) ? $viaje->Code : "",
+                            'Valido' => $viaje->valido(),
+                            'ShowModal' => false,
+                            'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
+                            'Estado' => $viaje->estado(),
+                            'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
+                            'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
+                            'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
+                            'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
+                            'Tara' => 0,
+                            'Bruto' => 0,
+                            'TipoTarifa' => 'm',
+                            'TipoFDA' => 'm',
+                            'Imagenes' => $viaje->imagenes
+                        ];}
                 }
             } else if ($request->get('action') == 'index') {
 
@@ -312,7 +342,7 @@ class ViajesNetosController extends Controller
                     'fecha'  => 'required|date_format:"Y-m-d"'
                 ]);
 
-                $viajes_netos = ViajeNeto::corte();
+                $viajes_netos = ViajeNeto::scopeCorte();
 
                 $turno_1 = $turno_2 = false;
                 foreach($request->get('turnos', []) as $turno) {
@@ -331,15 +361,15 @@ class ViajesNetosController extends Controller
 
                 if($turno_1 && $turno_2) {
                     $viajes_netos->where(function ($query) use ($timestamp_final_1, $timestamp_final_2, $timestamp_inicial_1, $timestamp_inicial_2){
-                        $query->whereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'")
-                            ->orWhereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
+                        $query->whereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'")
+                            ->orWhereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
                     });
                 } else if($turno_1 && ! $turno_2) {
-                    $viajes_netos->whereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'");
+                    $viajes_netos->whereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'");
                 } else if(! $turno_1 && $turno_2) {
-                    $viajes_netos->whereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
+                    $viajes_netos->whereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
                 }
-                $data = ViajeNetoTransformer::transform($viajes_netos->get());
+                $data = $viajes_netos->get();
             }
             return response()->json(['viajes_netos' => $data]);
         } else {
@@ -459,15 +489,15 @@ class ViajesNetosController extends Controller
 
                 return (new Viajes($data))->excel();
             } else
-            if ($request->get('action') == 'en_conflicto') {
-                return view('viajes_netos.index')
-                ->withAction('en_conflicto');
-                
-            }else{
-                return view('viajes_netos.index')
-                ->withAction('');
-            }
-            
+                if ($request->get('action') == 'en_conflicto') {
+                    return view('viajes_netos.index')
+                        ->withAction('en_conflicto');
+
+                }else{
+                    return view('viajes_netos.index')
+                        ->withAction('');
+                }
+
         }
     }
 
@@ -479,11 +509,11 @@ class ViajesNetosController extends Controller
     public function create(Request $request)
     {
         return view('viajes_netos.create')
-                ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
-                ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
-                ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
-                ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
-                ->withAction($request->get('action'));       
+            ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
+            ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
+            ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
+            ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
+            ->withAction($request->get('action'));
     }
 
     /**
@@ -523,22 +553,22 @@ class ViajesNetosController extends Controller
     {
         if($request->get('action') == 'validar') {
             return view('viajes_netos.edit')
-                    ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
-                    ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
-                    ->withAction('validar');
+                ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
+                ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
+                ->withAction('validar');
         } else if($request->get('action') == 'autorizar') {
             return view('viajes_netos.edit')
                 ->withViajes(ViajeNeto::registradosManualmente()->get())
                 ->withAction('autorizar');
         } else if($request->get('action') == 'modificar') {
             return view('viajes_netos.edit')
-                    ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
-                    ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
-                    ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
-                    ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
-                    ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
-                    ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
-                    ->withAction('modificar');
+                ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
+                ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
+                ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
+                ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
+                ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
+                ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
+                ->withAction('modificar');
         }
     }
 
@@ -550,23 +580,44 @@ class ViajesNetosController extends Controller
      */
     public function update(Request $request)
     {
-        if($request->get('type') == 'validar') {
-            $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-            return response()->json($viaje_neto->validar($request));
-        } else if($request->path() == 'viajes_netos/autorizar') {
-            $msg = ViajeNeto::autorizar($request->get('Estatus'));
-            Flash::success($msg);
-            return redirect()->back();
-        } else if($request->get('type') == 'modificar') {
+        try {
+            DB::connection('sca')->beginTransaction();
 
-            $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-            return response()->json($viaje_neto->modificar($request));
-        }else if($request->get('type') == 'poner_pagable') {
-            
-            
-            $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-            return response()->json($viaje_neto->poner_pagable($request));
+
+
+            if($request->get('type') == 'validar') {
+                $cubicacionNva=$request['data']['Cubicacion'];
+                $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
+                if($cubicacionNva>$viaje_neto->CubicacionCamion){
+                    throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
+                }
+
+                return response()->json($viaje_neto->validar($request));
+            } else if($request->path() == 'viajes_netos/autorizar') {
+                $msg = ViajeNeto::autorizar($request->get('Estatus'));
+                Flash::success($msg);
+                return redirect()->back();
+            } else if($request->get('type') == 'modificar') {
+
+                $cubicacionNva=$request['data']['CubicacionCamion'];
+                $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
+                if($cubicacionNva>$viaje_neto->CubicacionCamion){
+                    throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
+                }
+                return response()->json($viaje_neto->modificar($request));
+            }else if($request->get('type') == 'poner_pagable') {
+
+
+                $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
+                return response()->json($viaje_neto->poner_pagable($request));
+            }
+            DB::connection('sca')->commit();
+        } catch (\Exception $e) {
+            DB::connection('sca')->rollback();
+            throw $e;
         }
+
+
     }
 
     /**

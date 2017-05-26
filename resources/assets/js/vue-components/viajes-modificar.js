@@ -43,21 +43,32 @@ Vue.component('viajes-modificar', {
                 var val_config = {
                     auto_filter: true,
                     watermark: [
-                        'Fecha Llegada', 
-                        'Tiro', 
+                        '#',
+                        'Fecha Llegada',
+                        'Hora Llegada',
+                        'Sindicato',
+                        'Empresa',
+                        'Origen',
+                        'Tiro',
                         'Camion', 
                         'Cubic.',
-                        'Material', 
-                        'Origen',
+                        'Material',
+                        'Código',
                         'Modificar'
                     ],
-                    col_0: 'select',
-                    col_1: 'select',
-                    col_2: 'select',
+                    col_0: 'none',
+                    col_1: 'input',
+                    col_2: 'input',
+                    col_3: 'select',
                     col_4: 'select',
                     col_5: 'select',
-                    col_6: 'none',
-                    
+                    col_6: 'select',
+                    col_7: 'select',
+                    col_8: 'input',
+                    col_9: 'select',
+                    col_10: 'input',
+                    col_11: 'none',
+
                     base_path: App.tablefilterBasePath,
                     paging: false,
                     rows_counter: false,
@@ -125,7 +136,8 @@ Vue.component('viajes-modificar', {
                         type: response.body.tipo,
                         title : '',
                         text: response.body.message,
-                        showConfirmButton: true
+                        showConfirmButton: true,
+                        html:true
                     });
 
                     viaje.CubicacionCamion = response.body.viaje.CubicacionCamion;
@@ -145,7 +157,12 @@ Vue.component('viajes-modificar', {
                 }, (error) => {
                     _this.guardando = false;
                     viaje.ShowModal = false;
-                    swal('¡Error!', App.errorsToString(error.body), 'error');
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.body),
+                        html: true
+                    });
                 });
             });
         },

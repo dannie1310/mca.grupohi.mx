@@ -60,6 +60,7 @@ Route::resource('etapas', 'EtapasController');
 
 //Rutas de centros de costo
 Route::get('centroscostos', 'CentrosCostosController@index')->name('centroscostos.index');
+Route::get('centroscostos/{centroscosto}', 'CentrosCostosController@show')->name('centroscostos.show');
 Route::post('centroscostos', 'CentrosCostosController@store')->name('centroscostos.store');
 Route::get('centroscostos/create/{IdPadre}', 'CentrosCostosController@create')->name('centroscostos.create');
 Route::get('centroscostos/{centroscostos}/edit', 'CentrosCostosController@edit')->name('centroscostos.edit');
@@ -263,3 +264,7 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
 });
 Route::resource('usuario_proyecto', 'UsuarioProyectoController');
 Route::get('checkpermission/{permission}', 'UserController@checkpermission');
+//Rutas de solicitud de Ractivación
+//Route::resource('solicitud-reactivacion','SolicitudReactivacionController@index')->name('solicitud-reactivacion.index');
+Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
+Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');

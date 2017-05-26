@@ -15,7 +15,10 @@ class EmpresasController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-empresas', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-empresas', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-empresas', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
 
@@ -47,7 +50,7 @@ class EmpresasController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateEmpresaRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateEmpresaRequest $request)
@@ -85,8 +88,8 @@ class EmpresasController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Requests\EditEmpresaRequest|Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\EditEmpresaRequest $request, $id)
@@ -104,18 +107,25 @@ class EmpresasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $empresa = Empresa::findOrFail($id);
         if($empresa->Estatus == 1) {
             $empresa->Estatus = 0;
-            $text = '¡Empresa Inhabilitada!';
+            $empresa->usuario_desactivo=auth()->user()->idusuario;
+            $empresa->motivo=$request->motivo;
+            $empresa->updated_at=date("Y-m-d H:i:s");
+            $text = '¡EMPRESA DESHABILITADA CORRECTAMENTE!';
         } else {
             $empresa->Estatus = 1;
-            $text = '¡Empresa Habilitada!';
+            $empresa->motivo=null;
+            $empresa->usuario_desactivo=null;
+            $empresa->usuario_registro=auth()->user()->idusuario;
+            $empresa->created_at=date("Y-m-d H:i:s");
+            $text = '¡EMPRESA DESHABILITADA CORRECTAMENTE!';
         }
         $empresa->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

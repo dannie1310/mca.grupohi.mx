@@ -15,7 +15,10 @@ class EtapasController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-etapas', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-etapas', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-etapas', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
     
@@ -43,7 +46,7 @@ class EtapasController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateEtapaRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateEtapaRequest $request)
@@ -88,8 +91,8 @@ class EtapasController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Requests\EditEtapaRequest|Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\EditEtapaRequest $request, $id)
@@ -107,18 +110,25 @@ class EtapasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $etapa = Etapa::findOrFail($id);
         if($etapa->Estatus == 1) {
             $etapa->Estatus = 0;
-            $text = '¡Etapa Inhabilitada!';
+            $etapa->usuario_desactivo=auth()->user()->idusuario;
+            $etapa->motivo=$request->motivo;
+            $etapa->updated_at=date("Y-m-d H:i:s");
+            $text = '¡ETAPA DESHABILITADA CORRECTAMENTE!';
         } else {
             $etapa->Estatus = 1;
-            $text = '¡Etapa Habilitada!';
+            $etapa->motivo=null;
+            $etapa->usuario_desactivo=null;
+            $etapa->usuario_registro=auth()->user()->idusuario;
+            $etapa->created_at=date("Y-m-d H:i:s");
+            $text = '¡ETAPA HABILITADA CORRECTAMENTE!';
         }
         $etapa->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

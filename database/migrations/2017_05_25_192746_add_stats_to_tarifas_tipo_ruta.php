@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddStatsToTiros extends Migration
+class AddStatsToTarifasTipoRuta extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class AddStatsToTiros extends Migration
      */
     public function up()
     {
-        Schema::table('tiros', function (Blueprint $table) {
+        Schema::table('tipo_ruta', function (Blueprint $table) {
             $table->integer('usuario_registro');
             $table->integer('usuario_desactivo')->nullable();
             $table->text('motivo')->nullable();
@@ -27,7 +27,7 @@ class AddStatsToTiros extends Migration
      */
     public function down()
     {
-        Schema::table('tiros', function (Blueprint $table) {
+        Schema::table('tipo_ruta', function (Blueprint $table) {
             $table->dropColumn(['usuario_registro', 'usuario_desactivo', 'motivo']);
             $table->dropTimestamps();
         });

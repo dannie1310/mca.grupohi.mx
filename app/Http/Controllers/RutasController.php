@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
 use Carbon\Carbon;
 use App\Models\Ruta;
@@ -68,6 +69,10 @@ class RutasController extends Controller
         $request->request->add(['IdProyecto' => $request->session()->get('id')]);
         $request->request->add(['usuario_registro' => auth()->user()->idusuario]);
 
+        if($existe = Ruta::where($request->only(['IdOrigen', 'IdTiro']))->first()) {
+            $errors = ['Ya existe una ruta para el Origen y Tiro seleccionados'];
+            return redirect()->back()->withErrors($errors);
+        }
         $ruta = Ruta::create($request->all());
         
         $cronometria = new Cronometria();

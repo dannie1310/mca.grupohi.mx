@@ -7,7 +7,8 @@
     </div> 
     <div class="modal-body" id="modal-body">
     {!! Form::model($centro, ['method' => 'PATCH', 'route' => ['centroscostos.update', $centro], 'files' => true, 'id' => 'centrocosto_update_form']) !!}
-      <div class="row">    
+      <input type="hidden" name="usuario_registro" value="{{ auth()->user()->idusuario }}">
+      <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             {!! Form::label('Descripcion', 'Descripción:', ['class' => 'label-control']) !!}

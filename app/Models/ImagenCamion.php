@@ -31,4 +31,20 @@ class ImagenCamion extends Model
         $extesion = $file->getClientOriginalExtension();
         return "{$name}.{$extesion}";        
     }
+    public function getTipoCStringAttribute(){
+        switch ($this->TipoC){
+            case 'i':
+                return 'Izquierda';
+                break;
+            case 'f':
+                return 'Frente';
+                break;
+            case 't':
+                return 'Atras';
+                break;
+            case 'd':
+                return 'Derecha';
+                break;
+        }
+    }
 }

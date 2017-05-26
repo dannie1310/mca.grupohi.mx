@@ -28,10 +28,8 @@ class CorteViajesController extends Controller
      */
     public function index($id_corte)
     {
-        $corte = Corte::find($id_corte);
-        $viajes_netos = $corte->viajes_netos();
-
-        return response()->json(['viajes_netos' => ViajeNetoCorteTransformer::transform($viajes_netos)]);
+        $viajes_netos = ViajeNeto::scopeCorteEdit($id_corte)->get();
+        return response()->json(['viajes_netos' => $viajes_netos]);
     }
 
     /**
@@ -82,28 +80,33 @@ class CorteViajesController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param $id_corte
-     * @param $id_viaje_neto
+     * @param $id_viajeneto
      * @return \Illuminate\Http\Response
+     * @internal param $id_viaje_neto
      * @internal param int $id
      */
     public function update(Request $request, $id_corte, $id_viajeneto)
     {
+
         if($request->action == 'revertir_modificaciones') {
             CorteCambio::where('id_viajeneto', $id_viajeneto)->delete();
-            DB::connection('sca')
-                ->table('corte_detalle')
-                ->where('id_corte', $id_corte)
-                ->where('id_viajeneto', $id_viajeneto)
-                ->update(['estatus' => 1]);
+            $viajeneto = ViajeNeto::find($id_viajeneto);
+            if(! in_array($viajeneto->Estatus, [20,21,22,29])) {
+                DB::connection('sca')
+                    ->table('corte_detalle')
+                    ->where('id_corte', $id_corte)
+                    ->where('id_viajeneto', $id_viajeneto)
+                    ->update(['estatus' => 1]);
+            }
 
             return response()->json([
-                'viaje_neto' => ViajeNetoCorteTransformer::transform(ViajeNeto::find($id_viajeneto)),
+                'viaje_neto' => ViajeNeto::scopeCorteEdit($id_corte)->where('viajesnetos.IdViajeNeto', '=', $id_viajeneto)->first(),
             ]);
         }
         if($request->action == 'confirmar') {
             $result = (new Cortes($request->all()))->confirmar_viaje($id_corte, $id_viajeneto);
             return response()->json([
-                'viaje_neto' => ViajeNetoCorteTransformer::transform($result['viaje_neto'])
+                'viaje_neto' => $result['viaje_neto']
             ]);
         }
 
@@ -118,7 +121,7 @@ class CorteViajesController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'viaje_neto' => ViajeNetoCorteTransformer::transform($result['viaje_neto'])
+                'viaje_neto' => $result['viaje_neto']
             ]);
         }
     }

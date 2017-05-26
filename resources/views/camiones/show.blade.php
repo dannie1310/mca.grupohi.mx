@@ -2,8 +2,9 @@
 
 @section('content')
 <h1>{{ $camion->present()->datosCamion }}
+    @permission('editar-camiones')
     <a href="{{ route('camiones.edit', $camion) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> EDITAR</a>
-    <a href="{{ route('camiones.destroy', $camion) }}" class="btn pull-right element_destroy {{ $camion->Estatus == 1 ? 'activo btn-danger' : 'inactivo btn-success' }}" style="margin-right: 5px"><i class="fa {{ $camion->Estatus == 1 ? 'fa-ban' : 'fa-check' }}"></i> {{ $camion->Estatus == 1 ? 'INHABILITAR' : 'HABILITAR' }}</a>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('camiones.show', $camion) !!}
 <hr>

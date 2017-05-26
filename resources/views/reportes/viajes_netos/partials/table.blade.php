@@ -1,119 +1,157 @@
-<div class="table-responsive">
-    <table class="table table-striped">
-        <tr>
-            <td colspan="32"><div align="right"><font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo 'FECHA DE CONSULTA '.date("d-m-Y")."/".date("H:i:s",time()); ?></font></div></td>
-        </tr>
-        <tr>
-            <td colspan="32"  align="center">
-                <div align="left">
-                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">VIAJES NETOS DEL PERIODO (</font>
-                    <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
-                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</font></div></td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td colspan="2"><font color="#000000" face="Trebuchet MS" style="font-size:12px; ">OBRA:</font>&nbsp;<font color="#666666" face="Trebuchet MS" style="font-size:12px; "><?php echo \App\Models\Proyecto::find(\App\Facades\Context::getId())->descripcion ?></font></td>
-        </tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<body>
+@if(count($data))
+<table width="1300" border="0" align="center" >
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2"><div align="right"><font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo 'FECHA DE CONSULTA '.date("d-m-Y")."/".date("H:i:s",time()); ?></font></div></td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2"  align="center">
+            <div align="left">
+                <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">VIAJES NETOS DEL PERÍODO (</font>
+                <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
+                <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</font></div></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2"><font color="#000000" face="Trebuchet MS" style="font-size:12px; ">OBRA:</font>&nbsp;<font color="#666666" face="Trebuchet MS" style="font-size:12px; "><?php echo \App\Models\Proyecto::find(\App\Facades\Context::getId())->descripcion ?></font></td>
+    </tr>
 
-        <tr>
-            <td colspan="2"><font color="#000000" face="Trebuchet MS" style="font-size:12px; ">FECHA:</font> &nbsp;<font color="#666666" face="Trebuchet MS" style="font-size:12px; "><?php echo date("d-m-Y"); ?></font></td>
-        </tr>
-    </table>
-</div>
-<hr/>
-<div class="table-responsive">
-    <table class="table table-striped table-hover small">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Creo Primer Toque</th>
-            <th>Creo Segundo Toque</th>
-            <th>Cubicaci&oacute;n Cami&oacute;n m<sup>3</sup></th>
-            <th>Cubicaci&oacute;n Viaje Neto m<sup>3</sup></th>
-            <th>Cubicaci&oacute;n Viaje m<sup>3</sup></th>
-            <th>Cami&oacute;n</th>
-            <th>Placas Cami&oacute;n</th>
-            <th>Placas Caja</th>
-            <th>Sindicato Camion</th>
-            <th>Sindicato Viaje</th>
-            <th>Empresa Viaje</th>
-            <th>Sindicato Conciliado</th>
-            <th>Empresa Conciliado</th>
-            <th>Fecha Llegada</th>
-            <th>Hora Llegada</th>
-            <th>Turno</th>
-            <th>D&iacute;a de aplicaci&oacute;n</th>
-            <th>Or&iacute;gen</th>
-            <th>Destino</th>
-            <th>Material</th>
-            <th>Tiempo</th>
-            <th>Ruta</th>
-            <th>Distancia (Km)</th>
-            <th>1er Km</th>
-            <th>Km Sub.</th>
-            <th>Km Adc.</th>
-            <th>Importe</th>
-            <th>Estatus</th>
-            <th>Ticket</th>
-            <th>Folio Conciliaci&oacute;n</th>
-            <th>Fecha Conciliaci&oacute;n</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($data as $key => $item)
-            <?php
-            $creo_1 = App\User::find($item->CreoPrimerToque) ? App\User::find($item->CreoPrimerToque)->present()->nombreCompleto : '';
-            $creo_2 = App\User::find($item->Creo) ? App\User::find($item->Creo)->present()->nombreCompleto : '';
-            $horaini = '07:00:00';
-            $horafin = '19:00:00';
-            $turno = ($item->Hora >= $horaini && $item->Hora < $horafin) ? 'Primer Turno' : 'Segundo Turno';
-            if($item->Hora >= '00:00:00' && $item->Hora < $horaini){
-                $fechaAplica = strtotime ( '-1 day' , strtotime ( $item->Fecha ) ) ;
-                $fechaAplica = date ( 'd-m-Y' , $fechaAplica );
-            }
-            else {
-                $fechaAplica = $item->Fecha;
-            }
-            ?>
-            <tr>
-                <td>{{ $key+1 }}</td>
-                <td>{{ $creo_1 }}</td>
-                <td>{{ $creo_2 }}</td>
-                <td>{{ $item->cubicacion }}</td>
-                <td>{{ $item->CubicacionViajeNeto }}</td>
-                <td>{{ $item->CubicacionViaje }}</td>
-                <td>{{ $item->Camion }}</td>
-                <td>{{ $item->placas }}</td>
-                <td>{{ $item->PlacasCaja }}</td>
-                <td>{{ $item->SindicatoCamion }}</td>
-                <td>{{ $item->Sindicato }}</td>
-                <td>{{ $item->Empresa }}</td>
-                <td>{{ $item->SindicatoConci }}</td>
-                <td>{{ $item->Empresaconci }}</td>
-                <td>{{ $item->Fecha }}</td>
-                <td>{{ $item->Hora }}</td>
-                <td>{{ $turno }}</td>
-                <td>{{ $fechaAplica }}</td>
-                <td>{{ $item->origen }}</td>
-                <td>{{ $item->Tiro }}</td>
-                <td>{{ $item->material }}</td>
-                <td>{{ $item->tiempo_mostrar }}</td>
-                <td>{{ $item->ruta }}</td>
-                <td>{{ $item->distancia }}</td>
-                <td>{{ number_format($item->tarifa_material_pk,2,".",",") }}</td>
-                <td>{{ number_format($item->tarifa_material_ks,2,".",",") }}</td>
-                <td>{{ number_format($item->tarifa_material_ka,2,".",",") }}</td>
-                <td>{{ number_format($item->ImporteTotal_M,2,".",",") }}</td>
-                <td>{{ $item->Estatus }}</td>
-                <td>{{ $item->code }}</td>
-                <td>{{ $item->idconciliacion }}</td>
-                <td>{{ $item->fecha_conciliacion }}</td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
-</div>
+    <tr>
+        <td colspan="2"><font color="#000000" face="Trebuchet MS" style="font-size:12px; ">FECHA:</font> &nbsp;<font color="#666666" face="Trebuchet MS" style="font-size:12px; "><?php echo date("d-m-Y"); ?></font></td>
+    </tr>
+    <tr>
+        <td colspan="2"><table width="2000" border="0" align="center" >
+                <tr>
+                    <td >&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="26">&nbsp;</td>
+                    <td colspan="3" bgcolor="969696">
+                        <div align="center">
+                            <font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Tarifa</font></font>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr bgcolor="#0A8FC7">
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">#</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Creo Primer Toque</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Creo Segundo Toque</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Cubicaci&oacute;n Cami&oacute;nm<sup>3</sup></font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Cubicaci&oacute;n Viaje Neto m<sup>3</sup></font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Cubicaci&oacute;n Viaje m<sup>3</sup></font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Cami&oacute;n</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Placas Cami&oacute;n</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Placas Caja</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Sindicato Camion</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Sindicato Viaje</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Empresa Viaje</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Sindicato Conciliado</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Empresa Conciliado</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Salida</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Hora Salida</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Llegada</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Hora Llegada</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Turno</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">D&iacute;a de aplicaci&oacute;n</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Or&iacute;gen</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Destino</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Material</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Tiempo</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Ruta</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Distancia (Km)</font></div></td>
+                    <td bgcolor="C0C0C0"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">1er Km </font></div></td>
+                    <td bgcolor="C0C0C0"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Km Sub. </font></div></td>
+                    <td bgcolor="C0C0C0"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Km Adc.</font></div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Importe</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Estatus</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Ticket</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Conciliaci&oacute;n</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Conciliaci&oacute;n</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Viajes en Conflicto</font> </div></td>
+                </tr>
+                @foreach($data as $key => $item)
+                    <?php
+                    if($item->Hora >= '00:00:00' && $item->Hora < '07:00:00'){
+                        $fechaAplica = strtotime ( '-1 day' , strtotime ( $item->Fecha ) ) ;
+                        $fechaAplica = date ( 'd-m-Y' , $fechaAplica );
+                    }
+                    else {
+                        $fechaAplica = $item->Fecha;
+                    }
+                    $dia = date('N',strtotime($item->Fecha));
+                //echo $dia;
+
+                if($item->Hora >= '00:00:00' && $item->Hora < '07:00:00'){
+                    $fechaAplica = strtotime ( '-1 day' , strtotime ( $item->Fecha ) ) ;
+                    $fechaAplica = date ( 'd-m-Y' , $fechaAplica );
+                }
+                else {
+                    $fechaAplica = $item->Fecha;
+                }
+                ?>
+                <tr <?php if($item->conflictos!=''): ?> style="background-color: #FCC" <?php endif; ?> >
+                    <td width="1"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $key + 1; ?></font></div></td>
+                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->primer_toque; ?></font></div></td>
+                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->segundo_toque; ?></font></div></td>
+                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->cubicacion; ?></font></div></td>
+                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->CubicacionViajeNeto; ?></font></div></td>
+                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->CubicacionViaje; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Camion; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->placas; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->PlacasCaja; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->SindicatoCamion; ?></font></div></td>
+                    <td width="70"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Sindicato; ?></font></div></td>
+                    <td width="150"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Empresa; ?></font></div></td>
+                    <td width="70"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->SindicatoConci; ?></font></div></td>
+                    <td width="150"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Empresaconci; ?></font></div></td>
+                    <td width="50"><div align="center"> <font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->FechaSalida; ?></font></div></td>
+                    <td width="50"><div align="center"> <font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->HoraSalida; ?></font></div></td>
+                    <td width="50"><div align="center"> <font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Fecha; ?></font></div></td>
+                    <td width="50"><div align="center"> <font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Hora; ?></font></div></td>
+                    <td width="70"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->turno; ?></font></div></td>
+                    <td width="60"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $fechaAplica; ?></font></div></td>
+                    <td width="40"><div align="center"> <font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->origen; ?></font></div></td>
+                    <td width="90"><div align="center"> <font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Tiro; ?></font></div></td>
+                    <td width="70"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->material; ?></font></div></td>
+                    <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->tiempo_mostrar; ?></font></div></td>
+                    <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->ruta; ?></font></div></td>
+                    <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->distancia; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->tarifa_material_pk,2,".",",");; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->tarifa_material_ks,2,".",",");; ?></font></div></td>
+                    <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->tarifa_material_ka,2,".",","); ?></font></div></td>
+                    <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->ImporteTotal_M,2,".",","); ?></font></div></td>
+                    <td width="80"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Estatus; ?></font></div></td>
+                    <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->code; ?></font></div></td>
+                    <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->idconciliacion; ?></font></div></td>
+                    <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->fecha_conciliacion; ?></font></div></td>
+                    <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->conflictos; ?></font></div></td>
+                </tr>
+                      @endforeach
+                    @else
+                            <table width="600" align="center" >
+                            <tr>
+                                <td class="Titulo">NO EXISTEN ACARREOS EJECUTADOS EN EL PERIODO: </td>
+                            </tr>
+                            <tr>
+                                <td class="Titulo">DEL:<span class="Estilo1"> <?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?> </span>AL: <span class="Estilo1"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</span></font></td>
+                            </tr>
+
+                            <tr>
+                                <td class="Titulo">&nbsp;</td>
+                            </tr>
+                        </table>
+    @endif
 </body>
 </html>

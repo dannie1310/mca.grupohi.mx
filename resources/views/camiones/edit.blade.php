@@ -7,6 +7,7 @@
 @include('partials.errors')
 
 {!! Form::model($camion, ['method' => 'PATCH', 'route' => ['camiones.update', $camion], 'files' => true, 'id' => 'edit_camion']) !!}
+<input type="hidden" name="usuario_registro" value="{{ auth()->user()->idusuario }}">
 <div class="id_camion" id='{{ $camion->IdCamion }}'></div>
 <div class="form-horizontal col-md-10 col-md-offset-1 rcorners">
     <fieldset>

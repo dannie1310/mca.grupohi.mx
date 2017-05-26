@@ -8,17 +8,27 @@
             <app-errors v-bind:form="form"></app-errors>
             <h3>BUSCAR VIAJES</h3>
             {!! Form::open(['class' => 'form_buscar']) !!}
+            <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="fecha" checked="checked">BUSCAR POR FECHA</label></h4>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>FECHA INICIAL</label>
+                        <label>FECHA INICIAL (*)</label>
                         <input type="text" name="FechaInicial" v-datepicker class="fecha form-control">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>FECHA FINAL</label>
+                        <label>FECHA FINAL (*)</label>
                         <input type="text" name="FechaFinal" v-datepicker class="fecha form-control">
+                    </div>
+                </div>
+            </div>
+            <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="codigo" > BUSCAR POR CÓDIGO</label></h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Ticket (Código) (*)</label>
+                        <input type="text" name="Codigo" class="form-control">
                     </div>
                 </div>
             </div>
@@ -28,6 +38,7 @@
                 <span v-else>Buscar</span>
                 </button>
             </div>
+            <p class="small">Los campos <strong>(*)</strong> son obligatorios.</p>
             {!! Form::close() !!}
 
             <hr>
@@ -42,8 +53,9 @@
                     <table id="viajes_netos_modificar" v-tablefilter class="table table-condensed table-bordered table-hover small">
                         <thead>
                             <tr>
+                                <th rowspan="2">#</th>
                                 <th rowspan="2">Fecha de Llegada</th>
-                                <th rowspan="2">HoraLlgada</th>
+                                <th rowspan="2">Hora Llegada</th>
                                 <th rowspan="2">Sindicato</th>
                                 <th rowspan="2">Empresa</th>
                                 <th rowspan="2">Origen</th>
@@ -51,11 +63,13 @@
                                 <th rowspan="2">Camión</th>
                                 <th rowspan="2">Cubic.</th>
                                 <th rowspan="2">Material</th>
+                                <th rowspan="2">Código</th>
                                 <th rowspan="2">Modificar</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="viaje in viajes_netos">
+                            <tr v-for="(viaje, index) in viajes_netos">
+                                <td>@{{ index + 1 }}</td>
                                 <td>@{{ viaje.FechaLlegada }}</td>
                                 <td>@{{ viaje.HoraLlegada }}</td>
                                 <td>@{{ viaje.Sindicato }}</td>
@@ -65,6 +79,7 @@
                                 <td>@{{ viaje.Camion }}</td>
                                 <td>@{{ viaje.CubicacionCamion }}</td>
                                 <td>@{{ viaje.Material }}</td>
+                                <td>@{{ viaje.Codigo }}</td>
 
                                 <td>
                                     <a id="show-modal" @click="showModal(viaje)">

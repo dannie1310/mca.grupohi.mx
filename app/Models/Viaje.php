@@ -102,8 +102,22 @@ class Viaje extends Model
         return $this->belongsTo(ViajeNeto::class, 'IdViajeNeto');
     }
 
-    public function scopeParaRevertir($query) {
-        return $query->whereIn('Estatus', [0,10,20]);
+    public static function scopeParaRevertir() {
+        return DB::connection('sca')->table('viajes')
+            ->leftJoin('tiros', 'viajes.IdTiro', '=', 'tiros.IdTiro')
+            ->leftJoin('camiones', 'viajes.IdCamion', '=', 'camiones.IdCamion')
+            ->leftJoin('origenes', 'viajes.IdOrigen', '=', 'origenes.IdOrigen')
+            ->leftJoin('materiales', 'viajes.IdMaterial', '=', 'materiales.IdMaterial')
+            ->select(
+                "viajes.*",
+                "tiros.Descripcion as Tiro",
+                "camiones.Economico as Camion",
+                "viajes.CubicacionCamion as Cubicacion",
+                "origenes.Descripcion as Origen",
+                "materiales.Descripcion as Material",
+                "viajes.code as Codigo"
+            )
+            ->whereIn('viajes.Estatus', [0,10,20]);
     }
 
     public function revertir() {

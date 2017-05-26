@@ -2,8 +2,9 @@
 
 @section('content')
 <h1>{{ $sindicato->Descripcion }}
+    @permission('editar-sindicatos')
     <a href="{{ route('sindicatos.edit', $sindicato) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
-    <a href="{{ route('sindicatos.destroy', $sindicato) }}" class="btn pull-right element_destroy {{ $sindicato->Estatus == 1 ? 'activo btn-danger' : 'inactivo btn-success' }}" style="margin-right: 5px"><i class="fa {{ $sindicato->Estatus == 1 ? 'fa-ban' : 'fa-check' }}"></i> {{ $sindicato->Estatus == 1 ? 'INHABILITAR' : 'HABILITAR' }}</a>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('sindicatos.show', $sindicato) !!}
 <hr>
@@ -19,6 +20,12 @@
         {!! Form::label('NombreCorto', 'Nombre Corto', ['class' => 'control-label col-sm-3']) !!}
         <div class="col-sm-9">
             {!! Form::text('NombreCorto', null, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+        </div>
+    </div>
+    <div class="form-group">
+        {!! Form::label('RFC', 'RFC', ['class' => 'control-label col-sm-3']) !!}
+        <div class="col-sm-9">
+            {!! Form::text('rfc', null, ['class' => 'form-control', 'disabled' => 'disabled','place-holder'=>'AAAA999999XXX']) !!}
         </div>
     </div>
 </div>

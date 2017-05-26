@@ -7,6 +7,7 @@
 @include('partials.errors')
 
 {!! Form::open(['route' => 'camiones.store', 'files' => true, 'id' => 'create_camion']) !!}
+<input type="hidden" name="usuario_registro" value="{{ auth()->user()->idusuario }}">
 <div class="form-horizontal rcorners">
     <fieldset>
         <legend class="scheduler-border"><i class="fa fa-info-circle"></i> Información Básica</legend>
