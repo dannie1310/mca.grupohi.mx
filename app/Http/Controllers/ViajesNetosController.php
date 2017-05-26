@@ -24,6 +24,8 @@ class ViajesNetosController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:ViajesNetosController', ['only' => ['permisos_store']]);
+
 
         parent::__construct();
     }
