@@ -3,9 +3,11 @@
 @section('content')
 <h1>{{ $ruta->present()->claveRuta }}</h1>
 {!! Breadcrumbs::render('rutas.show', $ruta) !!}
+@permission('consultar-historico')
 <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
     Historico
 </button>
+@endpermission
 <hr>
 {!! Form::model($ruta) !!}
 <div class="form-horizontal col-md-6 col-md-offset-3 rcorners">

@@ -2,9 +2,11 @@
 
 @section('content')
 <h1>{{ $origen->Descripcion }}
+    @permission('consultar-historico')
     <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
         Historico
     </button>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('origenes.show', $origen) !!}
 

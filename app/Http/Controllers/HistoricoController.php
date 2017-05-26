@@ -10,6 +10,7 @@ class HistoricoController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:consultar-historico');
         parent::__construct();
     }
 

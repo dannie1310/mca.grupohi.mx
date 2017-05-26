@@ -5,9 +5,11 @@
     @permission('editar-empresas')
     <a style="margin-left: 5px" href="{{ route('empresas.edit', $empresa) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
     @endpermission
+    @permission('consultar-historico')
     <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
         Historico
     </button>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('empresas.show', $empresa) !!}
 <hr>

@@ -5,9 +5,11 @@
     @permission('editar-sindicatos')
     <a href="{{ route('sindicatos.edit', $sindicato) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
     @endpermission
+    @permission('consultar-historico')
     <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
         Historico
     </button>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('sindicatos.show', $sindicato) !!}
 <hr>

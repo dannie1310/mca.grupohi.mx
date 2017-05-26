@@ -4,9 +4,11 @@
         @permission('editar-impresoras')
         <a style="margin-left: 5px" href="{{route('impresoras.edit', $impresora)}}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> Editar</a>
     @endpermission
+        @permission('consultar-historico')
         <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
             Historico
         </button>
+        @endpermission
     </h1>
     {!! Breadcrumbs::render('impresoras.show', $impresora) !!}
     <hr>

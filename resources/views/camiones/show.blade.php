@@ -5,9 +5,11 @@
     @permission('editar-camiones')
     <a style="margin-left: 5px" href="{{ route('camiones.edit', $camion) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> EDITAR</a>
     @endpermission
+    @permission('consultar-historico')
     <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
         Historico
     </button>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('camiones.show', $camion) !!}
 <hr>
