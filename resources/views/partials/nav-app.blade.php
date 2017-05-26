@@ -51,8 +51,10 @@
         Operación<span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-      @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']))
+      @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']) || Auth::user()->can(['consulta-viajes']))
+      @if(Auth::user()->can(['consulta-viajes']))
         <li><a tabindex="-2" href="{{ route('viajes_netos.index') }}">Viajes</a></li>
+        @endif
         <li class="dropdown-submenu">
             <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Solicitudes para camiones</a> 
             <ul class="dropdown-menu">
