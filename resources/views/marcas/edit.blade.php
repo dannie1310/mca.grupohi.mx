@@ -7,8 +7,8 @@
 @include('partials.errors')
 
 {!! Form::model($marca, ['method' => 'PATCH', 'route' => ['marcas.update', $marca]]) !!}
-
-<div class="form-horizontal col-md-6 col-md-offset-3 rcorners">
+<input type="hidden" name="usuario_registro" value="{{auth()->user()->idusuario}}">
+<div class="form-horizontal rcorners">
     <div class="form-group">
         {!! Form::label('Descripcion', 'Descripción', ['class' => 'control-label col-sm-3']) !!}
         <div class="col-sm-9">

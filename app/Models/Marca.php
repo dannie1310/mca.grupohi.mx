@@ -12,11 +12,10 @@ class Marca extends Model
     protected $connection = 'sca';
     protected $table = 'marcas';
     protected $primaryKey = 'IdMarca';
-    protected $fillable = ['Descripcion'];
+    protected $fillable = ['Descripcion', 'usuario_registro', 'usuario_desactivo', 'motivo'];
     protected $presenter = ModelPresenter::class;
     
-    public $timestamps = false;
-    
+
     public function camiones() {
         return $this->hasMany(Camion::class, 'IdMarca');
     }

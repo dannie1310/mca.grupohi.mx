@@ -15,7 +15,10 @@ class MarcasController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-marcas', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-marcas', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-marcas', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
     
@@ -43,7 +46,7 @@ class MarcasController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateMarcaRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateMarcaRequest $request)
@@ -81,8 +84,8 @@ class MarcasController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Requests\EditMarcaRequest|Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\EditMarcaRequest $request, $id)
@@ -111,8 +114,9 @@ class MarcasController extends Controller
             $text = '¡MARCA DESHABILITADA CORRECTAMENTE!';
         } else {
             $marca->Estatus = 1;
-            $marca->usuario_desactivo=auth()->user()->idusuario;
-            $marca->motivo="";
+            $marca->usuario_desactivo=null;
+            $marca->usuario_registro=auth()->user()->idusuario;
+            $marca->motivo=null;
             $marca->created_at=date("Y-m-d H:i:s");
             $text = '¡MARCA HABILITADA CORRECTAMENTE!';
         }
