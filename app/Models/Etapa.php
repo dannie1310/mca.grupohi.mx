@@ -15,10 +15,12 @@ class Etapa extends Model
     protected $fillable = [
         'IdProyecto', 
         'Nivel', 
-        'Descripcion'
+        'Descripcion',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
     protected $presenter = ModelPresenter::class;
-    public $timestamps = false;
 
     public function proyectoLocal() {
         return $this->belongsTo(ProyectoLocal::class, 'IdProyecto');

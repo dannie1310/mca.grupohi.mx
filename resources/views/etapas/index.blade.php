@@ -2,7 +2,9 @@
 
 @section('content')
 <h1>ETAPAS DE PROYECTO
+    @permission('crear-etapas')
   <a href="{{ route('etapas.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Nueva Etapa</a>
+    @endpermission
     <a href="{{ route('csv.etapas-proyecto') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Descargar</a>
 </h1>
 {!! Breadcrumbs::render('etapas.index') !!}
@@ -26,19 +28,21 @@
           </td>
           <td>{{ $etapa->Descripcion }}</td>
           <td>{{ $etapa->created_at }}</td>
-          <td>{{ $etapa->user_registro->present()->nombreCompleto() }}</td>
+          <td>{{ $etapa->user_registro }}</td>
           <td>{{ $etapa->present()->estatus }}</td>
           <td>
 
             <a href="{{ route('etapas.show', $etapa) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
-            <a href="{{ route('etapas.edit', $etapa) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-
+            @permission('editar-etapas')
+              <a href="{{ route('etapas.edit', $etapa) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
+            @endpermission
+            @permission('desactivar-etapas')
             @if($etapa->Estatus == 1)
               <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_etapa({{$etapa->IdEtapaProyecto}})"><i class="fa fa-remove"></i></button>
             @else
               <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_etapa({{$etapa->IdEtapaProyecto}})"><i class="fa fa-check"></i></button>
             @endif
-
+            @endpermission
           </td>
         </tr>
       @endforeach

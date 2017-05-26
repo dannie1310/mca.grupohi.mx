@@ -2,8 +2,10 @@
 
 @section('content')
 <h1>{{ strtoupper(trans('strings.sindicatos')) }}
+  @permission('crear-sindicatos')
   <a href="{{ route('sindicatos.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> {{ trans('strings.new_sindicato') }}</a>
-  <a href="{{ route('csv.sindicatos') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Descargar</a>
+  @endpermission
+    <a href="{{ route('csv.sindicatos') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Descargar</a>
 </h1>
 {!! Breadcrumbs::render('sindicatos.index') !!}
 <hr>
@@ -36,14 +38,16 @@
           <td>
 
             <a href="{{ route('sindicatos.show', $sindicato) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
-            <a href="{{ route('sindicatos.edit', $sindicato) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-
+            @permission('editar-sindicatos')
+              <a href="{{ route('sindicatos.edit', $sindicato) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
+            @endpermission
+            @permission('desactivar-sindicatos')
             @if($sindicato->Estatus == 1)
               <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_sindicato({{$sindicato->IdSindicato}})"><i class="fa fa-remove"></i></button>
             @else
               <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_sindicato({{$sindicato->IdSindicato}})"><i class="fa fa-check"></i></button>
             @endif
-
+            @endpermission
           </td>
         </tr>
       @endforeach

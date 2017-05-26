@@ -16,7 +16,10 @@ class OperadoresController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-operadores', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-operadores', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-operadores', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
  
@@ -123,8 +126,9 @@ class OperadoresController extends Controller
             $text = '¡OPERADOR DESHABILITADO CORRECTAMENTE!';
          } else {
             $operador->Estatus = 1;
-            $operador->usuario_desactivo=auth()->user()->idusuario;
-            $operador->motivo="";
+            $operador->usuario_desactivo=null;
+            $operador->usuario_registro=auth()->user()->idusuario;
+            $operador->motivo=null;
             $operador->created_at=date("Y-m-d H:i:s");
             $text = '¡OPERADOR DESHABILITADO CORRECTAMENTE!';
         }

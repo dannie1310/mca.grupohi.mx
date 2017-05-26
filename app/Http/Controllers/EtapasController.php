@@ -15,7 +15,10 @@ class EtapasController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-etapas', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-etapas', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-etapas', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
     
@@ -43,7 +46,7 @@ class EtapasController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateEtapaRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateEtapaRequest $request)
@@ -88,8 +91,8 @@ class EtapasController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Requests\EditEtapaRequest|Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\EditEtapaRequest $request, $id)
@@ -118,7 +121,8 @@ class EtapasController extends Controller
             $text = '¡ETAPA DESHABILITADA CORRECTAMENTE!';
         } else {
             $etapa->Estatus = 1;
-            $etapa->motivo="";
+            $etapa->motivo=null;
+            $etapa->usuario_desactivo=null;
             $etapa->usuario_registro=auth()->user()->idusuario;
             $etapa->created_at=date("Y-m-d H:i:s");
             $text = '¡ETAPA HABILITADA CORRECTAMENTE!';
