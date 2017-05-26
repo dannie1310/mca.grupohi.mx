@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transformers\ViajeNetoTransformer;
+use App\Models\Viaje;
+use Illuminate\Http\Request;
+
 use App\Http\Requests;
 use App\Models\Camion;
 use App\Models\Empresa;
@@ -309,7 +313,7 @@ class ViajesNetosController extends Controller
                     'fecha'  => 'required|date_format:"Y-m-d"'
                 ]);
 
-                $viajes_netos = ViajeNeto::corte();
+                $viajes_netos = ViajeNeto::scopeCorte();
 
                 $turno_1 = $turno_2 = false;
                 foreach($request->get('turnos', []) as $turno) {
@@ -328,15 +332,15 @@ class ViajesNetosController extends Controller
 
                 if($turno_1 && $turno_2) {
                     $viajes_netos->where(function ($query) use ($timestamp_final_1, $timestamp_final_2, $timestamp_inicial_1, $timestamp_inicial_2){
-                        $query->whereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'")
-                            ->orWhereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
+                        $query->whereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'")
+                            ->orWhereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
                     });
                 } else if($turno_1 && ! $turno_2) {
-                    $viajes_netos->whereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'");
+                    $viajes_netos->whereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_1}' and '{$timestamp_final_1}'");
                 } else if(! $turno_1 && $turno_2) {
-                    $viajes_netos->whereRaw("CAST(CONCAT(FechaLlegada, ' ', HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
+                    $viajes_netos->whereRaw("CAST(CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) AS datetime) between '{$timestamp_inicial_2}' and '{$timestamp_final_2}'");
                 }
-                $data = ViajeNetoTransformer::transform($viajes_netos->get());
+                $data = $viajes_netos->get();
             }
             return response()->json(['viajes_netos' => $data]);
         } else {

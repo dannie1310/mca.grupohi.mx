@@ -5,8 +5,6 @@ namespace App\PDF;
 use App\Models\Cortes\Corte;
 use App\Models\Proyecto;
 use App\Facades\Context;
-use App\Models\Transformers\ViajeNetoCorteTransformer;
-use App\Models\Transformers\ViajeNetoTransformer;
 use Ghidev\Fpdf\Rotation;
 
 class PDFCorte extends Rotation
@@ -21,6 +19,7 @@ class PDFCorte extends Rotation
     var $WidthTotal;
     var $txtTitleTam, $txtSubtitleTam, $txtSeccionTam, $txtContenidoTam, $txtFooterTam;
     var $encola = '';
+    var $tipo, $num_items;
 
     /**
      * PDFCorte constructor.
@@ -85,94 +84,26 @@ class PDFCorte extends Rotation
         $this->setY($y_final_1 );
         $this->Ln(0.5);
 
-        if ($this->encola == 'items_confirmados') {
-            $this->SetWidths(array(0));
-            $this->SetFills(array('255,255,255'));
-            $this->SetTextColors(array('1,1,1'));
-            $this->SetRounds(array('0'));
-            $this->SetRadius(array(0));
-            $this->SetHeights(array(0));
-            $this->Row(Array(''));
-            $this->SetFont('Arial', 'B', $this->txtSeccionTam);
-            $this->SetTextColors(array('255,255,255'));
-            $this->CellFitScale($this->WidthTotal, 1, utf8_decode('VIAJES CONFIRMADOS ('. $this->corte->viajes_netos_confirmados()->count().')'), 0, 1, 'L');
-            $this->SetFont('Arial', 'B', 6);
-            $this->SetStyles(array('DF', 'DF', 'DF', 'DF', 'DF','DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF'));
-            $this->widths_items_confirmados();
-            $this->SetRounds(array('1', '', '', '', '', '', '', '', '', '', '', '', '', '', '','2'));
-            $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
-            $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
-            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0','0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
-            $this->SetHeights(array(0.3));
-            $this->SetAligns(array('C', 'C', 'C', 'C', 'C','C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-            $this->Row(array(
-                "#",
-                utf8_decode("Camión"),
-                utf8_decode("Código"),
-                "Fecha y Hora Llegada",
-                "Origen",
-                "Tiro",
-                "Material",
-                utf8_decode("Cubic. (m3)"),
-                "Importe",
-                utf8_decode("Checador Primer Toque"),
-                utf8_decode("Checador Segundo Toque"),
-                "Origen Nuevo",
-                "Tiro Nuevo",
-                "Material Nuevo",
-                "Cubic. Nueva (m3)",
-                utf8_decode("Justificación")));
-
-            $this->SetRounds(array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''));
-            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
-            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+        if ($this->encola == 'modificados') {
+            $this->encabezado_modificados();
+            $this->SetRounds(array('', '', '', '', '', '', '', '', '', '', '', '', '', '', ''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
             $this->SetHeights(array(0.35));
-            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'R', 'L', 'L', 'L', 'L', 'L', 'R', 'L'));
+            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'L', 'L', 'L', 'L', 'L', 'R', 'L'));
         }
 
-        if ($this->encola == "items_no_confirmados") {
-            $this->SetWidths(array(0));
-            $this->SetFills(array('255,255,255'));
-            $this->SetTextColors(array('1,1,1'));
-            $this->SetRounds(array('0'));
-            $this->SetRadius(array(0));
-            $this->SetHeights(array(0));
-            $this->Row(Array(''));
-            $this->SetFont('Arial', 'B', $this->txtSeccionTam);
-            $this->SetTextColors(array('255,255,255'));
-            $this->CellFitScale($this->WidthTotal, 1, utf8_decode('VIAJES NO CONFIRMADOS ('.$this->corte->viajes_netos_no_confirmados()->count().')'), 0, 1, 'L');
-            $this->SetFont('Arial', 'B', 6);
-            $this->SetStyles(array('DF', 'DF', 'DF', 'DF', 'DF','DF', 'DF', 'DF', 'DF', 'DF', 'DF'));
-            $this->widths_items_no_confirmados();
-            $this->SetRounds(array('1', '', '', '', '', '', '', '', '', '','2'));
-            $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
-            $this->SetFills(array('180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
-            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
-            $this->SetHeights(array(0.3));
-            $this->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-            $this->Row(array(
-                "#",
-                utf8_decode("Camión"),
-                utf8_decode("Código"),
-                "Fecha y Hora Llegada",
-                "Origen",
-                "Tiro",
-                "Material",
-                utf8_decode("Cubic. (m3)"),
-                "Importe",
-                utf8_decode("Checador Primer Toque"),
-                utf8_decode("Checador Segundo Toque")));
-
-            $this->SetRounds(array('', '', '', '', '', '', '', '', '', '', ''));
-            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
-            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+        if ($this->encola == "no_modificados") {
+            $this->encabezado_no_modificados();
+            $this->SetRounds(array('', '', '', '', '', '', '', '', '', ''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
             $this->SetHeights(array(0.35));
-            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'R', 'L', 'L'));
+            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'L', 'L'));
         }
     }
-
 
     private function title()
     {
@@ -187,46 +118,44 @@ class PDFCorte extends Rotation
         $this->Cell(0.45 * $this->WidthTotal, 0.7, utf8_decode('Detalles'), 0, 1, 'L');
     }
 
-    public function widths_items_confirmados() {
+    public function widths_items_modificados() {
         $this->SetWidths(array(
-            0.035 * 19.59,
-            0.053 * 19.59,
-            0.083 * 19.59,
-            0.063 * 19.59,
-            0.083 * 19.59,
-            0.083 * 19.59,
-            0.083 * 19.59,
-            0.05 * 19.59,
-            0.073 * 19.59,
-            0.1 * 19.59,
-            0.1 * 19.59,
-            0.083 * 19.59,
-            0.083 * 19.59,
-            0.083 * 19.59,
-            0.05 * 19.59,
-            0.175 * 19.59
+            0.035 * $this->WidthTotal,
+            0.050 * $this->WidthTotal,
+            0.065 * $this->WidthTotal,
+            0.080 * $this->WidthTotal,
+            0.075 * $this->WidthTotal,
+            0.075 * $this->WidthTotal,
+            0.075 * $this->WidthTotal,
+            0.035 * $this->WidthTotal,
+            0.085 * $this->WidthTotal,
+            0.085 * $this->WidthTotal,
+            0.075 * $this->WidthTotal,
+            0.075 * $this->WidthTotal,
+            0.075 * $this->WidthTotal,
+            0.035 * $this->WidthTotal,
+            0.080 * $this->WidthTotal
         ));
     }
 
-    public function widths_items_no_confirmados() {
+    public function widths_items_no_modificados() {
         $this->SetWidths(array(
-            0.078 * 19.59,
-            0.096 * 19.59,
-            0.125 * 19.59,
-            0.105 * 19.59,
-            0.125 * 19.59,
-            0.125 * 19.59,
-            0.125 * 19.59,
-            0.093 * 19.59,
-            0.11 * 19.59,
-            0.14 * 19.59,
-            0.14 * 19.59
+            0.03500 * $this->WidthTotal,
+            0.08777 * $this->WidthTotal,
+            0.10277 * $this->WidthTotal,
+            0.11777 * $this->WidthTotal,
+            0.11277 * $this->WidthTotal,
+            0.11277 * $this->WidthTotal,
+            0.11277 * $this->WidthTotal,
+            0.07277 * $this->WidthTotal,
+            0.12277 * $this->WidthTotal,
+            0.12277 * $this->WidthTotal
         ));
     }
+
 
     private function logo()
     {
-//$this->image(public_path('img/logo_hc.png'), $this->WidthTotal - 1.3, 0.5, 2.33, 1.5);
         if (Proyecto::find(Context::getId())->tiene_logo == 2) {
             $dataURI = "data:image/png;base64," . Proyecto::find(Context::getId())->logo;
             $dataPieces = explode(',', $dataURI);
@@ -276,10 +205,7 @@ class PDFCorte extends Rotation
         $this->CellFitScale(0.3 * $this->WidthTotal, 0.5, utf8_decode($this->corte->corte_detalles->count()), '', 1, 'L');
     }
 
-    function items_confirmados()
-    {
-        $numItems = count($this->corte->viajes_netos_confirmados());
-
+    public function encabezado_modificados() {
         $this->SetWidths(array(0));
         $this->SetFills(array('255,255,255'));
         $this->SetTextColors(array('1,1,1'));
@@ -289,16 +215,16 @@ class PDFCorte extends Rotation
         $this->Row(Array(''));
         $this->SetFont('Arial', 'B', $this->txtSeccionTam);
         $this->SetTextColors(array('255,255,255'));
-        $this->CellFitScale($this->WidthTotal, 1, utf8_decode('VIAJES CONFIRMADOS ('. $this->corte->viajes_netos_confirmados()->count().')'), 0, 1, 'L');
-        $this->SetFont('Arial', '', 6);
-        $this->SetStyles(array('DF', 'DF', 'DF', 'DF', 'DF', 'FD', 'DF','DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF'));
-        $this->widths_items_confirmados();
-        $this->SetRounds(array('1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '2'));
-        $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
-        $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
-        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0','0,0,0', '0,0,0', '0,0,0','0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+        $this->CellFitScale($this->WidthTotal, 1, utf8_decode($this->tipo.' ('.$this->num_items.')'), 0, 1, 'L');
+        $this->SetFont('Arial', 'B', 6);
+        $this->SetStyles(array('DF', 'DF', 'DF', 'DF', 'DF','DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF'));
+        $this->widths_items_modificados();
+        $this->SetRounds(array('1', '', '', '', '', '', '', '', '', '', '', '', '', '', '2'));
+        $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
+        $this->SetFills(array('180,180,180', '180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
+        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0','0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
         $this->SetHeights(array(0.3));
-        $this->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+        $this->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
         $this->Row(array(
             "#",
             utf8_decode("Camión"),
@@ -308,7 +234,6 @@ class PDFCorte extends Rotation
             "Tiro",
             "Material",
             utf8_decode("Cubic. (m3)"),
-            "Importe",
             utf8_decode("Checador Primer Toque"),
             utf8_decode("Checador Segundo Toque"),
             "Origen Nuevo",
@@ -316,56 +241,9 @@ class PDFCorte extends Rotation
             "Material Nuevo",
             "Cubic. Nueva (m3)",
             utf8_decode("Justificación")));
-
-        foreach (ViajeNetoCorteTransformer::transform($this->corte->viajes_netos_confirmados()) as $key => $item) {
-            $this->SetFont('Arial', '', 5);
-            $this->widths_items_confirmados();
-
-            $this->encola = "items_confirmados";
-            $this->SetRounds(array('', '', '', '', '','', '', '', '', '','', '', '', '', '', ''));
-            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0));
-            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
-            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
-            $this->SetHeights(array(0.35));
-            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'R', 'L', 'L', 'L', 'L', 'L', 'R', 'L'));
-
-            if ($key + 1 == $numItems ) {
-                $this->SetRounds(array('4', '', '', '', '', '',  '', '', '', '', '', '', '', '', '', '3'));
-                $this->SetRadius(array(0.2, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
-            }
-            $this->widths_items_confirmados();
-
-
-            $this->encola = "items_confirmados";
-//                for($cont = 0; $cont < 50; $cont ++){
-
-
-            $this->Row(array($key + 1,
-                $item['camion'],
-                $item['codigo'],
-                $item['timestamp_llegada'],
-                utf8_decode($item['origen']),
-                utf8_decode($item['tiro']),
-                utf8_decode($item['material']),
-                $item['cubicacion'],
-                "$ ".number_format($item['importe'], 2, '.', ','),
-                utf8_decode($item['registro_primer_toque']),
-                utf8_decode($item['registro']),
-                utf8_decode($item['corte_cambio']['origen_nuevo']),
-                utf8_decode($item['corte_cambio']['tiro_nuevo']),
-                utf8_decode($item['corte_cambio']['material_nuevo']),
-                utf8_decode($item['corte_cambio']['cubicacion_nueva']),
-                utf8_decode($item['corte_cambio']['justificacion'])
-            ));
-//                }
-            $this->encola = "";
-        }
     }
 
-    function items_no_confirmados()
-    {
-        $numItems = count($this->corte->viajes_netos_no_confirmados());
-
+    public function encabezado_no_modificados() {
         $this->SetWidths(array(0));
         $this->SetFills(array('255,255,255'));
         $this->SetTextColors(array('1,1,1'));
@@ -375,16 +253,16 @@ class PDFCorte extends Rotation
         $this->Row(Array(''));
         $this->SetFont('Arial', 'B', $this->txtSeccionTam);
         $this->SetTextColors(array('255,255,255'));
-        $this->CellFitScale($this->WidthTotal, 1, utf8_decode('VIAJES NO CONFIRMADOS ('.$this->corte->viajes_netos_no_confirmados()->count().')'), 0, 1, 'L');
-        $this->SetFont('Arial', '', 6);
-        $this->SetStyles(array('DF', 'DF', 'DF', 'DF', 'DF', 'FD', 'DF','DF', 'DF', 'DF', 'DF'));
-        $this->widths_items_no_confirmados();
-        $this->SetRounds(array('1', '', '', '', '', '', '', '', '', '', '2'));
-        $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
-        $this->SetFills(array('180,180,180', '180,180,180','180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
-        $this->SetTextColors(array('0,0,0', '0,0,0','0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
-        $this->SetHeights(array(0.3));
-        $this->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+        $this->CellFitScale($this->WidthTotal, 1, utf8_decode($this->tipo.' ('.$this->num_items.')'), 0, 1, 'L');
+        $this->SetFont('Arial', 'B', 6);
+        $this->SetStyles(array('DF', 'DF', 'DF', 'DF','DF', 'DF', 'DF', 'DF', 'DF', 'DF'));
+        $this->widths_items_no_modificados();
+        $this->SetRounds(array('1', '', '', '', '', '', '', '', '','2'));
+        $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
+        $this->SetFills(array('180,180,180','180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
+        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+        $this->SetHeights(array(0.5));
+        $this->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
         $this->Row(array(
             "#",
             utf8_decode("Camión"),
@@ -394,44 +272,91 @@ class PDFCorte extends Rotation
             "Tiro",
             "Material",
             utf8_decode("Cubic. (m3)"),
-            "Importe",
             utf8_decode("Checador Primer Toque"),
             utf8_decode("Checador Segundo Toque")));
 
-        foreach (ViajeNetoCorteTransformer::transform($this->corte->viajes_netos_no_confirmados()) as $key => $item) {
-            $this->SetFont('Arial', '', 5);
-            $this->widths_items_no_confirmados();
+    }
 
-            $this->encola = "items_no_confirmados";
-            $this->SetRounds(array('', '', '', '', '','', '', '', '', '',''));
-            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
-            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+    function items_modificados($items, $tipo)
+    {
+        $numItems = count($items);
+        $this->num_items = $numItems;
+        $this->tipo = $tipo;
+        $this->encola = 'modificados';
+
+        $this->encabezado_modificados();
+
+        foreach ($items as $key => $item) {
+            $this->SetFont('Arial', '', 5);
+            $this->widths_items_modificados();
+            $this->SetRounds(array('', '', '', '', '','', '', '', '', '','', '', '', '', ''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
             $this->SetHeights(array(0.35));
-            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'R', 'L', 'L'));
+            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'L', 'L', 'L', 'L', 'L', 'R', 'L'));
 
             if ($key + 1 == $numItems ) {
-                $this->SetRounds(array('4', '', '', '', '', '', '', '', '', '', '3'));
-                $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
+                $this->SetRounds(array('4', '', '', '', '', '',  '', '', '', '', '', '', '', '', '3'));
+                $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
             }
-            $this->widths_items_no_confirmados();
-
-
-            $this->encola = "items_no_confirmados";
-
-            $this->Row(array($key + 1,
-                $item['camion'],
-                $item['codigo'],
-                $item['timestamp_llegada'],
-                utf8_decode($item['origen']),
-                utf8_decode($item['tiro']),
-                utf8_decode($item['material']),
-                $item['cubicacion'],
-                "$ ".number_format($item['importe'], 2, '.', ','),
-                utf8_decode($item['registro_primer_toque']),
-                utf8_decode($item['registro'])
+            $this->widths_items_modificados();
+            $this->Row(array(
+                $key + 1,
+                $item->camion,
+                $item->Code,
+                $item->FechaHoraLlegada,
+                utf8_decode($item->origen),
+                utf8_decode($item->tiro),
+                utf8_decode($item->material),
+                $item->CubicacionCamion,
+                utf8_decode($item->creo_primer_toque),
+                utf8_decode($item->creo_segundo_toque),
+                utf8_decode($item->origen_nuevo),
+                utf8_decode($item->tiro_nuevo),
+                utf8_decode($item->material_nuevo),
+                utf8_decode($item->cubicacion_nueva),
+                utf8_decode($item->justificacion)
             ));
-            $this->encola = "";
+        }
+    }
+
+    function items_no_modificados($items, $tipo)
+    {
+        $numItems = count($items);
+        $this->num_items = $numItems;
+        $this->tipo = $tipo;
+        $this->encola = 'no_modificados';
+
+        $this->encabezado_no_modificados();
+
+        foreach ($items as $key => $item) {
+            $this->SetFont('Arial', '', 5);
+            $this->widths_items_no_modificados();
+            $this->SetRounds(array('', '', '', '', '', '', '', '', '',''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+            $this->SetHeights(array(0.35));
+            $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L', 'L', 'R', 'L', 'L'));
+
+            if ($key + 1 == $numItems ) {
+                $this->SetRounds(array('4', '', '', '', '', '', '', '', '', '3'));
+                $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0.2));
+            }
+            $this->widths_items_no_modificados();
+            $this->Row(array(
+                $key + 1,
+                $item->camion,
+                $item->Code,
+                $item->FechaHoraLlegada,
+                utf8_decode($item->origen),
+                utf8_decode($item->tiro),
+                utf8_decode($item->material),
+                $item->CubicacionCamion,
+                utf8_decode($item->creo_primer_toque),
+                utf8_decode($item->creo_segundo_toque)
+            ));
         }
     }
 
@@ -469,9 +394,25 @@ class PDFCorte extends Rotation
         $this->AliasNbPages();
         $this->AddPage();
         $this->SetAutoPageBreak(true,2);
-        $this->items_confirmados();
-        $this->Ln(0.75);
-        $this->items_no_confirmados();
+        if(count($this->corte->viajes_manuales_modificados())) {
+            $this->items_modificados($this->corte->viajes_manuales_modificados(), 'VIAJES MANUALES MODIFICADOS');
+            $this->Ln(1);
+        }
+        if(count($this->corte->viajes_manuales_no_modificados())) {
+            $this->items_no_modificados($this->corte->viajes_manuales_no_modificados(), 'VIAJES MANUALES NO MODIFICADOS');
+            $this->Ln(1);
+        }
+        if(count($this->corte->viajes_moviles_modificados())) {
+            $this->items_modificados($this->corte->viajes_moviles_modificados(), 'VIAJES MÓVILES MODIFICADOS');
+            $this->Ln(1);
+        }
+        if(count($this->corte->viajes_moviles_no_modificados())) {
+            $this->items_no_modificados($this->corte->viajes_moviles_no_modificados(), 'VIAJES MÓVILES NO MODIFICADOS');
+            $this->Ln(1);
+        }
+        if(count($this->corte->viajes_moviles_no_confirmados())) {
+            $this->items_no_modificados($this->corte->viajes_moviles_no_confirmados(), 'VIAJES NO CONFIRMADOS POR EL CHECADOR');
+        }
         $this->Output('I', "Corte{$this->corte->id}.pdf", 1);
         exit;
     }
