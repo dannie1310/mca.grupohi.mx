@@ -30,7 +30,7 @@
                      <td>{{ $impresora->marca}}</td>
                      <td>{{ $impresora->modelo}}</td>
                      <td>{{$impresora->created_at->format('d-M-Y h a') }}</td>
-                     <td>{{ $impresora->user_registro->present()->nombreCompleto()}}</td>
+                     <td>{{ $impresora->user_registro}}</td>
                      <td>{{ $impresora->estatus_string }}</td>
                      <td>
                           <a href="{{ route('impresoras.show', $impresora) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddStatsToTarifas extends Migration
+class AddStatsToEtapasproyectos extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,8 @@ class AddStatsToTarifas extends Migration
      */
     public function up()
     {
-        Schema::table('tarifas', function (Blueprint $table) {
+        Schema::table('etapasproyectos', function (Blueprint $table) {
+            $table->integer('usuario_registro');
             $table->integer('usuario_desactivo')->nullable();
             $table->text('motivo')->nullable();
             $table->timestamps();
@@ -26,8 +27,8 @@ class AddStatsToTarifas extends Migration
      */
     public function down()
     {
-        Schema::table('tarifas', function (Blueprint $table) {
-            $table->dropColumn(['usuario_desactivo', 'motivo']);
+        Schema::table('etapasproyectos', function (Blueprint $table) {
+            $table->dropColumn(['usuario_registro', 'usuario_desactivo', 'motivo']);
             $table->dropTimestamps();
         });
     }

@@ -58,7 +58,6 @@
                                 <th style="text-align: center"> Tiro </th>
                                 <th style="text-align: center"> Material </th>
                                 <th style="text-align: center"> Cubicación	</th>
-                                <th style="text-align: center"> Importe </th>
                                 <th style="text-align: center"> Checador Primer Toque </th>
                                 <th style="text-align: center"> Checador Segundo Toque </th>
                             </tr>
@@ -73,7 +72,6 @@
                                 <td>@{{ viaje_neto.tiro }}</td>
                                 <td>@{{ viaje_neto.material }}</td>
                                 <td style="text-align: right">@{{ viaje_neto.cubicacion }} m<sup>3</sup></td>
-                                <td style="text-align: right">$@{{ formato(viaje_neto.importe) }}</td>
                                 <td>@{{ viaje_neto.registro_primer_toque }}</td>
                                 <td>@{{ viaje_neto.registro }}</td>
                             </tr>

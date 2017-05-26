@@ -30,6 +30,7 @@ Vue.component('viajes-revertir', {
                 var val_config = {
                     auto_filter: true,
                     watermark: [
+                        '',
                         'Fecha de Llegada',
                         'Hora de Llegada',
                         'Origen',
@@ -37,15 +38,18 @@ Vue.component('viajes-revertir', {
                         'Camión',
                         'Cubic.',
                         'Material',
-                        'Código (Ticket)',
-                        'Modificar'
+                        'Código (Ticket)'
                     ],
-                    col_0: 'select',
-                    col_2: 'select',
+                    col_0: 'none',
+                    col_1: 'input',
+                    col_2: 'input',
                     col_3: 'select',
                     col_4: 'select',
-                    col_6: 'select',
-                    col_8: 'none',
+                    col_5: 'select',
+                    col_6: 'input',
+                    col_7: 'select',
+                    col_8: 'input',
+                    col_9: 'none',
 
                     base_path: App.tablefilterBasePath,
                     paging: false,

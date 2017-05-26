@@ -33894,12 +33894,13 @@ Vue.component('configuracion-diaria', {
 
         telefonos_select: function telefonos_select() {
             var result = [];
-            this.telefonos.forEach(function (telefono) {
-                result.push(telefono);
-            });
             if (this.current_checador.telefono) {
                 result.push(this.current_checador.telefono);
             }
+            this.telefonos.forEach(function (telefono) {
+                result.push(telefono);
+            });
+
             return result;
         }
     },
@@ -34166,7 +34167,7 @@ Vue.component('configuracion-diaria', {
                         swal({
                             type: 'info',
                             title: '¡No es posible realizar la acción!',
-                            text: 'No cuenta con los permisos necesarios para <strong>Editar Teléfonos</strong><br> Por favor solicitelo con el asministrador de permisos',
+                            text: 'No cuenta con los permisos necesarios para <strong>Editar Teléfonos</strong><br> Por favor solicitelo con el administrador de permisos',
                             html: true
                         });
                     }
@@ -34516,17 +34517,14 @@ Vue.component('corte-edit', {
         modified: function modified() {
             var _this = this;
             return _this.corte.viajes_netos.filter(function (viaje_neto) {
-                if (viaje_neto.corte_cambio) {
-                    return true;
-                }
-                return false;
+                return viaje_neto.corte_cambio;
             });
         },
 
         resultados: function resultados() {
             var _this = this;
             return this.corte.viajes_netos.filter(function (viaje_neto) {
-                if (viaje_neto.codigo == _this.form.busqueda.replace(/ /g, '')) {
+                if (viaje_neto.Code == _this.form.busqueda.replace(/ /g, '')) {
                     return true;
                 } else {
                     return false;
@@ -34623,20 +34621,20 @@ Vue.component('corte-edit', {
         editar: function editar(e) {
             e.preventDefault();
             var viaje = this.viaje;
-            if (viaje.corte_cambio) {
-                this.form.data.id_origen = viaje.corte_cambio.origen_nuevo ? viaje.corte_cambio.origen_nuevo.IdOrigen : viaje.id_origen;
-                this.form.data.id_tiro = viaje.corte_cambio.tiro_nuevo ? viaje.corte_cambio.tiro_nuevo.IdTiro : viaje.id_tiro;
-                this.form.data.id_material = viaje.corte_cambio.material_nuevo ? viaje.corte_cambio.material_nuevo.IdMaterial : viaje.id_material;
-                this.form.data.cubicacion = viaje.corte_cambio.cubicacion_nueva ? viaje.corte_cambio.cubicacion_nueva : viaje.cubicacion;
-                this.form.data.justificacion = viaje.corte_cambio.justificacion;
+            if (viaje.corte_cambio == true) {
+                this.form.data.id_origen = viaje.IdOrigenNuevo ? viaje.IdOrigenNuevo : viaje.IdOrigen;
+                this.form.data.id_tiro = viaje.IdTiroNuevo ? viaje.IdTiroNuevo : viaje.IdTiro;
+                this.form.data.id_material = viaje.IdMaterialNuevo ? viaje.IdMaterialNuevo : viaje.IdMaterial;
+                this.form.data.cubicacion = viaje.CubicacionCamionNueva ? viaje.CubicacionCamionNueva : viaje.CubicacionCamion;
+                this.form.data.justificacion = viaje.justificacion;
             } else {
-                this.form.data.id_origen = viaje.id_origen;
-                this.form.data.id_tiro = viaje.id_tiro;
-                this.form.data.id_material = viaje.id_material;
-                this.form.data.cubicacion = viaje.cubicacion;
+                this.form.data.id_origen = viaje.IdOrigen;
+                this.form.data.id_tiro = viaje.IdTiro;
+                this.form.data.id_material = viaje.IdMaterial;
+                this.form.data.cubicacion = viaje.CubicacionCamion;
                 this.form.data.justificacion = '';
             }
-            this.form.data.id = viaje.id;
+            this.form.data.id = viaje.IdViajeNeto;
             this.form.errors = [];
             $('#edit_modal').modal('show');
         },
@@ -34705,10 +34703,6 @@ Vue.component('corte-edit', {
             });
         },
 
-        formato: function formato(val) {
-            return numeral(val).format('0,0.00');
-        },
-
         confirmar_descartar: function confirmar_descartar() {
             var _this4 = this;
 
@@ -34729,7 +34723,7 @@ Vue.component('corte-edit', {
         descartar: function descartar(e) {
             e.preventDefault();
             var _this = this;
-            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + this.viaje.id + '?action=revertir_modificaciones';
+            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + this.viaje.IdViajeNeto + '?action=revertir_modificaciones';
 
             $.ajax({
                 type: 'POST',
@@ -34785,7 +34779,7 @@ Vue.component('corte-edit', {
 
         confirmar_viaje: function confirmar_viaje() {
             var _this = this;
-            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + _this.viaje.id;
+            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + _this.viaje.IdViajeNeto;
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -36335,13 +36329,19 @@ Vue.component('viajes-modificar', {
             inserted: function inserted(el) {
                 var val_config = {
                     auto_filter: true,
-                    watermark: ['Fecha Llegada', 'Tiro', 'Camion', 'Cubic.', 'Material', 'Origen', 'Modificar'],
-                    col_0: 'select',
-                    col_1: 'select',
-                    col_2: 'select',
+                    watermark: ['#', 'Fecha Llegada', 'Hora Llegada', 'Sindicato', 'Empresa', 'Origen', 'Tiro', 'Camion', 'Cubic.', 'Material', 'Código', 'Modificar'],
+                    col_0: 'none',
+                    col_1: 'input',
+                    col_2: 'input',
+                    col_3: 'select',
                     col_4: 'select',
                     col_5: 'select',
-                    col_6: 'none',
+                    col_6: 'select',
+                    col_7: 'select',
+                    col_8: 'input',
+                    col_9: 'select',
+                    col_10: 'input',
+                    col_11: 'none',
 
                     base_path: App.tablefilterBasePath,
                     paging: false,
@@ -36409,7 +36409,8 @@ Vue.component('viajes-modificar', {
                         type: response.body.tipo,
                         title: '',
                         text: response.body.message,
-                        showConfirmButton: true
+                        showConfirmButton: true,
+                        html: true
                     });
 
                     viaje.CubicacionCamion = response.body.viaje.CubicacionCamion;
@@ -36429,7 +36430,12 @@ Vue.component('viajes-modificar', {
                 }, function (error) {
                     _this.guardando = false;
                     viaje.ShowModal = false;
-                    swal('¡Error!', App.errorsToString(error.body), 'error');
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.body),
+                        html: true
+                    });
                 });
             });
         },
@@ -36484,13 +36490,17 @@ Vue.component('viajes-revertir', {
             inserted: function inserted(el) {
                 var val_config = {
                     auto_filter: true,
-                    watermark: ['Fecha de Llegada', 'Hora de Llegada', 'Origen', 'Tiro', 'Camión', 'Cubic.', 'Material', 'Código (Ticket)', 'Modificar'],
-                    col_0: 'select',
-                    col_2: 'select',
+                    watermark: ['', 'Fecha de Llegada', 'Hora de Llegada', 'Origen', 'Tiro', 'Camión', 'Cubic.', 'Material', 'Código (Ticket)'],
+                    col_0: 'none',
+                    col_1: 'input',
+                    col_2: 'input',
                     col_3: 'select',
                     col_4: 'select',
-                    col_6: 'select',
-                    col_8: 'none',
+                    col_5: 'select',
+                    col_6: 'input',
+                    col_7: 'select',
+                    col_8: 'input',
+                    col_9: 'none',
 
                     base_path: App.tablefilterBasePath,
                     paging: false,

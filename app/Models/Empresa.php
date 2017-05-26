@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
-
+use App\User;
 class Empresa extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -13,12 +13,15 @@ class Empresa extends Model
     protected $table = 'empresas';
     protected $primaryKey = 'IdEmpresa';
     protected $fillable = [
-        'razonKSocial',
-        'RFC'
+        'razonSocial',
+        'RFC',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
+
     protected $presenter = ModelPresenter::class;
-    public $timestamps = false;
-    
+
     public function camiones() {
         return $this->hasMany(Camion::class, 'IdEmpresa');
     }
@@ -32,5 +35,8 @@ class Empresa extends Model
 
     public function conciliaciones(){
         return $this->hasMany(Conciliacion::class, "idempresa", "IdEmpresa");
+    }
+    public function user_registro() {
+        return $this->belongsTo(User::class, 'usuario_registro', 'idusuario');
     }
 }

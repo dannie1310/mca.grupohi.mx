@@ -2,8 +2,13 @@
 @section('content')
     <h1>IMPRESORAS
         @permission('editar-impresoras')
-        <a href="{{route('impresoras.edit', $impresora)}}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> Editar</a>
+        <a style="margin-left: 5px" href="{{route('impresoras.edit', $impresora)}}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> Editar</a>
     @endpermission
+        @permission('consultar-historico')
+        <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
+            Historico
+        </button>
+        @endpermission
     </h1>
     {!! Breadcrumbs::render('impresoras.show', $impresora) !!}
     <hr>
@@ -22,4 +27,21 @@
 
         </ul>
     </div>
+    <div id="modal_historico">
+    </div>
+@endsection
+@section('scripts')
+    <script>
+        $('#ver_historico').off().on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: App.host + '/historico/impresoras/{{$impresora->id}}',
+                success: function (response) {
+                    $('#modal_historico').html(response);
+                    $('#historicoModal').modal('show');
+                }
+            })
+        });
+    </script>
 @endsection

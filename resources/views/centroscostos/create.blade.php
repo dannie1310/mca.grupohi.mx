@@ -6,9 +6,10 @@
       <h4 class="modal-title">Se Agregara el Centro de Costo a <strong>"{{isset($centro) ? $centro->Descripcion : 'Proyecto' }}"</strong></h4>
     </div> 
     <div class="modal-body" id="modal-body">
-    {!! Form::open(['route' => 'centroscostos.store', 'id' => 'centrocosto_store_form']) !!} 
-    <input type="hidden" name="IdPadre" value="{{isset($centro) ? $centro->IdCentroCosto : 0}}"/>
-      <div class="row">    
+    {!! Form::open(['route' => 'centroscostos.store', 'id' => 'centrocosto_store_form']) !!}
+      <input type="hidden" name="usuario_registro" value="{{auth()->user()->idusuario}}"/>
+      <input type="hidden" name="IdPadre" value="{{isset($centro) ? $centro->IdCentroCosto : 0}}"/>
+      <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             {!! Form::label('Descripcion', 'Descripción:', ['class' => 'label-control']) !!}

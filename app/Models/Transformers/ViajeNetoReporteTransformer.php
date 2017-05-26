@@ -20,8 +20,11 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
         $timestamp_inicial = $request->get('FechaInicial') . ' ' . $horaInicial;
         $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
 
-        return DB::connection('sca')->select(DB::raw(
-            "SELECT DATE_FORMAT(v.FechaLlegada, '%d-%m-%Y') AS Fecha,
+
+        $SQL = "SELECT
+      DATE_FORMAT(v.FechaLlegada, '%d-%m-%Y') AS Fecha,
+       DATE_FORMAT(v.FechaSalida, '%d-%m-%Y') AS FechaSalida,
+       DATE_FORMAT(v.HoraSalida, '%h:%i:%s') AS HoraSalida,
       t.IdTiro,
       t.Descripcion AS Tiro,
       c.IdCamion AS IdCamion,
@@ -33,6 +36,9 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
         WHEN v.estatus in (1,11,21,31) THEN 'Validado'
         WHEN v.estatus in (0,10,20,30) THEN 'Pendiente de Validar'
       END AS Estatus,
+      CONCAT(user_primer.nombre, ' ', user_primer.apaterno, ' ', user_primer.amaterno) as primer_toque,
+      CONCAT(user_segundo.nombre, ' ', user_segundo.apaterno, ' ', user_segundo.amaterno) as segundo_toque,
+      IF(v.HoraLlegada >= '07:00:00' AND v.HoraLlegada < '19:00:00', 'Primer Turno', 'Segundo Turno') as turno,
       v.HoraLlegada as Hora,
       v.code,
       c.CubicacionParaPago as cubicacion,
@@ -66,7 +72,8 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       c.placas,
       c.PlacasCaja,
       v.CreoPrimerToque,
-      v.Creo
+      v.Creo,
+      cev.identifiacador as conflictos
       FROM
         viajesnetos AS v
       JOIN tiros AS t USING (IdTiro)
@@ -82,15 +89,74 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       LEFT JOIN conciliacion_detalle AS conde ON conde.idviaje =  vi.IdViaje
       LEFT JOIN conciliacion as conci ON conci.idconciliacion = conde.idconciliacion 
       left join sindicatos as sincon on sincon.IdSindicato = conci.IdSindicato
+      left join igh.usuario as user_primer on v.CreoPrimerToque = user_primer.idusuario
+      left join igh.usuario as user_segundo on v.Creo = user_segundo.idusuario
       left join empresas as empcon on empcon.IdEmpresa = conci.IdEmpresa
+       left join (      
+      SELECT conflictos_entre_viajes_detalle.idviaje_neto,
+      
+       conflictos_entre_viajes.id as idconflicto
+  FROM (((conflictos_entre_viajes_detalle conflictos_entre_viajes_detalle_1
+          INNER JOIN
+          conflictos_entre_viajes conflictos_entre_viajes
+             ON (conflictos_entre_viajes_detalle_1.idconflicto =
+                    conflictos_entre_viajes.id))
+         INNER JOIN
+         conflictos_entre_viajes_detalle conflictos_entre_viajes_detalle
+            ON (conflictos_entre_viajes_detalle.idconflicto =
+                   conflictos_entre_viajes.id))
+        INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos
+           ON     (conflictos_entre_viajes_detalle.idviaje_neto =
+                      viajesnetos.IdViajeNeto)
+              AND (conflictos_entre_viajes_detalle_1.idviaje_neto =
+                      viajesnetos.IdViajeNeto))
+       INNER JOIN
+       (SELECT max(date_format(timestamp, '%Y-%m-%d')) AS maximo
+          FROM conflictos_entre_viajes conflictos_entre_viajes)
+       Subquery
+          ON (date_format(timestamp, '%Y-%m-%d') = Subquery.maximo)
+      
+      
+      ) as cevd on cevd.idviaje_neto = v.IdViajeNeto
+            
+       left join (
+       
+      
+       SELECT 
+       conflictos_entre_viajes.id,
+       group_concat(if(viajesnetos.Code IS NULL,
+          concat(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada),
+          viajesnetos.Code))
+          AS identifiacador
+  FROM ((conflictos_entre_viajes_detalle conflictos_entre_viajes_detalle
+         INNER JOIN viajesnetos viajesnetos
+            ON (conflictos_entre_viajes_detalle.idviaje_neto =
+                   viajesnetos.IdViajeNeto))
+        INNER JOIN
+        conflictos_entre_viajes conflictos_entre_viajes
+           ON (conflictos_entre_viajes_detalle.idconflicto =
+                  conflictos_entre_viajes.id))
+       INNER JOIN
+       (SELECT max(date_format(timestamp, '%Y-%m-%d')) AS maximo
+          FROM conflictos_entre_viajes conflictos_entre_viajes)
+       Subquery
+          ON (date_format(timestamp, '%Y-%m-%d') = Subquery.maximo)
+          group by  conflictos_entre_viajes.id
+     
+        
+        ) as cev
+                 on(cev.id = cevd.idconflicto)
       WHERE
+          v.Estatus " . $estatus  . "
+      AND
       CAST(CONCAT(v.FechaLlegada,
                     ' ',
                     v.HoraLlegada)
             AS DATETIME) between '{$timestamp_inicial}' and '{$timestamp_final}'
       AND v.IdViajeNeto not in (select IdViajeNeto from viajesrechazados)
-      AND v.Estatus {$estatus}
       group by IdViajeNeto
-      ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus;"));
+      ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus
+      ";
+        return DB::connection('sca')->select(DB::raw($SQL));
     }
 }

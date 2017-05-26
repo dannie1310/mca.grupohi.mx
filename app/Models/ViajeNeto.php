@@ -696,7 +696,7 @@ class ViajeNeto extends Model
             ->where('viajesnetos.Estatus', 0);
     }
 
-    public function scopeManuales($query){
+    public static function scopeManuales($query){
         return $query->whereIn('viajesnetos.Estatus', [20,21,22,29]);
     }
 
@@ -821,12 +821,72 @@ class ViajeNeto extends Model
         return "";
     }
 
-    public function scopeCorte($query){
-        return $query
-            ->leftJoin('corte_detalle', 'viajesnetos.IdViajeNeto', '=', 'corte_detalle.id_viajeneto')
-            ->whereNull('corte_detalle.id_viajeneto')
+    public static function scopeCorte(){
+        return DB::connection('sca')->table('viajesnetos')
+                ->leftJoin('corte_detalle', 'viajesnetos.IdViajeNeto', '=', 'corte_detalle.id_viajeneto')
+                ->leftJoin('camiones', 'viajesnetos.IdCamion', '=', 'camiones.IdCamion')
+                ->leftJoin('origenes', 'viajesnetos.IdOrigen', '=', 'origenes.IdOrigen')
+                ->leftJoin('tiros', 'viajesnetos.IdTiro', '=', 'tiros.IdTiro')
+                ->leftJoin('materiales', 'viajesnetos.IdMaterial', '=', 'materiales.IdMaterial')
+            ->leftJoin('igh.usuario as primer_toque', 'viajesnetos.CreoPrimerToque', '=', 'primer_toque.idusuario')
+            ->leftJoin('igh.usuario as user_registro', 'viajesnetos.Creo', '=', 'user_registro.idusuario')
+                ->whereNull('corte_detalle.id_viajeneto')
             ->where('viajesnetos.Creo', auth()->user()->idusuario)
-            ->orderBy('viajesnetos.IdViajeNeto', 'DESC');
+            ->orderBy('viajesnetos.IdViajeNeto', 'DESC')
+            ->select(
+                "viajesnetos.*",
+                "camiones.Economico as camion",
+                "viajesnetos.Code as codigo",
+                DB::raw("CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) as timestamp_llegada"),
+                "origenes.Descripcion as origen",
+                "tiros.Descripcion as tiro",
+                "materiales.Descripcion as material",
+                "viajesnetos.CubicacionCamion as cubicacion",
+                DB::raw("CONCAT(primer_toque.nombre, ' ', primer_toque.apaterno, ' ' , primer_toque.amaterno) as registro_primer_toque"),
+                DB::raw("CONCAT(user_registro.nombre, ' ', user_registro.apaterno, ' ' , user_registro.amaterno) as registro"),
+                "viajesnetos.Estatus as estatus"
+            );
+    }
+
+    public static function scopeCorteEdit($id_corte){
+        return DB::connection('sca')->table('viajesnetos')
+            ->leftJoin('corte_detalle', 'viajesnetos.IdViajeNeto', '=', 'corte_detalle.id_viajeneto')
+            ->leftJoin('camiones', 'viajesnetos.IdCamion', '=', 'camiones.IdCamion')
+            ->leftJoin('origenes', 'viajesnetos.IdOrigen', '=', 'origenes.IdOrigen')
+            ->leftJoin('tiros', 'viajesnetos.IdTiro', '=', 'tiros.IdTiro')
+            ->leftJoin('materiales', 'viajesnetos.IdMaterial', '=', 'materiales.IdMaterial')
+            ->leftJoin('igh.usuario as primer_toque', 'viajesnetos.CreoPrimerToque', '=', 'primer_toque.idusuario')
+            ->leftJoin('igh.usuario as user_registro', 'viajesnetos.Creo', '=', 'user_registro.idusuario')
+            ->leftJoin('corte_cambios', 'viajesnetos.IdViajeNeto', '=', 'corte_cambios.id_viajeneto')
+            ->leftJoin('origenes as origen_nuevo', 'corte_cambios.id_origen_nuevo', '=', 'origen_nuevo.IdOrigen')
+            ->leftJoin('tiros as tiro_nuevo', 'corte_cambios.id_tiro_nuevo', '=', 'tiro_nuevo.IdTiro')
+            ->leftJoin('materiales as material_nuevo', 'corte_cambios.id_material_nuevo', '=', 'material_nuevo.IdMaterial')
+            ->where('viajesnetos.Creo', auth()->user()->idusuario)
+            ->where('corte_detalle.id_corte', '=', $id_corte)
+            ->orderBy('viajesnetos.IdViajeNeto', 'DESC')
+            ->select(
+                "viajesnetos.*",
+                "camiones.Economico as camion",
+                "viajesnetos.Code as codigo",
+                DB::raw("CONCAT(viajesnetos.FechaLlegada, ' ', viajesnetos.HoraLlegada) as timestamp_llegada"),
+                "origenes.Descripcion as origen",
+                "tiros.Descripcion as tiro",
+                "materiales.Descripcion as material",
+                DB::raw("CONCAT(primer_toque.nombre, ' ', primer_toque.apaterno, ' ' , primer_toque.amaterno) as registro_primer_toque"),
+                DB::raw("CONCAT(user_registro.nombre, ' ', user_registro.apaterno, ' ' , user_registro.amaterno) as registro"),
+                DB::raw("IF(viajesnetos.Estatus = 0 OR viajesnetos.Estatus = 1, 'APLICACIÓN MOVIL', 'MANUAL') as tipo"),
+                DB::raw("IF(viajesnetos.Estatus = 0 OR viajesnetos.Estatus = 1, false, true) as manual"),
+                DB::raw("IF(corte_cambios.id is not null, true, false) as corte_cambio"),
+                "corte_cambios.cubicacion_nueva as CubicacionCamionNueva",
+                "corte_cambios.id_material_nuevo as IdMaterialNuevo",
+                "corte_cambios.id_origen_nuevo as IdOrigenNuevo",
+                "corte_cambios.id_tiro_nuevo as IdTiroNuevo",
+                "corte_cambios.justificacion as justificacion",
+                "origen_nuevo.Descripcion as origen_nuevo",
+                "tiro_nuevo.Descripcion as tiro_nuevo",
+                "material_nuevo.Descripcion as material_nuevo",
+                DB::raw("IF(corte_detalle.estatus = 2, true, false) as confirmed")
+            );
     }
 
     public function corte_cambio() {

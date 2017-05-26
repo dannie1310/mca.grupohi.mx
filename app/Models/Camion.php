@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
-
+use App\User;
 class Camion extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -36,12 +36,13 @@ class Camion extends Model
         'FechaAlta',
         'HoraAlta',
         'IdEmpresa',
-        'Disminucion'
+        'Disminucion',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
     protected $presenter = ModelPresenter::class;
-    
-    public $timestamps = false;
-    
+
     public function proyectoLocal() {
         return $this->belongsTo(ProyectoLocal::class, 'IdProyecto');
     }
@@ -107,5 +108,8 @@ class Camion extends Model
         }
 
         return $this;
+    }
+    public function user_registro() {
+        return $this->belongsTo(User::class, 'usuario_registro', 'idusuario');
     }
 }

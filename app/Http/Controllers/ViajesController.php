@@ -58,12 +58,18 @@ class ViajesController extends Controller
                 $data = ViajeTransformer::transform($filter);
 
             } else if ($request->get('tipo') == 'revertir') {
-                $this->validate($request, [
-                    'FechaInicial' => 'required|date_format:"Y-m-d"',
-                    'FechaFinal' => 'required|date_format:"Y-m-d"',
-                ]);
-                $viajes = Viaje::ParaRevertir()->whereBetween('FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])->get();
-                $data = ViajeTransformerRevertir::transform($viajes);
+                if($request->tipo_busqueda == 'fecha') {
+                    $this->validate($request, [
+                        'FechaInicial' => 'required|date_format:"Y-m-d"',
+                        'FechaFinal' => 'required|date_format:"Y-m-d"',
+                    ]);
+                    $data = Viaje::scopeParaRevertir()->whereBetween('viajes.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])->get();
+                } elseif ($request->tipo_busqueda == 'codigo') {
+                    $this->validate($request, [
+                        'Codigo' => 'required'
+                    ]);
+                    $data = Viaje::scopeParaRevertir()->where('viajes.code', '=', $request->Codigo)->get();
+                }
             }
 
             return response()->json([

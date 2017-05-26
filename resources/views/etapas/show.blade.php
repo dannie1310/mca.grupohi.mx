@@ -2,13 +2,19 @@
 
 @section('content')
 <h1>{{ $etapa->Descripcion }}
-    <a href="{{ route('etapas.edit', $etapa) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
-    <a href="{{ route('etapas.destroy', $etapa) }}" class="btn pull-right element_destroy {{ $etapa->Estatus == 1 ? 'activo btn-danger' : 'inactivo btn-success' }}" style="margin-right: 5px"><i class="fa {{ $etapa->Estatus == 1 ? 'fa-ban' : 'fa-check' }}"></i> {{ $etapa->Estatus == 1 ? 'INHABILITAR' : 'HABILITAR' }}</a>
+    @permission('editar-etapas')
+    <a style="margin-left: 5px" href="{{ route('etapas.edit', $etapa) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> {{ trans('strings.edit') }}</a>
+    @endpermission
+    @permission('consultar-historico')
+    <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
+        Historico
+    </button>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('etapas.show', $etapa) !!}
 <hr>
 {!! Form::model($etapa) !!}
-<div class="form-horizontal col-md-6 col-md-offset-3 rcorners">
+<div class="form-horizontal rcorners">
     <div class="form-group">
         {!! Form::label('Descripcion', 'Descripción', ['class' => 'control-label col-sm-3']) !!}
         <div class="col-sm-9">
@@ -20,4 +26,21 @@
     {!! link_to_route('etapas.index', 'Regresar', [],  ['class' => 'btn btn-info'])!!}
 </div>
 {!! Form::close() !!}
+<div id="modal_historico">
+</div>
 @stop
+@section('scripts')
+    <script>
+        $('#ver_historico').off().on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: App.host + '/historico/etapas/{{$etapa->IdEtapaProyecto}}',
+                success: function (response) {
+                    $('#modal_historico').html(response);
+                    $('#historicoModal').modal('show');
+                }
+            })
+        });
+    </script>
+@endsection

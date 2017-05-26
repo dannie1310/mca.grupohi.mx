@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Empresa;
 use Laracasts\Flash\Flash;
+use Illuminate\Support\Facades\Redirect;
 
 class EmpresasController extends Controller
 {
@@ -15,7 +16,10 @@ class EmpresasController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-empresas', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-empresas', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-empresas', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
 
@@ -47,15 +51,22 @@ class EmpresasController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateEmpresaRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateEmpresaRequest $request)
     {
-        $empresa = Empresa::create($request->all());
-        
-        Flash::success('¡EMPRESA REGISTRADA CORRECTAMENTE');
-        return redirect()->route('empresas.show', $empresa);
+        if(!preg_match('/^([A-ZÑ\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\d]{3}))?$/', $request->RFC))
+        {
+            Flash::error('El rfc tiene formato incorrecto.');
+            return Redirect::back()
+                ->withInput($request->input());
+
+        }else{
+            $empresa = Empresa::create($request->all());
+            Flash::success('¡EMPRESA REGISTRADA CORRECTAMENTE');
+            return redirect()->route('empresas.show', $empresa);
+        }
     }
 
     /**
@@ -85,17 +96,24 @@ class EmpresasController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Requests\EditEmpresaRequest|Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Requests\EditEmpresaRequest $request, $id)
     {
+        if(!preg_match('/^([A-ZÑ\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\d]{3}))?$/', $request->RFC))
+        {
+            Flash::error('El rfc tiene formato incorrecto.');
+            return Redirect::back()
+                ->withInput($request->input());
+
+        }else{
         $empresa = Empresa::findOrFail($id);
         $empresa->update($request->all());
         
         Flash::success('¡EMPRESA ACTUALIZADA CORRECTAMENTE!');
-        return redirect()->route('empresas.show', $empresa);
+        return redirect()->route('empresas.show', $empresa);}
     }
 
     /**
@@ -104,18 +122,25 @@ class EmpresasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $empresa = Empresa::findOrFail($id);
         if($empresa->Estatus == 1) {
             $empresa->Estatus = 0;
-            $text = '¡Empresa Inhabilitada!';
+            $empresa->usuario_desactivo=auth()->user()->idusuario;
+            $empresa->motivo=$request->motivo;
+            $empresa->updated_at=date("Y-m-d H:i:s");
+            $text = '¡EMPRESA DESHABILITADA CORRECTAMENTE!';
         } else {
             $empresa->Estatus = 1;
-            $text = '¡Empresa Habilitada!';
+            $empresa->motivo=null;
+            $empresa->usuario_desactivo=null;
+            $empresa->usuario_registro=auth()->user()->idusuario;
+            $empresa->created_at=date("Y-m-d H:i:s");
+            $text = '¡EMPRESA DESHABILITADA CORRECTAMENTE!';
         }
         $empresa->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

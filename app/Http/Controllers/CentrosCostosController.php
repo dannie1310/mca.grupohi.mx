@@ -8,13 +8,16 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\CentroCosto;
 use App\Models\ProyectoLocal;
-
+use Laracasts\Flash\Flash;
 class CentrosCostosController extends Controller
 {
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-centroscostos', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-centroscostos', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-centroscostos', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
     
@@ -41,11 +44,11 @@ class CentrosCostosController extends Controller
             return view('centroscostos.create');
         }
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Requests\CreateCentroCostoRequest|Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Requests\CreateCentroCostoRequest $request)
@@ -89,7 +92,9 @@ class CentrosCostosController extends Controller
      */
     public function show($id)
     {
-        //
+        $centrocosto = CentroCosto::findOrFail($id);
+        return view('centroscostos.detalle')->with("centro",$centrocosto);
+
     }
 
     /**
@@ -131,34 +136,33 @@ class CentrosCostosController extends Controller
      */
     public function destroy(Request $request, $id)
     {
+
         $centro = CentroCosto::findOrFail($id);
 
         if($request->get('_toggle')) {
             if($centro->Estatus == 1) {
                 $centro->Estatus = 0;
+                $centro->usuario_desactivo=auth()->user()->idusuario;
+                $centro->motivo=$request->motivo;
                 $text = '¡Centro de Costo Deshabilitado!';
             } else {
                 $centro->Estatus = 1;
+                $centro->motivo=null;
+                $centro->usuario_desactivo=null;
+                $centro->usuario_registro= auth()->user()->idusuario;
                 $text = '¡Centro de Costo Habilitado!';
             }
             $centro->save();
-                
-            return response()->json(['text' => $text]);
+            Flash::success($text);
         } else {
             if($centro->hijos()->count() != 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => '¡NO SE PUEDE ELIMINAR UN CENTRO DE COSTO QUE CONTENGA SUBCUENTAS!'
-                ]);
+                Flash::error('¡NO SE PUEDE ELIMINAR UN CENTRO DE COSTO QUE CONTENGA SUBCUENTAS!');
             } else {
                 CentroCosto::findOrFail($id);
                 CentroCosto::destroy($id);
-                return response()->json([
-                    'id' => $id,
-                    'success' => true,
-                    'message' => '¡CENTRO DE COSTO ELIMINADO CORRECTAMENTE!',
-                ]);
+                Flash::success('¡CENTRO DE COSTO ELIMINADO CORRECTAMENTE!');
             }
         }
+        return redirect()->back();
     }
 }

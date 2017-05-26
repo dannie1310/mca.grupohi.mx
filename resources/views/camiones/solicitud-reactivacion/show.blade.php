@@ -45,13 +45,13 @@
         </tr>
         <tr>
             <td><label>No Licnecia:</label></td>
-            <td><input type="text" class="form-control" value="{{ $camion->operador->NoLicencia }}" disabled></td>
-            <td><input type="text" class="form-control" value="{{ $solicitud->operador->NoLicencia  }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $camion->operador ? $camion->operador->NoLicencia:'' }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $solicitud->operador ? $solicitud->operador->NoLicencia:''  }}" disabled></td>
         </tr>
         <tr>
             <td><label>Vigencia:</label></td>
-            <td><input type="text" class="form-control" value="{{ $camion->operador->VigenciaLicencia  }}" disabled></td>
-            <td><input type="text" class="form-control" value="{{ $solicitud->operador->VigenciaLicencia  }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $camion->operador ? $camion->operador->VigenciaLicencia:''  }}" disabled></td>
+            <td><input type="text" class="form-control" value="{{ $solicitud->operador ? $solicitud->operador->VigenciaLicencia:''  }}" disabled></td>
         </tr>
         <tr>
             <td colspan="3"><hr></td>

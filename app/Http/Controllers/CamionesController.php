@@ -24,7 +24,12 @@ class CamionesController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-camiones', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-camiones', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-camiones', ['only' => ['create', 'store']]);
+
+
+
         parent::__construct();
     }
     
@@ -63,7 +68,7 @@ class CamionesController extends Controller
                 ->withOperadores(Operador::all()->lists('Nombre', 'IdOperador'))
                 ->withMarcas(Marca::all()->lists('Descripcion', 'IdMarca'))
                 ->withBotones(Boton::all()->lists('Identificador', 'IdBoton'))
-                ->withEmpresas(Empresa::all()->lists('razonSocial', 'idEmpresa'));
+                ->withEmpresas(Empresa::all()->lists('razonSocial', 'IdEmpresa'));
     }
 
     /**
@@ -171,10 +176,9 @@ class CamionesController extends Controller
                     ->where('IdCamion', $idCamion)
                     ->where('TipoC', $tipoC)->delete();
 
-               // $imagen->save();
+                // $imagen->save();
             }
-
-
+            
             ImagenCamion::create([
                 'IdCamion' => $camion->IdCamion,
                 'TipoC' => $tipoC,
@@ -197,18 +201,25 @@ class CamionesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $camion = Camion::findOrFail($id);
         if($camion->Estatus == 1) {
             $camion->Estatus = 0;
-            $text = '¡Camión Inhabilitado!';
+            $camion->usuario_desactivo=auth()->user()->idusuario;
+            $camion->motivo=$request->motivo;
+            $camion->updated_at=date("Y-m-d H:i:s");
+            $text = '¡CAMIÓN DESHABILITADO CORRECTAMENTE!';
         } else {
             $camion->Estatus = 1;
-            $text = '¡Camión Habilitado!';
+            $camion->motivo=null;
+            $camion->usuario_desactivo=null;
+            $camion->usuario_registro=auth()->user()->idusuario;
+            $camion->created_at=date("Y-m-d H:i:s");
+            $text = '¡CAMIÓN HABILITADO CORRECTAMENTE!';
         }
         $camion->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

@@ -2,8 +2,14 @@
 
 @section('content')
 <h1>{{ $operador->Nombre }}
-    <a href="{{ route('operadores.edit', $operador) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> EDITAR</a>
-    <a href="{{ route('operadores.destroy', $operador) }}" class="btn pull-right operadores_destroy {{ $operador->Estatus == 1 ? 'activo btn-danger' : 'inactivo btn-success' }}" style="margin-right: 5px"><i class="fa {{ $operador->Estatus == 1 ? 'fa-ban' : 'fa-check' }}"></i> {{ $operador->Estatus == 1 ? 'INHABILITAR' : 'HABILITAR' }}</a>
+    @permission('editar-operadores')
+    <a style="margin-left: 5px" href="{{ route('operadores.edit', $operador) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> EDITAR</a>
+    @endpermission
+    @permission('consultar-historico')
+    <button type="button" id="ver_historico" class="btn btn-primary pull-right"><i class="fa fa-calendar"></i>
+        Historico
+    </button>
+    @endpermission
 </h1>
 {!! Breadcrumbs::render('operadores.show', $operador) !!}
 <hr>
@@ -36,4 +42,21 @@
     {!! link_to_route('operadores.index', 'Regresar', [],  ['class' => 'btn btn-info'])!!}
 </div>
 {!! Form::close() !!}
+<div id="modal_historico">
+</div>
 @stop
+@section('scripts')
+    <script>
+        $('#ver_historico').off().on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: App.host + '/historico/operadores/{{$operador->IdOperador}}',
+                success: function (response) {
+                    $('#modal_historico').html(response);
+                    $('#historicoModal').modal('show');
+                }
+            })
+        });
+    </script>
+@endsection
