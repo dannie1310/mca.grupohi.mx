@@ -107,18 +107,24 @@ class EtapasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $etapa = Etapa::findOrFail($id);
         if($etapa->Estatus == 1) {
             $etapa->Estatus = 0;
-            $text = '¡Etapa Inhabilitada!';
+            $etapa->usuario_desactivo=auth()->user()->idusuario;
+            $etapa->motivo=$request->motivo;
+            $etapa->updated_at=date("Y-m-d H:i:s");
+            $text = '¡ETAPA DESHABILITADA CORRECTAMENTE!';
         } else {
             $etapa->Estatus = 1;
-            $text = '¡Etapa Habilitada!';
+            $etapa->motivo="";
+            $etapa->usuario_registro=auth()->user()->idusuario;
+            $etapa->created_at=date("Y-m-d H:i:s");
+            $text = '¡ETAPA HABILITADA CORRECTAMENTE!';
         }
         $etapa->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

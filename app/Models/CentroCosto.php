@@ -42,7 +42,9 @@ class CentroCosto extends Model
             return $this->padre->getLevel() + 1;                 
         }
     }
-    
+    public function user_registro(){
+        return $this->belongsTo(\App\User::class, 'usuario_registro','idusuario');
+    }
     public function getUltimoHijo() {
         return CentroCosto::where('IdPadre', '=', $this->IdCentroCosto)->orderBy('Nivel', 'DESC')->first();
     }
@@ -53,5 +55,8 @@ class CentroCosto extends Model
         } else {
             return $this->getUltimoHijo()->getUltimoDescendiente();
         }
+    }
+    public function getEstatusStringAttribute() {
+        return $this->Estatus == 1 ? 'ACTIVADA' : 'DESACTIVADA';
     }
 }

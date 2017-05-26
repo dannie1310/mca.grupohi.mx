@@ -176,18 +176,24 @@ class CamionesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $camion = Camion::findOrFail($id);
         if($camion->Estatus == 1) {
             $camion->Estatus = 0;
-            $text = '¡Camión Inhabilitado!';
+            $camion->usuario_desactivo=auth()->user()->idusuario;
+            $camion->motivo=$request->motivo;
+            $camion->updated_at=date("Y-m-d H:i:s");
+            $text = '¡CAMIÓN DESHABILITADO CORRECTAMENTE!';
         } else {
             $camion->Estatus = 1;
-            $text = '¡Camión Habilitado!';
+            $camion->motivo="";
+            $camion->usuario_registro=auth()->user()->idusuario;
+            $camion->updated_at=date("Y-m-d H:i:s");
+            $text = '¡CAMIÓN HABILITADO CORRECTAMENTE!';
         }
         $camion->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

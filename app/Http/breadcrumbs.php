@@ -195,6 +195,10 @@ Breadcrumbs::register('operadores.edit', function($breadcrumbs, $operador){
 Breadcrumbs::register('centroscostos.index', function($breadcrumbs){
     $breadcrumbs->push('CENTROS DE COSTO', route('centroscostos.index'));
 });
+Breadcrumbs::register('centroscostos.show', function ($breadcrumbs, $centro) {
+    $breadcrumbs->parent('centroscostos.index');
+    $breadcrumbs->push($centro->IdCentroCosto, route('centroscostos.show', $centro));
+});
 
 //Origenes por Usuario
 Breadcrumbs::register('origenes_usuarios.index', function($breadcrumbs){

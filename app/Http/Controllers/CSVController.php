@@ -41,8 +41,9 @@ class CSVController extends Controller
         parent::__construct();
     }
 
-    public function rutas() {
-        $headers = ['Clave', 'Origen', 'Tiro', 'Tipo de Ruta', '1er. KM', 'KM Subsecuentes', 'KM Adicionales', 'KM Total', 'Tiempo Minimo', 'Tiempo Tolerancia', "Estatus", "Registró", "Fecha y Hora Registro","Desactivo", "Fecha y Hora de Desactivación","Motivo de Desactivación"];
+    public function rutas()
+    {
+        $headers = ['Clave', 'Origen', 'Tiro', 'Tipo de Ruta', '1er. KM', 'KM Subsecuentes', 'KM Adicionales', 'KM Total', 'Tiempo Minimo', 'Tiempo Tolerancia', "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
         $items = Ruta::leftJoin('origenes', 'rutas.IdOrigen', '=', 'origenes.IdOrigen')
             ->leftJoin('tiros', 'rutas.IdTiro', '=', 'tiros.IdTiro')
             ->leftJoin('tipo_ruta', 'rutas.IdTipoRuta', '=', 'tipo_ruta.IdTipoRuta')
@@ -116,11 +117,13 @@ class CSVController extends Controller
 
     public function camiones()
     {
-        $headers = ["Economico", "Sindicato", "Empresa", "Placas del Camión", "Placas de la Caja", "Marca", "Modelo", "Propietario", "Operador", "Aseguradora", "Poliza de Seguro", "Vigencia Seguro", "Cubicación Real", "Cubicación Para Pago", "Estatus"];
+        $headers = ["Economico", "Sindicato", "Empresa", "Placas del Camión", "Placas de la Caja", "Marca", "Modelo", "Propietario", "Operador", "Aseguradora", "Poliza de Seguro", "Vigencia Seguro", "Cubicación Real", "Cubicación Para Pago", "Estatus", "Registró", "Fecha y Hora Registro", "Desactivo", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
         $items = Camion::leftJoin('operadores', 'camiones.IdOperador', '=', 'operadores.IdOperador')
             ->leftJoin('sindicatos', 'camiones.IdSindicato', '=', 'sindicatos.IdSindicato')
             ->leftJoin('empresas', 'camiones.IdEmpresa', '=', 'empresas.IdEmpresa')
             ->leftJoin('marcas', 'camiones.IdMarca', '=', 'marcas.IdMarca')
+            ->leftJoin("igh.usuario as usuario_reg", "camiones.usuario_registro", "=", "usuario_reg.idusuario")
+            ->leftJoin("igh.usuario as usuario_elim", "camiones.usuario_desactivo", "=", "usuario_elim.idusuario")
             ->select(
                 "camiones.Economico",
                 "sindicatos.Descripcion as Sindicato",
@@ -136,7 +139,13 @@ class CSVController extends Controller
                 "camiones.VigenciaPolizaSeguro",
                 "camiones.CubicacionReal",
                 "camiones.CubicacionParaPago",
-                "camiones.Estatus")
+                "camiones.Estatus",
+                DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
+                "camiones.created_at",
+                DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
+                "camiones.updated_at",
+                "camiones.motivo"
+            )
             ->get();
         $csv = new CSV($headers, $items);
         $csv->generate('camiones');
@@ -163,30 +172,52 @@ class CSVController extends Controller
 
     public function empresas()
     {
-        $headers = ["ID", "Razón Social", "RFC", "Estatus"];
-        $items = Empresa::select("IdEmpresa", "razonSocial", "RFC", "Estatus")->get();
+        $headers = ["ID", "Razón Social", "RFC", "Estatus", "Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $items = Empresa::
+        leftJoin("igh.usuario as usuario_reg", "empresas.usuario_registro", "=", "usuario_reg.idusuario")
+            ->leftJoin("igh.usuario as usuario_elim", "empresas.usuario_desactivo", "=", "usuario_elim.idusuario")
+            ->select("empresas.IdEmpresa as id", "empresas.razonSocial", "empresas.RFC", "empresas.Estatus",
+                DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
+                "empresas.created_at",
+                DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
+                "empresas.updated_at",
+                "empresas.motivo"
+            )
+            ->get();
         $csv = new CSV($headers, $items);
         $csv->generate('empresas');
     }
 
     public function sindicatos()
     {
-        $headers = ["ID", "Descripción", "Nombre Corto", "Estatus"];
-        $items = Sindicato::select("IdSindicato", "Descripcion", "NombreCorto", "Estatus")->get();
+        $headers = ["ID", "Descripción", "Nombre Corto", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $items = Sindicato:: leftJoin("igh.usuario as usuario_reg", "sindicatos.usuario_registro", "=", "usuario_reg.idusuario")
+            ->leftJoin("igh.usuario as usuario_elim", "sindicatos.usuario_desactivo", "=", "usuario_elim.idusuario")
+            ->select("IdSindicato", "Descripcion", "NombreCorto", "Estatus",
+                DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
+                "sindicatos.created_at",
+                DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
+                "sindicatos.updated_at",
+                "sindicatos.motivo")->get();
         $csv = new CSV($headers, $items);
         $csv->generate('sindicatos');
     }
 
     public function centros_costos()
     {
-        $headers = ["ID", "Descripción", "Cuenta", "Centro de Costo Padre", "Estatus"];
+        $headers = ["ID", "Descripción", "Cuenta", "Centro de Costo Padre", "Fecha y hora registro", "Registró", "Estatus"];
         $items = CentroCosto::leftJoin("centroscosto as padres", "centroscosto.IdPadre", "=", "padres.IdCentroCosto")
+            ->leftJoin("igh.usuario as usuario", "centroscosto.usuario_registro", "=", "usuario.idusuario")
             ->select(
                 "centroscosto.IdCentroCosto",
                 "centroscosto.Descripcion",
                 "centroscosto.Cuenta",
                 "padres.Descripcion as padre",
-                "centroscosto.Estatus")
+                "centroscosto.created_at",
+                "usuario.nombre",
+                "centroscosto.Estatus"
+
+            )
             ->orderBy("centroscosto.IdCentroCosto", "ASC")
             ->get();
         $csv = new CSV($headers, $items);
@@ -195,9 +226,17 @@ class CSVController extends Controller
 
     public function etapas_proyecto()
     {
-        $headers = ["ID", "Descripción", "Estatus"];
-        $items = Etapa::select("IdEtapaProyecto", "Descripcion", "Estatus")
-            ->get();
+        $headers = ["ID", "Descripción", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $items = Etapa::
+        leftJoin("igh.usuario as usuario_reg", "etapasproyectos.usuario_registro", "=", "usuario_reg.idusuario")
+            ->leftJoin("igh.usuario as usuario_elim", "etapasproyectos.usuario_desactivo", "=", "usuario_elim.idusuario")
+            ->select("IdEtapaProyecto", "Descripcion", "Estatus",
+               DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
+               "etapasproyectos.created_at",
+               DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
+               "etapasproyectos.updated_at",
+               "etapasproyectos.motivo")
+               ->get();
         $csv = new CSV($headers, $items);
         $csv->generate('etapas_proyecto');
     }
@@ -239,8 +278,16 @@ class CSVController extends Controller
 
     public function marcas()
     {
-        $headers = ["ID", "Descripción", "Estatus"];
-        $items = Marca::select("IdMarca", "Descripcion", "Estatus")
+        $headers = ["ID", "Descripción", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+
+        $items = Marca::leftJoin("igh.usuario as usuario_reg", "marcas.usuario_registro", "=", "usuario_reg.idusuario")
+            ->leftJoin("igh.usuario as usuario_elim", "marcas.usuario_desactivo", "=", "usuario_elim.idusuario")
+            ->select("IdMarca", "Descripcion", "Estatus",
+                DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
+                "marcas.created_at",
+                DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
+                "marcas.updated_at",
+                "marcas.motivo")
             ->get();
         $csv = new CSV($headers, $items);
         $csv->generate('marcas');
@@ -248,8 +295,19 @@ class CSVController extends Controller
 
     public function operadores()
     {
-        $headers = ["ID", "Nombre", "Dirección", "Número de Licencia", "Vigencia de Licencia", "Fecha Registro", "Fecha de Baja", "Estatus"];
-        $items = Operador::select("IdOperador", "Nombre", "Direccion", "NoLicencia", "VigenciaLicencia", "FechaAlta", "FechaBaja", "Estatus")
+        $headers = ["ID", "Nombre", "Dirección", "Número de Licencia", "Vigencia de Licencia", "Fecha Registro", "Fecha de Baja", "Estatus","Registro", "Fecha y Hora de Registro", "Desactivó", "Fecha y Hora de Desactivación", "Motivo de Desactivación"];
+        $items = Operador::
+        leftJoin("igh.usuario as usuario_reg", "operadores.usuario_registro", "=", "usuario_reg.idusuario")
+            ->leftJoin("igh.usuario as usuario_elim", "operadores.usuario_desactivo", "=", "usuario_elim.idusuario")
+            ->select(
+                "operadores.IdOperador", "operadores.Nombre",
+                "operadores.Direccion", "operadores.NoLicencia",
+                "operadores.VigenciaLicencia", "operadores.FechaAlta", "operadores.FechaBaja", "operadores.Estatus",
+                DB::raw("CONCAT(usuario_reg.nombre, ' ', usuario_reg.apaterno, ' ', usuario_reg.amaterno)"),
+                "operadores.created_at",
+                DB::raw("CONCAT(usuario_elim.nombre, ' ', usuario_elim.apaterno, ' ', usuario_elim.amaterno)"),
+                "operadores.updated_at",
+                "operadores.motivo")
             ->get();
         $csv = new CSV($headers, $items);
         $csv->generate('operadores');
@@ -364,27 +422,26 @@ class CSVController extends Controller
         $csv = new CSV($headers, $items);
         $csv->generate('telefonos');
     }
+
     public function usuario_rol()
     {
-        
-         $usuarios = UsuarioPerfilesTransformer::transform(User_1::with('roles')->habilitados()->get());
+
+        $usuarios = UsuarioPerfilesTransformer::transform(User_1::with('roles')->habilitados()->get());
         $permisos = Permission::all();
         $roles = Role::with('perms')->get();
 
         $rol_usuario = array();
         $role_usuario_vista = array();
-        $permisos_rol_vista= array();
+        $permisos_rol_vista = array();
 
         ////////////Rol usuario
-        foreach ($usuarios as $usuario )
-        {
+        foreach ($usuarios as $usuario) {
             $rol_usuario = array();
-            if(Auth::user()->hasRole('administrador-sistema')){
+            if (Auth::user()->hasRole('administrador-sistema')) {
                 array_push($rol_usuario, $usuario['id']);
             }
             array_push($rol_usuario, $usuario['nombre']);
-            if (count($usuario['roles']) > 0)
-            {
+            if (count($usuario['roles']) > 0) {
                 foreach ($roles as $rol) {
                     $aux = false;
                     foreach ($usuario['roles'] as $rolAsignado) {
@@ -394,20 +451,19 @@ class CSVController extends Controller
                     }
                     array_push($rol_usuario, $aux);
                 }
-            } else
-            {
+            } else {
                 $a = 0;
                 while (count($roles) > $a) {
                     array_push($rol_usuario, '');
                     $a++;
                 }
             }
-            $data =  $rol_usuario;
+            $data = $rol_usuario;
             array_push($role_usuario_vista, $data);
         }
         $headers = [];
-         
-        if(Auth::user()->hasRole('administrador-sistema')){
+
+        if (Auth::user()->hasRole('administrador-sistema')) {
             array_push($headers, 'Id');
         }
         array_push($headers, 'Usuario');
@@ -415,7 +471,7 @@ class CSVController extends Controller
             array_push($headers, $rol->display_name);
         }
         $items = $role_usuario_vista;
-        $csv = new CSV($headers,$items);
+        $csv = new CSV($headers, $items);
         $csv->generate('usuarios-roles');
 
 
@@ -429,27 +485,23 @@ class CSVController extends Controller
 
         $rol_usuario = array();
         $role_usuario_vista = array();
-        $permisos_rol_vista= array();
+        $permisos_rol_vista = array();
         ///////////Rol permisos
-        foreach ($roles as $rol)
-        {
-            $rol_permisos= array();
+        foreach ($roles as $rol) {
+            $rol_permisos = array();
             array_push($rol_permisos, $rol->display_name);
-            $permisoActual=DB::connection('sca')->table('sca_configuracion.permission_role')->where('role_id', '=', $rol->id)->get();
-            if (count($permisoActual) > 0)
-            {
-                foreach ($permisos as $permiso){
+            $permisoActual = DB::connection('sca')->table('sca_configuracion.permission_role')->where('role_id', '=', $rol->id)->get();
+            if (count($permisoActual) > 0) {
+                foreach ($permisos as $permiso) {
                     $aux = false;
-                    for($a=0;$a<count($permisoActual);$a++){
-                        if($permisoActual[$a]->permission_id==$permiso->id){
-                            $aux=true;
+                    for ($a = 0; $a < count($permisoActual); $a++) {
+                        if ($permisoActual[$a]->permission_id == $permiso->id) {
+                            $aux = true;
                         }
                     }
                     array_push($rol_permisos, $aux);
                 }
-            }
-            else
-            {
+            } else {
                 $a = 0;
                 while (count($permisos) > $a) {
                     array_push($rol_permisos, false);
@@ -468,10 +520,9 @@ class CSVController extends Controller
 
 
         $items = $permisos_rol_vista;
-        $csv = new CSV($headers,$items);
+        $csv = new CSV($headers, $items);
         $csv->generate('roles-permisos');
 
-       
 
     }
 
@@ -484,14 +535,14 @@ class CSVController extends Controller
 
         $rol_usuario = array();
         $role_usuario_vista = array();
-        $permisos_rol_vista= array();
+        $permisos_rol_vista = array();
 
-        $usuario_Permisos=array();
-        $usuario_Permisos_vista=array();
+        $usuario_Permisos = array();
+        $usuario_Permisos_vista = array();
 
         foreach ($usuarios as $usuario) {
-            $usuario_Permisos=array();
-            if(Auth::user()->hasRole('administrador-sistema')){
+            $usuario_Permisos = array();
+            if (Auth::user()->hasRole('administrador-sistema')) {
                 array_push($usuario_Permisos, $usuario['id']);
             }
             array_push($usuario_Permisos, $usuario['nombre']);
@@ -506,7 +557,7 @@ class CSVController extends Controller
                             group by (pm.permission_id)
                             order by 1 asc', ['userid' => $usuario['id']]);
 
-            if(count($permisosActuales)>0){
+            if (count($permisosActuales) > 0) {
                 foreach ($permisos as $permiso) {
                     $aux = false;
                     foreach ($permisosActuales as $permisosActual) {
@@ -517,8 +568,7 @@ class CSVController extends Controller
                     array_push($usuario_Permisos, $aux);
                 }
 
-            }
-            else {
+            } else {
                 $a = 0;
                 while (count($permisos) > $a) {
                     array_push($usuario_Permisos, false);
@@ -531,7 +581,7 @@ class CSVController extends Controller
         }
 
         $headers = [];
-        if(Auth::user()->hasRole('administrador-sistema')){
+        if (Auth::user()->hasRole('administrador-sistema')) {
             array_push($headers, 'Id');
         }
         array_push($headers, 'Usuario');
@@ -540,11 +590,10 @@ class CSVController extends Controller
         }
 
         $items = $usuario_Permisos_vista;
-        $csv = new CSV($headers,$items);
+        $csv = new CSV($headers, $items);
         $csv->generate('usuarios-permisos');
 
     }
-
 
 
 }

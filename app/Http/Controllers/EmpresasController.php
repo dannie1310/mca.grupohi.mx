@@ -104,18 +104,24 @@ class EmpresasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $empresa = Empresa::findOrFail($id);
         if($empresa->Estatus == 1) {
             $empresa->Estatus = 0;
-            $text = '¡Empresa Inhabilitada!';
+            $empresa->usuario_desactivo=auth()->user()->idusuario;
+            $empresa->motivo=$request->motivo;
+            $empresa->updated_at=date("Y-m-d H:i:s");
+            $text = '¡EMPRESA DESHABILITADA CORRECTAMENTE!';
         } else {
             $empresa->Estatus = 1;
-            $text = '¡Empresa Habilitada!';
+            $empresa->motivo="";
+            $empresa->usuario_registro=auth()->user()->idusuario;
+            $empresa->updated_at=date("Y-m-d H:i:s");
+            $text = '¡EMPRESA DESHABILITADA CORRECTAMENTE!';
         }
         $empresa->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }

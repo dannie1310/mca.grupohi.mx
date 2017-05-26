@@ -100,18 +100,24 @@ class MarcasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         $marca = Marca::findOrFail($id);
         if($marca->Estatus == 1) {
             $marca->Estatus = 0;
-            $text = '¡Marca Inhabilitada!';
+            $marca->usuario_desactivo=auth()->user()->idusuario;
+            $marca->motivo=$request->motivo;
+            $marca->updated_at=date("Y-m-d H:i:s");
+            $text = '¡MARCA DESHABILITADA CORRECTAMENTE!';
         } else {
             $marca->Estatus = 1;
-            $text = '¡Marca Habilitada!';
+            $marca->usuario_desactivo=auth()->user()->idusuario;
+            $marca->motivo="";
+            $marca->created_at=date("Y-m-d H:i:s");
+            $text = '¡MARCA HABILITADA CORRECTAMENTE!';
         }
         $marca->save();
-                
-        return response()->json(['text' => $text]);
+        Flash::success($text);
+        return redirect()->back();
     }
 }
