@@ -13,12 +13,15 @@ class Empresa extends Model
     protected $table = 'empresas';
     protected $primaryKey = 'IdEmpresa';
     protected $fillable = [
-        'razonKSocial',
-        'RFC'
+        'razonSocial',
+        'RFC',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
+
     protected $presenter = ModelPresenter::class;
-    public $timestamps = false;
-    
+
     public function camiones() {
         return $this->hasMany(Camion::class, 'IdEmpresa');
     }
