@@ -70,9 +70,9 @@ class AuthController extends Controller
             return response()->json(['error' => 'No se obtuvo Token de sesión, intente de nuevo.', 'code' => 200], 200);
         }
 
-        $user = Auth::user();
+        $user = auth()->user();
         $token = JWTAuth::fromUser($user);
-        $usrRegistrado = collect(Auth::user()->toArray())->only('idusuario','nombre', 'apaterno', 'amaterno');
+        $usrRegistrado = collect(auth()->user()->toArray())->only('idusuario','nombre', 'apaterno', 'amaterno');
         
         // Validación de que el usuario tiene permisos para utilizar el proyecto de regristro de Tags
        $permisos = DB::table('sca_configuracion.permisos_alta_tag')
