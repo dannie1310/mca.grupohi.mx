@@ -3,13 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Proyecto;
-use Ghi\Core\Models\UsuarioCadeco;
 use Illuminate\Http\Request;
 use App\Facades\Context;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use App\User;
-use App\User_1;
 use Illuminate\Support\Facades\DB;
 use Validator;
 use Illuminate\Support\Facades\Redirect;

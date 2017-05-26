@@ -38,6 +38,7 @@ class PDFController extends Controller
      */
     public function conciliacion($id)
     {
+        if(auth()->user()->can('ver-pdf')) {
         $conciliacion = Conciliacion::findOrFail($id);
 //        if(!count($conciliacion->conciliacionDetalles->where('estado', 1))) {
 //            Flash::error('No se puede mostrar el PDF ya que la conciliación no tiene viajes conciliados');
@@ -45,6 +46,10 @@ class PDFController extends Controller
 //        }
         $pdf = new PDFConciliacion('p', 'cm', 'Letter', $conciliacion);
         $pdf->create();
+        } else {
+            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+            return redirect()->back();
+        }
     }
 
     public function viajes_netos(Request $request)

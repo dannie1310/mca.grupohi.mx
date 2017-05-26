@@ -31,7 +31,7 @@ class DetalleAdministracionController extends Controller
 
     public function index()
     {
-        if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
+        if(auth()->user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
 
             $usuarios = UsuarioPerfilesTransformer::transform(User_1::with('roles')->habilitados()->get());
             $permisos = Permission::all();

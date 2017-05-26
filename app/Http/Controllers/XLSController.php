@@ -17,6 +17,7 @@ class XLSController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:descargar-excel-conciliacion', ['only' => ['conciliacion']]);
 
         parent::__construct();
     }

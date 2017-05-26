@@ -54,7 +54,7 @@ class RolesPermisosController extends Controller
 
     public function roles_permisos()
     {
-        if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
+        if(auth()->user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
             return view('administracion.roles_permisos');
         }else{
             Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
