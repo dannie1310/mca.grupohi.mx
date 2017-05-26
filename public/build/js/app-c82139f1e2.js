@@ -30681,7 +30681,7 @@ module.exports = exports['default'];
 
 },{}],25:[function(require,module,exports){
 /*!
- * vue-resource v1.2.1
+ * vue-resource v1.3.1
  * https://github.com/pagekit/vue-resource
  * Released under the MIT License.
  */
@@ -31335,7 +31335,15 @@ function Url(url, params) {
     options$$1 = merge({}, Url.options, self.$options, options$$1);
 
     Url.transforms.forEach(function (handler) {
-        transform = factory(handler, transform, self.$vm);
+
+        if (isString(handler)) {
+            handler = Url.transform[handler];
+        }
+
+        if (isFunction(handler)) {
+            transform = factory(handler, transform, self.$vm);
+        }
+
     });
 
     return transform(options$$1);
@@ -31355,7 +31363,8 @@ Url.options = {
  * Url transforms.
  */
 
-Url.transforms = [template, query, root];
+Url.transform = {template: template, query: query, root: root};
+Url.transforms = ['template', 'query', 'root'];
 
 /**
  * Encodes a Url parameter string.
@@ -31690,8 +31699,6 @@ var header = function (request, next) {
  * XMLHttp client (Browser).
  */
 
-var SUPPORTS_BLOB = typeof Blob !== 'undefined' && typeof FileReader !== 'undefined';
-
 var xhrClient = function (request) {
     return new PromiseObj(function (resolve) {
 
@@ -31727,16 +31734,16 @@ var xhrClient = function (request) {
             xhr.timeout = request.timeout;
         }
 
-        if (request.credentials === true) {
+        if (request.responseType && 'responseType' in xhr) {
+            xhr.responseType = request.responseType;
+        }
+
+        if (request.withCredentials || request.credentials) {
             xhr.withCredentials = true;
         }
 
         if (!request.crossOrigin) {
             request.headers.set('X-Requested-With', 'XMLHttpRequest');
-        }
-
-        if ('responseType' in xhr && SUPPORTS_BLOB) {
-            xhr.responseType = 'blob';
         }
 
         request.headers.forEach(function (value, name) {
@@ -32035,7 +32042,15 @@ function Http(options$$1) {
     defaults(options$$1 || {}, self.$options, Http.options);
 
     Http.interceptors.forEach(function (handler) {
-        client.use(handler);
+
+        if (isString(handler)) {
+            handler = Http.interceptor[handler];
+        }
+
+        if (isFunction(handler)) {
+            client.use(handler);
+        }
+
     });
 
     return client(new Request(options$$1)).then(function (response) {
@@ -32063,7 +32078,8 @@ Http.headers = {
     custom: {}
 };
 
-Http.interceptors = [before, method, body, jsonp, header, cors];
+Http.interceptor = {before: before, method: method, body: body, jsonp: jsonp, header: header, cors: cors};
+Http.interceptors = ['before', 'method', 'body', 'jsonp', 'header', 'cors'];
 
 ['get', 'delete', 'head', 'jsonp'].forEach(function (method$$1) {
 
@@ -32212,7 +32228,7 @@ module.exports = plugin;
 },{"got":7}],26:[function(require,module,exports){
 (function (global){
 /*!
- * Vue.js v2.2.4
+ * Vue.js v2.3.0
  * (c) 2014-2017 Evan You
  * Released under the MIT License.
  */
@@ -32256,20 +32272,21 @@ if ($('#app').length) {
     });
 }
 
-},{"./scripts":28,"./vue-components":38,"bootstrap-datepicker":1,"bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js":2,"bootstrap-fileinput":3,"bootstrap-fileinput/js/locales/es.js":4,"bootstrap-sass":5,"bootstrap-submenu":6,"datepair.js":8,"jquery":12,"jquery-timepicker/jquery.timepicker.js":9,"jquery-treegrid/js/jquery.treegrid.js":10,"jquery-ui":11,"numeral":13,"select2":14,"sweetalert":23,"underscore":24,"vue-resource":25,"vue/dist/vue.min.js":26}],28:[function(require,module,exports){
+},{"./scripts":28,"./vue-components":39,"bootstrap-datepicker":1,"bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js":2,"bootstrap-fileinput":3,"bootstrap-fileinput/js/locales/es.js":4,"bootstrap-sass":5,"bootstrap-submenu":6,"datepair.js":8,"jquery":12,"jquery-timepicker/jquery.timepicker.js":9,"jquery-treegrid/js/jquery.treegrid.js":10,"jquery-ui":11,"numeral":13,"select2":14,"sweetalert":23,"underscore":24,"vue-resource":25,"vue/dist/vue.min.js":26}],28:[function(require,module,exports){
 'use strict';
 
 require('./scripts/camiones');
 require('./scripts/centroscostos');
 require('./scripts/globales');
 require('./scripts/marcas');
+require('./scripts/materiales');
 require('./scripts/rutas');
 require('./scripts/tarifas');
 require('./scripts/etapas');
 require('./scripts/viajes');
 require('./scripts/conciliaciones');
 
-},{"./scripts/camiones":29,"./scripts/centroscostos":30,"./scripts/conciliaciones":31,"./scripts/etapas":32,"./scripts/globales":33,"./scripts/marcas":34,"./scripts/rutas":35,"./scripts/tarifas":36,"./scripts/viajes":37}],29:[function(require,module,exports){
+},{"./scripts/camiones":29,"./scripts/centroscostos":30,"./scripts/conciliaciones":31,"./scripts/etapas":32,"./scripts/globales":33,"./scripts/marcas":34,"./scripts/materiales":35,"./scripts/rutas":36,"./scripts/tarifas":37,"./scripts/viajes":38}],29:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -32778,90 +32795,6 @@ $(".element_destroy").off().on("click", function (event) {
     });
 });
 
-$('.mac').keyup(function (e) {
-    var r = /([a-f0-9]{2})/i;
-    var str = e.target.value.replace(/[^a-f0-9:]/ig, "");
-    if (e.keyCode != 8 && r.test(str.slice(-2))) {
-        str = str.concat(':');
-    }
-    e.target.value = str.slice(0, 17);
-});
-
-$('.alfanum').on("keypress", function (e) {
-    var tecla = document.all ? e.keyCode : e.which;
-    if (tecla == 8) return true;
-    var patron = /^[0-9-a-zA-Z]+$/;
-    var te = String.fromCharCode(tecla);
-    if (!patron.test(te)) event.returnValue = false;
-});
-
-$('.letras').on("keypress", function (e) {
-    var tecla = document.all ? e.keyCode : e.which;
-    if (tecla == 8) return true;
-    var patron = /^[a-zA-Z]+$/;
-    var te = String.fromCharCode(tecla);
-    if (!patron.test(te)) event.returnValue = false;
-});
-
-$('.add').click(function () {
-    $('.all').prop("checked", false);
-    var items = $("#list1 input:checked:not('.all')");
-
-    var n = items.length;
-    if (n > 0) {
-        items.each(function (idx, item) {
-            var choice = $(item);
-            choice.prop("checked", false);
-            choice.parent().appendTo("#list2");
-        });
-    } else {
-        alert("Choose an item from list 1");
-    }
-});
-
-$('.remove').click(function () {
-    $('.all').prop("checked", false);
-    var items = $("#list2 input:checked:not('.all')");
-    items.each(function (idx, item) {
-        var choice = $(item);
-        choice.prop("checked", false);
-        choice.parent().appendTo("#list1");
-    });
-});
-
-/* toggle all checkboxes in group */
-$('.all').click(function (e) {
-    e.stopPropagation();
-    var $this = $(this);
-    if ($this.is(":checked")) {
-        $this.parents('.list-group').find("[type=checkbox]").prop("checked", true);
-    } else {
-        $this.parents('.list-group').find("[type=checkbox]").prop("checked", false);
-        $this.prop("checked", false);
-    }
-});
-
-$('[type=checkbox]').click(function (e) {
-    e.stopPropagation();
-});
-
-/* toggle checkbox when list group item is clicked */
-$('.list-group a').click(function (e) {
-
-    e.stopPropagation();
-
-    var $this = $(this).find("[type=checkbox]");
-    if ($this.is(":checked")) {
-        $this.prop("checked", false);
-    } else {
-        $this.prop("checked", true);
-    }
-
-    if ($this.hasClass("all")) {
-        $this.trigger('click');
-    }
-});
-
 },{}],34:[function(require,module,exports){
 "use strict";
 
@@ -32902,6 +32835,45 @@ $(".marcas_destroy").off().on("click", function (event) {
 });
 
 },{}],35:[function(require,module,exports){
+"use strict";
+
+$(".materiales_destroy").off().on("click", function (event) {
+    var btn = $(this);
+    event.preventDefault();
+    swal({
+        title: "¿Estás seguro?",
+        text: "¡Se eliminará el material y no podra recuperarlo!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Si, ¡Eliminar!",
+        closeOnConfirm: false
+    }, function () {
+        $.ajax({
+            url: btn.attr('href'),
+            type: 'POST',
+            data: { _method: 'delete', _token: App.csrfToken },
+            success: function success(response) {
+                if (response.success) {
+                    swal({
+                        title: "¡Material Eliminado!",
+                        type: "success",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false }, function () {
+                        window.location.href = response.url;
+                    });
+                } else {
+                    sweetAlert("Oops...", "¡Hubo un error al procesar la solicitud!", "error");
+                }
+            },
+            error: function error() {
+                sweetAlert("Oops...", "¡Error Interno del Servidor!", "error");
+            }
+        });
+    });
+});
+
+},{}],36:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -33033,7 +33005,7 @@ $(document).ready(function () {
     }
 });
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -33087,7 +33059,7 @@ $(document).ready(function () {
     }
 });
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 if ($('#viajes_netos_autorizar').length) {
@@ -33164,7 +33136,7 @@ if ($('#viaje_neto_validar').length) {
     });
 }
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 require('./vue-components/global-errors');
@@ -33182,10 +33154,8 @@ require('./vue-components/viajes-revertir');
 require('./vue-components/viajes-index');
 require('./vue-components/corte-create');
 require('./vue-components/corte-edit');
-require('./vue-components/configuracion-diaria');
-require('./vue-components/roles-permisos');
 
-},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/configuracion-diaria":41,"./vue-components/corte-create":42,"./vue-components/corte-edit":43,"./vue-components/errors":44,"./vue-components/fda-bancomaterial":45,"./vue-components/fda-material":46,"./vue-components/global-errors":47,"./vue-components/origenes-usuarios":48,"./vue-components/roles-permisos":49,"./vue-components/viajes-completa":53,"./vue-components/viajes-index":54,"./vue-components/viajes-manual":55,"./vue-components/viajes-modificar":56,"./vue-components/viajes-revertir":57,"./vue-components/viajes-validar":58}],39:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":40,"./vue-components/conciliaciones-edit":41,"./vue-components/corte-create":42,"./vue-components/corte-edit":43,"./vue-components/errors":44,"./vue-components/fda-bancomaterial":45,"./vue-components/fda-material":46,"./vue-components/global-errors":47,"./vue-components/origenes-usuarios":48,"./vue-components/viajes-completa":52,"./vue-components/viajes-index":53,"./vue-components/viajes-manual":54,"./vue-components/viajes-modificar":55,"./vue-components/viajes-revertir":56,"./vue-components/viajes-validar":57}],40:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -33252,7 +33222,7 @@ Vue.component('conciliaciones-create', {
     }
 });
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-edit', {
@@ -33350,14 +33320,14 @@ Vue.component('conciliaciones-edit', {
         manuales: function manuales() {
             var _this = this;
             return _this.conciliacion.detalles.filter(function (detalle) {
-                return detalle.estatus_viaje >= 20 && detalle.estatus_viaje <= 29 && detalle.estado === 1;
+                return detalle.estatus_viaje === 20 && detalle.estado === 1;
             });
         },
 
         moviles: function moviles() {
             var _this = this;
             return _this.conciliacion.detalles.filter(function (detalle) {
-                return detalle.estatus_viaje >= 0 && detalle.estatus_viaje <= 9 && detalle.estado === 1;
+                return detalle.estatus_viaje === 0 && detalle.estado === 1;
             });
         }
     },
@@ -33822,10 +33792,8 @@ Vue.component('conciliaciones-edit', {
                 },
                 success: function success(response) {
                     swal('¡Hecho!', 'Datos actualizados correctamente', 'success');
-                    _this.conciliacion.importe_pagado = response.importe_pagado;
-                    _this.conciliacion.importe_pagado_sf = response.importe_pagado_sf;
-                    _this.conciliacion.volumen_pagado = response.volumen_pagado;
-                    _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
+                    _this.conciliacion.fecha = response.fecha;
+                    _this.conciliacion.folio = response.folio;
                 },
                 error: function error(_error7) {
                     if (_error7.status == 422) {
@@ -33846,481 +33814,6 @@ Vue.component('conciliaciones-edit', {
                 complete: function complete() {
                     _this.guardando = false;
                     $('#detalles_conciliacion').modal('hide');
-                }
-            });
-        }
-    }
-});
-
-},{}],41:[function(require,module,exports){
-'use strict';
-
-/**
- * Created by JFEsquivel on 27/04/2017.
- */
-
-Vue.component('configuracion-diaria', {
-    props: ['rol_checador'],
-
-    data: function data() {
-        return {
-            checadores: [],
-            tiros: [],
-            origenes: [],
-            esquemas: [],
-            perfiles: [],
-            telefonos: [],
-            current_checador: null,
-            current_telefono: null,
-            form: {
-                errors: []
-            },
-            guardando: false,
-            cargando: false
-        };
-    },
-
-    created: function created() {
-        this.initialize();
-    },
-
-    computed: {
-        para_origen: function para_origen() {
-            return this.perfiles.filter(function (perfil) {
-                if (perfil.id_esquema == '1') {
-                    return true;
-                }
-                return false;
-            });
-        },
-
-        para_tiro: function para_tiro() {
-            return this.perfiles.filter(function (perfil) {
-                if (perfil.id_esquema == '2') {
-                    return true;
-                }
-                return false;
-            });
-        },
-
-        telefonos_select: function telefonos_select() {
-            var result = [];
-            if (this.current_checador.telefono) {
-                result.push(this.current_checador.telefono);
-            }
-            this.telefonos.forEach(function (telefono) {
-                result.push(telefono);
-            });
-
-            return result;
-        }
-    },
-
-    methods: {
-        initialize: function initialize() {
-            var _this = this;
-            var url = App.host + '/init/configuracion-diaria';
-
-            $.ajax({
-                type: 'GET',
-                url: url,
-                beforeSend: function beforeSend() {
-                    _this.cargando = true;
-                },
-                success: function success(response) {
-                    _this.checadores = response.checadores;
-                    _this.checadores.forEach(function (checador) {
-                        Vue.set(checador, 'guardando', false);
-                    });
-                    _this.tiros = response.tiros;
-                    _this.tiros.forEach(function (tiro) {
-                        Vue.set(tiro, 'guardando', false);
-                    });
-
-                    _this.origenes = response.origenes;
-                    _this.perfiles = response.perfiles;
-                    _this.esquemas = response.esquemas;
-                    _this.telefonos = response.telefonos;
-                },
-                error: function error(_error) {
-                    if (_error.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error.responseJSON);
-                    } else if (_error.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.cargando = false;
-                }
-            });
-        },
-
-        tiro_by_id: function tiro_by_id(id) {
-            var result = {};
-            this.tiros.forEach(function (tiro) {
-                if (tiro.id == id) {
-                    result = tiro;
-                }
-            });
-            return result;
-        },
-
-        origen_by_id: function origen_by_id(id) {
-            var result = {};
-            this.origenes.forEach(function (origen) {
-                if (origen.id == id) {
-                    result = origen;
-                }
-            });
-            return result;
-        },
-
-        set_ubicacion: function set_ubicacion(user, e) {
-            var id = $(e.currentTarget).val();
-            if (user.configuracion.tipo == 1) {
-                Vue.set(user.configuracion, 'ubicacion', this.tiro_by_id(id));
-            } else if (user.configuracion.tipo == 0) {
-                Vue.set(user.configuracion, 'ubicacion', this.origen_by_id(id));
-            }
-            Vue.set(user.configuracion, 'id_perfil', '');
-            Vue.set(user.configuracion, 'turno', '');
-        },
-
-        clear_ubicacion: function clear_ubicacion(user) {
-            Vue.set(user.configuracion, 'ubicacion', {
-                id: '',
-                descripcion: ''
-            });
-        },
-
-        guardar_configuracion: function guardar_configuracion(user) {
-            var data = {
-                'id_usuario': user.id,
-                'tipo': user.configuracion.tipo,
-                'id_ubicacion': user.configuracion.ubicacion.id,
-                'id_perfil': user.configuracion.id_perfil,
-                'turno': user.configuracion.turno
-            };
-
-            var _this = this;
-            var url = App.host + '/configuracion-diaria?type=ubicacion';
-
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: data,
-                beforeSend: function beforeSend() {
-                    user.guardando = true;
-                },
-                success: function success(response) {
-                    var checador = response.checador;
-                    checador.guardando = false;
-                    Vue.set(_this.checadores, _this.checadores.indexOf(user), checador);
-                    swal({
-                        type: 'success',
-                        title: '¡Configuración Correcta!',
-                        text: 'Configuración establecida correctamente<br> para el usuario </strong>' + user.nombre + '</strong>',
-                        html: true
-                    });
-                },
-                error: function error(_error2) {
-                    if (_error2.status == 422) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error2.responseJSON)
-                        });
-                    } else if (_error2.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error2.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    user.guardando = false;
-                }
-            });
-        },
-
-        quitar_configuracion: function quitar_configuracion(user) {
-            var _this = this;
-            swal({
-                type: 'warning',
-                title: '¡Alerta!',
-                text: '¿Realmente desea eliminar la configuración para el checador<br>' + user.nombre + '?',
-                html: true,
-                showCancelButton: true,
-                confirmButtonText: "Si, eliminar",
-                cancelButtonText: "No, cancelar"
-            }, function () {
-                return _this.eliminar(user);
-            });
-        },
-
-        eliminar: function eliminar(user) {
-            var url = App.host + '/configuracion-diaria/' + user.configuracion.id + '?type=ubicacion';
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: {
-                    _method: 'DELETE'
-                },
-                beforeSend: function beforeSend() {
-                    user.guardando = true;
-                },
-                success: function success() {
-                    swal({
-                        type: 'success',
-                        text: 'Configuración eliminada correctamente',
-                        title: 'Información'
-                    });
-                    Vue.set(user, 'configuracion', {
-                        tipo: '',
-                        ubicacion: {
-                            id: '',
-                            descripcion: ''
-                        },
-                        id_perfil: '',
-                        turno: ''
-                    });
-                },
-                error: function error(_error3) {
-                    if (_error3.status == 422) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error3.responseJSON)
-                        });
-                    } else if (_error3.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error3.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    user.guardando = false;
-                }
-            });
-        },
-
-        confirmar_quitar_checador: function confirmar_quitar_checador(user) {
-            var _this = this;
-            swal({
-                type: 'warning',
-                title: '¡Alerta!',
-                text: "¿Realmente desea quitar el permiso de 'Checador' para el usuario<br><strong>" + user.nombre + "</strong>?",
-                html: true,
-                showCancelButton: true,
-                confirmButtonText: "Si, quitar",
-                cancelButtonText: "No, cancelar"
-            }, function () {
-                return _this.quitar_checador(user);
-            });
-        },
-
-        quitar_checador: function quitar_checador(user) {
-            var _this = this;
-            var url = App.host + '/user/' + user.id + '/roles/' + _this.rol_checador;
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: {
-                    _method: 'DELETE'
-                },
-                beforeSend: function beforeSend() {
-                    user.guardando = true;
-                },
-                success: function success(response) {
-                    Vue.delete(_this.checadores, _this.checadores.indexOf(user));
-                    _this.telefonos = response.telefonos;
-                },
-                error: function error(_error4) {
-                    if (_error4.status == 422) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error4.responseJSON)
-                        });
-                    } else if (_error4.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error4.responseText)
-                        });
-                    }
-                }
-            });
-        },
-
-        /** Mostrar datos de ususario al que se le asignará un teléfono **/
-        asignar_telefono: function asignar_telefono(user) {
-            var _this = this;
-            var url = App.host + '/checkpermission/editar-telefonos';
-            $.ajax({
-                type: 'GET',
-                url: url,
-                beforeSend: function beforeSend() {},
-                success: function success(response) {
-                    if (response.has_permission) {
-                        Vue.set(_this, 'current_checador', user);
-                        Vue.set(_this, 'current_telefono', user.telefono ? user.telefono : { id: '', info: '', imei: '' });
-                        $('#telefonos_modal').modal('show');
-                        _this.form.errors = [];
-                    } else {
-                        swal({
-                            type: 'info',
-                            title: '¡No es posible realizar la acción!',
-                            text: 'No cuenta con los permisos necesarios para <strong>Editar Teléfonos</strong><br> Por favor solicitelo con el administrador de permisos',
-                            html: true
-                        });
-                    }
-                },
-                error: function error(_error5) {
-                    if (_error5.status == 422) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error5.responseJSON)
-                        });
-                    } else if (_error5.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error5.responseText)
-                        });
-                    }
-                },
-                complete: function complete(response) {
-                    if (response.status == 200) {
-                        console.log(response.has_permission);
-                    }
-                }
-
-            });
-        },
-
-        /** Ocultar datos de ususario al que se le asignará un teléfono **/
-        cancelar_asignacion: function cancelar_asignacion() {
-            Vue.set(this, 'current_checador', null);
-            Vue.set(this, 'current_telefono', null);
-            $('#telefonos_modal').modal('hide');
-        },
-        confirmar_asignacion: function confirmar_asignacion(e) {
-            e.preventDefault();
-            var _this = this;
-            var data = $('#asignar_telefono_form').serialize();
-            var url = App.host + '/configuracion-diaria?type=telefono';
-
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: data,
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                },
-                success: function success(response) {
-                    $('#telefonos_modal').modal('hide');
-
-                    swal({
-                        type: 'success',
-                        title: '¡Configuración Correcta!',
-                        text: 'Teléfono <strong>' + response.checador.telefono.info + '</strong> configurado correctamente para el checador <br><strong>' + response.checador.nombre + '</strong>',
-                        html: true
-                    });
-                    Vue.set(_this.checadores, _this.checadores.indexOf(_this.current_checador), response.checador);
-
-                    _this.telefonos = response.telefonos;
-                    Vue.set(_this, 'current_user', null);
-                },
-                error: function error(_error6) {
-                    if (_error6.status == 422) {
-                        /*swal({
-                            type : 'error',
-                            title : '¡Error!',
-                            text : App.errorsToString(error.responseJSON)
-                        })*/
-                        App.setErrorsOnForm(_this.form, _error6.responseJSON);
-                    } else if (_error6.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error6.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                }
-            });
-        },
-
-        confirmar_quitar_telefono: function confirmar_quitar_telefono(e) {
-            var _this2 = this;
-
-            e.preventDefault();
-
-            swal({
-                title: "¡Quitar Teléfono!",
-                text: "¿Esta seguro de que desea quitar el teléfono para el usuario <strong>" + this.current_checador.nombre + "</strong>?",
-                type: "warning",
-                showCancelButton: true,
-                html: true,
-                confirmButtonText: "Si, quitar",
-                cancelButtonText: "No, cancelar",
-                confirmButtonColor: "#ec6c62"
-            }, function () {
-                return _this2.quitar_telefono();
-            });
-        },
-
-        quitar_telefono: function quitar_telefono() {
-
-            var _this = this;
-            var url = App.host + '/usuarios/' + _this.current_checador.id + '?type=telefono';
-            var info = _this.current_checador.telefono.info;
-
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: {
-                    _method: 'PATCH'
-                },
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                },
-                success: function success(response) {
-                    $('#telefonos_modal').modal('hide');
-                    Vue.set(_this, 'current_user', null);
-                    swal({
-                        type: 'success',
-                        title: '¡Configuración Borrada!',
-                        text: 'El Teléfono <strong>' + info + '</strong> se desconfiguro correctamente para el checador <br><strong>' + response.checador.nombre + '</strong>',
-                        html: true
-                    });
-                    Vue.set(_this.checadores, _this.checadores.indexOf(_this.current_checador), response.checador);
-                    _this.telefonos = response.telefonos;
-                },
-                error: function error(_error7) {
-                    if (_error7.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error7.responseJSON);
-                    } else if (_error7.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error7.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
                 }
             });
         }
@@ -34502,13 +33995,11 @@ Vue.component('corte-edit', {
                 'viajes_netos': []
             },
             'form': {
-                'busqueda': '',
                 'errors': [],
                 'data': {
                     'id_material': '',
                     'id_origen': '',
-                    'id_tiro': '',
-                    'justificacion': '',
+                    'observaciones': '',
                     'cubicacion': '',
                     'id': ''
                 }
@@ -34528,23 +34019,17 @@ Vue.component('corte-edit', {
         modified: function modified() {
             var _this = this;
             return _this.corte.viajes_netos.filter(function (viaje_neto) {
-                return viaje_neto.corte_cambio;
-            });
-        },
-
-        resultados: function resultados() {
-            var _this = this;
-            return this.corte.viajes_netos.filter(function (viaje_neto) {
-                if (viaje_neto.Code == _this.form.busqueda.replace(/ /g, '')) {
+                if (viaje_neto.modified) {
                     return true;
-                } else {
-                    return false;
                 }
+                return false;
             });
         }
     },
 
     methods: {
+        doSomethingOnHidden: function doSomethingOnHidden() {},
+
         fetch: function fetch() {
 
             var _this = this;
@@ -34629,31 +34114,19 @@ Vue.component('corte-edit', {
             });
         },
 
-        editar: function editar(e) {
-            e.preventDefault();
-            var viaje = this.viaje;
-            if (viaje.corte_cambio == true) {
-                this.form.data.id_origen = viaje.IdOrigenNuevo ? viaje.IdOrigenNuevo : viaje.IdOrigen;
-                this.form.data.id_tiro = viaje.IdTiroNuevo ? viaje.IdTiroNuevo : viaje.IdTiro;
-                this.form.data.id_material = viaje.IdMaterialNuevo ? viaje.IdMaterialNuevo : viaje.IdMaterial;
-                this.form.data.cubicacion = viaje.CubicacionCamionNueva ? viaje.CubicacionCamionNueva : viaje.CubicacionCamion;
-                this.form.data.justificacion = viaje.justificacion;
-            } else {
-                this.form.data.id_origen = viaje.IdOrigen;
-                this.form.data.id_tiro = viaje.IdTiro;
-                this.form.data.id_material = viaje.IdMaterial;
-                this.form.data.cubicacion = viaje.CubicacionCamion;
-                this.form.data.justificacion = '';
-            }
-            this.form.data.id = viaje.IdViajeNeto;
+        editar: function editar(viaje) {
+
+            $('input[name=observaciones]').val(viaje.observaciones);
+            this.viaje = viaje;
+
+            this.form.data.id_material = viaje.id_material_nuevo ? viaje.id_material_nuevo : viaje.id_material;
+            this.form.data.id_origen = viaje.id_orige_nuevo ? viaje.id_origen_nuevo : viaje.id_origen;
+            this.form.data.cubicacion = viaje.cubicacion_nueva ? viaje.cubicacion_nueva : viaje.cubicacion;
+            this.form.data.id = viaje.id;
+            this.index = this.corte.viajes_netos.indexOf(viaje);
+
             this.form.errors = [];
             $('#edit_modal').modal('show');
-        },
-
-        informacion: function informacion(viaje) {
-            this.viaje = viaje;
-            this.index = this.corte.viajes_netos.indexOf(viaje);
-            $('#info_modal').modal('show');
         },
 
         confirmar_modificacion: function confirmar_modificacion(e) {
@@ -34688,14 +34161,14 @@ Vue.component('corte-edit', {
                 },
                 success: function success(response) {
                     Vue.set(_this.corte.viajes_netos, _this.index, response.viaje_neto);
-                    _this.viaje = response.viaje_neto;
                     $('#edit_modal').modal('hide');
-                    $('#info_modal').modal('hide');
-                    swal({
-                        'type': 'success',
-                        'title': 'INFORMACIÓN',
-                        'text': 'Cambios aplicados correctamente'
-                    });
+                    if (response.viaje_neto.modified) {
+                        swal({
+                            'type': 'success',
+                            'title': 'INFORMACIÓN',
+                            'text': 'Cambios aplicados correctamente'
+                        });
+                    }
                 },
                 error: function error(_error3) {
                     if (_error3.status == 422) {
@@ -34714,27 +34187,13 @@ Vue.component('corte-edit', {
             });
         },
 
-        confirmar_descartar: function confirmar_descartar() {
-            var _this4 = this;
-
-            e.preventDefault();
-            swal({
-                title: "Revertir Modificaciones",
-                text: "¿Esta seguro de desea revertir los cambios hechos en el viaje?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Si, Revertir",
-                cancelButtonText: "No, Cancelar",
-                confirmButtonColor: "#ec6c62"
-            }, function () {
-                return _this4.descartar();
-            });
+        formato: function formato(val) {
+            return numeral(val).format('0,0.00');
         },
 
-        descartar: function descartar(e) {
-            e.preventDefault();
+        descartar: function descartar(viaje) {
             var _this = this;
-            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + this.viaje.IdViajeNeto + '?action=revertir_modificaciones';
+            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + viaje.id + '?action=revertir_modificaciones';
 
             $.ajax({
                 type: 'POST',
@@ -34746,12 +34205,11 @@ Vue.component('corte-edit', {
                     _this.guardando = true;
                 },
                 success: function success(response) {
-                    Vue.set(_this.corte.viajes_netos, _this.index, response.viaje_neto);
-                    _this.viaje = response.viaje_neto;
+                    Vue.set(_this.corte.viajes_netos, _this.corte.viajes_netos.indexOf(viaje), response.viaje_neto);
                     swal({
                         'type': 'success',
                         'title': 'INFORMACIÓN',
-                        'text': 'Cambios revertidos correctamente'
+                        'text': 'Cambios aplicados correctamente'
                     });
                 },
                 error: function error(_error4) {
@@ -34768,73 +34226,8 @@ Vue.component('corte-edit', {
                 complete: function complete() {
                     _this.guardando = false;
                 }
+
             });
-        },
-
-        confirmar_confirmacion: function confirmar_confirmacion(e) {
-            var _this5 = this;
-
-            e.preventDefault();
-            swal({
-                title: "Confirmar el viaje",
-                text: "¿Esta seguro de que la información es correcta?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Si, Confirmar",
-                cancelButtonText: "No, Cancelar",
-                confirmButtonColor: "#ec6c62"
-            }, function () {
-                return _this5.confirmar_viaje();
-            });
-        },
-
-        confirmar_viaje: function confirmar_viaje() {
-            var _this = this;
-            var url = App.host + '/corte/' + _this.corte.id + '/viajes_netos/' + _this.viaje.IdViajeNeto;
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: {
-                    _method: 'PATCH',
-                    action: 'confirmar'
-                },
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                },
-                success: function success(response) {
-                    $('#info_modal').modal('hide');
-                    Vue.set(_this.corte.viajes_netos, _this.index, response.viaje_neto);
-                    swal({
-                        'type': 'success',
-                        'title': 'INFORMACIÓN',
-                        'text': 'Viaje Confirmado Correctamente'
-                    });
-                },
-                error: function error(_error5) {
-                    if (_error5.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error5.responseJSON);
-                    } else if (_error5.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error5.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                }
-            });
-        },
-
-        buscar: function buscar(e) {
-            e.preventDefault();
-            this.form.errors = [];
-            if (this.resultados.length) {
-                this.informacion(this.resultados[0]);
-            } else {
-                this.form.errors.push('Ningún viaje coincide con la búsqueda');
-            }
         }
     }
 });
@@ -34848,7 +34241,7 @@ Vue.component('app-errors', {
     template: require('./templates/errors.html')
 });
 
-},{"./templates/errors.html":50}],45:[function(require,module,exports){
+},{"./templates/errors.html":49}],45:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-bancomaterial', {
@@ -35069,7 +34462,7 @@ Vue.component('global-errors', {
   }
 });
 
-},{"./templates/global-errors.html":51}],48:[function(require,module,exports){
+},{"./templates/global-errors.html":50}],48:[function(require,module,exports){
 'use strict';
 
 Vue.component('origenes-usuarios', {
@@ -35144,507 +34537,13 @@ Vue.component('origenes-usuarios', {
     }
 });
 
-},{"./templates/origenes-usuarios.html":52}],49:[function(require,module,exports){
-'use strict';
-
-Vue.component('roles-permisos', {
-    data: function data() {
-        return {
-            usuarios: [],
-            roles: [],
-            permisos: [],
-
-            selected_rol_id: '',
-            selected_rol: {},
-            selected_usuario_id: '',
-            selected_usuario: {},
-            cargando: false,
-            guardando: false,
-            form: {
-                errors: []
-            }
-        };
-    },
-
-    created: function created() {
-        this.init();
-    },
-
-    computed: {
-        permisosDisponibles: function permisosDisponibles() {
-            var _this = this;
-            if (this.selected_rol_id) {
-                return this.permisos.filter(function (permiso) {
-                    var i;
-
-                    for (i = 0; i < _this.selected_rol.perms.length; i++) {
-                        if (_this.selected_rol.perms[i].id === permiso.id) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-            } else {
-                return [];
-            }
-        },
-        rolesDisponibles: function rolesDisponibles() {
-            var _this = this;
-            if (this.selected_usuario_id) {
-                return this.roles.filter(function (rol) {
-                    var i;
-                    for (i = 0; i < _this.selected_usuario.roles.length; i++) {
-                        if (_this.selected_usuario.roles[i].id === rol.id) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-            } else {
-                return [];
-            }
-        }
-    },
-
-    directives: {},
-
-    methods: {
-        init: function init() {
-            var url = App.host + '/administracion/roles_permisos/init';
-            var _this = this;
-            $.ajax({
-                type: 'GET',
-                url: url,
-                beforeSend: function beforeSend() {
-                    _this.cargando = true;
-                },
-                success: function success(response) {
-                    _this.usuarios = response.usuarios;
-                    _this.roles = response.roles;
-                    _this.permisos = response.permisos;
-                },
-                error: function error(_error) {
-                    if (_error.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error.responseJSON);
-                    } else if (_error.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.cargando = false;
-                }
-            });
-        },
-
-        roles_store: function roles_store(e) {
-            e.preventDefault();
-
-            var _this = this;
-            var form = $('#roles_store_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            var data = form.serialize();
-
-            $.ajax({
-                type: type,
-                url: url,
-                data: data,
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                },
-                success: function success(response) {
-                    _this.roles.push(response.rol);
-                    $("#roles_store_form")[0].reset();
-                    swal("Correcto!", "Se ha creado correctamente tu rol.", "success");
-                },
-                error: function error(_error2) {
-                    if (_error2.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error2.responseJSON);
-                    } else if (_error2.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error2.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                }
-            });
-        },
-        permisos_store: function permisos_store(e) {
-            e.preventDefault();
-
-            var _this = this;
-            var form = $('#permisos_store_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            var data = form.serialize();
-
-            $.ajax({
-                type: type,
-                url: url,
-                data: data,
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                },
-                success: function success(response) {
-                    _this.permisos.push(response.permiso);
-                    $("#permisos_store_form")[0].reset();
-                    swal("Correcto!", "Se ha creado correctamente tu rol.", "success");
-                },
-                error: function error(_error3) {
-                    if (_error3.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error3.responseJSON);
-                    } else if (_error3.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error3.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                }
-            });
-        },
-        select_rol: function select_rol() {
-            $("#leftRolValues").empty();
-            $("#rightRolValues").empty();
-            var indice = $("#rol").prop('selectedIndex');
-
-            if (this.selected_rol_id) {
-                Vue.set(this, 'selected_rol', this.roles[indice - 1]);
-
-                this.permisosDisponibles.forEach(function (permiso) {
-                    $("#leftRolValues").append("<option id='" + permiso.id + "' value='" + permiso.id + "'>" + permiso.display_name + "</option>");
-                });
-                this.selected_rol.perms.forEach(function (permiso) {
-                    $("#rightRolValues").append("<option id='" + permiso.id + "' value='" + permiso.id + "'>" + permiso.display_name + "</option>");
-                });
-            } else {
-                Vue.set(this, 'selected_rol', {});
-            }
-        },
-        select_usuario: function select_usuario() {
-
-            var indice = $("#selUser").prop('selectedIndex');
-
-            $("#leftPermisoValues").empty();
-            $("#rightPermisoValues").empty();
-
-            if (this.selected_usuario_id) {
-                Vue.set(this, 'selected_usuario', this.usuarios[indice - 1]);
-                this.rolesDisponibles.forEach(function (roles) {
-                    $("#leftPermisoValues").append("<option id='" + roles.id + "' value='" + roles.id + "'>" + roles.display_name + "</option>");
-                });
-                this.selected_usuario.roles.forEach(function (roles) {
-                    $("#rightPermisoValues").append("<option id='" + roles.id + "' value='" + roles.id + "'>" + roles.display_name + "</option>");
-                });
-            } else {
-                Vue.set(this, 'selected_usuario', {});
-            }
-        },
-
-        stop_propagation: function stop_propagation(e) {
-            e.stopPropagation();
-        },
-
-        list_group_action: function list_group_action(e) {
-            e.stopPropagation();
-
-            var t = $("[type=checkbox]");
-            if (t.is(":checked")) {
-                t.prop("checked", false);
-            } else {
-                t.prop("checked", true);
-            }
-
-            if (t.hasClass("all")) {
-                t.trigger('click');
-            }
-        },
-        //////////////////////////////////////////////////////////////Add roles a usuario
-        remove_permiso_click: function remove_permiso_click(e) {
-            e.preventDefault();
-            var selectedItem = $("#rightPermisoValues option:selected");
-            $("#leftPermisoValues").append(selectedItem);
-
-            var _this = this;
-            var idsSeleccionados = [];
-            $("#rightPermisoValues option").each(function (index) {
-                idsSeleccionados.push(this.id);
-            });
-
-            var form = $('#rol_usuario_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            $.ajax({
-                type: type,
-                url: url,
-                data: {
-                    'rol': idsSeleccionados,
-                    'usuario': $('#selUser').val()
-                },
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                    $("#btnPermisoRight").prop("disabled", true);
-                    $("#btnPermisoLeft").prop("disabled", true);
-                },
-                success: function success(response) {
-                    _this.usuarios = response.usuarios;
-                    _this.roles = response.roles;
-                    _this.permisos = response.permisos;
-                    swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
-                },
-                error: function error(_error4) {
-                    if (_error4.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error4.responseJSON);
-                    } else if (_error4.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error4.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                    $("#btnPermisoRight").prop("disabled", false);
-                    $("#btnPermisoLeft").prop("disabled", false);
-                }
-            });
-        },
-
-        add_permiso_click: function add_permiso_click(e) {
-
-            var selectedItem = $("#leftPermisoValues option:selected");
-            $("#rightPermisoValues").append(selectedItem);
-
-            e.preventDefault();
-
-            var _this = this;
-            var idsSeleccionados = [];
-            $("#rightPermisoValues option").each(function (index) {
-                idsSeleccionados.push(this.id);
-            });
-
-            var form = $('#rol_usuario_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            $.ajax({
-                type: type,
-                url: url,
-                data: {
-                    'rol': idsSeleccionados,
-                    'usuario': $('#selUser').val()
-                },
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                    $("#btnPermisoRight").prop("disabled", true);
-                    $("#btnPermisoLeft").prop("disabled", true);
-                },
-                success: function success(response) {
-                    _this.usuarios = response.usuarios;
-                    _this.roles = response.roles;
-                    _this.permisos = response.permisos;
-                    swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
-                },
-                error: function error(_error5) {
-                    if (_error5.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error5.responseJSON);
-                    } else if (_error5.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error5.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                    $("#btnPermisoRight").prop("disabled", false);
-                    $("#btnPermisoLeft").prop("disabled", false);
-                }
-            });
-        },
-
-        //////////////////////////Add permisos roles
-        remove_rol_click: function remove_rol_click(e) {
-            var selectedItem = $("#rightRolValues option:selected");
-            $("#leftRolValues").append(selectedItem);
-
-            e.preventDefault();
-
-            var _this = this;
-            var idsSeleccionados = [];
-            $("#rightRolValues option").each(function (index) {
-                idsSeleccionados.push(this.id);
-            });
-
-            var form = $('#permiso_rol_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            $.ajax({
-                type: type,
-                url: url,
-                data: {
-                    'permiso': idsSeleccionados,
-                    'rol': $('#rol').val()
-                },
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                    $("#btnRolRight").prop("disabled", true);
-                    $("#btnRolLeft").prop("disabled", true);
-                },
-                success: function success(response) {
-                    _this.usuarios = response.usuarios;
-                    _this.roles = response.roles;
-                    _this.permisos = response.permisos;
-                    swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
-                },
-                error: function error(_error6) {
-                    if (_error6.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error6.responseJSON);
-                    } else if (_error6.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error6.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                    $("#btnRolRight").prop("disabled", false);
-                    $("#btnRolLeft").prop("disabled", false);
-                }
-            });
-        },
-        add_rol_click: function add_rol_click(e) {
-            e.preventDefault();
-            var selectedItem = $("#leftRolValues option:selected");
-            $("#rightRolValues").append(selectedItem);
-
-            var _this = this;
-            var idsSeleccionados = [];
-            $("#rightRolValues option").each(function (index) {
-                idsSeleccionados.push(this.id);
-            });
-
-            var form = $('#permiso_rol_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            $.ajax({
-                type: type,
-                url: url,
-                data: {
-                    'permiso': idsSeleccionados,
-                    'rol': $('#rol').val()
-                },
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                    $("#btnRolRight").prop("disabled", true);
-                    $("#btnRolLeft").prop("disabled", true);
-                },
-                success: function success(response) {
-                    _this.usuarios = response.usuarios;
-                    _this.roles = response.roles;
-                    _this.permisos = response.permisos;
-                    swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
-                },
-                error: function error(_error7) {
-                    if (_error7.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error7.responseJSON);
-                    } else if (_error7.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error7.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                    $("#btnRolRight").prop("disabled", false);
-                    $("#btnRolLeft").prop("disabled", false);
-                }
-            });
-        },
-        remove_click: function remove_click() {
-            $('.all').prop("checked", false);
-            var items = $("#list2 input:checked:not('.all')");
-            items.each(function (idx, item) {
-                var choice = $(item);
-                choice.prop("checked", false);
-                choice.parent().appendTo("#list1");
-            });
-        },
-        all_click: function all_click(e) {
-            e.stopPropagation();
-            var t = $(e.currentTarget);
-            if (t.is(":checked")) {
-                t.parents('.list-group').find("[type=checkbox]").prop("checked", true);
-            } else {
-                t.parents('.list-group').find("[type=checkbox]").prop("checked", false);
-                t.prop("checked", false);
-            }
-        },
-
-        permisos_roles: function permisos_roles(e) {
-            e.preventDefault();
-
-            $('#idUsuarioSelect').val($('#idUsuario').val());
-            var form = $('#permisos_roles_form');
-            var url = form.attr('action');
-            var type = form.attr('method');
-            var data = form.serialize();
-
-            $.ajax({
-                type: type,
-                url: url,
-                data: data,
-
-                beforeSend: function beforeSend() {
-                    _this.guardando = true;
-                },
-                success: function success(response) {
-                    _this.roles.push(response.rol);
-                    swal("Correcto!", "Se ha creado correctamente tu rol.", "success");
-                },
-                error: function error(_error8) {
-                    if (_error8.status == 422) {
-                        App.setErrorsOnForm(_this.form, _error8.responseJSON);
-                    } else if (_error8.status == 500) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error8.responseText)
-                        });
-                    }
-                },
-                complete: function complete() {
-                    _this.guardando = false;
-                }
-            });
-        }
-
-    }
-});
-
-},{}],50:[function(require,module,exports){
+},{"./templates/origenes-usuarios.html":51}],49:[function(require,module,exports){
 module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 function timeStamp(type) {
@@ -35864,7 +34763,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-index', {
@@ -35877,12 +34776,11 @@ Vue.component('viajes-index', {
             'cargando': false,
             'guardando': false,
             'form': {
-                'errors': [],
-                'estado': ''
-            },
-            'ver_mas': false
+                'errors': []
+            }
         };
     },
+
     directives: {
         datepicker: {
             inserted: function inserted(el) {
@@ -35911,6 +34809,7 @@ Vue.component('viajes-index', {
             //data-toggle="modal" data-target="#detalles_conflicto"
         }
     },
+
     methods: {
         buscar_en_conflicto: function buscar_en_conflicto(e) {
             e.preventDefault();
@@ -35954,7 +34853,6 @@ Vue.component('viajes-index', {
         },
         buscar: function buscar(e) {
             e.preventDefault();
-            $('input[name=type]').val('');
             var _this = this;
 
             var data = $('.form_buscar').serialize();
@@ -35993,6 +34891,7 @@ Vue.component('viajes-index', {
                 }
             });
         },
+
         fetchDetalleConflicto: function fetchDetalleConflicto(id_conflicto, id_viaje) {
             var _this2 = this;
 
@@ -36065,16 +34964,19 @@ Vue.component('viajes-index', {
                 }
             });
         },
+
         detalle_conflicto: function detalle_conflicto(id_conflicto, id_viaje) {
 
             this.fetchDetalleConflicto(id_conflicto, id_viaje);
             $("#detalles_conflicto").modal("show");
         },
+
         detalle_conflicto_pagable: function detalle_conflicto_pagable(id_conflicto, id_viaje) {
 
             this.fetchDetalleConflicto(id_conflicto, id_viaje);
             $("#detalles_conflicto_pagable").modal("show");
         },
+
         pdf: function pdf(e) {
             e.preventDefault();
 
@@ -36094,41 +34996,11 @@ Vue.component('viajes-index', {
             $('.form_buscar_en_conflicto').attr('target', '_blank');
             $('.form_buscar_en_conflicto').attr('method', 'GET');
             $('.form_buscar_en_conflicto').submit();
-        },
-        excel: function excel(e) {
-            e.preventDefault();
-            var url = App.host + '/viajes_netos';
-
-            $('input[name=type]').val('excel');
-            $('.form_buscar').attr('action', url);
-            $('.form_buscar').attr('method', 'GET');
-            $('.form_buscar').submit();
-        },
-        toogle_show_all: function toogle_show_all() {
-            if (this.show_all) {
-                this.show_all = false;
-            } else {
-                this.show_all = true;
-            }
-        },
-        formato: function formato(val) {
-            return numeral(val).format('0,0.00');
-        },
-        ver_mas_function: function ver_mas_function() {
-            if (this.ver_mas) {
-                //TODO: Ocultar Columnas con clase .ocultar y ver_mas = false;
-                $('.ocultar').fadeOut(1000);
-                this.ver_mas = false;
-            } else {
-                //TODO: Mostrar Columnas con clase .ocultar  y ver_mas = true
-                $('.ocultar').fadeIn(1000);
-                this.ver_mas = true;
-            }
         }
     }
 });
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -36293,7 +35165,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -36414,8 +35286,7 @@ Vue.component('viajes-modificar', {
                         type: response.body.tipo,
                         title: '',
                         text: response.body.message,
-                        showConfirmButton: true,
-                        html: true
+                        showConfirmButton: true
                     });
 
                     viaje.CubicacionCamion = response.body.viaje.CubicacionCamion;
@@ -36435,12 +35306,7 @@ Vue.component('viajes-modificar', {
                 }, function (error) {
                     _this.guardando = false;
                     viaje.ShowModal = false;
-                    swal({
-                        type: 'error',
-                        title: '¡Error!',
-                        text: App.errorsToString(error.body),
-                        html: true
-                    });
+                    swal('¡Error!', App.errorsToString(error.body), 'error');
                 });
             });
         },
@@ -36461,7 +35327,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -36598,7 +35464,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 // register modal component

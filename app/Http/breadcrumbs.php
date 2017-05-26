@@ -411,7 +411,7 @@ Breadcrumbs::register('usuario_proyecto.edit', function ($breadcrumbs) {
 Breadcrumbs::register('usuario_proyecto.create', function ($breadcrumbs) {
     $breadcrumbs->parent('usuario_proyecto.index');
     $breadcrumbs->push('NUEVO USUARIO', route('usuario_proyecto.create'));
-    });
+});    
 Breadcrumbs::register('solicitud-reactivacion.index', function($breadcrumbs) {
     $breadcrumbs->push('LISTA DE SOLICITUDES', route('solicitud-reactivacion.index'));
 });

@@ -59,9 +59,9 @@ class OperadoresController extends Controller
             'IdProyecto' => $proyecto_local->IdProyecto,
             'FechaAlta' => Carbon::now()->toDateString()
         ]);
-        
+
         $operador = Operador::create($request->all());
-        
+
         Flash::success('¡OPERADOR REGISTRADO CORRECTAMENTE!');
         return redirect()->route('operadores.show', $operador);
     }

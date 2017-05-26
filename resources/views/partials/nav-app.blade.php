@@ -50,8 +50,20 @@
         Operación<span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-
+      @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']))
         <li><a tabindex="-2" href="{{ route('viajes_netos.index') }}">Viajes</a></li>
+        <li class="dropdown-submenu">
+            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Solicitudes Camiones</a> 
+            <ul class="dropdown-menu">
+                @if(Auth::user()->can(['consulta-solicitud-actualizar']))
+                    <li><a href="{{ route('solicitud-actualizacion.index') }}">Actualizar</a> </li>
+                @endif
+                @if(Auth::user()->can(['consulta-solicitud-reactivar']))
+                    <li><a href="{{ route('solicitud-reactivacion.index') }}">Reactivar</a> </li>
+                @endif
+            </ul>
+        </li>
+      @endif
 
         <li class="dropdown-submenu">
             <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Registrar Viajes</a>  
