@@ -275,3 +275,6 @@ Route::get('historico/telefonos/{id}', 'HistoricoController@telefonos');
 Route::get('historico/sindicatos/{id}', 'HistoricoController@sindicatos');
 Route::get('historico/rutas/{id}', 'HistoricoController@rutas');
 Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
+
+Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
+Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
