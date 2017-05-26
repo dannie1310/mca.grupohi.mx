@@ -7,7 +7,7 @@
 @include('partials.errors')
 
 {!! Form::model($operador, ['method' => 'PATCH', 'route' => ['operadores.update', $operador]]) !!}
-
+<input type="hidden" name="usuario_registro" value="{{auth()->user()->idusuario}}">
 <div class="form-horizontal col-md-6 col-md-offset-3 rcorners">
     <div class="form-group">
         {!! Form::label('Nombre', 'Nombre', ['class' => 'control-label col-sm-2']) !!}

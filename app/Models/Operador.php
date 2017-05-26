@@ -18,12 +18,14 @@ class Operador extends Model
         'Direccion', 
         'NoLicencia', 
         'VigenciaLicencia', 
-        'FechaAlta' 
+        'FechaAlta',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
     protected $presenter = ModelPresenter::class;
 
-    public $timestamps = false;
-    
+
     public function camiones() {
         return $this->hasMany(Camion::class, 'IdOperador');
     }
