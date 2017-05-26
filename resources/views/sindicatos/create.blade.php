@@ -7,7 +7,7 @@
 @include('partials.errors')
 
 {!! Form::open(['route' => 'sindicatos.store']) !!}
-
+<input name="usuario_registro" type="hidden" value="{{ auth()->user()->idusuario }}">
 <div class="form-horizontal col-md-6 col-md-offset-3 rcorners">
     <div class="form-group">
         {!! Form::label('Descripcion', 'Descripción', ['class' => 'control-label col-sm-3']) !!}

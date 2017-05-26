@@ -31,7 +31,7 @@
           <td>{{ $sindicato->rfc }}</td>
           <td>{{ $sindicato->NombreCorto }}</td>
           <td>{{ $sindicato->created_at }}</td>
-          <td>{{ $sindicato->user_registro->present()->nombreCompleto() }}</td>
+          <td>{{ $sindicato->user_registro }}</td>
           <td>{{ $sindicato->present()->estatus }}</td>
           <td>
 

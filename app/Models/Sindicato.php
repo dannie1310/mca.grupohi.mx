@@ -16,9 +16,7 @@ class Sindicato extends Model
     protected $fillable = ['Descripcion', 'NombreCorto','rfc','usuario_registro','usuario_desactivo','motivo'];
 
     protected $presenter = ModelPresenter::class;
-    
-    public $timestamps = false;
-    
+
     public function camiones() {
         return $this->hasMany(Camion::class, 'IdSindicato');
     }
