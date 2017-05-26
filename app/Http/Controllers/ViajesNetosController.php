@@ -13,11 +13,9 @@ use App\Models\Material;
 use App\Models\Origen;
 use App\Models\Sindicato;
 use App\Models\Tiro;
-use App\Models\Transformers\ViajeNetoTransformer;
 use App\Models\ViajeNeto;
 use App\Models\Viajes\Viajes;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
 

@@ -141,10 +141,10 @@ class XLSController extends Controller
                         $conciliacion->empresa,
                         $conciliacion->sindicato,
                         $conciliacion->num_viajes,
-                        number_format($conciliacion->volumen, 2, ".", ","),
-                        is_numeric($conciliacion->volumen_pagado_alert) ? number_format($conciliacion->volumen_pagado_alert, 2, ".",",") : $conciliacion->volumen_pagado_alert,
-                        number_format($conciliacion->importe, 2, ".", ","),
-                        is_numeric($conciliacion->importe_pagado_alert) ? number_format($conciliacion->importe_pagado_alert, 2, ".",",") : $conciliacion->importe_pagado_alert,
+                        $conciliacion->volumen,
+                        is_numeric($conciliacion->volumen_pagado_alert) ? $conciliacion->volumen_pagado_alert : $conciliacion->volumen_pagado_alert,
+                        $conciliacion->importe,
+                        is_numeric($conciliacion->importe_pagado_alert) ? $conciliacion->importe_pagado_alert : $conciliacion->importe_pagado_alert,
                         $conciliacion->estado_str
                     ));
                     $i++;
