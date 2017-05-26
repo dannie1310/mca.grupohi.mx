@@ -2,7 +2,9 @@
 
 @section('content')
 <h1>CAMIONES
+    @permission('crear-camiones')
   <a href="{{ route('camiones.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> {{ trans('strings.new_camion') }}</a>
+    @endpermission
     <a href="{{ route('csv.camiones') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Excel</a>
 </h1>
 {!! Breadcrumbs::render('camiones.index') !!}
@@ -33,27 +35,29 @@
       @foreach($camiones as $camion)
         <tr>
           <td>
-                <a href="{{ route('camiones.show', $camion) }}">{{ $camion->Economico }}</a>
+              <a href="{{ route('camiones.show', $camion) }}">{{ $camion->Economico }}</a>
           </td>
           <td>{{ $camion->Propietario }}</td>
           <td>{{ isset($camion->operador->Nombre) ? $camion->operador->Nombre : 'SIN OPERADOR' }}</td>
           <td>{{ $camion->CubicacionReal}} m<sup>3</sup></td>
           <td>{{ $camion->CubicacionParaPago}} m<sup>3</sup></td>
             <td>{{ $camion->created_at }}</td>
-            <td>{{ $camion->user_registro->present()->nombreCompleto() }}</td>
+            <td>{{ $camion->user_registro }}</td>
 
             <td>{{ $camion->present()->estatus }}</td>
           <td>
 
               <a href="{{ route('camiones.show', $camion) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
+              @permission('editar-camiones')
               <a href="{{ route('camiones.edit', $camion) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-
+              @endpermission
+              @permission('desactivar-camiones')
               @if($camion->Estatus == 1)
                   <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_camion({{$camion->IdCamion}})"><i class="fa fa-remove"></i></button>
               @else
                   <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_camion({{$camion->IdCamion}})"><i class="fa fa-check"></i></button>
               @endif
-
+              @endpermission
           </td>
         </tr>
       @endforeach

@@ -36,12 +36,13 @@ class Camion extends Model
         'FechaAlta',
         'HoraAlta',
         'IdEmpresa',
-        'Disminucion'
+        'Disminucion',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
     protected $presenter = ModelPresenter::class;
-    
-    public $timestamps = false;
-    
+
     public function proyectoLocal() {
         return $this->belongsTo(ProyectoLocal::class, 'IdProyecto');
     }

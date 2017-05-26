@@ -1,20 +1,25 @@
 <tr bgcolor="{{$type}}" id="{{$centro->IdCentroCosto}}" class="treegrid-{{$centro->IdCentroCosto}} treegrid-parent-{{$centro->IdPadre}}">
     <td>{{$centro->Descripcion}}</td>
     <td>{{$centro->Cuenta}}</td>
+    <td>{{$centro->created_at}}</td>
+    <td>{{$centro->user_registro }}</td>
+    <td>{{$centro->estatus_string }}</td>
     <td>
-        <a href="{{ route('centroscostos.edit', $centro) }}" class="btn btn-info btn-xs centrocosto_edit" type="button">
-            <i class="fa fa-pencil-square-o"></i>
-        </a>
+        <a href="{{ route('centroscostos.show', $centro) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
+        @permission('editar-centroscostos')
+        <a href="{{ route('centroscostos.edit', $centro) }}" title="Editar" class="btn btn-xs btn-info centrocosto_edit"><i class="fa fa-pencil"></i></a>
+        @endpermission
+        @permission('desactivar-centroscostos')
+        @if($centro->Estatus == 1)
+            <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_centro({{$centro->IdCentroCosto}})"><i class="fa fa-remove"></i></button>
+        @else
+            <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_centro({{$centro->IdCentroCosto}})"><i class="fa fa-check"></i></button>
+        @endif
+        @endpermission
+        @permission('crear-centroscostos')
         <a href="{{ route('centroscostos.create', $centro) }}" class="btn btn-success btn-xs centrocosto_create" type="button">
             <i class="fa fa-plus-circle"></i>
         </a>
-        <a href="{{ route('centroscostos.destroy', $centro) }}" class="btn btn-danger btn-xs centrocosto_destroy" type="button">
-            <i class="fa fa-minus-circle"></i>
-        </a>
-    </td>
-    <td>
-        <a href="{{ route('centroscostos.destroy', $centro) }}" class="btn btn-xs centrocosto_toggle {{ $centro->Estatus == 1 ? 'activo btn-danger' : 'inactivo btn-success' }}">
-            {{ $centro->Estatus == 1 ? trans('strings.deactivate') : trans('strings.activate') }}
-        </a>
+        @endpermission
     </td>
 </tr>

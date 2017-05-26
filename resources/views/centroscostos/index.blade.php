@@ -2,7 +2,9 @@
 
 @section('content')
 <h1>{{ strtoupper(trans('strings.centroscostos')) }}
-  <a href="{{ route('centroscostos.create', 0) }}" class="btn btn-success pull-right centrocosto_create"><i class="fa fa-plus"></i> NUEVO CENTRO DE COSTO</a>
+    @permission('crear-centroscostos')
+    <a href="{{ route('centroscostos.create', 0) }}" class="btn btn-success pull-right centrocosto_create"><i class="fa fa-plus"></i> NUEVO CENTRO DE COSTO</a>
+    @endpermission
     <a href="{{ route('csv.centros-costos') }}" style="margin-right: 5px" class="btn btn-info pull-right"><i class="fa fa-file-excel-o"></i> Descargar</a>
 
 </h1>
@@ -31,29 +33,30 @@
                 <td>{{$centro->Descripcion}}</td>
                 <td>{{$centro->Cuenta}}</td>
                 <td>{{$centro->created_at}}</td>
-                <td>{{$centro->user_registro->present()->nombreCompleto()}}</td>
+                <td>{{$centro->user_registro }}</td>
                 <td>{{$centro->estatus_string }}</td>
                 <td>
-
                     <a href="{{ route('centroscostos.show', $centro) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
-
+                    @permission('editar-centroscostos')
                     <a href="{{ route('centroscostos.edit', $centro) }}" title="Editar" class="btn btn-xs btn-info centrocosto_edit"><i class="fa fa-pencil"></i></a>
+                    @endpermission
+                    @permission('desactivar-centroscostos')
                     @if($centro->Estatus == 1)
                         <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_centro({{$centro->IdCentroCosto}})"><i class="fa fa-remove"></i></button>
                     @else
                         <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_centro({{$centro->IdCentroCosto}})"><i class="fa fa-check"></i></button>
                     @endif
+                    @endpermission
+                    @permission('crear-centroscostos')
                     <a href="{{ route('centroscostos.create', $centro) }}" class="btn btn-success btn-xs centrocosto_create" type="button">
                         <i class="fa fa-plus-circle"></i>
                     </a>
-
+                    @endpermission
                 </td>
-
             </tr>
             @endforeach
         </tbody>             
     </table>
-
 
     <form id='delete' method="post">
         <input type='hidden' name='motivo' value/>
@@ -87,7 +90,7 @@
                 function(inputValue){
                     if (inputValue === false) return false;
                     if (inputValue === "") {
-                        swal.showInputError("Escriba el motivo de la eliminación!");
+                        swal.showInputError("Escriba el motivo de la desactivación!");
                         return false
                     }
                     form.attr("action", url);
@@ -119,10 +122,7 @@
                     form.submit();
                 });
         }
-
-
     </script>
-</div>
 <div id="div_modal"></div>
 @stop
 

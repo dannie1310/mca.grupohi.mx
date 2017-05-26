@@ -16,7 +16,7 @@
             <li class="list-group-item"><strong>CUENTA:</strong> {{$centro->Cuenta}}</li>
             <li class="list-group-item"><strong>ESTATUS:</strong>{{$centro->estatus_string }}</li>
             <li class="list-group-item"><strong>FECHA Y HORA REGISTRO:</strong> {{$centro->created_at}}</li>
-            <li class="list-group-item"><strong>PERSONA QUE REGITRÓ:</strong> {{$centro->user_registro->present()->nombreCompleto()}}</li>
+            <li class="list-group-item"><strong>PERSONA QUE REGITRÓ:</strong> {{$centro->user_registro}}</li>
 
         </ul>
     </div>

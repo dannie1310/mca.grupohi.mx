@@ -17,12 +17,13 @@ class CentroCosto extends Model
         'Nivel', 
         'Descripcion',
         'IdPadre', 
-        'Cuenta'
+        'Cuenta',
+        'usuario_registro',
+        'usuario_desactivo',
+        'motivo'
     ];
     protected $presenter = ModelPresenter::class;
-    
-    public $timestamps = false;
-    
+
     public function padre() {
         return $this->belongsTo(CentroCosto::class, 'IdPadre');
     }

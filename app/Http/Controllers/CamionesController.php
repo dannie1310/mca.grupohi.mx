@@ -23,7 +23,12 @@ class CamionesController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-       
+        $this->middleware('permission:desactivar-camiones', ['only' => ['destroy']]);
+        $this->middleware('permission:editar-camiones', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crear-camiones', ['only' => ['create', 'store']]);
+
+
+
         parent::__construct();
     }
     
@@ -62,7 +67,7 @@ class CamionesController extends Controller
                 ->withOperadores(Operador::all()->lists('Nombre', 'IdOperador'))
                 ->withMarcas(Marca::all()->lists('Descripcion', 'IdMarca'))
                 ->withBotones(Boton::all()->lists('Identificador', 'IdBoton'))
-                ->withEmpresas(Empresa::all()->lists('razonSocial', 'idEmpresa'));
+                ->withEmpresas(Empresa::all()->lists('razonSocial', 'IdEmpresa'));
     }
 
     /**
@@ -187,7 +192,8 @@ class CamionesController extends Controller
             $text = '¡CAMIÓN DESHABILITADO CORRECTAMENTE!';
         } else {
             $camion->Estatus = 1;
-            $camion->motivo="";
+            $camion->motivo=null;
+            $camion->usuario_desactivo=null;
             $camion->usuario_registro=auth()->user()->idusuario;
             $camion->updated_at=date("Y-m-d H:i:s");
             $text = '¡CAMIÓN HABILITADO CORRECTAMENTE!';
