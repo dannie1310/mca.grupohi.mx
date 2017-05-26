@@ -45,6 +45,7 @@
     </ul>
   </li>
   @endif
+  
   @if(Auth::user()->can(['consulta-solicitud-actualizar']) 
   || Auth::user()->can(['consulta-solicitud-reactivar']) 
   || Auth::user()->can(['ingresar-viajes-manuales']) 
