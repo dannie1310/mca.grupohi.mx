@@ -612,44 +612,32 @@ class ViajesNetosController extends Controller
      */
     public function update(Request $request)
     {
-        try {
-            DB::connection('sca')->beginTransaction();
-
-
-
-            if($request->get('type') == 'validar') {
-                $cubicacionNva=$request['data']['Cubicacion'];
-                $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-                if($cubicacionNva>$viaje_neto->CubicacionCamion){
-                    throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
-                }
-
-                return response()->json($viaje_neto->validar($request));
-            } else if($request->path() == 'viajes_netos/autorizar') {
-                $msg = ViajeNeto::autorizar($request->get('Estatus'));
-                Flash::success($msg);
-                return redirect()->back();
-            } else if($request->get('type') == 'modificar') {
-
-                $cubicacionNva=$request['data']['CubicacionCamion'];
-                $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-                if($cubicacionNva>$viaje_neto->CubicacionCamion){
-                    throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
-                }
-                return response()->json($viaje_neto->modificar($request));
-            }else if($request->get('type') == 'poner_pagable') {
-
-
-                $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-                return response()->json($viaje_neto->poner_pagable($request));
+        if($request->get('type') == 'validar') {
+            $cubicacionNva=$request['data']['Cubicacion'];
+            $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
+            if($cubicacionNva>$viaje_neto->CubicacionCamion){
+                throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
             }
-            DB::connection('sca')->commit();
-        } catch (\Exception $e) {
-            DB::connection('sca')->rollback();
-            throw $e;
+
+            return response()->json($viaje_neto->validar($request));
+        } else if($request->path() == 'viajes_netos/autorizar') {
+            $msg = ViajeNeto::autorizar($request->get('Estatus'));
+            Flash::success($msg);
+            return redirect()->back();
+        } else if($request->get('type') == 'modificar') {
+
+            $cubicacionNva=$request['data']['CubicacionCamion'];
+            $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
+            if($cubicacionNva>$viaje_neto->CubicacionCamion){
+                throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
+            }
+            return response()->json($viaje_neto->modificar($request));
+        }else if($request->get('type') == 'poner_pagable') {
+
+
+            $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
+            return response()->json($viaje_neto->poner_pagable($request));
         }
-
-
     }
 
     /**
