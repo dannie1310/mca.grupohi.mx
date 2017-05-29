@@ -43,11 +43,13 @@ class SolicitudReactivacionController extends Controller
             }
         }
         else{
-            //$solicitudes = SolicitudReactivacion::orderBy('FechaHoraRegistro', 'DESC')->limit(10)->get();
-            return view('camiones.solicitud-reactivacion.index');
-                //->with(['items' => $solicitudes]);
+            if(auth()->user()->can('consulta-solicitud-reactivar')){
+                return view('camiones.solicitud-reactivacion.index');
+            }else{
+                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                return redirect()->back();
+            }
         }
-
     }
 
     public function buscar(Request $request){

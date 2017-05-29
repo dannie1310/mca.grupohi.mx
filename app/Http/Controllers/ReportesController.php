@@ -14,6 +14,7 @@ class ReportesController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:consulta-viajes-netos', ['only' => ['viajes_netos_create']]);
 
         parent::__construct();
     }

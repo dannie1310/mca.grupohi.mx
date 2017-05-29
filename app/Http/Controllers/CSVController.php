@@ -437,7 +437,7 @@ class CSVController extends Controller
         ////////////Rol usuario
         foreach ($usuarios as $usuario) {
             $rol_usuario = array();
-            if (Auth::user()->hasRole('administrador-sistema')) {
+            if (auth()->user()->hasRole('administrador-sistema')) {
                 array_push($rol_usuario, $usuario['id']);
             }
             array_push($rol_usuario, $usuario['nombre']);
@@ -463,7 +463,7 @@ class CSVController extends Controller
         }
         $headers = [];
 
-        if (Auth::user()->hasRole('administrador-sistema')) {
+        if (auth()->user()->hasRole('administrador-sistema')) {
             array_push($headers, 'Id');
         }
         array_push($headers, 'Usuario');
@@ -542,7 +542,7 @@ class CSVController extends Controller
 
         foreach ($usuarios as $usuario) {
             $usuario_Permisos = array();
-            if (Auth::user()->hasRole('administrador-sistema')) {
+            if (auth()->user()->hasRole('administrador-sistema')) {
                 array_push($usuario_Permisos, $usuario['id']);
             }
             array_push($usuario_Permisos, $usuario['nombre']);
@@ -581,7 +581,7 @@ class CSVController extends Controller
         }
 
         $headers = [];
-        if (Auth::user()->hasRole('administrador-sistema')) {
+        if (auth()->user()->hasRole('administrador-sistema')) {
             array_push($headers, 'Id');
         }
         array_push($headers, 'Usuario');

@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\EntrustPermission;
+use App\Http\Middleware\EntrustRole;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -31,7 +32,7 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'context' => \App\Http\Middleware\RedirectIfContextNotSet::class,
-        'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
+        'role' => EntrustRole::class,
         'permission' => EntrustPermission::class,
         'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
         'api.context'   => \App\Http\Middleware\VerifyContextApi::class,

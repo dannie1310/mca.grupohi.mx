@@ -11,6 +11,7 @@ use App\Models\Viaje;
 use App\Models\ViajeNeto;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laracasts\Flash\Flash;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -72,16 +73,21 @@ class ConciliacionesDetallesController extends Controller
             Flash::success('<li><strong>VIAJES CONCILIADOS: </strong>' . $output['registros'] . '</li><li>' . '<strong>VIAJES NO CONCILIADOS: </strong>' . $output['registros_nc'] . '</li>');
             return redirect()->back();
         }else if($request->get('Tipo') == '4') {
-            $conciliacion = Conciliacion::find($id);
-            $fecha_conciliacion = $conciliacion->fecha_conciliacion;
-            $fecha_minima = Carbon::createFromFormat('Y-m-d', '2017-04-09');
-            if(!($fecha_minima->format("Ymd")>=$fecha_conciliacion->format("Ymd"))){
-                Flash::error("Esta concilación no puede ser procesada con la opción: Carga Excel Completa");
-                return redirect()->back();
-            }else{
+            if (auth()->user()->hasRole('conciliacion_historico')) {
+                $conciliacion = Conciliacion::find($id);
+                $fecha_conciliacion = $conciliacion->fecha_conciliacion;
+                $fecha_minima = Carbon::createFromFormat('Y-m-d', '2017-04-09');
+                if (!($fecha_minima->format("Ymd") >= $fecha_conciliacion->format("Ymd"))) {
+                    Flash::error("Esta concilación no puede ser procesada con la opción: Carga Excel Completa");
+                    return redirect()->back();
+                } else {
 
-                $output = (new Conciliaciones($conciliacion))->cargarExcelProcesoCompleto($request->file('excel'));
-                Flash::success('<li><strong>VIAJES CONCILIADOS: </strong>' . $output['registros'] . '</li><li>' . '<strong>VIAJES NO CONCILIADOS: </strong>' . $output['registros_nc'] . '</li>');
+                    $output = (new Conciliaciones($conciliacion))->cargarExcelProcesoCompleto($request->file('excel'));
+                    Flash::success('<li><strong>VIAJES CONCILIADOS: </strong>' . $output['registros'] . '</li><li>' . '<strong>VIAJES NO CONCILIADOS: </strong>' . $output['registros_nc'] . '</li>');
+                    return redirect()->back();
+                }
+            } else {
+                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
                 return redirect()->back();
             }
         }

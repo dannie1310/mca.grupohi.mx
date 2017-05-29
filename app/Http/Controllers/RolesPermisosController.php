@@ -25,9 +25,13 @@ class RolesPermisosController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:crear-permisos', ['only' => ['permisos_store']]);
+        $this->middleware('permission:crear-roles', ['only' => ['roles_store']]);
+        $this->middleware('permission:configuracion-permisos-rol', ['only' => ['permisos_rol_store']]);
+        $this->middleware('permission:asignar-rol-usuario', ['only' => ['roles_usuario_store']]);
+
         parent::__construct();
     }
-
 
     public function init()
     {
@@ -50,7 +54,12 @@ class RolesPermisosController extends Controller
 
     public function roles_permisos()
     {
-        return view('administracion.roles_permisos');
+        if(auth()->user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
+            return view('administracion.roles_permisos');
+        }else{
+            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+            return redirect()->back();
+        }
 
     }
 
@@ -95,9 +104,6 @@ class RolesPermisosController extends Controller
             return response()->json(['permiso'=>$permiso]);
         }
     }
-
-
-
 
     public function  permisos_rol_store(Request $request){
         if($request->ajax()){
