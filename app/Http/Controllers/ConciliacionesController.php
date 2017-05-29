@@ -19,6 +19,7 @@ class ConciliacionesController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:consultar-conciliacion', ['only' => ['index','edit']]);
        
         parent::__construct();
     }

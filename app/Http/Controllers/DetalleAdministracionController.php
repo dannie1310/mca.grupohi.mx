@@ -12,6 +12,7 @@ use App\Models\Entrust\Permission;
 use App\Models\Entrust\Role;
 use App\Models\Transformers\UsuarioPerfilesTransformer;
 use Illuminate\Support\Facades\DB;
+use Laracasts\Flash\Flash;
 
 class DetalleAdministracionController extends Controller
 {
@@ -30,79 +31,80 @@ class DetalleAdministracionController extends Controller
 
     public function index()
     {
+        if(auth()->user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
 
-        $usuarios = UsuarioPerfilesTransformer::transform(User_1::with('roles')->habilitados()->get());
-        $permisos = Permission::all();
-        $roles = Role::with('perms')->get();
+            $usuarios = UsuarioPerfilesTransformer::transform(User_1::with('roles')->habilitados()->get());
+            $permisos = Permission::all();
+            $roles = Role::with('perms')->get();
 
-        $rol_usuario = array();
-        $role_usuario_vista = array();
-        $permisos_rol_vista = array();
-        $usuario_Permisos = array();
-        ///////////Rol permisos
-        foreach ($roles as $rol) {
-            $rol_permisos = array();
-            $permisoActual = DB::connection('sca')->table('sca_configuracion.permission_role')->where('role_id', '=', $rol->id)->get();
-            if (count($permisoActual) > 0) {
-                foreach ($permisos as $permiso) {
-                    $aux = false;
-                    for ($a = 0; $a < count($permisoActual); $a++) {
-                        if ($permisoActual[$a]->permission_id == $permiso->id) {
-                            $aux = true;
-                        }
-                    }
-                    array_push($rol_permisos, $aux);
-                }
-            } else {
-                $a = 0;
-                while (count($permisos) > $a) {
-                    array_push($rol_permisos, false);
-                    $a++;
-                }
-            }
-
-            $data = ['permisosActuales' => $rol_permisos, 'rol' => $rol];
-            array_push($permisos_rol_vista, $data);
-        }
-
-
-        ////////////Rol usuario
-        foreach ($usuarios as $usuario) {
             $rol_usuario = array();
-            if (count($usuario['roles']) > 0) {
-                foreach ($roles as $rol) {
-                    $aux = false;
-                    foreach ($usuario['roles'] as $rolAsignado) {
-                        if ($rol->id == $rolAsignado->id) {
-                            $aux = true;
+            $role_usuario_vista = array();
+            $permisos_rol_vista = array();
+            $usuario_Permisos = array();
+            ///////////Rol permisos
+            foreach ($roles as $rol) {
+                $rol_permisos = array();
+                $permisoActual = DB::connection('sca')->table('sca_configuracion.permission_role')->where('role_id', '=', $rol->id)->get();
+                if (count($permisoActual) > 0) {
+                    foreach ($permisos as $permiso) {
+                        $aux = false;
+                        for ($a = 0; $a < count($permisoActual); $a++) {
+                            if ($permisoActual[$a]->permission_id == $permiso->id) {
+                                $aux = true;
+                            }
                         }
+                        array_push($rol_permisos, $aux);
                     }
-                    array_push($rol_usuario, $aux);
+                } else {
+                    $a = 0;
+                    while (count($permisos) > $a) {
+                        array_push($rol_permisos, false);
+                        $a++;
+                    }
                 }
-            } else {
-                $a = 0;
-                while (count($roles) > $a) {
-                    array_push($rol_usuario, 'false');
-                    $a++;
-                }
+
+                $data = ['permisosActuales' => $rol_permisos, 'rol' => $rol];
+                array_push($permisos_rol_vista, $data);
             }
-            $data = [
-                'usuario' => $usuario,
-                'roles' => $rol_usuario
-            ];
-            array_push($role_usuario_vista, $data);
-        }
 
 
-        /////////////usuario -permisos
-        //$usuario_Permisos=array();
-        $usuario_Permisos_vista=array();
+            ////////////Rol usuario
+            foreach ($usuarios as $usuario) {
+                $rol_usuario = array();
+                if (count($usuario['roles']) > 0) {
+                    foreach ($roles as $rol) {
+                        $aux = false;
+                        foreach ($usuario['roles'] as $rolAsignado) {
+                            if ($rol->id == $rolAsignado->id) {
+                                $aux = true;
+                            }
+                        }
+                        array_push($rol_usuario, $aux);
+                    }
+                } else {
+                    $a = 0;
+                    while (count($roles) > $a) {
+                        array_push($rol_usuario, 'false');
+                        $a++;
+                    }
+                }
+                $data = [
+                    'usuario' => $usuario,
+                    'roles' => $rol_usuario
+                ];
+                array_push($role_usuario_vista, $data);
+            }
 
-        foreach ($usuarios as $usuario) {
-            $usuario_Permisos=array();
-            //$data = array();
-            array_push($data, $usuario['nombre']);
-            $permisosActuales = DB::connection('sca')->select('
+
+            /////////////usuario -permisos
+            //$usuario_Permisos=array();
+            $usuario_Permisos_vista = array();
+
+            foreach ($usuarios as $usuario) {
+                $usuario_Permisos = array();
+                //$data = array();
+                array_push($data, $usuario['nombre']);
+                $permisosActuales = DB::connection('sca')->select('
                            Select distinct p.id,p.display_name FROM 
                             sca_configuracion.role_user ru
                             inner join 
@@ -113,44 +115,46 @@ class DetalleAdministracionController extends Controller
                             group by (pm.permission_id)
                             order by 1 asc', ['userid' => $usuario['id']]);
 
-            if(count($permisosActuales)>0){
-                foreach ($permisos as $permiso) {
-                    $aux = false;
-                    foreach ($permisosActuales as $permisosActual) {
-                        if ($permiso->id == $permisosActual->id) {
-                            $aux = true;
+                if (count($permisosActuales) > 0) {
+                    foreach ($permisos as $permiso) {
+                        $aux = false;
+                        foreach ($permisosActuales as $permisosActual) {
+                            if ($permiso->id == $permisosActual->id) {
+                                $aux = true;
+                            }
                         }
+                        array_push($usuario_Permisos, $aux);
                     }
-                    array_push($usuario_Permisos, $aux);
-                }
 
-            }
-            else {
+                } else {
                     $a = 0;
                     while (count($permisos) > $a) {
                         array_push($usuario_Permisos, false);
                         $a++;
                     }
+                }
+                $data = [
+                    'usuario' => $usuario['nombre'],
+                    'permisos' => $usuario_Permisos
+                ];
+                array_push($usuario_Permisos_vista, $data);
+
             }
+
+
             $data = [
-                'usuario' => $usuario['nombre'],
-                'permisos' => $usuario_Permisos
+                'roles_usuarios' => $role_usuario_vista,
+                'permisos_roles' => $permisos_rol_vista,
+                'roles' => $roles,
+                'permisos' => $permisos,
+                'permisosUsuario' => $usuario_Permisos_vista
+
             ];
-            array_push($usuario_Permisos_vista, $data);
-
+            return view('administracion.detalle_administracion')->with($data);
+        }else{
+            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+            return redirect()->back();
         }
-
-
-        $data = [
-            'roles_usuarios' => $role_usuario_vista,
-            'permisos_roles' => $permisos_rol_vista,
-            'roles' => $roles,
-            'permisos' => $permisos,
-            'permisosUsuario'=>$usuario_Permisos_vista
-
-        ];
-
-        return view('administracion.detalle_administracion')->with($data);
     }
 
 

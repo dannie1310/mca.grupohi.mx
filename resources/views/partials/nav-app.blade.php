@@ -64,13 +64,13 @@
         Operación<span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-      
+
         @if(Auth::user()->can(['consulta-viajes']))
         <li><a tabindex="-2" href="{{ route('viajes_netos.index') }}">Viajes</a></li>
         @endif
         @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']))
         <li class="dropdown-submenu">
-            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Solicitudes para camiones</a> 
+            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Solicitudes para camiones</a>
             <ul class="dropdown-menu">
                 @if(Auth::user()->can(['consulta-solicitud-actualizar']))
                     <li><a href="{{ route('solicitud-actualizacion.index') }}">Solicitud para actualizar</a> </li>
@@ -83,7 +83,7 @@
       @endif
       @if(Auth::user()->can(['ingresar-viajes-manuales']) || Auth::user()->can(['autorizar-viajes-manuales']) || Auth::user()->can(['ingresar-viajes-manuales-completos']) )
         <li class="dropdown-submenu">
-            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Registrar Viajes</a>  
+            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Registrar Viajes</a>
             <ul class="dropdown-menu">
                 <li class="dropdown-submenu">
                     <a tabindex="-1" class="dropdown-toggle" data-toggle="dropdown">Carga Manual</a>
@@ -105,7 +105,7 @@
         @if(Auth::user()->can(['validar-viajes']))
         <li><a href="{{ route('viajes_netos.edit', ['action' => 'validar']) }}">Validar Viajes</a></li>
         @endif
-        @if (Auth::user()->can(['consultar-conciliacion'])) 
+        @if (Auth::user()->can(['consultar-conciliacion']))
             <li><a href="{{ route('conciliaciones.index') }}">Conciliaciones</a></li>
         @endif
         @if(Auth::user()->can(['modificar-viajes']))
