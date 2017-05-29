@@ -151,8 +151,9 @@
 
 
                     <div class="carousel-inner" role="listbox">
-                        @foreach($camion->Imagenes as $imagen)
-                            <div class="item <?php if($imagen->TipoC == 'i')  echo 'active'; ?>">
+                        <?php $x = 0; ?>
+                        @foreach($solicitud->solicitudImagenes as $imagen)
+                            <div class="item <?php if($x == 0) { echo 'active'; $x=$x+1;} ?>">
                                 <img src="{{ 'data:image/png;base64,'.$imagen->Imagen }}" alt="...">
                                 <div class="carousel-caption">
                                     {{ $imagen->TipoC_string }}
@@ -190,8 +191,9 @@
 
                     <!-- Wrapper for slides -->
                     <div class="carousel-inner" role="listbox">
+                        <?php $x = 0; ?>
                         @foreach($solicitud->solicitudImagenes as $imagen)
-                            <div class="item <?php if($imagen->TipoC == 'i')  echo 'active'; ?>">
+                                <div class="item <?php if($x == 0) { echo 'active'; $x=$x+1;} ?>">
                                 <img src="{{ 'data:image/png;base64,'.$imagen->Imagen }}" alt="...">
                                 <div class="carousel-caption">
                                     {{ $imagen->tipoc_string }}
