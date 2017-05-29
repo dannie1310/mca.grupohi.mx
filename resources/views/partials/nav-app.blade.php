@@ -45,7 +45,20 @@
     </ul>
   </li>
   @endif
-  @if(Auth::user()->can(['consulta-solicitud-actualizar']) || Auth::user()->can(['consulta-solicitud-reactivar']) || Auth::user()->can(['ingresar-viajes-manuales']) || Auth::user()->can(['autorizar-viajes-manuales']) || Auth::user()->can(['ingresar-viajes-manuales-completos']) || Auth::user()->can(['consulta-viajes']))
+  
+  @if(Auth::user()->can(['consulta-solicitud-actualizar']) 
+  || Auth::user()->can(['consulta-solicitud-reactivar']) 
+  || Auth::user()->can(['ingresar-viajes-manuales']) 
+  || Auth::user()->can(['autorizar-viajes-manuales']) 
+  || Auth::user()->can(['ingresar-viajes-manuales-completos']) 
+  || Auth::user()->can(['consulta-viajes'])
+  || Auth::user()->can(['configuracion-diaria'])
+  || Auth::user()->can(['consultar-cortes-checador'])
+  || Auth::user()->can(['consultar-viajes-conflicto'])
+  || Auth::user()->can(['revertir-viajes'])
+  || Auth::user()->can(['modificar-viajes'])
+  || Auth::user()->can(['consultar-conciliacion'])
+  || Auth::user()->can(['validar-viajes']))
   <li class="dropdown">
     <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
         Operación<span class="caret"></span>

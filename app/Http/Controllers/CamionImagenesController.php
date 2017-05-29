@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\ImagenCamion;
+use Illuminate\Support\Facades\DB;
 
 class CamionImagenesController extends Controller
 {
@@ -113,9 +114,39 @@ class CamionImagenesController extends Controller
     public function destroy($id_camion, $tipoC)
     {
         $camion = \App\Models\Camion::findOrFail($id_camion);
+        //$imagen = $camion->imagenes->where('TipoC', $tipoC)->first();
+
+
         $imagen = $camion->imagenes->where('TipoC', $tipoC)->first();
-        $imagen -> Estatus = 0;
-        $imagen -> save();
+        $imagenes = $camion->imagenes_hist->where('TipoC', $tipoC);
+
+
+        if($imagen) {
+
+            foreach ($imagenes as $imagen_hist ) {
+                $idCamion = $imagen_hist->IdCamion;
+                $insert = DB::connection('sca')->table('camiones_imagenes_historicos')->insert([
+                    'IdCamion' => $imagen_hist->IdCamion,
+                    'TipoC' => $imagen_hist->TipoC,
+                    'Imagen' => $imagen_hist->Imagen,
+                    'Tipo' => $imagen_hist->Tipo,
+                    'Ruta' => $imagen_hist->Ruta,
+                    'Estatus' => $imagen_hist->Estatus,
+                    'Usuario' => auth()->user()->idusuario
+                ]);
+            }
+
+            $delete = DB::connection('sca')->table('camiones_imagenes')
+                ->where('IdCamion', $idCamion)
+                ->where('TipoC', $tipoC)->delete();
+
+            // $imagen->save();
+        }
+        
+
+
+        //$imagen -> Estatus = 0;
+        //$imagen -> save();
         return response()->json(['success' => true]);    
     }
 }
