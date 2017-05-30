@@ -109,10 +109,22 @@ class PDFCorte extends Rotation
             $this->encabezado_totales();
             $this->SetRounds(array('', '', '', '', '', '', '',));
             $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
-            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '180,180,180'));
             $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
             $this->SetHeights(array(0.35));
             $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
+        }
+
+        if ($this->encola == "total") {
+            $this->encabezado_totales();
+            $this->SetRounds(array('', '', '', '', '', '', ''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '0,0,0'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '255,255,255'));
+            $this->SetHeights(array(0.35));
+            $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
+            $this->SetRounds(array('4', '', '', '', '', '', '3'));
+            $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0.2));
         }
     }
 
@@ -416,7 +428,7 @@ class PDFCorte extends Rotation
         $numItems = count($items);
 
         $this->num_items = $numItems;
-        $this->tipo = 'TOTALES';
+        $this->tipo = 'ACUMULADO DE VIAJES POR ORIGEN';
         $this->encola = 'totales';
 
         $this->encabezado_totales();
@@ -426,7 +438,7 @@ class PDFCorte extends Rotation
             $this->widths_totales();
             $this->SetRounds(array('', '', '', '', '', '', ''));
             $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
-            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255'));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '180,180,180'));
             $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
             $this->SetHeights(array(0.35));
             $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
@@ -457,12 +469,14 @@ class PDFCorte extends Rotation
                 $col_6
             ));
         }
+        $this->encola = 'total';
+
         $this->SetFont('Arial', 'B', 5);
         $this->widths_totales();
         $this->SetRounds(array('', '', '', '', '', '', ''));
         $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
-        $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
-        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+        $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '0,0,0'));
+        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '255,255,255'));
         $this->SetHeights(array(0.35));
         $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
         $this->SetRounds(array('4', '', '', '', '', '', '3'));
