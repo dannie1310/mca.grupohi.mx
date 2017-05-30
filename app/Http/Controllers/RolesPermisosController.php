@@ -141,13 +141,14 @@ class RolesPermisosController extends Controller
 
         if($request->ajax()){
             $usuario=User::find($request->usuario);
-            foreach ($request->rol as $rol) {
+
+
                 DB::connection('sca')
                     ->table('sca_configuracion.role_user')
                     ->where('id_proyecto', '=', Context::getId())
                     ->where('user_id', '=', $usuario->idusuario)
                     ->delete();
-            }
+
 
             if(count($request->rol)>0){
                 foreach ($request->rol as $rol) {
