@@ -135,7 +135,7 @@ class ViajeNeto extends Model
             ->where(function($query){
                 $query
                     ->whereNotNull('viajes.IdViaje')
-                    ->whereIn('viajesnetos.Estatus', [0, 10, 20, 30]);
+                    ->whereIn('viajesnetos.Estatus', [1, 11, 21, 31]);
             });
     }
 
