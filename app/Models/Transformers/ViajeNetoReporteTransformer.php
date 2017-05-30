@@ -68,7 +68,7 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       conci.fecha_inicial,
       conci.fecha_final,
       conci.estado,
-      IF(conci.estado < 0, 'CALCELADA', IF(conci.estado = 0, 'GENERADA', IF(conci.estado = 1, 'CERRADA', 'APROBADA'))) as estado_string,
+      IF(conci.estado < 0, 'CALCELADA', IF(conci.estado = 0, 'GENERADA', IF(conci.estado = 1, 'CERRADA', IF(conci.estado = 2, 'APROBADA', '')))) as estado_string,
       vi.IdViaje,
       c.placas,
       c.PlacasCaja,
