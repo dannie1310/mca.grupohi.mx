@@ -81,6 +81,8 @@
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Conciliaci&oacute;n</font> </div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Estado Conciliaci&oacute;n</font> </div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Viajes en Conflicto</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">IMEI</font> </div></td>
+                    <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Perfil</font> </div></td>
                 </tr>
                 @foreach($data as $key => $item)
                     <?php
@@ -105,7 +107,7 @@
                 <tr <?php if($item->conflictos!=''): ?> style="background-color: #FCC" <?php endif; ?> >
                     <td width="1"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $key + 1; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->primer_toque; ?></font></div></td>
-                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->segundo_toque; ?></font></div></td>
+                    <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo ($item->IdPerfil != 3) ? $item->segundo_toque : "N/A"; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->cubicacion; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->CubicacionViajeNeto; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->CubicacionViaje; ?></font></div></td>
@@ -139,6 +141,8 @@
                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->fecha_conciliacion; ?></font></div></td>
                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->estado_string; ?></font></div></td>
                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->conflictos; ?></font></div></td>
+                    <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->imei; ?></font></div></td>
+                    <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->perfil; ?></font></div></td>
                 </tr>
                       @endforeach
                     @else

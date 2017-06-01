@@ -74,7 +74,10 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       c.PlacasCaja,
       v.CreoPrimerToque,
       v.Creo,
-      cev.identifiacador as conflictos
+      cev.identifiacador as conflictos,
+      v.imei,
+      cpc.name as perfil,
+      cpc.id as IdPerfil
       FROM
         viajesnetos AS v
       JOIN tiros AS t USING (IdTiro)
@@ -93,6 +96,7 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       left join igh.usuario as user_primer on v.CreoPrimerToque = user_primer.idusuario
       left join igh.usuario as user_segundo on v.Creo = user_segundo.idusuario
       left join empresas as empcon on empcon.IdEmpresa = conci.IdEmpresa
+      left join configuracion_perfiles_cat as cpc on cpc.id = v.IdPerfil
        left join (      
       SELECT conflictos_entre_viajes_detalle.idviaje_neto,
       
