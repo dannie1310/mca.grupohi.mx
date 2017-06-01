@@ -87,7 +87,7 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       LEFT JOIN viajes AS vi ON vi.IdViajeNeto = v.IdViajeNeto
       left join sindicatos as sin on sin.IdSindicato = vi.IdSindicato
       left join empresas as emp on emp.IdEmpresa = vi.IdEmpresa
-      LEFT JOIN conciliacion_detalle AS conde ON conde.idviaje =  vi.IdViaje
+      LEFT JOIN conciliacion_detalle AS conde ON (conde.idviaje =  vi.IdViaje AND conde.estado = 1)
       LEFT JOIN conciliacion as conci ON conci.idconciliacion = conde.idconciliacion 
       left join sindicatos as sincon on sincon.IdSindicato = conci.IdSindicato
       left join igh.usuario as user_primer on v.CreoPrimerToque = user_primer.idusuario
