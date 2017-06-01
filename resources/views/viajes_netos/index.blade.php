@@ -174,7 +174,7 @@
 
 
                                 <th colspan="3" style="text-align: center">CONCILIACIÓN</th>
-                                <th colspan="5" style="text-align: center">ESTADO DEL VIAJE</th>
+                                <th colspan="6" style="text-align: center">ESTADO DEL VIAJE</th>
                             </tr>
                             <tr>
                                 <th style="text-align: center"> # </th>
@@ -205,6 +205,7 @@
                                 <th style="text-align: center"> FECHA  </th>
 
                                 <th style="text-align: center"> REGISTRÓ </th>
+                                <th style="text-align: center"> FECHA Y HORA REGISTRO </th>
                                 <th style="text-align: center"> AUTORIZÓ </th>
                                 <th style="text-align: center"> VALIDÓ </th>
                                 <th style="text-align: center"> ESTADO </th>
@@ -242,13 +243,13 @@
                                 <td style="white-space: nowrap">@{{ viaje_neto.fecha_conciliacion }}</td>
 
                                 <td style="white-space: nowrap">@{{ viaje_neto.registro }}</td>
+                                <td style="white-space: nowrap">@{{ viaje_neto.fecha_hora_carga }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.autorizo }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.valido }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.estado }}</td>
                                 <td style="white-space: nowrap" v-if ="viaje_neto.conflicto>0&&!viaje_neto.conflicto_pagable>0">
                                     <a style="cursor: pointer" @click="detalle_conflicto(viaje_neto.conflicto, viaje_neto.id)" >Ver</a></td>
                                 <td style="white-space: nowrap" v-if ="viaje_neto.conflicto>0&&viaje_neto.conflicto_pagable>0">
-                                    
                                     <a style="cursor: pointer" @click="detalle_conflicto_pagable(viaje_neto.conflicto, viaje_neto.id)" >(P) Ver</a></td>
                                 <td style="white-space: nowrap" v-if ="!viaje_neto.conflicto>0">N/A</td>
                             </tr>
