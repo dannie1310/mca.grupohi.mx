@@ -20,6 +20,7 @@ class UsuarioSistemaController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('poner-viajes-conflicto-pagables', ['only' => ['permisos_store']]);
         parent::__construct();
     }
 

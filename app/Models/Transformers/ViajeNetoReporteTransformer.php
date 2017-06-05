@@ -68,12 +68,16 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       conci.fecha_inicial,
       conci.fecha_final,
       conci.estado,
+      IF(conci.estado < 0, 'CALCELADA', IF(conci.estado = 0, 'GENERADA', IF(conci.estado = 1, 'CERRADA', IF(conci.estado = 2, 'APROBADA', '')))) as estado_string,
       vi.IdViaje,
       c.placas,
       c.PlacasCaja,
       v.CreoPrimerToque,
       v.Creo,
-      cev.identifiacador as conflictos
+      cev.identifiacador as conflictos,
+      v.imei,
+      cpc.name as perfil,
+      cpc.id as IdPerfil
       FROM
         viajesnetos AS v
       JOIN tiros AS t USING (IdTiro)
@@ -86,12 +90,13 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       LEFT JOIN viajes AS vi ON vi.IdViajeNeto = v.IdViajeNeto
       left join sindicatos as sin on sin.IdSindicato = vi.IdSindicato
       left join empresas as emp on emp.IdEmpresa = vi.IdEmpresa
-      LEFT JOIN conciliacion_detalle AS conde ON conde.idviaje =  vi.IdViaje
+      LEFT JOIN conciliacion_detalle AS conde ON (conde.idviaje =  vi.IdViaje AND conde.estado = 1)
       LEFT JOIN conciliacion as conci ON conci.idconciliacion = conde.idconciliacion 
       left join sindicatos as sincon on sincon.IdSindicato = conci.IdSindicato
       left join igh.usuario as user_primer on v.CreoPrimerToque = user_primer.idusuario
       left join igh.usuario as user_segundo on v.Creo = user_segundo.idusuario
       left join empresas as empcon on empcon.IdEmpresa = conci.IdEmpresa
+      left join configuracion_perfiles_cat as cpc on cpc.id = v.IdPerfil
        left join (      
       SELECT conflictos_entre_viajes_detalle.idviaje_neto,
       

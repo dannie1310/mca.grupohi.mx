@@ -32,6 +32,22 @@ class Corte extends Model
         return $this->hasMany(CorteDetalle::class, 'id_corte');
     }
 
+    public function origenes() {
+        $results = new Collection();
+        foreach (CorteDetalle::where(['id_corte' => $this->id])->get() as $detalle) {
+            $existe = false;
+            foreach ($results as $result) {
+                if ($result == $detalle->viajeNeto->origen) {
+                    $existe = true;
+                }
+            }
+            if (! $existe) {
+                $results->push($detalle->viajeNeto->origen);
+            }
+        }
+        return $results->sortBy('Descripcion');
+    }
+
     public function viajes_manuales_modificados() {
         return DB::connection('sca')->table('viajesnetos')
             ->leftJoin('camiones', 'viajesnetos.IdCamion', '=', 'camiones.IdCamion')
@@ -64,8 +80,7 @@ class Corte extends Model
                 "corte_cambios.justificacion as justificacion"
             )
             ->whereIn('viajesnetos.Estatus', [20,21,22,29])
-            ->whereNotNull('corte_cambios.id')
-            ->get();
+            ->whereNotNull('corte_cambios.id');
     }
 
     public function viajes_manuales_no_modificados() {
@@ -100,8 +115,7 @@ class Corte extends Model
                 "corte_cambios.justificacion as justificacion"
             )
             ->whereIn('viajesnetos.Estatus', [20,21,22,29])
-            ->whereNull('corte_cambios.id')
-            ->get();
+            ->whereNull('corte_cambios.id');
     }
 
     public function viajes_moviles_modificados() {
@@ -136,8 +150,7 @@ class Corte extends Model
                 "corte_cambios.justificacion as justificacion"
             )
             ->whereIn('viajesnetos.Estatus', [0,1])
-            ->whereNotNull('corte_cambios.id')
-            ->get();
+            ->whereNotNull('corte_cambios.id');
     }
 
     public function viajes_moviles_no_modificados() {
@@ -173,8 +186,7 @@ class Corte extends Model
             )
             ->whereIn('viajesnetos.Estatus', [0,1])
             ->whereNull('corte_cambios.id')
-            ->where('corte_detalle.estatus', '=', 2)
-            ->get();
+            ->where('corte_detalle.estatus', '=', 2);
     }
 
     public function viajes_moviles_no_confirmados() {
@@ -210,8 +222,7 @@ class Corte extends Model
             )
             ->whereIn('viajesnetos.Estatus', [0,1])
             ->whereNull('corte_cambios.id')
-            ->where('corte_detalle.estatus', '=', 1)
-            ->get();
+            ->where('corte_detalle.estatus', '=', 1);
     }
 
     public function viajes_netos_confirmados()

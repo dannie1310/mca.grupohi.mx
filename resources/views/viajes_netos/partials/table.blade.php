@@ -48,7 +48,7 @@
             <th colspan="3">EMPRESA</th>
             <th colspan="3">SINDICATO</th>
             <th colspan="3">CONCILIACI&Oacute;N</th>
-            <th colspan="5">ESTADO DEL VIAJE</th>
+            <th colspan="6">ESTADO DEL VIAJE</th>
         </tr>
         <tr style="background-color: #f9f9f9">
             <th> # </th>
@@ -77,6 +77,7 @@
             <th> FECHA  </th>
 
             <th> REGISTR&Oacute; </th>
+            <th> FECHA Y HORA REGISTRO </th>
             <th> AUTORIZ&Oacute; </th>
             <th> VALID&Oacute; </th>
             <th> ESTADO </th>
@@ -107,6 +108,7 @@
                 <td>{{ $item->id_conciliacion }}</td>
                 <td>{{ $item->fecha_conciliacion }}</td>
                 <td>{{ $item->registro }}</td>
+                <td>{{ $item->fecha_hora_carga }}</td>
                 <td>{{ $item->autorizo }}</td>
                 <td>{{ $item->valido }}</td>
                 <td>{{ $item->estado }}</td>

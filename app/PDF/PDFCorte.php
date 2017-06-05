@@ -20,6 +20,7 @@ class PDFCorte extends Rotation
     var $txtTitleTam, $txtSubtitleTam, $txtSeccionTam, $txtContenidoTam, $txtFooterTam;
     var $encola = '';
     var $tipo, $num_items;
+    var $totales = ['TOTAL', 0,0,0,0,0,0];
 
     /**
      * PDFCorte constructor.
@@ -103,6 +104,28 @@ class PDFCorte extends Rotation
             $this->SetHeights(array(0.35));
             $this->SetAligns(array('C', 'L', 'L', 'L', 'L', 'L','L', 'R', 'L', 'L'));
         }
+
+        if ($this->encola == "totales") {
+            $this->encabezado_totales();
+            $this->SetRounds(array('', '', '', '', '', '', '',));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '180,180,180'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+            $this->SetHeights(array(0.35));
+            $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
+        }
+
+        if ($this->encola == "total") {
+            $this->encabezado_totales();
+            $this->SetRounds(array('', '', '', '', '', '', ''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '0,0,0'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '255,255,255'));
+            $this->SetHeights(array(0.35));
+            $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
+            $this->SetRounds(array('4', '', '', '', '', '', '3'));
+            $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0.2));
+        }
     }
 
     private function title()
@@ -153,6 +176,17 @@ class PDFCorte extends Rotation
         ));
     }
 
+    public function widths_totales() {
+        $this->SetWidths(array(
+            0.1428 * $this->WidthTotal,
+            0.1428 * $this->WidthTotal,
+            0.1428 * $this->WidthTotal,
+            0.1428 * $this->WidthTotal,
+            0.1428 * $this->WidthTotal,
+            0.1428 * $this->WidthTotal,
+            0.1428 * $this->WidthTotal
+        ));
+    }
 
     private function logo()
     {
@@ -277,6 +311,36 @@ class PDFCorte extends Rotation
 
     }
 
+    public function encabezado_totales() {
+        $this->SetWidths(array(0));
+        $this->SetFills(array('255,255,255'));
+        $this->SetTextColors(array('1,1,1'));
+        $this->SetRounds(array('0'));
+        $this->SetRadius(array(0));
+        $this->SetHeights(array(0));
+        $this->Row(Array(''));
+        $this->SetFont('Arial', 'B', $this->txtSeccionTam);
+        $this->SetTextColors(array('255,255,255'));
+        $this->CellFitScale($this->WidthTotal, 1, utf8_decode($this->tipo), 0, 1, 'L');
+        $this->SetFont('Arial', 'B', 6);
+        $this->SetStyles(array('DF', 'DF', 'DF', 'DF','DF', 'DF', 'DF'));
+        $this->widths_totales();
+        $this->SetRounds(array('1', '', '', '', '', '', '2'));
+        $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0.2));
+        $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180'));
+        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+        $this->SetHeights(array(0.5));
+        $this->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C'));
+        $this->Row(array(
+            utf8_decode("Origen"),
+            utf8_decode("Móviles Modificados"),
+            utf8_decode("Móviles No Modificados"),
+            utf8_decode("Manuales Modificados"),
+            utf8_decode("Manuales No Modificados"),
+            utf8_decode("No Confirmados"),
+            utf8_decode("Total")));
+    }
+
     function items_modificados($items, $tipo)
     {
         $numItems = count($items);
@@ -360,6 +424,70 @@ class PDFCorte extends Rotation
         }
     }
 
+    public function totales($items) {
+        $numItems = count($items);
+
+        $this->num_items = $numItems;
+        $this->tipo = 'ACUMULADO DE VIAJES POR ORIGEN';
+        $this->encola = 'totales';
+
+        $this->encabezado_totales();
+
+        foreach ($this->corte->origenes() as $key => $item) {
+            $this->SetFont('Arial', '', 5);
+            $this->widths_totales();
+            $this->SetRounds(array('', '', '', '', '', '', ''));
+            $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
+            $this->SetFills(array('255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '255,255,255', '180,180,180'));
+            $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0'));
+            $this->SetHeights(array(0.35));
+            $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
+
+            $this->widths_totales();
+
+            $col_1 = count($this->corte->viajes_moviles_modificados()->where('viajesnetos.IdOrigen', '=', $item->IdOrigen)->get());
+            $col_2 = count($this->corte->viajes_moviles_no_modificados()->where('viajesnetos.IdOrigen', '=', $item->IdOrigen)->get());
+            $col_3 = count($this->corte->viajes_manuales_modificados()->where('viajesnetos.IdOrigen', '=', $item->IdOrigen)->get());
+            $col_4 = count($this->corte->viajes_manuales_no_modificados()->where('viajesnetos.IdOrigen', '=', $item->IdOrigen)->get());
+            $col_5 = count($this->corte->viajes_moviles_no_confirmados()->where('viajesnetos.IdOrigen', '=', $item->IdOrigen)->get());
+            $col_6 = $col_1 + $col_2 + $col_3 + $col_4 + $col_5;
+
+            $this->totales[1] += $col_1;
+            $this->totales[2] += $col_2;
+            $this->totales[3] += $col_3;
+            $this->totales[4] += $col_4;
+            $this->totales[5] += $col_5;
+            $this->totales[6] += $col_6;
+
+            $this->Row(array(
+                utf8_decode($item->Descripcion),
+                $col_1,
+                $col_2,
+                $col_3,
+                $col_4,
+                $col_5,
+                $col_6
+            ));
+        }
+        $this->encola = 'total';
+
+        $this->SetFont('Arial', 'B', 5);
+        $this->widths_totales();
+        $this->SetRounds(array('', '', '', '', '', '', ''));
+        $this->SetRadius(array(0, 0, 0, 0, 0, 0, 0));
+        $this->SetFills(array('180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '180,180,180', '0,0,0'));
+        $this->SetTextColors(array('0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '0,0,0', '255,255,255'));
+        $this->SetHeights(array(0.35));
+        $this->SetAligns(array('L', 'R', 'R', 'R', 'R', 'R', 'R'));
+        $this->SetRounds(array('4', '', '', '', '', '', '3'));
+        $this->SetRadius(array(0.2, 0, 0, 0, 0, 0, 0.2));
+
+        $this->Row(
+            $this->totales
+        );
+
+    }
+
     function Footer()
     {
         $this->SetY($this->GetPageHeight() - 1);
@@ -394,25 +522,28 @@ class PDFCorte extends Rotation
         $this->AliasNbPages();
         $this->AddPage();
         $this->SetAutoPageBreak(true,2);
-        if(count($this->corte->viajes_manuales_modificados())) {
-            $this->items_modificados($this->corte->viajes_manuales_modificados(), 'VIAJES MANUALES MODIFICADOS');
+        if(count($this->corte->viajes_manuales_modificados()->get())) {
+            $this->items_modificados($this->corte->viajes_manuales_modificados()->get(), 'VIAJES MANUALES MODIFICADOS');
             $this->Ln(1);
         }
-        if(count($this->corte->viajes_manuales_no_modificados())) {
-            $this->items_no_modificados($this->corte->viajes_manuales_no_modificados(), 'VIAJES MANUALES NO MODIFICADOS');
+        if(count($this->corte->viajes_manuales_no_modificados()->get())) {
+            $this->items_no_modificados($this->corte->viajes_manuales_no_modificados()->get(), 'VIAJES MANUALES NO MODIFICADOS');
             $this->Ln(1);
         }
-        if(count($this->corte->viajes_moviles_modificados())) {
-            $this->items_modificados($this->corte->viajes_moviles_modificados(), 'VIAJES MÓVILES MODIFICADOS');
+        if(count($this->corte->viajes_moviles_modificados()->get())) {
+            $this->items_modificados($this->corte->viajes_moviles_modificados()->get(), 'VIAJES MÓVILES MODIFICADOS');
             $this->Ln(1);
         }
-        if(count($this->corte->viajes_moviles_no_modificados())) {
-            $this->items_no_modificados($this->corte->viajes_moviles_no_modificados(), 'VIAJES MÓVILES NO MODIFICADOS');
+        if(count($this->corte->viajes_moviles_no_modificados()->get())) {
+            $this->items_no_modificados($this->corte->viajes_moviles_no_modificados()->get(), 'VIAJES MÓVILES NO MODIFICADOS');
             $this->Ln(1);
         }
-        if(count($this->corte->viajes_moviles_no_confirmados())) {
-            $this->items_no_modificados($this->corte->viajes_moviles_no_confirmados(), 'VIAJES NO CONFIRMADOS POR EL CHECADOR');
+        if(count($this->corte->viajes_moviles_no_confirmados()->get())) {
+            $this->items_no_modificados($this->corte->viajes_moviles_no_confirmados()->get(), 'VIAJES NO CONFIRMADOS POR EL CHECADOR');
+            $this->Ln(1);
         }
+
+        $this->totales($this->corte->origenes());
         $this->Output('I', "Corte{$this->corte->id}.pdf", 1);
         exit;
     }

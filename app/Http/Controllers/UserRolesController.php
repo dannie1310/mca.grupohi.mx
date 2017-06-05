@@ -109,7 +109,7 @@ class UserRolesController extends Controller
                 $telefono->save();
             }
 
-            $configuracion = Configuracion::where('id_checador', '=', $id_user)->first();
+            $configuracion = Configuracion::where('id_usuario', '=', $id_user)->first();
             if($configuracion) {
                 $configuracion->delete();
             }

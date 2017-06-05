@@ -17,6 +17,7 @@ class XLSController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:descargar-excel-conciliacion', ['only' => ['conciliacion']]);
 
         parent::__construct();
     }
@@ -77,7 +78,7 @@ class XLSController extends Controller
                 ));
                 $i = 2;
                 foreach($conciliacion->conciliacionDetalles as $detalle){
-                    if($detalle->estatus >=0){
+                    if($detalle->estado >=0){
                         $sheet->row($i, array(
                             $detalle->viaje->camion->Economico,
                             $detalle->viaje->code,

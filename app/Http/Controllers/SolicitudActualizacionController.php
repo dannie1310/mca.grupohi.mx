@@ -42,9 +42,13 @@ class SolicitudActualizacionController extends Controller
             }
         }
         else{
-            //$solicitudes = SolicitudActualizacion::orderBy('FechaHoraRegistro', 'DESC')->limit(10)->get();
-            return view('camiones.solicitud-actualizacion.index');
-            //->with(['items' => $solicitudes]);
+            if(auth()->user()->can('solicitud-actualizacion')){
+                return view('camiones.solicitud-actualizacion.index');}
+                else{
+                    Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                    return redirect()->back();
+             }
+
         }
     }
 

@@ -55,9 +55,8 @@ class AuthController extends Controller
             return response()->json(['error' => 'No se obtuvo Token de sesión, intente de nuevo.', 'code' => 200], 200);
         }
 
-        $user = Auth::user();
+        $user = auth()->user();
         $token = JWTAuth::fromUser($user);
-        $usrRegistrado = collect(Auth::user()->toArray())->only('idusuario','nombre', 'apaterno', 'amaterno');
 
         // Preparación del JSON de respuesta en caso de haber pasado todas las validaciones necesarias
         $nombre = $usrRegistrado['nombre'].' '.$usrRegistrado['apaterno'].' '.$usrRegistrado['amaterno'];

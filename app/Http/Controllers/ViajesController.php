@@ -6,6 +6,7 @@ use App\Models\Transformers\ViajeTransformer;
 use App\Models\Transformers\ViajeTransformerRevertir;
 use App\Models\Viaje;
 use Illuminate\Http\Request;
+use Laracasts\Flash\Flash;
 
 
 class ViajesController extends Controller
@@ -121,7 +122,12 @@ class ViajesController extends Controller
     public function edit(Request $request)
     {
         if($request->get('action') == 'revertir') {
-            return view('viajes.edit')->withAction('revertir');
+            if(auth()->user()->can('revertir-viajes')) {
+                return view('viajes.edit')->withAction('revertir');
+            }else{
+                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                return redirect()->back();
+            }
         }
     }
 

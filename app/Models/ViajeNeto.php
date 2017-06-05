@@ -135,7 +135,7 @@ class ViajeNeto extends Model
             ->where(function($query){
                 $query
                     ->whereNotNull('viajes.IdViaje')
-                    ->whereIn('viajesnetos.Estatus', [0, 10, 20, 30]);
+                    ->whereIn('viajesnetos.Estatus', [1, 11, 21, 31]);
             });
     }
 
@@ -968,7 +968,8 @@ class ViajeNeto extends Model
                 "sindicatos_camiones.NombreCorto as sindicato_camion",
                 DB::raw("group_concat(c.idconciliacion) as id_conciliacion"),
                 DB::raw("group_concat(CONCAT(user_concilio.nombre, ' ', user_concilio.apaterno, ' ', user_concilio.amaterno)) as concilio"),
-                DB::raw("group_concat(c.fecha_conciliacion) as fecha_conciliacion")
+                DB::raw("group_concat(c.fecha_conciliacion) as fecha_conciliacion"),
+                DB::raw("CONCAT(viajesnetos.FechaCarga, ' ', viajesnetos.HoraCarga) as fecha_hora_carga")
             )
             ->groupBy('viajesnetos.IdViajeNeto');
     }

@@ -14,7 +14,6 @@
 Route::get('/', 'PagesController@home')->name('home');
 Route::get('index', 'PagesController@index')->name('index');
 Route::get('proyectos', 'PagesController@proyectos')->name('proyectos');
-Route::get('origenes_usuarios', 'PagesController@origenes_usuarios')->name('origenes_usuarios.index');
 
 // Rutas de Autenticación
 Route::get('auth/login', [
@@ -39,48 +38,51 @@ Route::get('/context/{databaseName}/{id}', 'ContextController@set')
 
 
 // Rutas de Catalogos
-Route::resource('materiales', 'MaterialesController');
-Route::resource('marcas', 'MarcasController');
-Route::resource('sindicatos', 'SindicatosController');
-Route::resource('origenes', 'OrigenesController');
-Route::get('origenes/{origenes}/tiros', 'OrigenesTirosController@index')->name('origenes.tiros.index');
-Route::resource('tiros', 'TirosController');
-Route::resource('rutas', 'RutasController');
-Route::resource('ruta.archivos', 'RutaArchivosController');
-Route::resource('camiones', 'CamionesController');
-Route::resource('camion.imagenes', 'CamionImagenesController');
-Route::resource('tarifas_material', 'TarifasMaterialController');
-Route::resource('tarifas_peso', 'TarifasPesoController');
-Route::resource('tarifas_tiporuta', 'TarifasTipoRutaController');
-Route::resource('operadores', 'OperadoresController');
-Route::resource('empresas', 'EmpresasController');
-Route::resource('fda_material', 'FDAMaterialController');
-Route::resource('fda_banco_material', 'FDABancoMaterialController');
-Route::resource('etapas', 'EtapasController');
+Route::group(['middleware' => ['permission:control-catalogos']], function () {
+    Route::get('origenes_usuarios', 'PagesController@origenes_usuarios')->name('origenes_usuarios.index');
+    Route::resource('materiales', 'MaterialesController');
+    Route::resource('marcas', 'MarcasController');
+    Route::resource('sindicatos', 'SindicatosController');
+    Route::resource('origenes', 'OrigenesController');
+    Route::get('origenes/{origenes}/tiros', 'OrigenesTirosController@index')->name('origenes.tiros.index');
+    Route::resource('tiros', 'TirosController');
+    Route::resource('rutas', 'RutasController');
+    Route::resource('ruta.archivos', 'RutaArchivosController');
+    Route::resource('camiones', 'CamionesController');
+    Route::resource('camion.imagenes', 'CamionImagenesController');
+    Route::resource('tarifas_material', 'TarifasMaterialController');
+    Route::resource('tarifas_peso', 'TarifasPesoController');
+    Route::resource('tarifas_tiporuta', 'TarifasTipoRutaController');
+    Route::resource('operadores', 'OperadoresController');
+    Route::resource('empresas', 'EmpresasController');
+    Route::resource('fda_material', 'FDAMaterialController');
+    Route::resource('fda_banco_material', 'FDABancoMaterialController');
+    Route::resource('etapas', 'EtapasController');
+    Route::get('centroscostos', 'CentrosCostosController@index')->name('centroscostos.index');
+    Route::get('centroscostos/{centroscosto}', 'CentrosCostosController@show')->name('centroscostos.show');
+    Route::post('centroscostos', 'CentrosCostosController@store')->name('centroscostos.store');
+    Route::get('centroscostos/create/{IdPadre}', 'CentrosCostosController@create')->name('centroscostos.create');
+    Route::get('centroscostos/{centroscostos}/edit', 'CentrosCostosController@edit')->name('centroscostos.edit');
+    Route::patch('centroscostos/{centroscostos}', 'CentrosCostosController@update')->name('centroscostos.update');
+    Route::delete('centroscostos/{centroscostos}', 'CentrosCostosController@destroy')->name('centroscostos.destroy');
+    Route::get('usuarios/{usuarios}/origenes', 'OrigenesUsuariosController@index');
+    Route::post('usuarios/{usuarios}/origenes/{origenes}', 'OrigenesUsuariosController@store');
+    Route::get('usuarios', 'UserController@index');
+    Route::patch('usuarios/{usuarios}', 'UserController@update');
+    Route::resource('telefonos', 'TelefonosController');
+    Route::resource('impresoras', 'ImpresorasController');
+});
 
-//Rutas de centros de costo
-Route::get('centroscostos', 'CentrosCostosController@index')->name('centroscostos.index');
-Route::get('centroscostos/{centroscosto}', 'CentrosCostosController@show')->name('centroscostos.show');
-Route::post('centroscostos', 'CentrosCostosController@store')->name('centroscostos.store');
-Route::get('centroscostos/create/{IdPadre}', 'CentrosCostosController@create')->name('centroscostos.create');
-Route::get('centroscostos/{centroscostos}/edit', 'CentrosCostosController@edit')->name('centroscostos.edit');
-Route::patch('centroscostos/{centroscostos}', 'CentrosCostosController@update')->name('centroscostos.update');
-Route::delete('centroscostos/{centroscostos}', 'CentrosCostosController@destroy')->name('centroscostos.destroy');
 
-//Rutas de Origenes por Usuario
-Route::get('usuarios/{usuarios}/origenes', 'OrigenesUsuariosController@index');
-Route::post('usuarios/{usuarios}/origenes/{origenes}', 'OrigenesUsuariosController@store');
-Route::get('usuarios', 'UserController@index');
-Route::patch('usuarios/{usuarios}', 'UserController@update');
-
-//Rutas de Viajes Netos
+    //Rutas de Viajes Netos
 Route::get('viajes_netos', 'ViajesNetosController@index')->name('viajes_netos.index');
 Route::get('viajes_netos/create', 'ViajesNetosController@create')->name('viajes_netos.create');
 Route::group(['prefix' => 'viajes_netos'], function() {
     Route::post('completa', 'ViajesNetosController@store');
     Route::post('manual', [
         'as' => 'viajes_netos.manual.store',
-        'uses' => 'ViajesNetosController@store'
+        'uses' => 'ViajesNetosController@store',
+        'middleware' => ['permission:ingresar-viajes-manuales']
     ]);
 });
 Route::get('viajes_netos/edit' , 'ViajesNetosController@edit')->name('viajes_netos.edit');
@@ -194,8 +196,7 @@ Route::group(['prefix' => 'administracion', 'middleware' => ['role:administrador
 });
 Route::resource('usuarios_sistema', 'UsuarioSistemaController');
 
-Route::resource('telefonos', 'TelefonosController');
-Route::resource('impresoras', 'ImpresorasController');
+
 Route::resource('telefonos-impresoras', 'TelefonosImpresorasController');
 
 
@@ -221,9 +222,6 @@ Route::group(['prefix' => 'csv'],function () {
     Route::get('usuario-rol', 'CSVController@usuario_rol')->name('csv.usuario_rol');
     Route::get('rol-permiso', 'CSVController@rol_permiso')->name('csv.rol_permiso');
     Route::get('usuario-permiso', 'CSVController@usuario_permiso')->name('csv.usuario_permiso');
-
-
-
 });
 
 Route::get('detalle_configuracion', 'DetalleAdministracionController@index')->name('detalle.configuracion');
@@ -279,5 +277,10 @@ Route::get('historico/sindicatos/{id}', 'HistoricoController@sindicatos');
 Route::get('historico/rutas/{id}', 'HistoricoController@rutas');
 Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 
-Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
-Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
+Route::group(['middleware' => ['permission:consulta-solicitud-reactivar']], function () {
+    Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
+});
+
+Route::group(['middleware' => ['permission:consulta-solicitud-actualizar']], function () {
+    Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
+});
