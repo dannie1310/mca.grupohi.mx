@@ -21,6 +21,7 @@ Vue.component('viajes-manual', {
                     IdTiro       : '',
                     IdMaterial   : '',
                     Motivo       : '',
+                    IdMotivo     : '',
                     Tiros        : []
                 }],
                 'errors': []
@@ -65,10 +66,17 @@ Vue.component('viajes-manual', {
         setCamion: function(viaje) {
             viaje.Cubicacion = '';
             if(viaje.IdCamion) {
-                this.$http.get(App.host + '/camiones/' + viaje.IdCamion).then((response) => {
-                    viaje.Cubicacion = response.body.CubicacionParaPago;
-                }, (error) => {
-                    App.setErrorsOnForm(this.form, error.body);
+                var url = App.host + '/camiones/' + viaje.IdCamion + '/cubicacion';
+                var _this = this;
+                $.ajax({
+                    url : url,
+                    type: 'GET',
+                    success: function (response) {
+                        Vue.set(viaje, 'Cubicacion', response.cubicacion);
+                    },
+                    error: function (error) {
+                        App.setErrorsOnForm(_this.form, error.responseJSON);
+                    }
                 });
             } else {
                 viaje.Cubicacion = '';
@@ -88,6 +96,7 @@ Vue.component('viajes-manual', {
                 IdTiro       : '',
                 IdMaterial   : '',
                 Motivo       : '',
+                IdMotivo     : '',
                 Tiros        : []
             });
         },

@@ -118,6 +118,11 @@ class CamionesController extends Controller
                 ->withCamion(Camion::findOrFail($id));
     }
 
+    public function getCubicacion($id) {
+        $camion = Camion::find($id);
+        return response()->json(['cubicacion' => $camion->CubicacionParaPago]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *

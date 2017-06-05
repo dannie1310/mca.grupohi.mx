@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MotivoCargaManual;
 use App\Models\Transformers\ViajeNetoTransformer;
 use Illuminate\Http\Request;
 
@@ -522,6 +523,7 @@ class ViajesNetosController extends Controller
     {
         if(auth()->user()->can('ingresar-viajes-manuales')) {
             return view('viajes_netos.create')
+                ->withMotivos(MotivoCargaManual::orderBy('id','ASC')->lists('descripcion','id'))
                 ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
                 ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
                 ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
@@ -541,11 +543,7 @@ class ViajesNetosController extends Controller
      */
     public function store(Requests\CreateViajeNetoRequest $request)
     {
-        if($request->path() == 'viajes_netos/manual') {
-            return response()->json(ViajeNeto::cargaManual($request));
-        } else if($request->path() == 'viajes_netos/completa') {
-            return response()->json(ViajeNeto::cargaManualCompleta($request));
-        }
+        return response()->json(ViajeNeto::cargaManual($request));
     }
 
     /**

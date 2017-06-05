@@ -74,10 +74,23 @@
                             </td>
                         </tr>
                         <tr>
+
                             <td><strong>Motivo</strong></td>
-                            <td colspan="9">
-                                <input v-bind:name="'viajes[' + (index + 1) + '][Motivo]'" type="text" class="form-control input-sm" v-model="viaje.Motivo">
+
+                            <td colspan="5">
+                                <select v-bind:name="'viajes[' + (index + 1) + '][IdMotivo]'" class="form-control input-sm" v-model="viaje.IdMotivo">
+                                    <option value>--SELECCIONE--</option>
+                                    @foreach($motivos as $key => $motivo)
+                                        <option value="{{ $key }}">{{ $motivo }}</option>
+                                    @endforeach
+                                </select>
                             </td>
+                            <td colspan="4">
+                                <span v-if="viaje.IdMotivo == 7">
+                                <input v-bind:name="'viajes[' + (index + 1) + '][Motivo]'" type="text" class="form-control input-sm" v-model="viaje.Motivo" placeholder="Especifique el motivo ... ">
+                                </span>
+                            </td>
+
                         </tr>
                     </tbody>
                 </table>

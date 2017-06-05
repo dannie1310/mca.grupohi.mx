@@ -174,7 +174,7 @@
 
 
                                 <th colspan="3" style="text-align: center">CONCILIACIÓN</th>
-                                <th colspan="6" style="text-align: center">ESTADO DEL VIAJE</th>
+                                <th colspan="7" style="text-align: center">ESTADO DEL VIAJE</th>
                             </tr>
                             <tr>
                                 <th style="text-align: center"> # </th>
@@ -205,6 +205,7 @@
                                 <th style="text-align: center"> FECHA  </th>
 
                                 <th style="text-align: center"> REGISTRÓ </th>
+                                <th style="text-align: center"> MOTIVO </th>
                                 <th style="text-align: center"> FECHA Y HORA REGISTRO </th>
                                 <th style="text-align: center"> AUTORIZÓ </th>
                                 <th style="text-align: center"> VALIDÓ </th>
@@ -243,6 +244,7 @@
                                 <td style="white-space: nowrap">@{{ viaje_neto.fecha_conciliacion }}</td>
 
                                 <td style="white-space: nowrap">@{{ viaje_neto.registro }}</td>
+                                <td style="white-space: nowrap">@{{ viaje_neto.Observaciones }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.fecha_hora_carga }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.autorizo }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.valido }}</td>

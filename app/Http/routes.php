@@ -36,6 +36,8 @@ Route::get('/context/{databaseName}/{id}', 'ContextController@set')
     ->name('context.set')
     ->where(['databaseName' => '[aA-zZ0-9_-]+', 'id' => '[0-9]+']);
 
+Route::get('origenes/{origenes}/tiros', 'OrigenesTirosController@index')->name('origenes.tiros.index');
+Route::get('camiones/{camiones}/cubicacion', 'CamionesController@getCubicacion');
 
 // Rutas de Catalogos
 Route::group(['middleware' => ['permission:control-catalogos']], function () {
@@ -44,7 +46,6 @@ Route::group(['middleware' => ['permission:control-catalogos']], function () {
     Route::resource('marcas', 'MarcasController');
     Route::resource('sindicatos', 'SindicatosController');
     Route::resource('origenes', 'OrigenesController');
-    Route::get('origenes/{origenes}/tiros', 'OrigenesTirosController@index')->name('origenes.tiros.index');
     Route::resource('tiros', 'TirosController');
     Route::resource('rutas', 'RutasController');
     Route::resource('ruta.archivos', 'RutaArchivosController');

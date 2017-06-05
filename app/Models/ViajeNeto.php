@@ -37,7 +37,8 @@ class ViajeNeto extends Model
         'Code',
         'CubicacionCamion',
         'IdEmpresa',
-        'IdSindicato'
+        'IdSindicato',
+        'IdMotivo'
     ];
     protected $presenter = ModelPresenter::class;
     public $timestamps = false;
@@ -206,8 +207,9 @@ class ViajeNeto extends Model
                     'Creo' => auth()->user()->idusuario,
                     'Estatus' => 29,
                     'Code' => $viaje['Codigo'],
+                    'IdMotivo'=>$viaje['IdMotivo'],
                     'CubicacionCamion' => $viaje['Cubicacion'],
-                    'Observaciones' => $viaje['Motivo']
+                    'Observaciones' => $viaje['IdMotivo']==7?$viaje['Motivo']:MotivoCargaManual::find($viaje['IdMotivo'])->descripcion
                 ];
 
                 ViajeNeto::create(array_merge($viaje, $extra));
