@@ -29,7 +29,6 @@ class AuthController extends Controller
      * @apiParam {String} clave  Clave de acceso del Usuario de Intranet.
      *
      * @apiSuccess {String} IdUsuario Información de ID del Usuario Logueado.
-     * @apiSuccess {String} Nombre Información del nombre completo del Usuario Logueado.
      * @apiSuccess {Array} proyectos Proyectos a las que el Usuario tiene acceso.
      * @apiSuccess {String} token Token generado para el usuario.
      *
@@ -38,18 +37,6 @@ class AuthController extends Controller
      *  {
      *          "IdUsuario": 1,
      *          "Nombre": "FULL NAME",
-     *          "proyectos": [
-     *          {
-     *              "id_proyecto"       : "1",
-     *              "descripcion"   : "DESCRIPCION DEL PROYECTO 1",
-     *          },
-     *          {
-     *              "id_proyecto"       : "2",
-     *              "descripcion"   : "DESCRIPCION DEL PROYECTO 2"
-     *          },
-     *          {
-     *              ...
-     *          }
      *      ],
      *      "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."
      *  }
@@ -71,7 +58,6 @@ class AuthController extends Controller
         $user = Auth::user();
         $token = JWTAuth::fromUser($user);
         $usrRegistrado = collect(Auth::user()->toArray())->only('idusuario','nombre', 'apaterno', 'amaterno');
-        $nombre = $usrRegistrado['nombre'].' '.$usrRegistrado['apaterno'].' '.$usrRegistrado['amaterno'];
 
         // Preparación del JSON de respuesta en caso de haber pasado todas las validaciones necesarias
         $nombre = $usrRegistrado['nombre'].' '.$usrRegistrado['apaterno'].' '.$usrRegistrado['amaterno'];
