@@ -56,9 +56,12 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
+        
+        
         $token = JWTAuth::fromUser($user);
 
         // Preparación del JSON de respuesta en caso de haber pasado todas las validaciones necesarias
+        $usrRegistrado =collect(Auth::user()->toArray())->only('idusuario','nombre','apaterno','amaterno');
         $nombre = $usrRegistrado['nombre'].' '.$usrRegistrado['apaterno'].' '.$usrRegistrado['amaterno'];
         $resp = response()->json(array_merge([
             'IdUsuario' => $usrRegistrado['idusuario'],

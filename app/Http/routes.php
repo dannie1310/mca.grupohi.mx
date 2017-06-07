@@ -235,8 +235,8 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
     $api->post('authenticate', 'App\Http\Controllers\API\AuthController@authenticate');
 
     // Rutas de API Registro de Tags
-    $api->post('tags_nuevos/{usuario}', 'App\Http\Controllers\API\TagsController@store');
-    $api->get('tags_nuevos/{usuario}', 'App\Http\Controllers\API\TagsController@lista');
+    $api->post('tags_nuevos', 'App\Http\Controllers\API\TagsController@store');
+    $api->get('tags_nuevos', 'App\Http\Controllers\API\TagsController@lista');
 
     //Authenticate Routes
     /*$api->post('authenticate', 'Ghi\Http\Controllers\Api\Auth\AuthController@authenticate');
