@@ -59,6 +59,8 @@ class User extends Model implements AuthenticatableContract,
 
     public function roles()
     {
+        $test = 'OK';
+        //dd(Context::getId());
         return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), 'user_id', 'role_id')->where('id_proyecto', Context::getId());
     }
 
