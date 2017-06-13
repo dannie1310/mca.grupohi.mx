@@ -6,6 +6,7 @@ use App\Models\Camion;
 use App\Models\Camiones\SolicitudActualizacion;
 use Illuminate\Http\Request;
 
+use Laracasts\Flash\Flash;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
