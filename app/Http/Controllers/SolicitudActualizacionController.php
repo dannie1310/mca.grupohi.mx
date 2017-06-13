@@ -43,7 +43,7 @@ class SolicitudActualizacionController extends Controller
             }
         }
         else{
-            if(auth()->user()->can('solicitud-actualizacion')){
+            if(auth()->user()->can('consulta-solicitud-actualizar')){
                 return view('camiones.solicitud-actualizacion.index');}
                 else{
                     Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
