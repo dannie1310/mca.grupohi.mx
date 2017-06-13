@@ -146,7 +146,7 @@
                         }
                         if(x==0){
                             $('.informacion').hide();
-                            $('.nota').html('Ningún viaje coincide con los datos de consulta');
+                            $('.nota').html('Ninguna solicitud coincide con los datos de consulta');
                         }
                         else{
                             $('.informacion').show();
