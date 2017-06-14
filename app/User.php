@@ -4,6 +4,7 @@ namespace App;
 
 use App\Models\ConfiguracionDiaria\Configuracion;
 use App\Models\Telefono;
+use App\Models\Proyecto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Illuminate\Support\Facades\Config;
 use App\Facades\Context;
+use Auth;
 
 
 class User extends Model implements AuthenticatableContract,
@@ -59,9 +61,21 @@ class User extends Model implements AuthenticatableContract,
 
     public function roles()
     {
-        $test = 'OK';
-        //dd(Context::getId());
         return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), 'user_id', 'role_id')->where('id_proyecto', Context::getId());
+    }
+
+    public function rolesApi($id_role){
+        $resp = Proyecto::select('proyectos.id_proyecto', 'proyectos.base_datos', 'proyectos.descripcion')
+                    ->join('role_user', 'proyectos.id_proyecto', '=', 'role_user.id_proyecto')
+                    ->join('roles', 'role_user.role_id', '=', 'roles.id')
+                    ->where('role_user.user_id', Auth::user()->idusuario)
+                    ->where('roles.name', $id_role)->get()->toArray();
+
+        if(count($resp) == 1 ) {
+            return $resp[0];
+        } else {
+            return null;
+        }
     }
 
     public function configuracion() {

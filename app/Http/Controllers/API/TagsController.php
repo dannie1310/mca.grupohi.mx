@@ -11,6 +11,7 @@ use App\Models\Empresa;
 use App\Models\Proyecto;
 use DB;
 use Auth;
+use App\User;
 
 class TagsController extends Controller
 {
@@ -71,6 +72,12 @@ class TagsController extends Controller
     public function store(Request $request)
     {
         $datos = $request->json()->all();
+        $rol = 19;
+        $usr = new User();
+        $proy = $usr->rolesApi($rol);
+
+        dd($proy['descripcion']);
+        
         // Revisar si existe el UID del Tag
         if(TagModel::where('uid',$datos['uid'])->count() > 0){
             return response()->json(['msj' => 'ok']);

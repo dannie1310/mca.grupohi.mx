@@ -239,6 +239,9 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
     $api->post('tags_nuevos', 'App\Http\Controllers\API\TagsController@store');
     $api->get('tags_nuevos', 'App\Http\Controllers\API\TagsController@lista');
 
+    $api->get('registro_camiones/{role}', 'App\Http\Controllers\API\RegistroCamionesController@index');
+    $api->post('registro_camiones', 'App\Http\Controllers\API\RegistroCamionesController@lista');       
+
     //Authenticate Routes
     /*$api->post('authenticate', 'Ghi\Http\Controllers\Api\Auth\AuthController@authenticate');
 
