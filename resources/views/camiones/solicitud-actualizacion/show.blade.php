@@ -229,10 +229,12 @@
 
         <tr>
             <td colspan="3" align="center">
-                <div <?php if($solicitud->Estatus != 0 ){ echo 'hidden';}?>>
-                    <button class="btn btn-success reactivar">Actualizar</button>
-                    <button class="btn btn-danger cancelar">Cancelar</button>
-                </div>
+                @if(Auth::user()->can(['aprobar-solicitud-actualizar']))
+                    <div <?php if($solicitud->Estatus != 0 ){ echo 'hidden';}?>>
+                        <button class="btn btn-success reactivar">Actualizar</button>
+                        <button class="btn btn-danger cancelar">Cancelar</button>
+                    </div>
+                @end
                 <a href="{{ route('solicitud-actualizacion.index') }}" class="btn btn-info pull-right">Regresar</a>
             </td>
         </tr>
