@@ -10,7 +10,7 @@
         <tr>
             <td colspan="2"  align="center">
                 <div align="left">
-                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">INICIO DE VIAJES DEL PERÍODO (</font>
+                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">INICIO DE VIAJES DEL PER&Iacute;ODO (</font>
                     <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
                     <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</font></div></td>
         </tr>
@@ -29,7 +29,7 @@
 
                     <tr bgcolor="#0A8FC7">
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Origen</font></div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Camión</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Cami&oacute;n</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Placas Cami&oacute;n</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Material</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Inicio</font></div></td>
