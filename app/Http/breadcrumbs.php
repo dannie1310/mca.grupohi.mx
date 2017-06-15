@@ -309,6 +309,9 @@ Breadcrumbs::register('viajes.revertir', function($breadcrumbs) {
 Breadcrumbs::register('reportes.viajes_netos', function($breadcrumbs) {
     $breadcrumbs->push('VIAJES NETOS', route('reportes.viajes_netos.create'));
 });
+Breadcrumbs::register('reportes.inicio_viajes', function($breadcrumbs) {
+    $breadcrumbs->push('INICIO VIAJES', route('reportes.inicio_viajes.create'));
+});
 
 
 //Corte de Checador

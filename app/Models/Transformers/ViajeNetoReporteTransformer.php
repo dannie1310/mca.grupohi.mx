@@ -162,6 +162,7 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       group by IdViajeNeto
       ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus
       ";
+        dd($timestamp_inicial);
         return DB::connection('sca')->select(DB::raw($SQL));
     }
 }
