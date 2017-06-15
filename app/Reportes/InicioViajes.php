@@ -8,6 +8,15 @@
 
 namespace App\Reportes;
 
+use App\Facades\Context;
+use App\Models\Proyecto;
+use App\Models\Transformers\InicioViajeReporteTransformer;
+use App\User;
+use Carbon\Carbon;
+use function foo\func;
+use Illuminate\Http\Request;
+use Laracasts\Flash\Flash;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InicioViajes
 {
@@ -27,18 +36,8 @@ class InicioViajes
         $this->horaInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
         $this->horaFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
 
-        switch ($request->get('Estatus')) {
-            case '0':
-                $this->estatus = 'in (0,1,10,11,20,21,30,31)';
-                break;
-            case '1':
-                $this->estatus = 'in (1,11,21,31)';
-                break;
-            case '2':
-                $this->estatus = 'in (0,10,20,30)';
-                break;
-        }
-        $this->data = InicioViajesReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
+
+        $this->data = InicioViajeReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal);
     }
 
     /**

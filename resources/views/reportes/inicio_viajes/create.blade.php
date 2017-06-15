@@ -4,7 +4,7 @@
     <h1>REPORTES</h1>
     {!! Breadcrumbs::render('reportes.inicio_viajes')  !!}
     <hr>
-    <h3>BUSCAR VIAJES</h3>
+    <h3>BUSCAR</h3>
     @include('partials.errors')
     {!! Form::open(['method' => 'GET', 'route' => ['reportes.inicio_viajes.show'], 'id' => 'form_reporte_viajes_netos']) !!}
     <input type="hidden" name="action" value />
@@ -36,16 +36,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="form-group">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>ESTATUS</label>
-                    {!! Form::select('Estatus', [0 => 'TODOS', 1 => 'VALIDADOS', 2 => 'SIN VALIDAR'], old('Estatus'), ['class' => 'form-control']) !!}
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-success excel">GENERAR REPORTE</button>
         <button type="submit" class="btn btn-primary view">VISTA PREVIA</button>

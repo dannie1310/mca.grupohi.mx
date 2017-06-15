@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Reportes\InicioViajes;
 use App\Reportes\ViajesNetos;
 use Illuminate\Http\Request;
 
@@ -64,10 +65,10 @@ class ReportesController extends Controller
         ]);
 
         if($request->get('action') == 'view') {
-            return (new ViajesNetos($request))->show();
+            return (new InicioViajes($request))->show();
         } else if($request->get('action') == 'excel')
         {
-            return (new ViajesNetos($request))->excel();
+            return (new InicioViajes($request))->excel();
         }
     }
 }
