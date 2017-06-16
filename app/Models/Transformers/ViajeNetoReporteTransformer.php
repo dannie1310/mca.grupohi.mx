@@ -62,9 +62,7 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       tm.PrimerKM as tarifa_material_pk,
       tm.KMSubsecuente as tarifa_material_ks,
       tm.KMAdicional as tarifa_material_ka,
-      ((tm.PrimerKM*1*c.CubicacionParaPago)
-      +(tm.KMSubsecuente*r.KmSubsecuentes*c.CubicacionParaPago)
-      +(tm.KMAdicional*r.KmAdicionales*c.CubicacionParaPago)) 
+      
 
       if(vi.IdViaje is not null, vi.Importe,
 ((tm.PrimerKM*1*if(v.CubicacionCamion<=8,c.CubicacionParaPago,v.CubicacionCamion))+
