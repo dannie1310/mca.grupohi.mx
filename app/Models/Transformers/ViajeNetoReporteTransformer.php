@@ -62,7 +62,15 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
       tm.PrimerKM as tarifa_material_pk,
       tm.KMSubsecuente as tarifa_material_ks,
       tm.KMAdicional as tarifa_material_ka,
-      ((tm.PrimerKM*1*c.CubicacionParaPago)+(tm.KMSubsecuente*r.KmSubsecuentes*c.CubicacionParaPago)+(tm.KMAdicional*r.KmAdicionales*c.CubicacionParaPago)) as ImporteTotal_M,
+      ((tm.PrimerKM*1*c.CubicacionParaPago)
+      +(tm.KMSubsecuente*r.KmSubsecuentes*c.CubicacionParaPago)
+      +(tm.KMAdicional*r.KmAdicionales*c.CubicacionParaPago)) 
+
+      if(vi.IdViaje is not null, vi.Importe,
+((tm.PrimerKM*1*if(v.CubicacionCamion<=8,c.CubicacionParaPago,v.CubicacionCamion))+
+      (tm.KMSubsecuente*r.KmSubsecuentes*if(v.CubicacionCamion<=8,c.CubicacionParaPago,v.CubicacionCamion))+
+      (tm.KMAdicional*r.KmAdicionales*if(v.CubicacionCamion<=8,c.CubicacionParaPago,v.CubicacionCamion)))
+    ) as ImporteTotal_M,
       conci.idconciliacion,
       conci.fecha_conciliacion,
       conci.fecha_inicial,
