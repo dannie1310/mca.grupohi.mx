@@ -140,8 +140,9 @@
           Reportes<span class="caret"></span>
       </a>
       <ul class="dropdown-menu" role="menu">
-          <li><a href="{{ route('reportes.viajes_netos.create') }}">Viajes Netos</a></li>
           <li><a href="{{ route('reportes.inicio_viajes.create') }}">Inicio Viajes</a></li>
+          <li><a href="{{ route('reportes.viajes_netos.create') }}">Viajes Netos</a></li>
+          <li><a href="{{ route('reportes.inicio_viajes.create') }}">Conciliaciones Detallado</a></li>
       </ul>
   </li>
   @endif

@@ -2,7 +2,6 @@
 <html>
 <body>
 @if(count($data))
-    <?php dd($data);?>
     <table width="1000" border="0" align="center" >
 
         <tr>
@@ -11,7 +10,7 @@
         <tr>
             <td colspan="2"  align="center">
                 <div align="left">
-                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">INICIO DE VIAJES DEL PER&Iacute;ODO (</font>
+                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">CONCILIACIONES DEL PER&Iacute;ODO (</font>
                     <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
                     <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</font></div></td>
         </tr>

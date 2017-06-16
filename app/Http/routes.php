@@ -158,6 +158,14 @@ Route::group(['prefix' => 'reportes'], function () {
         'as'   => 'reportes.inicio_viajes.show',
         'uses' => 'ReportesController@inicio_viajes_show'
     ]);
+    Route::get('conciliacion_detalle/create', [
+        'as'   => 'reportes.conciliacion_detalle.create',
+        'uses' => 'ReportesController@conciliacion_detalle_create'
+    ]);
+    Route::get('conciliacion_detalle/show', [
+        'as'   => 'reportes.conciliacion_detalle.show',
+        'uses' => 'ReportesController@conciliacion_detalle_show'
+    ]);
 });
 
 Route::resource('conciliaciones', 'ConciliacionesController');
