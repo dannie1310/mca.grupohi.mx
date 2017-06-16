@@ -26,9 +26,14 @@ class InicioViajeReporteTransformer extends AbstractTransformer
                 CONCAT(u.nombre, ' ', u.apaterno, ' ', u.amaterno) as usuario,
                 c.Economico as camion,
                 c.Placas as placas,
+                c.CubicacionParaPago as cubicacion,
                 m.Descripcion as material,
                 o.Descripcion as origen,
-                p.name as perfil
+                p.name as perfil,
+                case 
+                when (hour(i.fecha_origen) >= '07:00:00' and hour(i.fecha_origen) < '19:00:00')  then 'Primer Turno'
+                else 'Segundo Turno'
+                end as turno
                 FROM prod_sca_pista_aeropuerto_2.inicio_camion i
                 inner join camiones c on c.IdCamion = i.idcamion
                 inner join materiales m on m.IdMaterial = i.idmaterial
