@@ -80,7 +80,10 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
     conci.fecha_final,
     conci.estado,
 
-
+ IF(v.HoraLlegada >= '07:00:00'
+            AND v.HoraLlegada < '19:00:00',
+        'Primer Turno',
+        'Segundo Turno') AS turno,
 
 
 
