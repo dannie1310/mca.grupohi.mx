@@ -205,6 +205,8 @@ FROM
       group by IdViajeNeto
       ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus
       ";
-        return DB::connection('sca')->select(DB::raw($SQL));
+        $r = DB::connection('sca')->select(DB::raw($SQL));
+	  DB::connection('sca')->disableQueryLog();
+        return $r;
     }
 }
