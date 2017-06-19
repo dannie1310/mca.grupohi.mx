@@ -28,6 +28,7 @@
             <td colspan="2"><table width="1300" border="1" align="center" >
 
                     <tr bgcolor="#0A8FC7">
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">#</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Origen</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Cami&oacute;n</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Placas Cami&oacute;n</font></div></td>
@@ -43,6 +44,7 @@
                     @foreach($data as $key => $item)
 
                         <tr>
+                            <td width="1"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $key + 1; ?></font></div></td>
                             <td width="5"><div align="left"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">&nbsp;&nbsp;<?php echo $item->origen; ?></font></div></td>
                             <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->camion; ?></font></div></td>
                             <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->placas; ?></font></div></td>

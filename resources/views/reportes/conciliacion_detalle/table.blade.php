@@ -32,9 +32,10 @@
             <td colspan="2"><font color="#000000" face="Trebuchet MS" style="font-size:12px; ">FECHA:</font> &nbsp;<font color="#666666" face="Trebuchet MS" style="font-size:12px; "><?php echo date("d-m-Y"); ?></font></td>
         </tr>
         <tr>
-            <td colspan="2"><table width="1900" border="1" align="right" >
+            <td colspan="2"><table width="1900" border="2" align="left" >
 
                     <tr bgcolor="#0A8FC7">
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">#</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Conciliaci&oacute;n</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Conciliaci&oacute;n Historico</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Conciliaci&oacute;n</font></div></td>
@@ -56,7 +57,8 @@
                     @foreach($data as $key => $item)
 
                         <tr>
-                            <td width="3"><div align="left"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">&nbsp;&nbsp;<?php echo $item->folio_conciliacion; ?></font></div></td>
+                            <td width="1"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $key + 1; ?></font></div></td>
+                            <td width="3"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">&nbsp;&nbsp;<?php echo $item->folio_conciliacion; ?></font></div></td>
                             <td width="3"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->folio_conciliacion_historico; ?></font></div></td>
                             <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->fecha_conciliacion; ?></font></div></td>
                             <td width="15"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->fecha_registro_conciliacion; ?></font></div></td>
@@ -71,6 +73,7 @@
                             <td width="3"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->cubicacion_camion; ?></font></div></td>
                             <td width="3"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->importe_viaje; ?></font></div></td>
                             <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->estado_conciliacion; ?></font></div></td>
+
                         </tr>
                     @endforeach
                     @else
