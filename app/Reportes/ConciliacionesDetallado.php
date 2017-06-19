@@ -9,7 +9,7 @@
 namespace App\Reportes;
 use App\Facades\Context;
 use App\Models\Proyecto;
-use App\Models\Transformers\ConciliacionDetalleTransformer;
+use App\Models\Transformers\ConciliacionesDetalladoReporteTransformer;
 use App\User;
 use Carbon\Carbon;
 use function foo\func;
@@ -22,10 +22,15 @@ class ConciliacionesDetallado
 {
 
     protected $estatus;
+    protected $fechaInicial;
+    protected $fechaFinal;
     protected $horaInicial;
     protected $horaFinal;
     protected $request;
     protected $data;
+    protected $tipo_busqueda;
+    protected $codigo;
+
 
     /**
      * InicioViajes constructor.
@@ -33,12 +38,34 @@ class ConciliacionesDetallado
      */
     public function __construct(Request $request)
     {
+
         $this->request = $request;
-        $this->horaInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
-        $this->horaFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
+        $this->tipo_busqueda = $request->get('tipo_busqueda');
 
+        if($this->tipo_busqueda == "fecha"){
+            $this->codigo = " ";
+            $this->horaInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
+            $this->horaFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
+            $this->fechaInicial = Carbon::createFromFormat('Y-m-d', $request->get('FechaInicial'))->toDateString();
+            $this->fechaFinal = Carbon::createFromFormat('Y-m-d', $request->get('FechaFinal'))->toDateString();
 
-        $this->data = ConciliacionDetalleTransformer::toArray($request, $this->horaInicial, $this->horaFinal);
+        }else{
+            $this->horaInicial = " ";
+            $this->horaFinal = " ";
+            $this->codigo = $request->get('Codigo');
+            $this->fechaInicial = " ";
+            $this->fechaFinal = " ";
+        }
+
+        $request->replace([
+            'FechaInicial' => $this->fechaInicial,
+            'FechaFinal' => $this->fechaFinal,
+            'HoraInicial' => $this->horaInicial,
+            'HoraFinal' => $this->horaFinal,
+            'Codigo' => $this->codigo]);
+
+        $this->data = ConciliacionesDetalladoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->codigo);
+
     }
 
     /**

@@ -312,6 +312,9 @@ Breadcrumbs::register('reportes.viajes_netos', function($breadcrumbs) {
 Breadcrumbs::register('reportes.inicio_viajes', function($breadcrumbs) {
     $breadcrumbs->push('INICIO VIAJES', route('reportes.inicio_viajes.create'));
 });
+Breadcrumbs::register('reportes.conciliacion_detalle', function($breadcrumbs) {
+    $breadcrumbs->push('CONCILIACIÓN DETALLE', route('reportes.conciliacion_detalle.create'));
+});
 
 
 //Corte de Checador

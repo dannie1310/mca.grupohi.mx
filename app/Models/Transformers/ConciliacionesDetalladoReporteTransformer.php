@@ -15,13 +15,19 @@ use Themsaid\Transformers\AbstractTransformer;
 class ConciliacionesDetalladoReporteTransformer
 {
 
+    protected  $dato;
 
-    public static function toArray(Request $request, $horaInicial, $horaFinal)
+    public static function toArray(Request $request, $horaInicial, $horaFinal, $codigo)
     {
 
         $timestamp_inicial = $request->get('FechaInicial') . ' ' . $horaInicial;
         $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
 
+        if($request->get('Codigo') != " "){
+            $dato = "where  conciliacion.idconciliacion = '{$codigo}'";
+        }else{
+            $dato = "where   conciliacion.fecha_conciliacion between '{$timestamp_inicial}' and '{$timestamp_final}'";
+        }
 
         $SQL = "SELECT conciliacion.idconciliacion AS folio_conciliacion,
        conciliacion.Folio AS folio_conciliacion_historico,
@@ -51,20 +57,21 @@ class ConciliacionesDetalladoReporteTransformer
                 IF(conciliacion.estado = 2, 'APROBADA', ''))))
           AS estado_conciliacion,
        viajes.IdViaje
-  FROM ((((prod_sca_pista_aeropuerto_2.viajes viajes
-           LEFT OUTER JOIN prod_sca_pista_aeropuerto_2.camiones camiones
+  FROM ((((viajes viajes
+           LEFT OUTER JOIN camiones camiones
               ON (viajes.IdCamion = camiones.IdCamion))
           INNER JOIN
-          prod_sca_pista_aeropuerto_2.conciliacion_detalle conciliacion_detalle
+          conciliacion_detalle conciliacion_detalle
              ON (conciliacion_detalle.idviaje = viajes.IdViaje))
          LEFT OUTER JOIN
-         prod_sca_pista_aeropuerto_2.conciliacion conciliacion
+         conciliacion conciliacion
             ON (conciliacion_detalle.idconciliacion =
                    conciliacion.idconciliacion))
-        LEFT OUTER JOIN prod_sca_pista_aeropuerto_2.sindicatos sindicatos
+        LEFT OUTER JOIN sindicatos sindicatos
            ON (conciliacion.idsindicato = sindicatos.IdSindicato))
-       LEFT OUTER JOIN prod_sca_pista_aeropuerto_2.empresas empresas
-          ON (conciliacion.idempresa = empresas.IdEmpresa)";
+       LEFT OUTER JOIN empresas empresas
+          ON (conciliacion.idempresa = empresas.IdEmpresa)
+        ".$dato;
 
         return DB::connection('sca')->select(DB::raw($SQL));
     }

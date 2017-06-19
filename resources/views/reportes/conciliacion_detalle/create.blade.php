@@ -8,6 +8,7 @@
     @include('partials.errors')
     {!! Form::open(['method' => 'GET', 'route' => ['reportes.conciliacion_detalle.show'], 'id' => 'form_reporte_viajes_netos']) !!}
     <input type="hidden" name="action" value />
+    <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="fecha" checked="checked">BUSCAR POR FECHA</label></h4>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -33,6 +34,15 @@
             <div class="form-group">
                 <label>HORA FINAL</label>
                 <input type="text" class="time end form-control" name="HoraFinal" value="{{ old('HoraFinal') }}" />
+            </div>
+        </div>
+    </div>
+    <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="folio" >BUSCAR POR FOLIO</label></h4>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Folio (*)</label>
+                <input type="text" name="Codigo" class="form-control">
             </div>
         </div>
     </div>

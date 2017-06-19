@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Reportes\ConciliacionesDetallado;
 use App\Reportes\InicioViajes;
 use App\Reportes\ViajesNetos;
 use Illuminate\Http\Request;
@@ -29,6 +30,9 @@ class ReportesController extends Controller
 
     public function inicio_viajes_create(){
         return view(('reportes.inicio_viajes.create'));
+    }
+    public function conciliacion_detalle_create(){
+        return view(('reportes.conciliacion_detalle.create'));
     }
     /**
      * @param Request $request
@@ -69,6 +73,41 @@ class ReportesController extends Controller
         } else if($request->get('action') == 'excel')
         {
             return (new InicioViajes($request))->excel();
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return $this|void
+     */
+    public function conciliacion_detalle_show(Request $request) {
+
+
+
+       if($request->get('tipo_busqueda') == 'fecha') {
+            $this->validate($request, [
+                'FechaInicial' => 'required|date_format:"Y-m-d"',
+                'FechaFinal' => 'required|date_format:"Y-m-d"',
+                'HoraInicial' => 'required|date_format:"g:i:s a"',
+                'HoraFinal' => 'required|date_format:"g:i:s a"',
+                'tipo_busqueda' => 'required'
+            ]);
+
+
+        }else{
+           $this->validate($request, [
+               'Codigo' => 'required'
+           ]);
+
+
+       }
+
+
+        if($request->get('action') == 'view') {
+            return (new ConciliacionesDetallado($request))->show();
+        } else if($request->get('action') == 'excel')
+        {
+            return (new ConciliacionesDetallado($request))->excel();
         }
     }
 }

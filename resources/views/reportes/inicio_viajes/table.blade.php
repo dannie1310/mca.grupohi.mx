@@ -2,7 +2,6 @@
 <html>
 <body>
 @if(count($data))
-    <?php dd($data);?>
     <table width="1000" border="0" align="center" >
 
         <tr>
