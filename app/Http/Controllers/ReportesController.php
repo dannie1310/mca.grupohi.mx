@@ -85,18 +85,19 @@ class ReportesController extends Controller
 
 
        if($request->get('tipo_busqueda') == 'fecha') {
-            $this->validate($request, [
-                'FechaInicial' => 'required|date_format:"Y-m-d"',
-                'FechaFinal' => 'required|date_format:"Y-m-d"',
-                'HoraInicial' => 'required|date_format:"g:i:s a"',
-                'HoraFinal' => 'required|date_format:"g:i:s a"',
-                'tipo_busqueda' => 'required'
-            ]);
-
-
-        }else{
            $this->validate($request, [
-               'Codigo' => 'required'
+               'FechaInicial' => 'required|date_format:"Y-m-d"',
+               'FechaFinal' => 'required|date_format:"Y-m-d"',
+               'HoraInicial' => 'required|date_format:"g:i:s a"',
+               'HoraFinal' => 'required|date_format:"g:i:s a"',
+               'tipo_busqueda' => 'required'
+           ]);
+
+       }
+       else if($request->get('tipo_busqueda') == 'folio') {
+           $this->validate($request, [
+               'Codigo' => 'required',
+               'tipo_busqueda' => 'required'
            ]);
 
 
