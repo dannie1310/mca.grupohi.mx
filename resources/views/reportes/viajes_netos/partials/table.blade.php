@@ -84,8 +84,11 @@
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">IMEI</font> </div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Perfil</font> </div></td>
                 </tr>
-                @foreach($data as $key => $item)
+                <?php $key_global =0; ?>
+                @foreach($data as $chunk)
+                @foreach($chunk as $key => $item)
                     <?php
+                    $key_global++;
                     if($item->Hora >= '00:00:00' && $item->Hora < '07:00:00'){
                         $fechaAplica = strtotime ( '-1 day' , strtotime ( $item->Fecha ) ) ;
                         $fechaAplica = date ( 'd-m-Y' , $fechaAplica );
@@ -105,7 +108,7 @@
                 }
                 ?>
                 <tr <?php if($item->conflictos!=''): ?> style="background-color: #FCC" <?php endif; ?> >
-                    <td width="1"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $key + 1; ?></font></div></td>
+                    <td width="1"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $key_global ; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->primer_toque; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo ($item->IdPerfil != 3) ? $item->segundo_toque : "N/A"; ?></font></div></td>
                     <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->cubicacion; ?></font></div></td>
@@ -144,6 +147,7 @@
                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->imei; ?></font></div></td>
                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->perfil; ?></font></div></td>
                 </tr>
+                      @endforeach
                       @endforeach
                     @else
                             <table width="600" align="center" >
