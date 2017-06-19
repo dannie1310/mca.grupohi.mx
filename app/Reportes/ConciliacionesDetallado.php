@@ -26,6 +26,8 @@ class ConciliacionesDetallado
     protected $fechaFinal;
     protected $horaInicial;
     protected $horaFinal;
+    protected $hInicial;
+    protected $hFinal;
     protected $request;
     protected $data;
     protected $tipo_busqueda;
@@ -44,8 +46,10 @@ class ConciliacionesDetallado
 
         if($this->tipo_busqueda == "fecha"){
             $this->codigo = " ";
-            $this->horaInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
-            $this->horaFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
+            $this->hInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
+            $this->hFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
+            $this->horaInicial = $request->get('HoraInicial');
+            $this->horaFinal = $request->get('HoraFinal');
             $this->fechaInicial = Carbon::createFromFormat('Y-m-d', $request->get('FechaInicial'))->toDateString();
             $this->fechaFinal = Carbon::createFromFormat('Y-m-d', $request->get('FechaFinal'))->toDateString();
 
@@ -64,7 +68,7 @@ class ConciliacionesDetallado
             'HoraFinal' => $this->horaFinal,
             'Codigo' => $this->codigo]);
 
-        $this->data = ConciliacionesDetalladoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->codigo);
+        $this->data = ConciliacionesDetalladoReporteTransformer::toArray($request, $this->hInicial, $this->hFinal, $this->codigo);
 
     }
 
