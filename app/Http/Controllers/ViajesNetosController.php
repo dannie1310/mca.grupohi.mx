@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CierrePeriodo;
 use App\Models\MotivoCargaManual;
 use App\Models\Transformers\ViajeNetoTransformer;
 use Illuminate\Http\Request;
@@ -578,8 +579,10 @@ class ViajesNetosController extends Controller
                 }
         } else if($request->get('action') == 'autorizar') {
             if(auth()->user()->can('autorizar-viajes-manuales')) {
+
                 return view('viajes_netos.edit')
                     ->withViajes(ViajeNeto::registradosManualmente()->get())
+                    ->withCierre(CierrePeriodo::query()->get())
                     ->withAction('autorizar');
             }else{
                 Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
@@ -619,6 +622,7 @@ class ViajesNetosController extends Controller
 
             return response()->json($viaje_neto->validar($request));
         } else if($request->path() == 'viajes_netos/autorizar') {
+
             $msg = ViajeNeto::autorizar($request->get('Estatus'));
             Flash::success($msg);
             return redirect()->back();

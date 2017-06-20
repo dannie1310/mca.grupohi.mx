@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use App\Models\Conciliacion\ConciliacionDetalle;
 use Conflictos\ConflictoEntreViajesDetalle;
 use App\Models\Conflictos\ViajeNetoConflictoPagable;
+use Jenssegers\Date\Date;
+
 class ViajeNeto extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -142,29 +144,48 @@ class ViajeNeto extends Model
 
     public static function autorizar($data) {
         $autorizados = 0;
+        $error=0;
         DB::connection('sca')->beginTransaction();
         try {
             if(count($data) == 0) {
                 $msg = "SELECCIONA AL MENOS UN VIAJE";
             } else {
-                foreach($data as $key => $estatus) {
+                foreach ($data as $key => $estatus) {
                     $viaje = ViajeNeto::findOrFail($key);
                     $viaje->Estatus = $estatus;
-                    if($estatus == '22') {
-                        $viaje->Rechazo = auth()->user()->idusuario;
-                        $viaje->FechaHoraRechazo = Carbon::now()->toDateTimeString();
-                    } else {
-                        $viaje->Aprobo = auth()->user()->idusuario;
-                        $viaje->FechaHoraAprobacion = Carbon::now()->toDateTimeString();
-                    }
-                    $viaje->save();
-                    if($estatus == "20") {
-                        $autorizados += 1;
-                    }
-                }
-                $msg = "VIAJES AUTORIZADOS (".$autorizados.")\n VIAJES RECHAZADOS (".(count($data) - $autorizados).")";
-            }
+                    $fecha =Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
 
+                    $s = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+
+                    if ($s[0]->existe == 0) {
+                        if ($estatus == '22') {
+                            $viaje->Rechazo = auth()->user()->idusuario;
+                            $viaje->FechaHoraRechazo = Carbon::now()->toDateTimeString();
+                        } else {
+                            $viaje->Aprobo = auth()->user()->idusuario;
+                            $viaje->FechaHoraAprobacion = Carbon::now()->toDateTimeString();
+                        }
+                        $viaje->save();
+                        if ($estatus == "20") {
+                            $autorizados += 1;
+                        }
+                    } else {
+                        $error++;
+                    }
+
+                }
+
+                if ($error != 0 && $autorizados != 0) {
+                    $msg = "VIAJES AUTORIZADOS (" . $autorizados . ")\n VIAJES RECHAZADOS (" . (count($data) - $autorizados) . ") \n VIAJES NO AUTORIZADOS POR PERIODO CERRADO ($error)";
+                } elseif ($error == 0 && $autorizados != 0) {
+                    $msg = "VIAJES AUTORIZADOS (" . $autorizados . ")\n VIAJES RECHAZADOS (" . (count($data) - $autorizados) . ")";
+                } elseif ($error != 0 && $autorizados == 0) {
+                    {
+                        $msg = "VIAJES NO AUTORIZADOS POR PERIODO CERRADO ($error)";
+                    }
+
+                }
+            }
             DB::connection('sca')->commit();
             return $msg;
         } catch (Exception $ex) {
@@ -186,45 +207,66 @@ class ViajeNeto extends Model
     }
 
     public static function cargaManual($request) {
+
         DB::connection('sca')->beginTransaction();
+        $contar=0;
         try {
             foreach($request->get('viajes', []) as $viaje) {
                 $ruta = Ruta::where('IdOrigen', $viaje['IdOrigen'])
                     ->where('IdTiro', $viaje['IdTiro'])
                     ->first();
-                $fecha_salida = Carbon::createFromFormat('Y-m-d H:i', $viaje['FechaLlegada'].' '.$viaje['HoraLlegada'])
+                $fecha_salida = Carbon::createFromFormat('Y-m-d H:i', $viaje['FechaLlegada'] . ' ' . $viaje['HoraLlegada'])
                     ->subMinutes($ruta->cronometria->TiempoMinimo);
 
-                $proyecto_local = ProyectoLocal::where('IdProyectoGlobal', '=', $request->session()->get('id'))->first();
-                $extra = [
-                    'FechaCarga' => Carbon::now()->toDateString(),
-                    'HoraCarga' => Carbon::now()->toTimeString(),
-                    'FechaLlegada' => $viaje['FechaLlegada'],
-                    'HoraLlegada' => $viaje['HoraLlegada'],
-                    'FechaSalida' => $fecha_salida->toDateString(),
-                    'HoraSalida' => $fecha_salida->toTimeString(),
-                    'IdProyecto' => $proyecto_local->IdProyecto,
-                    'Creo' => auth()->user()->idusuario,
-                    'Estatus' => 29,
-                    'Code' => $viaje['Codigo'],
-                    'IdMotivo'=>$viaje['IdMotivo'],
-                    'CubicacionCamion' => $viaje['Cubicacion'],
-                    'Observaciones' => $viaje['IdMotivo']==7?$viaje['Motivo']:MotivoCargaManual::find($viaje['IdMotivo'])->descripcion
+                $s = DB::connection('sca')->select(DB::raw("
+                        SELECT COUNT(*) as existe FROM cierres_periodo
+                        where mes = '{$fecha_salida->month}' and anio = '{$fecha_salida->year}'"));
+
+                if ($s[0]->existe== 0) {
+                    $proyecto_local = ProyectoLocal::where('IdProyectoGlobal', '=', $request->session()->get('id'))->first();
+                    $extra = [
+                        'FechaCarga' => Carbon::now()->toDateString(),
+                        'HoraCarga' => Carbon::now()->toTimeString(),
+                        'FechaLlegada' => $viaje['FechaLlegada'],
+                        'HoraLlegada' => $viaje['HoraLlegada'],
+                        'FechaSalida' => $fecha_salida->toDateString(),
+                        'HoraSalida' => $fecha_salida->toTimeString(),
+                        'IdProyecto' => $proyecto_local->IdProyecto,
+                        'Creo' => auth()->user()->idusuario,
+                        'Estatus' => 29,
+                        'Code' => $viaje['Codigo'],
+                        'IdMotivo' => $viaje['IdMotivo'],
+                        'CubicacionCamion' => $viaje['Cubicacion'],
+                        'Observaciones' => $viaje['IdMotivo'] == 7 ? $viaje['Motivo'] : MotivoCargaManual::find($viaje['IdMotivo'])->descripcion
+                    ];
+
+                    ViajeNeto::create(array_merge($viaje, $extra));
+                    $contar=$contar+1;
+                }
+
+            }
+            if($contar == count($request->get('viajes'))){
+
+                DB::connection('sca')->commit();
+                return [
+                    'success' => true,
+                    'message' => '¡' . count($request->get('viajes')) . ' VIAJE(S) REGISTRADO(S) CORRECTAMENTE!'
                 ];
 
-                ViajeNeto::create(array_merge($viaje, $extra));
+            }else{
+
+                return [
+                    'success' => false,
+                    'message' => 'No puede registrar viajes con periodo cerrados.'
+                ];
             }
-            DB::connection('sca')->commit();
-            return [
-                'success' => true,
-                'message' => '¡'.count($request->get('viajes')).' VIAJE(S) REGISTRADO(S) CORRECTAMENTE!'
-            ];
         } catch (Exception $ex) {
             DB::connection('sca')->rollback();
         }
     }
 
     public static function cargaManualCompleta($request) {
+
         DB::connection('sca')->beginTransaction();
         try {
             $registrados = 0;

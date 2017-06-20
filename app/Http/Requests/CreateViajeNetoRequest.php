@@ -69,7 +69,8 @@ class CreateViajeNetoRequest extends Request
             $messages['viajes.'.$key.'.Cubicacion.numeric'] = '(Viaje: '.$key.') El campo Cubicación debe ser numérico.';
 
             $messages['viajes.'.$key.'.Codigo.required'] = '(Viaje: '.$key.') El campo Codigo es obligatorio.';
-            $messages['viajes.'.$key.'.Codigo.unique'] = '(Viaje: '.$key.') Ya existe un Viaje Neto con el Código proporcionado';
+            $messages['viajes.'.$key.'.Codigo.unique'] = '(Viaje: '.$key.') Ya existe un Viaje Neto con el Código proporcionado.';
+            $messages['viajes.'.$key.'.Periodo.error'] = '(Viaje: '.$key.') No se puede registrar viajes de un periodo cerrado.';
 
             $messages['viajes.'.$key.'.IdMotivo.required'] = '(Viaje: '.$key.') Por favor seleccione un Motivo.';
 
