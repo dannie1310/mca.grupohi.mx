@@ -28,7 +28,7 @@
                         <tr>
                             <td>@{{ index + 1 }}</td>
                             <td>
-                                <input v-bind:name="'viajes[' + (index + 1) + '][Codigo]'" type="text" class="form-control input-sm" v-model="viaje.Codigo">
+                                <input v-bind:name="'viajes[' + (index + 1) + '][Codigo]'" type="text" class="form-control input-sm"  v-model="viaje.Codigo">
                             </td>
                             <td>
                                 <input v-bind:name="'viajes[' + (index + 1) + '][FechaLlegada]'" type="text" v-bind:class="'form-control input-sm FechaLlegada' + index" v-datepicker>

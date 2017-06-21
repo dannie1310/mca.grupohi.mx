@@ -47,8 +47,8 @@ Vue.component('viajes-manual', {
         }
     },
  
-    methods: {         
-        
+    methods: {
+
         setTiros: function(viaje) {
             viaje.Tiros = [];
             if(viaje.IdOrigen) {
@@ -100,7 +100,7 @@ Vue.component('viajes-manual', {
                 Tiros        : []
             });
         },
-        
+
         removeViaje: function(index, e) {
             e.preventDefault();
             if(index != (this.form.viajes.length -1)) {
@@ -115,7 +115,7 @@ Vue.component('viajes-manual', {
                 this.form.viajes.splice(index, 1);
             }
         },
-        
+
         registrar: function() {
 
             var _this = this;
@@ -157,13 +157,13 @@ Vue.component('viajes-manual', {
                 }
             });
         },
-        
+
         confirmarRegistro: function (e) {
             e.preventDefault();
 
             swal({
-                title: "¿Desea continuar con el registro?", 
-                text: "¿Esta seguro de que la información es correcta?", 
+                title: "¿Desea continuar con el registro?",
+                text: "¿Esta seguro de que la información es correcta?",
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Si",
