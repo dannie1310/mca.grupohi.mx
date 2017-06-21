@@ -7,6 +7,7 @@ Vue.component('viajes-validar', {
     data: function() {
         return {
             'viajes_netos' : [],
+            'cierre' : [],
             'cargando' : false,
             'guardando' : false,
             'form' : {

@@ -63,7 +63,7 @@ class ViajesNetos
 
         return response()->view('reportes.viajes_netos.partials.table', ['data' => $this->data, 'request' => $this->request])
             ->header('Content-type','text/csv')
-            ->header('Content-Disposition' , 'filename=Acarreos Ejecutados por Material '.date("d-m-Y").'_'.date("H.i.s",time()).'.cvs');
+            ->header('Content-Disposition' , 'filename=ViajesNetos_'.date("d-m-Y").'_'.date("H.i.s",time()).'.cvs');
     }
 
     public function show() {

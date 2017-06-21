@@ -47,8 +47,8 @@ Vue.component('viajes-manual', {
         }
     },
  
-    methods: {         
-        
+    methods: {
+
         setTiros: function(viaje) {
             viaje.Tiros = [];
             if(viaje.IdOrigen) {
@@ -100,7 +100,7 @@ Vue.component('viajes-manual', {
                 Tiros        : []
             });
         },
-        
+
         removeViaje: function(index, e) {
             e.preventDefault();
             if(index != (this.form.viajes.length -1)) {
@@ -115,11 +115,10 @@ Vue.component('viajes-manual', {
                 this.form.viajes.splice(index, 1);
             }
         },
-        
+
         registrar: function() {
 
             var _this = this;
-            this.guardando = true;
             this.form.errors = [];
             var data = $('.form_carga_manual').serialize();
             var url = App.host + '/viajes_netos/manual';
@@ -128,29 +127,43 @@ Vue.component('viajes-manual', {
                 url : url,
                 type : 'POST',
                 data : data,
+                beforeSend: function () {
+                    _this.guardando = true;
+                },
                 success: function(response) {
-                    swal({
-                        type: 'success',
-                        title: '',
-                        text: response.message,
-                        showConfirmButton: true
-                    });
-                    _this.guardando = false;
+                    if(! response.success) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: response.message
+                        });
+                    } else {
+                        swal({
+                            type: 'success',
+                            title: '',
+                            text: response.message,
+                            showConfirmButton: true
+                        });
+                    }
+
                 },
                 error: function(error) {
                     _this.guardando = false;
                     console.log(error);
                     App.setErrorsOnForm(_this.form, error.responseJSON);
+                },
+                complete: function () {
+                    _this.guardando = false;
                 }
             });
         },
-        
+
         confirmarRegistro: function (e) {
             e.preventDefault();
 
             swal({
-                title: "¿Desea continuar con el registro?", 
-                text: "¿Esta seguro de que la información es correcta?", 
+                title: "¿Desea continuar con el registro?",
+                text: "¿Esta seguro de que la información es correcta?",
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Si",

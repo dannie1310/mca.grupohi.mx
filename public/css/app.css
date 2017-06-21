@@ -15,10 +15,13 @@ and open the template in the editor.
 .datepicker-inline {
   width: 220px;
 }
-.datepicker.datepicker-rtl {
+.datepicker-rtl {
   direction: rtl;
 }
-.datepicker.datepicker-rtl table tr td span {
+.datepicker-rtl.dropdown-menu {
+  left: auto;
+}
+.datepicker-rtl table tr td span {
   float: right;
 }
 .datepicker-dropdown {
@@ -391,6 +394,10 @@ and open the template in the editor.
 .datepicker .next:hover,
 .datepicker tfoot tr th:hover {
   background: #eee;
+}
+.datepicker .prev.disabled,
+.datepicker .next.disabled {
+  visibility: hidden;
 }
 .datepicker .cw {
   font-size: 10px;
@@ -6530,7 +6537,7 @@ button.close {
   src: local("Roboto BlackItalic"), local("Roboto-BlackItalic"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.woff2") format("woff2"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.woff") format("woff"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.ttf") format("truetype"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.svg#Roboto") format("svg"); }
 
 /*!
- * bootstrap-fileinput v4.3.9
+ * bootstrap-fileinput v4.4.1
  * http://plugins.krajee.com/file-input
  *
  * Krajee default styling for bootstrap-fileinput.

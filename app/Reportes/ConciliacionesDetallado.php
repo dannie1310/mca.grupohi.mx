@@ -43,22 +43,17 @@ class ConciliacionesDetallado
 
         $this->request = $request;
         $this->tipo_busqueda = $request->get('tipo_busqueda');
+        $this->horaInicial = $request->get('HoraInicial');
+        $this->horaFinal = $request->get('HoraFinal');
+        $this->fechaInicial = Carbon::createFromFormat('Y-m-d', $request->get('FechaInicial'))->toDateString();
+        $this->fechaFinal = Carbon::createFromFormat('Y-m-d', $request->get('FechaFinal'))->toDateString();
 
         if($this->tipo_busqueda == "fecha"){
             $this->codigo = " ";
             $this->hInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
             $this->hFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
-            $this->horaInicial = $request->get('HoraInicial');
-            $this->horaFinal = $request->get('HoraFinal');
-            $this->fechaInicial = Carbon::createFromFormat('Y-m-d', $request->get('FechaInicial'))->toDateString();
-            $this->fechaFinal = Carbon::createFromFormat('Y-m-d', $request->get('FechaFinal'))->toDateString();
-
         }else{
-            $this->horaInicial = " ";
-            $this->horaFinal = " ";
             $this->codigo = $request->get('Codigo');
-            $this->fechaInicial = " ";
-            $this->fechaFinal = " ";
         }
 
         $request->replace([

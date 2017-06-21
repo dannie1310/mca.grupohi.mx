@@ -21,23 +21,38 @@
         </thead>
         <tbody>
             @foreach($viajes as $viaje)
-            <tr>
-                <td>{{ $viaje->Code }}</td>
-                <td>{{ $viaje->FechaLlegada }}</td>
-                <td>{{ $viaje->HoraLlegada }}
-                <td>{{ $viaje->Camion }}</td>
-                <td>{{ $viaje->Tiro }}</td>
-                <td>{{ $viaje->Origen }}</td>
-                <td>{{ $viaje->Material }}</td>
-                <td>{{ $viaje->Registro }}</td>
-                <td>{{ $viaje->Observaciones }}</td>
-                <td>
-                    <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="20" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
-                </td>
-                <td>
-                    <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="22" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
-                </td>
-            </tr>
+                <?php  $find=0; $fecha = Carbon\Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);?>
+                <tr>
+                    <td>{{ $viaje->Code }}</td>
+                    <td>{{ $viaje->FechaLlegada }}</td>
+                    <td>{{ $viaje->HoraLlegada }}
+                    <td>{{ $viaje->Camion }}</td>
+                    <td>{{ $viaje->Tiro }}</td>
+                    <td>{{ $viaje->Origen }}</td>
+                    <td>{{ $viaje->Material }}</td>
+                    <td>{{ $viaje->Registro }}</td>
+                    <td>{{ $viaje->Observaciones }}</td>
+                @foreach($cierre as $item)
+                        @if($item->mes == $fecha->month && $item->anio == $fecha->year)
+                          <?php $find++; ?>
+                        @endif
+                @endforeach
+                @if($find !=0)
+                    <td>
+                        Periodo
+                    </td>
+                    <td>
+                         Cerrado
+                    </td>
+                @else
+                    <td>
+                        <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="20" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
+                    </td>
+                    <td>
+                        <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="22" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
+                    </td>
+                @endif
+                </tr>
             @endforeach
         </tbody>
     </table> 

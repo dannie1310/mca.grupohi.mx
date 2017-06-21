@@ -15,10 +15,13 @@ and open the template in the editor.
 .datepicker-inline {
   width: 220px;
 }
-.datepicker.datepicker-rtl {
+.datepicker-rtl {
   direction: rtl;
 }
-.datepicker.datepicker-rtl table tr td span {
+.datepicker-rtl.dropdown-menu {
+  left: auto;
+}
+.datepicker-rtl table tr td span {
   float: right;
 }
 .datepicker-dropdown {
@@ -391,6 +394,10 @@ and open the template in the editor.
 .datepicker .next:hover,
 .datepicker tfoot tr th:hover {
   background: #eee;
+}
+.datepicker .prev.disabled,
+.datepicker .next.disabled {
+  visibility: hidden;
 }
 .datepicker .cw {
   font-size: 10px;

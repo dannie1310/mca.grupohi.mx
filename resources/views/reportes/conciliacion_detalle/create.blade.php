@@ -42,7 +42,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label>Folio (*)</label>
-                <input type="text" name="folio" class="form-control">
+                <input type="text" name="Codigo" class="form-control">
             </div>
         </div>
     </div>
