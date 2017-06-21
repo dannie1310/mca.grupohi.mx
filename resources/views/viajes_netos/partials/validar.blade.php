@@ -1,4 +1,4 @@
-<h1>VIAJES</h1>
+<h1 xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">VIAJES</h1>
 {!! Breadcrumbs::render('viajes_netos.validar') !!}
 <hr>
 <div id="app">
@@ -46,6 +46,7 @@
                         <i class="fa fa-2x fa-spinner fa-spin"></i> Cargando Viajes...
                     </div>
                 </span>
+
                 <span v-if="viajes_netos.length">
                     <h3>RESULTADOS DE LA BÚSQUEDA</h3>
                     <table id="viajes_netos_validar" v-tablefilter class="table table-condensed table-bordered table-hover small">
@@ -89,6 +90,9 @@
                             <td>@{{ viaje.KMSubsecuente }}</td>
                             <td>@{{ viaje.KMAdicional }}</td>
                             <td>@{{ viaje.Importe }}</td>
+
+
+
                             <td>
                                 <span v-if='viaje.Valido'>
                                     <i class="fa fa-flag" style="color: green" v-bind:title="viaje.Estado"></i>
@@ -217,6 +221,7 @@
                                     <button class="btn btn-xs btn-default" disabled="disabled"><i class="fa fa-2x fa-photo"></i></button>
                                 </span>           
                             </td>
+
                         </tr>
                     </tbody>
                 </table>

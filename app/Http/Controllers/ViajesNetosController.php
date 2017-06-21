@@ -179,7 +179,11 @@ class ViajesNetosController extends Controller
                         ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
                         ->get();
 
+
                     foreach ($viajes as $viaje) {
+                        $fecha =  Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
+                        $cierre = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
                             'IdViajeNeto' => $viaje->IdViajeNeto,
@@ -208,9 +212,11 @@ class ViajesNetosController extends Controller
                             'Bruto' => 0,
                             'TipoTarifa' => 'm',
                             'TipoFDA' => 'm',
+                            'cierre' => $cierre.existe,
                             'Imagenes' => $viaje->imagenes
                         ];
                     }
+
                 } else if($request->tipo_busqueda == 'codigo') {
                     $this->validate($request, [
                         'Codigo' => 'required'
@@ -569,10 +575,13 @@ class ViajesNetosController extends Controller
     {
         if($request->get('action') == 'validar') {
             if(auth()->user()->can('validar-viajes')) {
-            return view('viajes_netos.edit')
-                ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
-                ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
-                ->withAction('validar');}
+
+                return view('viajes_netos.edit')
+                    ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
+                    ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
+                    ->withCierre(CierrePeriodo::query()->get())
+                    ->withAction('validar');
+            }
                 else{
                     Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
                     return redirect()->back();
