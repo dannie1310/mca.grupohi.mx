@@ -57,26 +57,31 @@ class ViajesNetosController extends Controller
                         ->get();
 
                     foreach ($viajes as $viaje) {
-                        $data [] = [
-                            'IdViajeNeto' => $viaje->IdViajeNeto,
-                            'FechaLlegada' => $viaje->FechaLlegada,
-                            'Tiro' => $viaje->tiro->Descripcion,
-                            'IdTiro' => $viaje->tiro->IdTiro,
-                            'Camion' => $viaje->camion->Economico,
-                            'IdCamion' => $viaje->IdCamion,
-                            'HoraLlegada' => $viaje->HoraLlegada,
-                            'CubicacionCamion' => $viaje->CubicacionCamion,
-                            'Origen' => $viaje->origen->Descripcion,
-                            'IdOrigen' => $viaje->origen->IdOrigen,
-                            'Material' => $viaje->material->Descripcion,
-                            'IdMaterial' => $viaje->material->IdMaterial,
-                            'ShowModal' => false,
-                            'IdSindicato' => $viaje->IdSindicato,
-                            'IdEmpresa' => $viaje->IdEmpresa,
-                            'Sindicato' => (String)$viaje->sindicato,
-                            'Empresa' => (String)$viaje->empresa,
-                            'Codigo' => $viaje->Code
-                        ];
+                        $fecha = Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
+                        $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+                        foreach ($cierres as $cierre) {
+                            $data [] = [
+                                'IdViajeNeto' => $viaje->IdViajeNeto,
+                                'FechaLlegada' => $viaje->FechaLlegada,
+                                'Tiro' => $viaje->tiro->Descripcion,
+                                'IdTiro' => $viaje->tiro->IdTiro,
+                                'Camion' => $viaje->camion->Economico,
+                                'IdCamion' => $viaje->IdCamion,
+                                'HoraLlegada' => $viaje->HoraLlegada,
+                                'CubicacionCamion' => $viaje->CubicacionCamion,
+                                'Origen' => $viaje->origen->Descripcion,
+                                'IdOrigen' => $viaje->origen->IdOrigen,
+                                'Material' => $viaje->material->Descripcion,
+                                'IdMaterial' => $viaje->material->IdMaterial,
+                                'ShowModal' => false,
+                                'IdSindicato' => $viaje->IdSindicato,
+                                'IdEmpresa' => $viaje->IdEmpresa,
+                                'Sindicato' => (String)$viaje->sindicato,
+                                'Empresa' => (String)$viaje->empresa,
+                                'Codigo' => $viaje->Code,
+                                'cierre' => $cierre->existe
+                            ];
+                        }
                     }
                 } elseif ($request->tipo_busqueda == 'codigo') {
                     $this->validate($request, [
@@ -182,39 +187,40 @@ class ViajesNetosController extends Controller
 
                     foreach ($viajes as $viaje) {
                         $fecha =  Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
-                        $cierre = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
-
-                        $data [] = [
-                            'Accion' => $viaje->valido() ? 1 : 0,
-                            'IdViajeNeto' => $viaje->IdViajeNeto,
-                            'FechaLlegada' => $viaje->FechaLlegada,
-                            'Tiro' => (String) $viaje->tiro,
-                            'Camion' => (String) $viaje->camion,
-                            'HoraLlegada' => $viaje->HoraLlegada,
-                            'Cubicacion' => $viaje->CubicacionCamion,
-                            'Origen' => (String )$viaje->origen,
-                            'IdOrigen' => $viaje->IdOrigen,
-                            'IdSindicato' => isset($viaje->IdSindicato) ? $viaje->IdSindicato : '',
-                            'IdEmpresa' => isset($viaje->IdEmpresa) ? $viaje->IdEmpresa : '',
-                            'Material' => (String) $viaje->material,
-                            'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
-                            'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
-                            'Code' => isset($viaje->Code) ? $viaje->Code : "",
-                            'Valido' => $viaje->valido(),
-                            'ShowModal' => false,
-                            'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
-                            'Estado' => $viaje->estado(),
-                            'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
-                            'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
-                            'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
-                            'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
-                            'Tara' => 0,
-                            'Bruto' => 0,
-                            'TipoTarifa' => 'm',
-                            'TipoFDA' => 'm',
-                            'cierre' => $cierre.existe,
-                            'Imagenes' => $viaje->imagenes
-                        ];
+                        $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+                        foreach ($cierres as $cierre) {
+                            $data [] = [
+                                'Accion' => $viaje->valido() ? 1 : 0,
+                                'IdViajeNeto' => $viaje->IdViajeNeto,
+                                'FechaLlegada' => $viaje->FechaLlegada,
+                                'Tiro' => (String)$viaje->tiro,
+                                'Camion' => (String)$viaje->camion,
+                                'HoraLlegada' => $viaje->HoraLlegada,
+                                'Cubicacion' => $viaje->CubicacionCamion,
+                                'Origen' => (String )$viaje->origen,
+                                'IdOrigen' => $viaje->IdOrigen,
+                                'IdSindicato' => isset($viaje->IdSindicato) ? $viaje->IdSindicato : '',
+                                'IdEmpresa' => isset($viaje->IdEmpresa) ? $viaje->IdEmpresa : '',
+                                'Material' => (String)$viaje->material,
+                                'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
+                                'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
+                                'Code' => isset($viaje->Code) ? $viaje->Code : "",
+                                'Valido' => $viaje->valido(),
+                                'ShowModal' => false,
+                                'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
+                                'Estado' => $viaje->estado(),
+                                'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
+                                'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
+                                'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
+                                'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
+                                'Tara' => 0,
+                                'Bruto' => 0,
+                                'TipoTarifa' => 'm',
+                                'TipoFDA' => 'm',
+                                'cierre' => $cierre->existe,
+                                'Imagenes' => $viaje->imagenes
+                            ];
+                        }
                     }
 
                 } else if($request->tipo_busqueda == 'codigo') {

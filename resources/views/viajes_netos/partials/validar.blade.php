@@ -91,17 +91,20 @@
                             <td>@{{ viaje.KMAdicional }}</td>
                             <td>@{{ viaje.Importe }}</td>
 
-
-
-                            <td>
+                            <td v-if="viaje.cierre == 0">
                                 <span v-if='viaje.Valido'>
-                                    <i class="fa fa-flag" style="color: green" v-bind:title="viaje.Estado"></i>
+                                    <i class="fa fa-check" style="color: green" v-bind:title="viaje.Estado"></i>
                                 </span>
                                 <span v-else>
                                     <i class="fa fa-exclamation-triangle" style="color: red" v-bind:title="viaje.Estado"></i>
                                 </span>
                             </td>
-                            <td>
+                            <td v-else>
+                                <span>
+                                    <i class="fa fa-times" style="color: red"></i>
+                                </span>
+                            </td>
+                            <td v-if="viaje.cierre == 0">
                                 <a id="show-modal" @click="showModal(viaje)">
                                     Validar     
                                 </a>
@@ -191,6 +194,9 @@
                                     </div>
                                 </modal-validar>
                             </td>
+                            <td v-else>
+                               Periodo Cerrado
+                            </td>
                             <td>
                                 <span v-if="viaje.Imagenes.length">
                                     <button class="btn btn-xs btn-default" data-toggle="modal" v-bind:data-target="'.modal-lg-' + viaje.IdViajeNeto"><i class="fa fa-2x fa-photo"></i></button>
@@ -221,6 +227,7 @@
                                     <button class="btn btn-xs btn-default" disabled="disabled"><i class="fa fa-2x fa-photo"></i></button>
                                 </span>           
                             </td>
+
 
                         </tr>
                     </tbody>
