@@ -119,6 +119,33 @@ class Viaje extends Model
             )
             ->whereIn('viajes.Estatus', [0,10,20]);
     }
+    public static function scopeParaRevertirPeriodo($tipo,$inicial, $final, $codigo)
+    {
+        if($tipo == 0){
+            $dato = "and viajes.FechaLlegada between '{$inicial}' and '{$final}'";
+        }else if($tipo == 1){
+            $dato ="and viajes.code ='{$codigo}'";
+        }
+        $sql = "SELECT viajes.*, tiros.Descripcion AS Tiro,
+                camiones.Economico AS Camion,
+                viajes.CubicacionCamion AS Cubicacion,
+                origenes.Descripcion AS Origen,
+                materiales.Descripcion AS Material,
+                viajes.code AS Codigo,
+                c.anio as anio,
+                c.mes as mes
+                from viajes
+                left join tiros on viajes.IdTiro = tiros.IdTiro
+                left join camiones on viajes.IdCamion = camiones.IdCamion
+                left join origenes on viajes.IdOrigen = origenes.IdOrigen
+                left join materiales on viajes.IdMaterial = materiales.IdMaterial
+                left join cierres_periodo as c on c.mes = DATE_FORMAT(viajes.FechaLlegada, '%m') and DATE_FORMAT(viajes.FechaLlegada, '%Y')  = c.anio
+                where viajes.Estatus in (0, 10, 20)".$dato;
+
+        return DB::connection('sca')->select(DB::raw($sql));
+
+
+    }
 
     public function revertir() {
         DB::connection('sca')->beginTransaction();
