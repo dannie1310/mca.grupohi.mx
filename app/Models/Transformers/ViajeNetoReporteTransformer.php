@@ -34,7 +34,6 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
     v.IdViajeNeto AS IdViajeNeto,
     v.estatus AS idEstatus,
     v.code,
-
     IF(vi.estatus IS NOT NULL,
         'Validado',
         IF(vr.estatus IS NOT NULL,
@@ -204,7 +203,6 @@ FROM
                     ' ',
                     v.HoraLlegada)
             AS DATETIME) between '{$timestamp_inicial}' and '{$timestamp_final}'
-      AND v.IdViajeNeto not in (select IdViajeNeto from viajesrechazados)
       group by IdViajeNeto
       ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus
       ";
