@@ -642,10 +642,10 @@ class ViajesNetosController extends Controller
         if($request->get('type') == 'validar') {
             $cubicacionNva=$request['data']['Cubicacion'];
             $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-            if($cubicacionNva>$viaje_neto->CubicacionCamion){
-                throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
-            }
 
+            if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion){
+                throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m3');
+            }
             return response()->json($viaje_neto->validar($request));
         } else if($request->path() == 'viajes_netos/autorizar') {
 
@@ -656,7 +656,7 @@ class ViajesNetosController extends Controller
 
             $cubicacionNva=$request['data']['CubicacionCamion'];
             $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
-            if($cubicacionNva>$viaje_neto->CubicacionCamion){
+            if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion){
                 throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
             }
             return response()->json($viaje_neto->modificar($request));

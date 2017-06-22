@@ -257,7 +257,7 @@ class ViajeNeto extends Model
 
                 return [
                     'success' => false,
-                    'message' => 'No puede registrar viajes en periodos cerrados.'
+                    'message' => 'No puede registrar viajes con periodo cerrados.'
                 ];
             }
         } catch (Exception $ex) {
