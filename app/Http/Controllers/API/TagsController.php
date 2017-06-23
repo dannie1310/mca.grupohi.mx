@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Tags\TagModel;
+use App\Models\Empresa;
+use App\Models\Proyecto;
+use DB;
+use Auth;
+use App\User;
 
 class TagsController extends Controller
 {
@@ -15,6 +20,28 @@ class TagsController extends Controller
     public function __construct() {
 
         $this->middleware('jwt.auth');
+    }
+
+    public function lista()
+    {
+        //$usr = auth()->user();
+        //$test = auth()->user()->hasRole([$idusuario]);
+        //dd($test);
+        // Validación de que el usuario tiene permisos para utilizar el proyecto de regristro de Tags
+       $permisos = DB::table('sca_configuracion.permisos_alta_tag')
+                    ->whereRaw('(TIMESTAMP(vigencia) > NOW() OR vigencia is null)')
+                    ->where('idusuario',Auth::user()->idusuario )->get();
+        if(!$permisos){
+            return response()->json(['error' => 'No tiene los privilegios para dar de alta tags en los proyectos.', 'code' => 200], 200);
+        }
+
+        
+        $resp = response()->json(array_merge([
+            'proyectos' => Proyecto::select('id_proyecto', 'descripcion')->get()
+        ]
+        ));
+
+        return $resp;
     }
     /**
      * Display a listing of the resource.
@@ -42,36 +69,29 @@ class TagsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $usuario)
+    public function store(Request $request)
     {
-        $previos = 0;
-        $registrados = 0;
         $datos = $request->json()->all();
-        $cantidad = count($datos);
-        if($cantidad === 0)
-        {
-            return response()->json(['error' => 'No ha mandado ningún registro para sincronizar.']);
-        }
-        foreach ($datos as $key => $value) {
-            // Revisar si existe el UID del Tag
-            if(TagModel::where('uid',$value['uid'])->count() > 0){
-                $previos = $previos + 1;
-            }else{
-                $tag = new TagModel();
-                $tag->uid = $value['uid'];
-                $tag->id_proyecto = $value['id_proyecto'];
-                $tag->registro = $usuario;
-                if($tag->save()){
-                    $registrados = $registrados + 1 ;
-                }
-            }   
-        }
-        if(($registrados + $previos) == $cantidad){
-            return response()->json([
-                    'msj' => 'UIDs registrados correctamente. Registrados: '.$registrados.' Registrados Previamente: '.$previos.' A registrar: '.$cantidad ]);    
+        $rol = 19;
+        $usr = new User();
+        $proy = $usr->rolesApi($rol);
+
+        dd($proy['descripcion']);
+        
+        // Revisar si existe el UID del Tag
+        if(TagModel::where('uid',$datos['uid'])->count() > 0){
+            return response()->json(['msj' => 'ok']);
         }else{
-            return response()->json(['error' => 'No se registraron todos los uids. Registrados: '.$registrados.' A registrar: '.$cantidad]);
-        }
+            $tag = new TagModel();
+            $tag->uid = $datos['uid'];
+            $tag->id_proyecto = $datos['id_proyecto'];
+            $tag->registro = Auth::user()->idusuario;
+            if($tag->save()){
+                return response()->json(['msj' => 'true']);
+            }else{
+                return response()->json(['msj' => 'false']);
+            }
+        }   
     }
 
     /**

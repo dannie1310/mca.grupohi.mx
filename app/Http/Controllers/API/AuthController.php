@@ -5,18 +5,18 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Models\Empresa;
-use App\Models\Proyecto;
 use App\Http\Controllers\Controller;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Session;
 use Auth;
-use DB;
+
 
 class AuthController extends Controller
 {
-
+    /**
+     * AuthController constructor.
+     */
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'getLogout']);
@@ -31,7 +31,6 @@ class AuthController extends Controller
      * @apiParam {String} clave  Clave de acceso del Usuario de Intranet.
      *
      * @apiSuccess {String} IdUsuario Información de ID del Usuario Logueado.
-     * @apiSuccess {String} Nombre Información del nombre completo del Usuario Logueado.
      * @apiSuccess {Array} proyectos Proyectos a las que el Usuario tiene acceso.
      * @apiSuccess {String} token Token generado para el usuario.
      *
@@ -40,18 +39,6 @@ class AuthController extends Controller
      *  {
      *          "IdUsuario": 1,
      *          "Nombre": "FULL NAME",
-     *          "proyectos": [
-     *          {
-     *              "id_proyecto"       : "1",
-     *              "descripcion"   : "DESCRIPCION DEL PROYECTO 1",
-     *          },
-     *          {
-     *              "id_proyecto"       : "2",
-     *              "descripcion"   : "DESCRIPCION DEL PROYECTO 2"
-     *          },
-     *          {
-     *              ...
-     *          }
      *      ],
      *      "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."
      *  }
@@ -71,23 +58,16 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
-        $token = JWTAuth::fromUser($user);
-        $usrRegistrado = collect(auth()->user()->toArray())->only('idusuario','nombre', 'apaterno', 'amaterno');
         
-        // Validación de que el usuario tiene permisos para utilizar el proyecto de regristro de Tags
-       $permisos = DB::table('sca_configuracion.permisos_alta_tag')
-                    ->whereRaw('(TIMESTAMP(vigencia) > NOW() OR vigencia is null)')
-                    ->where('idusuario',$usrRegistrado["idusuario"] )->get();
-        if(!$permisos){
-            return response()->json(['error' => 'No tiene los privilegios para dar de alta tags en los proyectos.', 'code' => 200], 200);
-        }
+        
+        $token = JWTAuth::fromUser($user);
 
         // Preparación del JSON de respuesta en caso de haber pasado todas las validaciones necesarias
+        $usrRegistrado =collect(Auth::user()->toArray())->only('idusuario','nombre','apaterno','amaterno');
         $nombre = $usrRegistrado['nombre'].' '.$usrRegistrado['apaterno'].' '.$usrRegistrado['amaterno'];
         $resp = response()->json(array_merge([
             'IdUsuario' => $usrRegistrado['idusuario'],
-            'Nombre'    => $nombre,
-            'proyectos' => Proyecto::select('id_proyecto', 'descripcion')->get()
+            'Nombre'    => $nombre
         ],
         compact('token')
         ));
