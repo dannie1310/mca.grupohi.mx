@@ -10,7 +10,9 @@ use App\User;
 use App\Models\Camion;
 use App\Models\Sindicato;
 use App\Models\Empresa;
+use App\Models\Camiones\SolicitudActualizacion;
 use App\Contracts\Context;
+use DB;
 
 class RegistroCamionesController extends Controller
 {
@@ -50,16 +52,21 @@ class RegistroCamionesController extends Controller
                                                 'camiones.CubicacionParaPago AS cubicacion_para_pago',
                                                 'camiones.Estatus as estatus'
                                                 )
-                                            ->join('sindicatos', 'camiones.IdSindicato', '=', 'sindicatos.IdSindicato')
-                                            ->join('empresas', 'camiones.IdEmpresa', '=', 'empresas.IdEmpresa')
-                                            ->join('marcas', 'camiones.IdMarca', '=', 'marcas.IdMarca')
-                                            ->join('operadores', 'camiones.IdOperador', '=', 'operadores.IdOperador')->get(),
-                    'sindicatos' => Sindicato::select('IdSindicato as sindicato', 'Descripcion as id')->get(),
-                    'empresas' => Empresa::select('razonSocial as empresa', 'IdEmpresa as id')->get()
+                                            ->join('sindicatos', 'camiones.IdSindicato', '=', 'sindicatos.IdSindicato', 'left outer')
+                                            ->join('empresas', 'camiones.IdEmpresa', '=', 'empresas.IdEmpresa', 'left outer')
+                                            ->join('marcas', 'camiones.IdMarca', '=', 'marcas.IdMarca', 'left outer')
+                                            ->join('operadores', 'camiones.IdOperador', '=', 'operadores.IdOperador', 'left outer')->get(),
+                    'sindicatos' => Sindicato::select('IdSindicato as id', 'Descripcion as sindicato')->get(),
+                    'empresas' => Empresa::select('razonSocial as empresa', 'IdEmpresa as id')->get(),
+                    'tipos_imagen'=> DB::select("select 'f' as id, 'Frente' as descripcion union select 'd','Derecha' union select 'i','Izquierda' union select 'a','Atras'")
 
                 ]
                 ));
-                return $resp;
+        if(!$resp){
+            return response()->json(['error' => 'No se pudieron recuperar los catalogos.', 'code' => 200], 200);
+        }
+        
+        return $resp;
     }
 
     /**
@@ -69,12 +76,11 @@ class RegistroCamionesController extends Controller
      */
     public function index($role)
     {
-        ////$datos = $request->json()->all();
-        $rol = 19;
         $usr = new User();
         $proy = $usr->rolesApi($role);
-
-        //dd($cam->select()->get());
+        if($proy == null){
+            return response()->json(['error' => 'El usuario no tiene los permisos necesarios.', 'code' => 200], 200);
+        }
 
         $resp = response()->json(array_merge([
             'proyectos' => $proy
@@ -99,9 +105,26 @@ class RegistroCamionesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function camion_store(Request $request)
     {
         //
+        $camion = new SolicitudActualizacion($request->all());
+        $camion->save();
+
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function imagen_store(Request $request)
+    {
+        //
+
+        
     }
 
     /**

@@ -14,7 +14,9 @@ use Auth;
 
 class AuthController extends Controller
 {
-
+    /**
+     * AuthController constructor.
+     */
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'getLogout']);

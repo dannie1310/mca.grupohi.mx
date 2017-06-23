@@ -15,6 +15,8 @@ Route::get('/', 'PagesController@home')->name('home');
 Route::get('index', 'PagesController@index')->name('index');
 Route::get('proyectos', 'PagesController@proyectos')->name('proyectos');
 
+Route::get('tickets', 'TicketsController@show')->name('tickets');
+
 // Rutas de Autenticación
 Route::get('auth/login', [
         'as' => 'auth.login',
@@ -240,7 +242,9 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
     $api->get('tags_nuevos', 'App\Http\Controllers\API\TagsController@lista');
 
     $api->get('registro_camiones/{role}', 'App\Http\Controllers\API\RegistroCamionesController@index');
-    $api->post('registro_camiones', 'App\Http\Controllers\API\RegistroCamionesController@lista');       
+    $api->get('registro_camiones', 'App\Http\Controllers\API\RegistroCamionesController@lista');
+    $api->post('registro_camiones/camion', 'App\Http\Controllers\API\RegistroCamionesController@camion_store');
+    $api->post('registro_camiones/imagen', 'App\Http\Controllers\API\RegistroCamionesController@imagen_store');
 
     //Authenticate Routes
     /*$api->post('authenticate', 'Ghi\Http\Controllers\Api\Auth\AuthController@authenticate');
