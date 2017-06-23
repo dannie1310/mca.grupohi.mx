@@ -12,6 +12,7 @@ use DateTime;
 use App\Contracts\Context;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use PhpSpec\Exception\Exception;
 
 class TicketsController extends Controller
 {
@@ -76,36 +77,82 @@ class TicketsController extends Controller
         $exp = explode("|", $desc);
 
         $resp = DB::connection('sca')->table('proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
-        $camion = DB::connection('sca')->table($resp->base_datos.'.camiones')->select('Economico')->where('idCamion', $exp[1])->first();
-        $material = DB::connection('sca')->table($resp->base_datos.'.materiales')->select('Descripcion')->where('idMaterial', $exp[6])->first();
-
-        if($exp[2] != '0'){
-            $origen = DB::connection('sca')->table($resp->base_datos.'.origenes')->select('Descripcion')->where('IdOrigen', $exp[2])->first();
-        }else{
-            $origen = 'NO SE ENCONTRO ORIGEN PARA ESTE TIRO';
+        if($resp == null){
+            $resp="No se encontro en la base de datos";
         }
 
-        if($exp[4] != '0'){
-            $tiro = DB::connection('sca')->table($resp->base_datos.'.tiros')->select('Descripcion')->where('IdTiro', $exp[4])->first();
+        if($exp[1] != '0') {
+            $camiont = DB::connection('sca')->table($resp->base_datos . '.camiones')->select('Economico')->where('idCamion', $exp[1])->first();
+                if($camiont == null){
+                    $camion = "No se encontro en la base de datos";
+                }else {
+                    $camion = $camiont->Economico;
+                }
         }else{
-            $tiro = 'TIRO NUEVO';
+            $camion = " ";
+        }
+        if($exp[6] != '0') {
+            $materialt = DB::connection('sca')->table($resp->base_datos . '.materiales')->select('Descripcion')->where('idMaterial', $exp[6])->first();
+                if($materialt == null){
+                    $material = "No se encontro en la base de datos";
+                }else {
+                    $material = $materialt->Descripcion;
+                }
+        }
+        else{
+            $material = " ";
+        }
+        if($exp[2] != '0'){
+            $origent = DB::connection('sca')->table($resp->base_datos.'.origenes')->select('Descripcion')->where('IdOrigen', $exp[2])->first();
+            $origen = $origent->Descripcion;
+            if($origent == null){
+                $origent = "No se encontro en la base de datos";
+            }else {
+                $origen = $origent->Descripcion;
+            }
+        }else{
+            $origen = " ";
+        }
+        if($exp[4] != '0'){
+            $tiroA = DB::connection('sca')->table($resp->base_datos.'.tiros')->select('Descripcion')->where('IdTiro', $exp[4])->first();
+            if($tiroA == null){
+                $tiro = "No se encontro en la base de datos";
+            }else {
+                $tiro = $tiroA->Descripcion;
+            }
+        }else{
+            $tiro = " ";
         }
         //dd($exp[3]);
-        $t = DateTime::createFromFormat("ymdHis", $exp[3]);
-        $fechaSalida = $t->format("d/m/y H:i:s");
+        if($exp[3] != '0' || $exp[3] != 'null') {
+            $t = DateTime::createFromFormat("ymdHis", $exp[3]);
+            $fechaSalida = $t->format("d/m/y H:i:s");
+        }else{
+            $fechaSalida = " ";
+        }
+        if($exp[5] != '0' || $exp[3] != 'null') {
+            $d = DateTime::createFromFormat("ymdHis", $exp[5]);
+            $fechaLlegada = $d->format("d/m/y H:i:s");
+        }else{
+            $fechaLlegada = " ";
+        }
 
-        $d = DateTime::createFromFormat("ymdHis", $exp[5]);
-        $fechaLlegada = $d->format("d/m/y H:i:s");
+        $ChInicio = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[10])->first();
+        if($ChInicio == null){
+            $ChInicio = "No se encontro en la base de datos";
+        }
+        $ChCierre = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[7])->first();
+        if($ChCierre == null){
+            $ChCierre = "No se encontro en la base de datos";
+        }
 
-        $ChInicio = DB::connection('sca')->table($resp->base_datos.'.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[10])->first();
-        $ChCierre = DB::connection('sca')->table($resp->base_datos.'.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[7])->first();
 
         //dd($exp[4]);
         $respT = response()->json(array_merge([
             'proyecto'    => $resp->descripcion,
-            'camion'      => $camion->Economico,
+            'camion'      => $camion,
             'cubicacion'  => $exp[11].' m3',
-            'material'    => $material->Descripcion,
+            'material'    => $material,
             'origen'      => $origen,
             'fechaSalida' => $fechaSalida,
             'destino'     => $tiro,
@@ -115,13 +162,10 @@ class TicketsController extends Controller
             'barras'      => $exp[8].$exp[1]
         ]
         ));
+
         $info = json_decode($respT->content());
 
         return view('tickets.create')->with('info', $info );
-
-
-
-
 
     }
 

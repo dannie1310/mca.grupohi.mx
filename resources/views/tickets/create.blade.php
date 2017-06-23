@@ -4,37 +4,45 @@
 <html>
 <body>
 
-        <div class="row col-sm-12">
-            <div class="form-group text-center">
-                <h4> VALIDACI&Oacute;N TICKET ACARREOS</h4>
-            </div>
-        </div>
         <div class="row">
-            <div class="col-sm-12">
-                <div class="form-group">
-                    <label>C&oacute;digo de Barras: </label>
-                    <input class="form-control" readonly="true" style="font-size: 20px" value="<?php echo $info->barras     ?>" />
-                    <h2></h2>
-                </div>
+            <div class="form-group  col-sm-12 text-center">
+                <h3><strong>VALIDACI&Oacute;N TICKET ACARREOS</strong> </h3>
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-sm-12 ">
+                <div class="form-group text-center text-uppercase text-info">
+                    <h1><strong> <?php echo $info->barras     ?></strong></h1>
+                </div>
+            </div>
+        </div>
+        @if($info->proyecto !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Proyecto: </label>
                     <input class="form-control" readonly="true" value=" <?php echo $info->proyecto     ?>" />
+
                 </div>
             </div>
         </div>
+        @endif
+        @if($info->camion !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Cami&oacute;n: </label>
-                    <input class="form-control" readonly="true" value="<?php echo $info->camion     ?>" />
+                    @if($info->camion=="No se encontro en la base de datos")
+                        <input class="form-control" style="color: #FF0000" readonly="true" value="<?php echo $info->camion     ?>" />
+                    @else
+                        <input class="form-control" readonly="true" value="<?php echo $info->camion     ?>" />
+                    @endif
                 </div>
             </div>
         </div>
+        @endif
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
@@ -43,22 +51,35 @@
                 </div>
             </div>
         </div>
+        @if($info->material !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Material: </label>
-                    <input class="form-control" readonly="true" value="<?php echo $info->material     ?>" />
+                    @if($info->material=="No se encontro en la base de datos")
+                        <input class="form-control" style="color: #FF0000" readonly="true" value="<?php echo $info->material     ?>" />
+                    @else
+                        <input class="form-control" readonly="true" value="<?php echo $info->material     ?>" />
+                    @endif
                 </div>
             </div>
         </div>
+        @endif
+        @if($info->origen !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Origen: </label>
-                    <input class="form-control" readonly="true" value="<?php echo $info->origen     ?>" />
+                    @if($info->origen=="No se encontro en la base de datos")
+                        <input class="form-control" style="color: #FF0000" readonly="true" value="<?php echo $info->origen     ?>" />
+                    @else
+                        <input class="form-control" readonly="true" value="<?php echo $info->origen     ?>" />
+                    @endif
                 </div>
             </div>
         </div>
+        @endif
+        @if($info->fechaSalida !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
@@ -67,14 +88,22 @@
                 </div>
             </div>
         </div>
+        @endif
+        @if($info->destino !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Destino: </label>
-                    <input class="form-control" readonly="true" value="<?php echo $info->destino     ?>" />
+                    @if($info->destino=="No se encontro en la base de datos")
+                        <input class="form-control" style="color: #FF0000" readonly="true" value="<?php echo $info->destino     ?>" />
+                    @else
+                        <input class="form-control" readonly="true" value="<?php echo $info->destino     ?>" />
+                    @endif
                 </div>
             </div>
         </div>
+        @endif
+        @if($info->fechaLlegada !=" ")
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
@@ -83,11 +112,16 @@
                 </div>
             </div>
         </div>
+        @endif
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Checador Inicio: </label>
-                    <input class="form-control" readonly="true" value="<?php echo $info->ChInicio     ?>" />
+                    @if($info->ChInicio=="No se encontro en la base de datos")
+                        <input class="form-control" style="color: #FF0000" readonly="true" value="<?php echo $info->ChInicio     ?>" />
+                    @else
+                        <input class="form-control" readonly="true" value="<?php echo $info->ChInicio     ?>" />
+                    @endif
                 </div>
             </div>
         </div>
@@ -95,7 +129,12 @@
             <div class="col-sm-12">
                 <div class="form-group">
                     <label>Checador Cierre: </label>
-                    <input class="form-control" readonly="true" value="<?php echo $info->ChCierre     ?>" />
+                    @if($info->ChCierre=="No se encontro en la base de datos")
+                        <input class="form-control" style="color: #FF0000" readonly="true" value="<?php echo $info->ChCierre     ?>" />
+                    @else
+                        <input class="form-control" readonly="true" value="<?php echo $info->ChCierre     ?>" />
+                    @endif
+
                 </div>
             </div>
         </div>
