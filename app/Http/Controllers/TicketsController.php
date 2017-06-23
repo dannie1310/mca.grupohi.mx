@@ -76,7 +76,7 @@ class TicketsController extends Controller
         $desc = $this->desencripta($dat);
         $exp = explode("|", $desc);
 
-        $resp = DB::connection('sca')->table('proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
+        $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
         if($resp == null){
             $resp="No se encontro en la base de datos";
         }
