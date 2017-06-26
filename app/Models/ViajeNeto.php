@@ -162,6 +162,7 @@ class ViajeNeto extends Model
                         if ($estatus == '22') {
                             $viaje->Rechazo = auth()->user()->idusuario;
                             $viaje->FechaHoraRechazo = Carbon::now()->toDateTimeString();
+                            FolioValeManual::where('id_viaje_neto','=',$viaje->IdViajeNeto)->update(['id_viaje_neto' => NULL]);
                         } else {
                             $viaje->Aprobo = auth()->user()->idusuario;
                             $viaje->FechaHoraAprobacion = Carbon::now()->toDateTimeString();
@@ -175,16 +176,14 @@ class ViajeNeto extends Model
                     }
 
                 }
-
                 if ($error != 0 && $autorizados != 0) {
                     $msg = "VIAJES AUTORIZADOS (" . $autorizados . ")\n VIAJES RECHAZADOS (" . (count($data) - $autorizados) . ") \n VIAJES NO AUTORIZADOS POR PERIODO CERRADO ($error)";
                 } elseif ($error == 0 && $autorizados != 0) {
                     $msg = "VIAJES AUTORIZADOS (" . $autorizados . ")\n VIAJES RECHAZADOS (" . (count($data) - $autorizados) . ")";
                 } elseif ($error != 0 && $autorizados == 0) {
-                    {
                         $msg = "VIAJES NO AUTORIZADOS POR PERIODO CERRADO ($error)";
-                    }
-
+                }else if($error == 0 && $autorizados == 0){
+                    $msg = "VIAJES RECHAZADOS (" . (count($data) - $autorizados) . ")";
                 }
             }
             DB::connection('sca')->commit();
@@ -208,48 +207,56 @@ class ViajeNeto extends Model
     }
 
     public static function cargaManual($request) {
-
+        $error="";
         DB::connection('sca')->beginTransaction();
         $contar=0;
+
         try {
             foreach($request->get('viajes', []) as $viaje) {
 
+                $viaje_comprobar = ViajeNeto::whereRaw("Code ={$viaje['Codigo']}")
+                    ->whereIn('Estatus', [29, 20, 21])->first();
 
-                $ruta = Ruta::where('IdOrigen', $viaje['IdOrigen'])
-                    ->where('IdTiro', $viaje['IdTiro'])
-                    ->first();
-                $fecha_salida = Carbon::createFromFormat('Y-m-d H:i', $viaje['FechaLlegada'] . ' ' . $viaje['HoraLlegada'])
-                    ->subMinutes($ruta->cronometria->TiempoMinimo);
+                if ($viaje_comprobar == "") {
 
-                $s = DB::connection('sca')->select(DB::raw("
+                    $ruta = Ruta::where('IdOrigen', $viaje['IdOrigen'])
+                        ->where('IdTiro', $viaje['IdTiro'])
+                        ->first();
+                    $fecha_salida = Carbon::createFromFormat('Y-m-d H:i', $viaje['FechaLlegada'] . ' ' . $viaje['HoraLlegada'])
+                        ->subMinutes($ruta->cronometria->TiempoMinimo);
+
+                    $s = DB::connection('sca')->select(DB::raw("
                         SELECT COUNT(*) as existe FROM cierres_periodo
                         where mes = '{$fecha_salida->month}' and anio = '{$fecha_salida->year}'"));
 
-                if ($s[0]->existe== 0) {
-                    $proyecto_local = ProyectoLocal::where('IdProyectoGlobal', '=', $request->session()->get('id'))->first();
-                    $extra = [
-                        'FechaCarga' => Carbon::now()->toDateString(),
-                        'HoraCarga' => Carbon::now()->toTimeString(),
-                        'FechaLlegada' => $viaje['FechaLlegada'],
-                        'HoraLlegada' => $viaje['HoraLlegada'],
-                        'FechaSalida' => $fecha_salida->toDateString(),
-                        'HoraSalida' => $fecha_salida->toTimeString(),
-                        'IdProyecto' => $proyecto_local->IdProyecto,
-                        'Creo' => auth()->user()->idusuario,
-                        'Estatus' => 29,
-                        'Code' => $viaje['Codigo'],
-                        'IdMotivo' => $viaje['IdMotivo'],
-                        'CubicacionCamion' => $viaje['Cubicacion'],
-                        'Observaciones' => $viaje['IdMotivo'] == 7 ? $viaje['Motivo'] : MotivoCargaManual::find($viaje['IdMotivo'])->descripcion
-                    ];
+                    if ($s[0]->existe == 0) {
+                        $proyecto_local = ProyectoLocal::where('IdProyectoGlobal', '=', $request->session()->get('id'))->first();
+                        $extra = [
+                            'FechaCarga' => Carbon::now()->toDateString(),
+                            'HoraCarga' => Carbon::now()->toTimeString(),
+                            'FechaLlegada' => $viaje['FechaLlegada'],
+                            'HoraLlegada' => $viaje['HoraLlegada'],
+                            'FechaSalida' => $fecha_salida->toDateString(),
+                            'HoraSalida' => $fecha_salida->toTimeString(),
+                            'IdProyecto' => $proyecto_local->IdProyecto,
+                            'Creo' => auth()->user()->idusuario,
+                            'Estatus' => 29,
+                            'Code' => $viaje['Codigo'],
+                            'IdMotivo' => $viaje['IdMotivo'],
+                            'CubicacionCamion' => $viaje['Cubicacion'],
+                            'Observaciones' => $viaje['IdMotivo'] == 7 ? $viaje['Motivo'] : MotivoCargaManual::find($viaje['IdMotivo'])->descripcion
+                        ];
 
-                    $nuevo_viaje=ViajeNeto::create(array_merge($viaje, $extra));
+                        $nuevo_viaje = ViajeNeto::create(array_merge($viaje, $extra));
 
-                    FolioValeManual::where('folio','=',$viaje['Codigo'])->update(['id_viaje_neto' => $nuevo_viaje->IdViajeNeto]);
+                        FolioValeManual::where('folio', '=', $viaje['Codigo'])->update(['id_viaje_neto' => $nuevo_viaje->IdViajeNeto]);
 
-                    $contar=$contar+1;
+                        $contar = $contar + 1;
+                    }
+                }else{
+                    //dd($viaje_comprobar['IdViajeNeto']);
+                    $error = "{$viaje_comprobar['Code']}";
                 }
-
             }
             if($contar == count($request->get('viajes'))){
 
@@ -259,8 +266,13 @@ class ViajeNeto extends Model
                     'message' => '¡' . count($request->get('viajes')) . ' VIAJE(S) REGISTRADO(S) CORRECTAMENTE!'
                 ];
 
-            }else{
-
+            }elseif ($error != 0){
+                return [
+                    'success' => false,
+                    'message' => 'Folio(s) ['.$error.'] ya se encuentra.'
+                ];
+            }
+            else{
                 return [
                     'success' => false,
                     'message' => 'No puede registrar viajes con periodo cerrados.'
