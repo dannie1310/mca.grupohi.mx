@@ -25,10 +25,16 @@
                         </tr>
                     </thead>
                     <tbody v-for="(viaje, index) in form.viajes">
+
                         <tr>
                             <td>@{{ index + 1 }}</td>
                             <td>
-                                <input v-bind:name="'viajes[' + (index + 1) + '][Codigo]'" type="text" class="form-control input-sm"  v-model="viaje.Codigo">
+                                <select v-bind:name="'viajes[' + (index + 1) + '][Codigo]'" class="form-control input-sm" v-model="viaje.Codigo">
+                                    <option value>-SELECCIONE-</option>
+                                    @foreach($folios as $key => $folio)
+                                        <option value="{{ $folio }}">{{ $folio }}</option>
+                                    @endforeach
+                                </select>
                             </td>
                             <td>
                                 <input v-bind:name="'viajes[' + (index + 1) + '][FechaLlegada]'" type="text" v-bind:class="'form-control input-sm FechaLlegada' + index" v-datepicker>

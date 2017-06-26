@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\Conciliacion\ConciliacionDetalle;
 use Conflictos\ConflictoEntreViajesDetalle;
 use App\Models\Conflictos\ViajeNetoConflictoPagable;
+use App\Models\FolioValeManual;
 use Jenssegers\Date\Date;
 
 class ViajeNeto extends Model
@@ -212,6 +213,8 @@ class ViajeNeto extends Model
         $contar=0;
         try {
             foreach($request->get('viajes', []) as $viaje) {
+
+
                 $ruta = Ruta::where('IdOrigen', $viaje['IdOrigen'])
                     ->where('IdTiro', $viaje['IdTiro'])
                     ->first();
@@ -240,7 +243,10 @@ class ViajeNeto extends Model
                         'Observaciones' => $viaje['IdMotivo'] == 7 ? $viaje['Motivo'] : MotivoCargaManual::find($viaje['IdMotivo'])->descripcion
                     ];
 
-                    ViajeNeto::create(array_merge($viaje, $extra));
+                    $nuevo_viaje=ViajeNeto::create(array_merge($viaje, $extra));
+
+                    FolioValeManual::where('folio','=',$viaje['Codigo'])->update(['id_viaje_neto' => $nuevo_viaje->IdViajeNeto]);
+
                     $contar=$contar+1;
                 }
 

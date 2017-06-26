@@ -16,6 +16,7 @@ use App\Models\Sindicato;
 use App\Models\Tiro;
 use App\Models\ViajeNeto;
 use App\Models\Viajes\Viajes;
+use App\Models\FolioValeManual;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
@@ -228,6 +229,7 @@ class ViajesNetosController extends Controller
                         }
                     }
 
+                } else if($request->tipo_busqueda == 'codigo') {
                 } else if($request->tipo_busqueda == 'codigo') {
                     $this->validate($request, [
                         'Codigo' => 'required'
@@ -546,12 +548,14 @@ class ViajesNetosController extends Controller
     public function create(Request $request)
     {
         if(auth()->user()->can('ingresar-viajes-manuales')) {
+
             return view('viajes_netos.create')
                 ->withMotivos(MotivoCargaManual::orderBy('id','ASC')->lists('descripcion','id'))
                 ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
                 ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
                 ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
                 ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
+                ->withFolios(FolioValeManual::whereRaw('id_viaje_neto is null')->lists('folio','id'))
                 ->withAction($request->get('action'));
         }else{
             Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
