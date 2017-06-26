@@ -230,7 +230,6 @@ class ViajesNetosController extends Controller
                     }
 
                 } else if($request->tipo_busqueda == 'codigo') {
-                } else if($request->tipo_busqueda == 'codigo') {
                     $this->validate($request, [
                         'Codigo' => 'required'
                     ]);
@@ -649,6 +648,10 @@ class ViajesNetosController extends Controller
 
             if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion){
                 throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m3');
+            }
+
+            if($request['data']['Accion']==0){
+                FolioValeManual::where('folio', '=', $viaje_neto->Code)->update(['id_viaje_neto' => NULL]);
             }
             return response()->json($viaje_neto->validar($request));
         } else if($request->path() == 'viajes_netos/autorizar') {
