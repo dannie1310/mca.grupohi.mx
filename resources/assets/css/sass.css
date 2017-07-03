@@ -5875,7 +5875,7 @@ button.close {
   src: local("Roboto BlackItalic"), local("Roboto-BlackItalic"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.woff2") format("woff2"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.woff") format("woff"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.ttf") format("truetype"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.svg#Roboto") format("svg"); }
 
 /*!
- * bootstrap-fileinput v4.4.1
+ * bootstrap-fileinput v4.4.2
  * http://plugins.krajee.com/file-input
  *
  * Krajee default styling for bootstrap-fileinput.
@@ -5971,7 +5971,8 @@ button.close {
 
 .krajee-default .file-preview-image {
   vertical-align: middle;
-  image-orientation: from-image; }
+  font: 40px Impact, Charcoal, sans-serif;
+  color: green; }
 
 .krajee-default .file-preview-text {
   display: block;
