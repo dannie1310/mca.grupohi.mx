@@ -53,7 +53,8 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label>Cami&oacute;n: </label>
-                                <input class="form-control"  readonly="true" :value="items.camion" />
+                                <input class="form-control" v-if="items.camion=='No se encontro en la base de datos'" style="color: #FF0000" readonly="true" :value="items.camion" />
+                                <input class="form-control" v-else readonly="true" :value="items.camion" />
                             </div>
                         </div>
                     </div>
@@ -69,7 +70,8 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>Material: </label>
-                                    <input class="form-control" readonly="true" :value="items.material" />
+                                    <input class="form-control" v-if="items.material=='No se encontro en la base de datos'" style="color: #FF0000" readonly="true" :value="items.material" />
+                                    <input class="form-control" v-else readonly="true" :value="items.material" />
                                 </div>
                             </div>
                         </div>
@@ -77,7 +79,8 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>Origen: </label>
-                                    <input class="form-control" readonly="true" :value="items.origen" />
+                                    <input class="form-control" v-if="items.origen=='Sin Origen.' || items.origen=='nada' " style="color: #FF0000" readonly="true" :value="items.origen" />
+                                    <input class="form-control" v-else readonly="true" :value="items.origen" />
                                 </div>
                             </div>
                         </div>
@@ -93,7 +96,8 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>Destino: </label>
-                                    <input class="form-control" readonly="true" :value="items.destino" />
+                                    <input v-if="items.destino =='No se encontro en la base de datos'" style="color: #FF0000"  class="form-control" readonly="true" :value="items.destino" />
+                                    <input v-else class="form-control" readonly="true" :value="items.destino" />
                                 </div>
                             </div>
                         </div>

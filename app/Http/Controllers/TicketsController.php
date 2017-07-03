@@ -97,7 +97,7 @@ class TicketsController extends Controller
                     $camion = $camiont->Economico;
                 }
         }else{
-            $camion = " ";
+            $camion = "Sin Dato de Camión";
         }
         if($exp[6] != '0') {
             $materialt = DB::connection('sca')->table($resp->base_datos . '.materiales')->select('Descripcion')->where('idMaterial', $exp[6])->first();
@@ -108,7 +108,7 @@ class TicketsController extends Controller
                 }
         }
         else{
-            $material = " ";
+            $material = "Sin Dato de Material.";
         }
         if($exp[2] != '0'){
             $origent = DB::connection('sca')->table($resp->base_datos.'.origenes')->select('Descripcion')->where('IdOrigen', $exp[2])->first();
@@ -119,7 +119,7 @@ class TicketsController extends Controller
                 $origen = $origent->Descripcion;
             }
         }else{
-            $origen = "Sin Origen. ";
+            $origen = "Sin Origen.";
         }
         if($exp[4] != '0'){
             $tiroA = DB::connection('sca')->table($resp->base_datos.'.tiros')->select('Descripcion')->where('IdTiro', $exp[4])->first();
@@ -129,20 +129,20 @@ class TicketsController extends Controller
                 $tiro = $tiroA->Descripcion;
             }
         }else{
-            $tiro = " ";
+            $tiro = "Sin Tiro";
         }
         //dd($exp[3]);
         if($exp[3] != '0' || $exp[3] != 'null') {
             $t = DateTime::createFromFormat("ymdHis", $exp[3]);
             $fechaSalida = $t->format("d/m/y H:i:s");
         }else{
-            $fechaSalida = " ";
+            $fechaSalida = "Sin Fecha de Salida.";
         }
         if($exp[5] != '0' || $exp[3] != 'null') {
             $d = DateTime::createFromFormat("ymdHis", $exp[5]);
             $fechaLlegada = $d->format("d/m/y H:i:s");
         }else{
-            $fechaLlegada = " ";
+            $fechaLlegada = "Sin Fecha de Llegada. ";
         }
 
         $ChInicio = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[10])->first();

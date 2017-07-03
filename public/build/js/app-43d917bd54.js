@@ -45752,10 +45752,9 @@ Vue.component('tickets-validar', {
                 beforeSend: function beforeSend() {},
                 success: function success(response) {
                     self.items = response;
-                    //self.items = JSON.parse(response.body);
                 },
                 error: function error(_error) {
-                    alert(_error.responseText);
+                    alert('¡¡Codigo QR Invalido!!');
                 }
             });
         }

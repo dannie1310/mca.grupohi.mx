@@ -32,7 +32,7 @@ Vue.component('tickets-validar', {
                     self.items = response;
                 },
                 error: function(error) {
-                    alert(error.responseText);
+                    alert('¡¡Codigo QR Invalido!!');
                 }
             });
         }
