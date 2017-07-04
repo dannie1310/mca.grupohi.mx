@@ -45,12 +45,12 @@
     </ul>
   </li>
   @endif
-  
-  @if(Auth::user()->can(['consulta-solicitud-actualizar']) 
-  || Auth::user()->can(['consulta-solicitud-reactivar']) 
-  || Auth::user()->can(['ingresar-viajes-manuales']) 
-  || Auth::user()->can(['autorizar-viajes-manuales']) 
-  || Auth::user()->can(['ingresar-viajes-manuales-completos']) 
+
+  @if(Auth::user()->can(['consulta-solicitud-actualizar'])
+  || Auth::user()->can(['consulta-solicitud-reactivar'])
+  || Auth::user()->can(['ingresar-viajes-manuales'])
+  || Auth::user()->can(['autorizar-viajes-manuales'])
+  || Auth::user()->can(['ingresar-viajes-manuales-completos'])
   || Auth::user()->can(['consulta-viajes'])
   || Auth::user()->can(['configuracion-diaria'])
   || Auth::user()->can(['consultar-cortes-checador'])
@@ -131,6 +131,9 @@
             </ul>
         </li>
         @endif
+        @if(Auth::user()->can(['validar-tickets']))
+            <li><a href="{{ route('tickets.index') }}">Validar Tickets</a> </li>
+        @endif
     </ul>
   </li>
 @endif
@@ -147,24 +150,6 @@
   </li>
   @endif
 
-  @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema']))
-
-      <li class="dropdown">
-          <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
-              Administración<span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" role="menu">
-              @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema']))
-              <li><a href="{{ route('administracion.roles_permisos') }}">Configuración general</a></li>
-              @endif
-              <li><a href="{{ route('detalle.configuracion') }}">Detalle configuración</a></li>
-             <!-- <li><a href="{{ route('usuarios_sistema.index') }}">Alta de usuarios</a></li> -->
-             @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema']))
-              <li><a href="{{ route('usuario_proyecto.index') }}">Asignación de Usuarios a Proyectos</a></li>
-              @endif
-          </ul>
-      </li>
-  @endif
 
 
 @else

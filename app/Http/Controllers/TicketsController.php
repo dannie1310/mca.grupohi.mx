@@ -21,7 +21,8 @@ class TicketsController extends Controller
     private $deposito_claves = "C:/DKEY/";
 
     function __construct(Repository $config) {
-
+        $this->middleware('auth');
+        $this->middleware('context');
         $this->config = $config;
     }
 

@@ -26,10 +26,10 @@
                                 </div>
                             </div>
                         </div>
-                    <div class="row">
+                    <div class="row" v-if="items.barras!=''">
                         <div class="col-sm-12 ">
-                            <div class="form-group text-center text-uppercase text-info">
-                                <h1><strong > @{{ items.barras }} </strong></h1>
+                            <div class="form-group text-center text-uppercase text-info" >
+                                <h1><strong >@{{ items.barras }}</strong></h1>
                             </div>
                         </div>
                     </div>
