@@ -33,9 +33,11 @@ Vue.component('tickets-validar', {
                 },
                 success: function(response) {
                     self.items = response;
+                    self.code = '';
                 },
                 error: function(error) {
                     self.error = '¡¡TICKET INVÁLIDO!!';
+                    self.code = '';
                 }
             });
         },

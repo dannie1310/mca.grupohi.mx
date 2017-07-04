@@ -45755,9 +45755,11 @@ Vue.component('tickets-validar', {
                 beforeSend: function beforeSend() {},
                 success: function success(response) {
                     self.items = response;
+                    self.code = '';
                 },
                 error: function error(_error) {
                     self.error = '¡¡TICKET INVÁLIDO!!';
+                    self.code = '';
                 }
             });
         },
