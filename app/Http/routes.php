@@ -15,7 +15,8 @@ Route::get('/', 'PagesController@home')->name('home');
 Route::get('index', 'PagesController@index')->name('index');
 Route::get('proyectos', 'PagesController@proyectos')->name('proyectos');
 
-Route::get('tickets', 'TicketsController@show')->name('tickets');
+Route::get('tickets/validar', 'TicketsController@show')->name('tickets.show');
+Route::get('tickets/control', 'TicketsController@index')->name('tickets.index');
 
 // Rutas de Autenticación
 Route::get('auth/login', [

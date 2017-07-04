@@ -2052,7 +2052,7 @@
 
 },{}],3:[function(require,module,exports){
 /*!
- * bootstrap-fileinput v4.4.1
+ * bootstrap-fileinput v4.4.2
  * http://plugins.krajee.com/file-input
  *
  * Author: Kartik Visweswaran
@@ -2425,7 +2425,7 @@
             self.cancelling = false;
         },
         _init: function (options) {
-            var self = this, $el = self.$element, $cont, t;
+            var self = this, $el = self.$element, $cont, t, tmp;
             self.options = options;
             $.each(options, function (key, value) {
                 switch (key) {
@@ -2450,6 +2450,11 @@
                         break;
                 }
             });
+            if (self.rtl) { // swap buttons for rtl
+                tmp = self.previewZoomButtonIcons.prev;
+                self.previewZoomButtonIcons.prev = self.previewZoomButtonIcons.next;
+                self.previewZoomButtonIcons.next = tmp;
+            }
             self._cleanup();
             self.$form = $el.closest('form');
             self._initTemplateDefaults();
@@ -2508,6 +2513,9 @@
                 self.disable();
             }
             self._initZoom();
+            if (self.hideThumbnailContent) {
+                $h.addCss(self.$preview, 'hide-content');
+            }
         },
         _initTemplateDefaults: function () {
             var self = this, tMain1, tMain2, tPreview, tFileIcon, tClose, tCaption, tBtnDefault, tBtnLink, tBtnBrowse,
@@ -2550,7 +2558,7 @@
             tBtnBrowse = '<div tabindex="500" class="{css}" {status}>{icon} {label}</div>';
             tModalMain = '<div id="' + $h.MODAL_ID + '" class="file-zoom-dialog modal fade" ' +
                 'tabindex="-1" aria-labelledby="' + $h.MODAL_ID + 'Label"></div>';
-            tModal = '<div class="modal-dialog modal-lg" role="document">\n' +
+            tModal = '<div class="modal-dialog modal-lg{rtl}" role="document">\n' +
                 '  <div class="modal-content">\n' +
                 '    <div class="modal-header">\n' +
                 '      <div class="kv-zoom-actions pull-right">{toggleheader}{fullscreen}{borderless}{close}</div>\n' +
@@ -3380,6 +3388,7 @@
         _getModalContent: function () {
             var self = this;
             return self._getLayoutTemplate('modal').setTokens({
+                'rtl': self.rtl ? ' kv-rtl' : '',
                 'zoomFrameClass': self.frameClass,
                 'heading': self.msgZoomModalHeading,
                 'prev': self._getZoomButton('prev'),
@@ -3960,7 +3969,8 @@
                 previewId = self.previewInitId + "-" + i, $thumb, chkComplete, $btnUpload, $btnDelete,
                 hasPostData = self.filestack.length > 0 || !$.isEmptyObject(self.uploadExtraData),
                 $prog = $('#' + previewId).find('.file-thumb-progress'),
-                fnBefore, fnSuccess, fnComplete, fnError, updateUploadLog, params = {id: previewId, index: i};
+                fnBefore, fnSuccess, fnComplete, fnError, updateUploadLog, params = {id: previewId, index: i},
+                uploadFailed, multiUploadMode = !$h.isEmpty(self.$element.attr('multiple'));
             self.formdata = formdata;
             if (self.showPreview) {
                 $thumb = $('#' + previewId + ':not(.file-preview-initial)');
@@ -3972,7 +3982,9 @@
                 return;
             }
             updateUploadLog = function (i, previewId) {
-                self.updateStack(i, undefined);
+                if (multiUploadMode || !uploadFailed) {
+                    self.updateStack(i, undefined);
+                }
                 self.uploadLog.push(previewId);
                 if (self._checkAsyncComplete()) {
                     self.fileBatchCompleted = true;
@@ -3987,6 +3999,7 @@
                     len = data.content.length;
                 }
                 setTimeout(function () {
+                    var triggerReset = multiUploadMode || !uploadFailed;
                     if (self.showPreview) {
                         self.previewCache.set(u.content, u.config, u.tags, u.append);
                         if (len) {
@@ -4015,8 +4028,10 @@
                             self._initPreviewActions();
                         }
                     }
-                    self.unlock();
-                    self._clearFileInput();
+                    self.unlock(triggerReset);
+                    if (triggerReset) {
+                        self._clearFileInput();
+                    }
                     $initThumbs = self.$preview.find('.file-preview-initial');
                     if (self.uploadAsync && $initThumbs.length) {
                         $h.addCss($initThumbs, $h.SORT_CSS);
@@ -4069,8 +4084,9 @@
                             updateUploadLog(i, pid);
                         }
                     } else {
+                        uploadFailed = true;
                         self._showUploadError(data.error, params);
-                        self._setPreviewError($thumb, i);
+                        self._setPreviewError($thumb, i, (multiUploadMode ? null : self.filestack[i]));
                         if (allFiles) {
                             updateUploadLog(i, pid);
                         }
@@ -4096,12 +4112,13 @@
             fnError = function (jqXHR, textStatus, errorThrown) {
                 var op = self.ajaxOperations.uploadThumb,
                     errMsg = self._parseError(op, jqXHR, errorThrown, (allFiles ? files[i].name : null));
+                uploadFailed = true;
                 setTimeout(function () {
                     if (allFiles) {
                         updateUploadLog(i, previewId);
                     }
                     self.uploadStatus[previewId] = 100;
-                    self._setPreviewError($thumb, i);
+                    self._setPreviewError($thumb, i, (multiUploadMode ? null : self.filestack[i]));
                     $.extend(true, params, self._getOutData(jqXHR));
                     self._setProgress(101, $prog, self.msgAjaxProgressError.replace('{operation}', op));
                     self._showUploadError(errMsg, params);
@@ -4961,7 +4978,6 @@
                 w2 = $preview.width();
                 if (w1 > w2) {
                     $img.css('width', '100%');
-                    $thumb.css('width', '97%');
                 }
                 params = {ind: i, id: previewId};
                 self._checkDimensions(i, 'Small', $img, $thumb, fname, 'Width', params);
@@ -4989,10 +5005,10 @@
                 self._raise('fileimageloaderror', [previewId]);
             }).each(function () {
                 if (this.complete) {
-                    $(this).load();
+                    $(this).trigger('load');
                 } else {
                     if (this.error) {
-                        $(this).error();
+                        $(this).trigger('error');
                     }
                 }
             });
@@ -5131,9 +5147,8 @@
             self.$captionContainer.find('.file-caption-ellipsis').attr('title', title);
         },
         _createContainer: function () {
-            var self = this, $container = $(document.createElement("div"))
-                .attr({"class": 'file-input file-input-new'})
-                .html(self._renderMain());
+            var self = this, attribs = {"class": 'file-input file-input-new' + (self.rtl ? ' kv-rtl' : '')},
+                $container = $(document.createElement("div")).attr(attribs).html(self._renderMain());
             self.$element.before($container);
             self._initBrowse($container);
             if (self.theme) {
@@ -5776,6 +5791,8 @@
         autoReplace: false,
         autoOrientImage: true, // for JPEG images based on EXIF orientation tag
         required: false,
+        rtl: false,
+        hideThumbnailContent: false,
         generateFileId: null,
         previewClass: '',
         captionClass: '',
@@ -43242,8 +43259,9 @@ require('./vue-components/corte-create');
 require('./vue-components/corte-edit');
 require('./vue-components/configuracion-diaria');
 require('./vue-components/roles-permisos');
+require('./vue-components/tickets-validar');
 
-},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/configuracion-diaria":41,"./vue-components/corte-create":42,"./vue-components/corte-edit":43,"./vue-components/errors":44,"./vue-components/fda-bancomaterial":45,"./vue-components/fda-material":46,"./vue-components/global-errors":47,"./vue-components/origenes-usuarios":48,"./vue-components/roles-permisos":49,"./vue-components/viajes-completa":53,"./vue-components/viajes-index":54,"./vue-components/viajes-manual":55,"./vue-components/viajes-modificar":56,"./vue-components/viajes-revertir":57,"./vue-components/viajes-validar":58}],39:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/configuracion-diaria":41,"./vue-components/corte-create":42,"./vue-components/corte-edit":43,"./vue-components/errors":44,"./vue-components/fda-bancomaterial":45,"./vue-components/fda-material":46,"./vue-components/global-errors":47,"./vue-components/origenes-usuarios":48,"./vue-components/roles-permisos":49,"./vue-components/tickets-validar":53,"./vue-components/viajes-completa":54,"./vue-components/viajes-index":55,"./vue-components/viajes-manual":56,"./vue-components/viajes-modificar":57,"./vue-components/viajes-revertir":58,"./vue-components/viajes-validar":59}],39:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -45705,6 +45723,60 @@ module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <
 },{}],53:[function(require,module,exports){
 'use strict';
 
+Vue.component('tickets-validar', {
+    data: function data() {
+        return {
+            code: '',
+            items: {},
+            click: false,
+            error: ''
+        };
+    },
+    created: function created() {},
+
+    methods: {
+        escanear: function escanear(e) {
+            var self = this;
+            if (e.keyCode == 13) {
+                self.click = true;
+                self.error = '';
+                self.items = {};
+                self.decodificar(e);
+            }
+        },
+        decodificar: function decodificar(e) {
+            e.preventDefault();
+            var self = this;
+            var url = 'http://localhost:8000/tickets/validar?data=' + self.code;
+
+            $.ajax({
+                type: 'get',
+                url: url,
+                beforeSend: function beforeSend() {},
+                success: function success(response) {
+                    self.items = response;
+                    self.code = '';
+                },
+                error: function error(_error) {
+                    self.error = '¡¡TICKET INVÁLIDO!!';
+                    self.code = '';
+                }
+            });
+        },
+        limpiar: function limpiar() {
+            var self = this;
+            self.code = '';
+            self.error = '';
+            self.items = {};
+        }
+
+    }
+
+});
+
+},{}],54:[function(require,module,exports){
+'use strict';
+
 function timeStamp(type) {
     var today = new Date();
     var dd = today.getDate();
@@ -45922,7 +45994,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-index', {
@@ -46186,7 +46258,7 @@ Vue.component('viajes-index', {
     }
 });
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -46370,7 +46442,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -46544,7 +46616,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -46685,7 +46757,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -46697,6 +46769,7 @@ Vue.component('viajes-validar', {
     data: function data() {
         return {
             'viajes_netos': [],
+            'cierre': [],
             'cargando': false,
             'guardando': false,
             'form': {
