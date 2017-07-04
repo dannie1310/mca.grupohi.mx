@@ -16,7 +16,7 @@ use Themsaid\Transformers\AbstractTransformer;
 class ViajeNetoReporteTransformer extends AbstractTransformer
 {
     public static function toArray(Request $request, $horaInicial, $horaFinal, $estatus) {
-
+        ini_set('memory_limit','2048M');
         $timestamp_inicial = $request->get('FechaInicial') . ' ' . $horaInicial;
         $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
 

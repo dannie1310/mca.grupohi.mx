@@ -60,7 +60,6 @@ class ViajesNetos
             Flash::error('Ningún viaje neto coincide con los datos de consulta');
             return redirect()->back()->withInput();
         }
-
         return response()->view('reportes.viajes_netos.partials.table', ['data' => $this->data, 'request' => $this->request])
             ->header('Content-type','text/csv')
             ->header('Content-Disposition' , 'filename=ViajesNetos_'.date("d-m-Y").'_'.date("H.i.s",time()).'.cvs');
