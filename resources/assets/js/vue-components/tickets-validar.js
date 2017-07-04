@@ -3,7 +3,8 @@ Vue.component('tickets-validar', {
         return {
             code: '',
             items:{},
-            click: false
+            click: false,
+            error: ''
         }
     },
     created: function() {
@@ -15,6 +16,8 @@ Vue.component('tickets-validar', {
             var self = this;
             if ((e.keyCode == 13)){
                 self.click = true;
+                self.error = '';
+                self.items = {};
                 self.decodificar(e);
             }
         },
@@ -32,9 +35,15 @@ Vue.component('tickets-validar', {
                     self.items = response;
                 },
                 error: function(error) {
-                    alert('¡¡Codigo QR Invalido!!');
+                    self.error = '¡¡TICKET INVÁLIDO!!';
                 }
             });
+        },
+        limpiar: function () {
+            var self = this;
+            self.code = '';
+            self.error = '';
+            self.items = {};
         }
 
 

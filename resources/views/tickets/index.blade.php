@@ -10,7 +10,7 @@
                 <div id="app" class="container">
                         <div class="row col-sm-12">
                             <div class="form-group text-center">
-                                <h4> VALIDACI&Oacute;N TICKET ACARREOS</h4>
+                                <h4> VALIDACIÓN DE TICKETS DE ACARREOS</h4>
                             </div>
                         </div>
                         <div class="row">
@@ -22,13 +22,16 @@
                                     <h2></h2>
                                 </div>
                                 <div class="form-group text-center text-uppercase text-info">
-                                    <input type="button"  value="Limpiar" onClick="window.location.reload()">
+                                    <input type="button"  value="Limpiar" @click="limpiar">
                                 </div>
                             </div>
                         </div>
                     <div class="row" v-if="items.barras!=''">
                         <div class="col-sm-12 ">
-                            <div class="form-group text-center text-uppercase text-info" >
+                            <div v-if="error !=''" style="color: #FF0000" class="form-group text-center text-uppercase text-info" >
+                                <h1 style=""><strong >@{{ error }}</strong></h1>
+                            </div>
+                            <div v-else class="form-group text-center text-uppercase text-info" >
                                 <h1><strong >@{{ items.barras }}</strong></h1>
                             </div>
                         </div>
