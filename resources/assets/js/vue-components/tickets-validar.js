@@ -24,7 +24,7 @@ Vue.component('tickets-validar', {
         decodificar: function(e) {
             e.preventDefault();
             var self = this;
-            var url = 'http://localhost:8000/tickets/validar?data=' + self.code;
+            var url = App.host + '/tickets/validar?data=' + self.code;
 
             $.ajax({
                 type : 'get',

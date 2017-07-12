@@ -21,8 +21,8 @@ class TicketsController extends Controller
     private $deposito_claves = "C:/DKEY/";
 
     function __construct(Repository $config) {
-        //$this->middleware('auth');
-        //$this->middleware('context');
+        $this->middleware('auth');
+        $this->middleware('context');
         $this->config = $config;
     }
 
@@ -65,12 +65,6 @@ class TicketsController extends Controller
      */
     public function show(Request $request)
     {
-        //dd($request->header('data'));
-        //zsddcDsmDjUrSDemDJf6uwN0SM2Ml0e1DLlH%2BJCRVRA3oFwCAB7wC8dXwsGFROq9tX%2FXcHKsDa9U%0AMuvMosSLnV4LJn%2BFmj4xLOOO4jnoQUKm7iZOSYN3BouZqddVbL81KDjWP2OeBJi64nH%2BDzi1ou9M%0AVVepdqof4BSMeIFOSJo%3D%0A
-        //$dat = "K4rxiu29S2QgkItt%2BwqVYVSDsKobU42GWKMnHXbv3keNvjQS1plSaovbvsCvmAmMfsDcU6Is00O%2F%0AHaF%2FZajc7UfSw9KrzIh0hutgqKrjnaPF1sdNBBoEZxK9h6Tn1yN%2Fea6oZtxq5wnwbynJNp7m895e%0A1TnIihqriO3dnCtJ7cg%3D%0A";
-        //$dat = "c%2BcM9CtmbkRhAyK%2BYQYxu7sedasmLXY6CMRt%2Fntq2hmBwSshaY3q37DK9TJt2trQYDJmwnJ%2BPHx%2B%0A5L1xlAbEgOev3l0usZ5hbVmdNC%2FUKn%2BMyCUwek%2BPSl7rfj5nRytuyX%2FAkGq1fMKjStN8pU%2FGwxGD%0AuaK69NtyyFtSjndi6Wo%3D%0A";
-        //
-
         //dd($resp);
         //$this->config->set('database.connections.sca.database', $resp[0]['base_datos']);
 
@@ -82,8 +76,6 @@ class TicketsController extends Controller
 
         //dd($desc);
         $exp = explode("|", $desc);
-
-
 
         $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
         if($resp == null){
@@ -169,27 +161,8 @@ class TicketsController extends Controller
             'barras'      => $exp[8].$exp[1]
         ], 200);
 
-        //dd($exp[4]);
-       /* $respT = response()->json(array_merge([
-            'proyecto'    => $resp->descripcion,
-            'camion'      => $camion,
-            'cubicacion'  => $exp[11].' m3',
-            'material'    => $material,
-            'origen'      => $origen,
-            'fechaSalida' => $fechaSalida,
-            'destino'     => $tiro,
-            'fechaLlegada'=> $fechaLlegada,
-            'ChInicio'    => $ChInicio->nombre.' '.$ChInicio->apaterno.' '.$ChInicio->amaterno,
-            'ChCierre'    => $ChCierre->nombre.' '.$ChCierre->apaterno.' '.$ChCierre->amaterno,
-            'barras'      => $exp[8].$exp[1]
-        ]
-        ));*/
-
-        //$info= json_encode($respT->content());
         $respuesta = response()->json(    $respT->content());
-        //dd($info);
-        //return $info;
-        //return view('tickets.create')->with('info', $info );
+
 
     }
 
