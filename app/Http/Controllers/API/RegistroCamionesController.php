@@ -19,7 +19,7 @@ class RegistroCamionesController extends Controller
 
     
 
-      public function __construct() {
+    public function __construct() {
 
         $this->middleware('jwt.auth');
         $this->middleware('api.context',['except' => 'index']);
