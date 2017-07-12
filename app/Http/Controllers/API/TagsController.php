@@ -24,9 +24,6 @@ class TagsController extends Controller
 
     public function lista()
     {
-        //$usr = auth()->user();
-        //$test = auth()->user()->hasRole([$idusuario]);
-        //dd($test);
         // Validación de que el usuario tiene permisos para utilizar el proyecto de regristro de Tags
        $permisos = DB::table('sca_configuracion.permisos_alta_tag')
                     ->whereRaw('(TIMESTAMP(vigencia) > NOW() OR vigencia is null)')

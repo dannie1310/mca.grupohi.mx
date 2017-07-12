@@ -82,7 +82,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>Origen: </label>
-                                    <input class="form-control" v-if="items.origen=='Sin Origen.' || items.origen=='nada' " style="color: #FF0000" readonly="true" :value="items.origen" />
+                                    <input class="form-control" v-if="items.origen=='Sin Origen.' || items.origen=='No se encontro en la base de datos' " style="color: #FF0000" readonly="true" :value="items.origen" />
                                     <input class="form-control" v-else readonly="true" :value="items.origen" />
                                 </div>
                             </div>

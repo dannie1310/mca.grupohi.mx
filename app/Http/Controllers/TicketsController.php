@@ -21,8 +21,8 @@ class TicketsController extends Controller
     private $deposito_claves = "C:/DKEY/";
 
     function __construct(Repository $config) {
-        $this->middleware('auth');
-        $this->middleware('context');
+        //$this->middleware('auth');
+        //$this->middleware('context');
         $this->config = $config;
     }
 
@@ -113,9 +113,9 @@ class TicketsController extends Controller
         }
         if($exp[2] != '0'){
             $origent = DB::connection('sca')->table($resp->base_datos.'.origenes')->select('Descripcion')->where('IdOrigen', $exp[2])->first();
-            $origen = $origent->Descripcion;
+
             if($origent == null){
-                $origent = "No se encontro en la base de datos";
+                $origen = "No se encontro en la base de datos";
             }else {
                 $origen = $origent->Descripcion;
             }
@@ -170,7 +170,7 @@ class TicketsController extends Controller
         ], 200);
 
         //dd($exp[4]);
-        $respT = response()->json(array_merge([
+       /* $respT = response()->json(array_merge([
             'proyecto'    => $resp->descripcion,
             'camion'      => $camion,
             'cubicacion'  => $exp[11].' m3',
@@ -183,12 +183,12 @@ class TicketsController extends Controller
             'ChCierre'    => $ChCierre->nombre.' '.$ChCierre->apaterno.' '.$ChCierre->amaterno,
             'barras'      => $exp[8].$exp[1]
         ]
-        ));
+        ));*/
 
-        $info= json_encode($respT->content());
+        //$info= json_encode($respT->content());
         $respuesta = response()->json(    $respT->content());
         //dd($info);
-        return $info;
+        //return $info;
         //return view('tickets.create')->with('info', $info );
 
     }
