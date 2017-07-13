@@ -45741,7 +45741,7 @@ Vue.component('tickets-validar', {
                     self.code = '';
                 },
                 error: function error(_error) {
-                    self.error = '¡¡TICKET INVÁLIDO!!';
+                    self.error = '¡¡TICKET INVÁLIDO!!' + _error;
                     self.code = '';
                 }
             });
