@@ -80,98 +80,107 @@ class TicketsController extends Controller
 
 
         $exp = explode("|", $desc);
-       // dd(Context::getId(). " : ".$exp[0]);
 
-        if(Context::getId() == $exp[0]) {
-            $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
-            if ($resp == null) {
-                $resp = "No se encontro en la base de datos";
-            }
-
-            if ($exp[1] != '0') {
-                $camiont = DB::connection('sca')->table($resp->base_datos . '.camiones')->select('Economico')->where('idCamion', $exp[1])->first();
-                if ($camiont == null) {
-                    $camion = "No se encontro en la base de datos";
-                } else {
-                    $camion = $camiont->Economico;
+        if(count($exp)==13) {
+            if (Context::getId() == $exp[0]) {
+                $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
+                if ($resp == null) {
+                    $resp = "No se encontro en la base de datos";
                 }
-            } else {
-                $camion = "Sin Dato de Camión";
-            }
-            if ($exp[6] != '0') {
-                $materialt = DB::connection('sca')->table($resp->base_datos . '.materiales')->select('Descripcion')->where('idMaterial', $exp[6])->first();
-                if ($materialt == null) {
-                    $material = "No se encontro en la base de datos";
+
+                if ($exp[1] != '0') {
+                    $camiont = DB::connection('sca')->table($resp->base_datos . '.camiones')->select('Economico')->where('idCamion', $exp[1])->first();
+                    if ($camiont == null) {
+                        $camion = "No se encontro en la base de datos";
+                    } else {
+                        $camion = $camiont->Economico;
+                    }
                 } else {
-                    $material = $materialt->Descripcion;
+                    $camion = "Sin Dato de Camión";
                 }
-            } else {
-                $material = "Sin Dato de Material.";
-            }
-            if ($exp[2] != '0') {
-                $origent = DB::connection('sca')->table($resp->base_datos . '.origenes')->select('Descripcion')->where('IdOrigen', $exp[2])->first();
-
-                if ($origent == null) {
-                    $origen = "No se encontro en la base de datos";
+                if ($exp[6] != '0') {
+                    $materialt = DB::connection('sca')->table($resp->base_datos . '.materiales')->select('Descripcion')->where('idMaterial', $exp[6])->first();
+                    if ($materialt == null) {
+                        $material = "No se encontro en la base de datos";
+                    } else {
+                        $material = $materialt->Descripcion;
+                    }
                 } else {
-                    $origen = $origent->Descripcion;
+                    $material = "Sin Dato de Material.";
                 }
-            } else {
-                $origen = "Sin Origen.";
-            }
-            if ($exp[4] != '0') {
-                $tiroA = DB::connection('sca')->table($resp->base_datos . '.tiros')->select('Descripcion')->where('IdTiro', $exp[4])->first();
-                if ($tiroA == null) {
-                    $tiro = "No se encontro en la base de datos";
+                if ($exp[2] != '0') {
+                    $origent = DB::connection('sca')->table($resp->base_datos . '.origenes')->select('Descripcion')->where('IdOrigen', $exp[2])->first();
+
+                    if ($origent == null) {
+                        $origen = "No se encontro en la base de datos";
+                    } else {
+                        $origen = $origent->Descripcion;
+                    }
                 } else {
-                    $tiro = $tiroA->Descripcion;
+                    $origen = "Sin Origen.";
                 }
-            } else {
-                $tiro = "Sin Tiro";
-            }
-            //dd($exp[3]);
-            if ($exp[3] != '0' || $exp[3] != 'null') {
-                $t = DateTime::createFromFormat("ymdHis", $exp[3]);
-                $fechaSalida = $t->format("d/m/y H:i:s");
-            } else {
-                $fechaSalida = "Sin Fecha de Salida.";
-            }
-            if ($exp[5] != '0' || $exp[3] != 'null') {
-                $d = DateTime::createFromFormat("ymdHis", $exp[5]);
-                $fechaLlegada = $d->format("d/m/y H:i:s");
-            } else {
-                $fechaLlegada = "Sin Fecha de Llegada. ";
-            }
+                if ($exp[4] != '0') {
+                    $tiroA = DB::connection('sca')->table($resp->base_datos . '.tiros')->select('Descripcion')->where('IdTiro', $exp[4])->first();
+                    if ($tiroA == null) {
+                        $tiro = "No se encontro en la base de datos";
+                    } else {
+                        $tiro = $tiroA->Descripcion;
+                    }
+                } else {
+                    $tiro = "Sin Tiro";
+                }
+                //dd($exp[3]);
+                if ($exp[3] != '0' || $exp[3] != 'null') {
+                    $t = DateTime::createFromFormat("ymdHis", $exp[3]);
+                    $fechaSalida = $t->format("d/m/y H:i:s");
+                } else {
+                    $fechaSalida = "Sin Fecha de Salida.";
+                }
+                if ($exp[5] != '0' || $exp[3] != 'null') {
+                    $d = DateTime::createFromFormat("ymdHis", $exp[5]);
+                    $fechaLlegada = $d->format("d/m/y H:i:s");
+                } else {
+                    $fechaLlegada = "Sin Fecha de Llegada. ";
+                }
 
-            $ChInicio = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[10])->first();
-            if ($ChInicio == null) {
-                $ChInicio = "No se encontro en la base de datos";
-            }
-            $ChCierre = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[7])->first();
-            if ($ChCierre == null) {
-                $ChCierre = "No se encontro en la base de datos";
-            }
+                $ChInicio = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[10])->first();
+                if ($ChInicio == null) {
+                    $ChInicio = "No se encontro en la base de datos";
+                }
+                $ChCierre = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[7])->first();
+                if ($ChCierre == null) {
+                    $ChCierre = "No se encontro en la base de datos";
+                }
 
-            return response()->json([
-                'proyecto' => $resp->descripcion,
-                'camion' => $camion,
-                'cubicacion' => $exp[11] . ' m3',
-                'material' => $material,
-                'origen' => $origen,
-                'fechaSalida' => $fechaSalida,
-                'destino' => $tiro,
-                'fechaLlegada' => $fechaLlegada,
-                'ChInicio' => $ChInicio->nombre . ' ' . $ChInicio->apaterno . ' ' . $ChInicio->amaterno,
-                'ChCierre' => $ChCierre->nombre . ' ' . $ChCierre->apaterno . ' ' . $ChCierre->amaterno,
-                'barras' => $exp[8] . $exp[1]
-            ], 200);
+                return response()->json([
+                    'proyecto' => $resp->descripcion,
+                    'camion' => $camion,
+                    'cubicacion' => $exp[11] . ' m3',
+                    'material' => $material,
+                    'origen' => $origen,
+                    'fechaSalida' => $fechaSalida,
+                    'destino' => $tiro,
+                    'fechaLlegada' => $fechaLlegada,
+                    'ChInicio' => $ChInicio->nombre . ' ' . $ChInicio->apaterno . ' ' . $ChInicio->amaterno,
+                    'ChCierre' => $ChCierre->nombre . ' ' . $ChCierre->apaterno . ' ' . $ChCierre->amaterno,
+                    'barras' => $exp[8] . $exp[1]
+                ], 200);
 
-            //$respuesta = response()->json($respT->content());
+
+                //$respuesta = response()->json($respT->content());
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'No pertenece al proyecto.'
+                ];
+            }
         }else{
-            return response()->json([
-                'error' => 'No pertenece al proyecto',
-            ],400);
+            return [
+                'success' => false,
+                'message' => '¡Ticket Invalido!.'
+            ];
         }
+       // return response()->json(['error' => "400"],400);
 
 
     }

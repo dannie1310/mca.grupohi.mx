@@ -45737,12 +45737,13 @@ Vue.component('tickets-validar', {
                 url: url,
                 beforeSend: function beforeSend() {},
                 success: function success(response) {
-                    self.items = response;
-                    self.code = '';
-                },
-                error: function error(_error) {
-                    self.error = '¡¡TICKET INVÁLIDO!!' + _error;
-                    self.code = '';
+                    if (!response.success) {
+                        self.error = response.message;
+                        self.code = '';
+                    } else {
+                        self.items = response.message;
+                        self.code = '';
+                    }
                 }
             });
         },
