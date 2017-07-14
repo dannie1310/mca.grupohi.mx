@@ -32,14 +32,13 @@ Vue.component('tickets-validar', {
                 beforeSend: function() {
                 },
                 success: function(response) {
-                    if(!response.success){
-                        self.error = response.message;
-                        self.code = '';
-                    }else {
-                        self.items = response.message;
-                        self.code = '';
-                    }
-                 }
+                    self.items = response;
+                    self.code = '';
+                },
+                error: function(error) {
+                    self.error = error.responseJSON.error;
+                    self.code =  '';
+                }
             });
         },
         limpiar: function () {

@@ -16,15 +16,11 @@ use PhpSpec\Exception\Exception;
 
 class TicketsController extends Controller
 {
-    private $config;
-    private $context;
-
     private $deposito_claves = "C:/DKEY/";
 
-    function __construct(Repository $config) {
+    function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
-        $this->config = $config;
     }
 
     /**
@@ -66,22 +62,15 @@ class TicketsController extends Controller
      */
     public function show(Request $request)
     {
-        //dd($resp);
-        //$this->config->set('database.connections.sca.database', $resp[0]['base_datos']);
 
         $dat = $request->input('data');
 
         $desc = $this->desencripta($dat);
 
-        //dd(urlencode($dat));
-
-        //dd($desc);
-
-
 
         $exp = explode("|", $desc);
-
         if(count($exp)==13) {
+
             if (Context::getId() == $exp[0]) {
                 $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
                 if ($resp == null) {
@@ -166,23 +155,12 @@ class TicketsController extends Controller
                     'barras' => $exp[8] . $exp[1]
                 ], 200);
 
-
-                //$respuesta = response()->json($respT->content());
-            } else {
-                return [
-                    'success' => false,
-                    'message' => 'No pertenece al proyecto.'
-                ];
+            }else{
+               return response()->json(['error' => 'Esté Ticket no pertenece al proyecto.'],400);
             }
         }else{
-            return [
-                'success' => false,
-                'message' => '¡Ticket Invalido!.'
-            ];
+            return response()->json(['error' => '¡TICKET INVÁLIDO!'],400);
         }
-       // return response()->json(['error' => "400"],400);
-
-
     }
 
     function desencripta($txt_encriptado) {
