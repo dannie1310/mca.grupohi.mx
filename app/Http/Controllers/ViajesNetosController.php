@@ -547,15 +547,16 @@ class ViajesNetosController extends Controller
     public function create(Request $request)
     {
         if(auth()->user()->can('ingresar-viajes-manuales')) {
-
-            return view('viajes_netos.create')
+           return view('viajes_netos.create')
                 ->withMotivos(MotivoCargaManual::orderBy('id','ASC')->lists('descripcion','id'))
-                ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
+                ->withCamiones(Camion::whereRaw('Estatus = 1')->orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
                 ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
                 ->withTiros(Tiro::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdTiro'))
                 ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
                 ->withFolios(FolioValeManual::whereRaw('id_viaje_neto is null')->lists('folio','id'))
                 ->withAction($request->get('action'));
+
+
         }else{
             Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
             return redirect()->back();
