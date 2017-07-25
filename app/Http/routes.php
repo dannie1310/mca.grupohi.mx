@@ -43,7 +43,7 @@ Route::get('origenes/{origenes}/tiros', 'OrigenesTirosController@index')->name('
 Route::get('camiones/{camiones}/cubicacion', 'CamionesController@getCubicacion');
 
 // Rutas de Catalogos
-Route::group(['middleware' => ['permission:control-catalogos']], function () {
+//Route::group(['middleware' => ['permission:control-catalogos']], function () {
     Route::get('origenes_usuarios', 'PagesController@origenes_usuarios')->name('origenes_usuarios.index');
     Route::resource('materiales', 'MaterialesController');
     Route::resource('marcas', 'MarcasController');
@@ -75,7 +75,7 @@ Route::group(['middleware' => ['permission:control-catalogos']], function () {
     Route::patch('usuarios/{usuarios}', 'UserController@update');
     Route::resource('telefonos', 'TelefonosController');
     Route::resource('impresoras', 'ImpresorasController');
-});
+//});
 
 
     //Rutas de Viajes Netos
@@ -204,7 +204,7 @@ Route::delete('configuracion-diaria/{id}', 'ConfiguracionDiariaController@destro
 Route::resource('user.roles', 'UserRolesController');
 
 //Rutas de Administración
-Route::group(['prefix' => 'administracion', 'middleware' => ['role:administrador-sistema|administrador-permisos']], function () {
+//Route::group(['prefix' => 'administracion', 'middleware' => ['role:administrador-sistema|administrador-permisos']], function () {
     Route::get('roles_permisos', 'RolesPermisosController@roles_permisos')->name('administracion.roles_permisos');
     Route::get('roles_permisos/init', 'RolesPermisosController@init');
     Route::post('roles_permisos/roles', 'RolesPermisosController@roles_store')->name('roles.store');
@@ -213,7 +213,7 @@ Route::group(['prefix' => 'administracion', 'middleware' => ['role:administrador
     Route::post('roles_permisos/rol_usuario_store', 'RolesPermisosController@roles_usuario_store')->name('rol_usuario.store');
     Route::post('roles_permisos/permisos_roles','RolesPermisosController@permisos_roles')->name('permisos.roles');
 
-});
+//});
 Route::resource('usuarios_sistema', 'UsuarioSistemaController');
 
 
@@ -302,10 +302,10 @@ Route::get('historico/sindicatos/{id}', 'HistoricoController@sindicatos');
 Route::get('historico/rutas/{id}', 'HistoricoController@rutas');
 Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 
-Route::group(['middleware' => ['permission:consulta-solicitud-reactivar']], function () {
+//Route::group(['middleware' => ['permission:consulta-solicitud-reactivar']], function () {
     Route::resource('solicitud-reactivacion', 'SolicitudReactivacionController');
-});
+//});
 
-Route::group(['middleware' => ['permission:consulta-solicitud-actualizar']], function () {
+//Route::group(['middleware' => ['permission:consulta-solicitud-actualizar']], function () {
     Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
-});
+//});
