@@ -8,20 +8,20 @@ use App\User;
 class Camion extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
-    
+
     protected $connection = 'sca';
     protected $table = 'camiones';
     protected $primaryKey = 'IdCamion';
     protected $fillable = [
-        'IdProyecto', 
-        'IdSindicato', 
-        'Propietario', 
+        'IdProyecto',
+        'IdSindicato',
+        'Propietario',
         'IdOperador',
-        'IdBoton', 
+        'IdBoton',
         'Placas',
         'PlacasCaja',
-        'Economico', 
-        'IdMarca', 
+        'Economico',
+        'IdMarca',
         'Modelo',
         'PolizaSeguro',
         'VigenciaPolizaSeguro',

@@ -22,7 +22,8 @@ class InicioViajeReporteTransformer extends AbstractTransformer
         $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
 
 
-        $SQL = "SELECT i.fecha_origen AS fechaorigen,
+        $SQL = "SELECT distinct 
+                i.fecha_origen AS fechaorigen,
                 CONCAT(u.nombre, ' ', u.apaterno, ' ', u.amaterno) as usuario,
                 c.Economico as camion,
                 c.Placas as placas,

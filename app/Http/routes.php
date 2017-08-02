@@ -204,7 +204,7 @@ Route::delete('configuracion-diaria/{id}', 'ConfiguracionDiariaController@destro
 Route::resource('user.roles', 'UserRolesController');
 
 //Rutas de Administración
-//Route::group(['prefix' => 'administracion', 'middleware' => ['role:administrador-sistema|administrador-permisos']], function () {
+Route::group(['prefix' => 'administracion', 'middleware' => ['role:administrador-sistema|administrador-permisos']], function () {
     Route::get('roles_permisos', 'RolesPermisosController@roles_permisos')->name('administracion.roles_permisos');
     Route::get('roles_permisos/init', 'RolesPermisosController@init');
     Route::post('roles_permisos/roles', 'RolesPermisosController@roles_store')->name('roles.store');
@@ -213,7 +213,7 @@ Route::resource('user.roles', 'UserRolesController');
     Route::post('roles_permisos/rol_usuario_store', 'RolesPermisosController@roles_usuario_store')->name('rol_usuario.store');
     Route::post('roles_permisos/permisos_roles','RolesPermisosController@permisos_roles')->name('permisos.roles');
 
-//});
+});
 Route::resource('usuarios_sistema', 'UsuarioSistemaController');
 
 
