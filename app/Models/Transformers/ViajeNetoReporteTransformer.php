@@ -24,7 +24,7 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
         $SQL = "SELECT 
     DATE_FORMAT(v.FechaLlegada, '%d-%m-%Y') AS Fecha,
     DATE_FORMAT(v.FechaSalida, '%d-%m-%Y') AS FechaSalida,
-    DATE_FORMAT(v.HoraSalida, '%h:%i:%s') AS HoraSalida,
+    DATE_FORMAT(v.HoraSalida, '%H:%i:%s') AS HoraSalida,
     t.IdTiro,
     cpc.name AS Perfil,
     cpc.id AS IdPerfil,
