@@ -121,7 +121,9 @@ class ViajesNetosController extends Controller
                         }
                     }
                 }
-            }else if($request->get('action') == 'detalle_conflicto'){
+            }
+
+            else if($request->get('action') == 'detalle_conflicto'){
                 $id_conflicto = $request->get("id_conflicto");
                 $id_viaje = $request->get("id_viaje");
                 $conflicto = \App\Models\Conflictos\ConflictoEntreViajes::find($id_conflicto);
@@ -147,7 +149,8 @@ class ViajesNetosController extends Controller
                 }
 
                 return response()->json( $data);
-            }else if($request->get('action') == 'en_conflicto'){
+            }
+            else if($request->get('action') == 'en_conflicto'){
                 if($request->get("tipo_busqueda") == "fecha"){
                     $this->validate($request, [
                         'FechaInicial' => 'required|date_format:"Y-m-d"',
@@ -176,6 +179,43 @@ class ViajesNetosController extends Controller
                 $viajes_netos = $query->get();
 
                 $data = ViajeNetoTransformer::transform($viajes_netos);
+                foreach ($data as $dat) {
+
+                    //dd($dat['timestamp_llegada']);
+                    $fecha =  Carbon::createFromFormat('Y-m-d', $dat['fechaLlegada']);
+                    $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+                    //dd($cierres);
+                    foreach ($cierres as $cierre) {
+                        $datos [] = [
+                                'id'                => $dat['id'],
+                                'autorizo'          => $dat['autorizo'],
+                                'camion'            => $dat['camion'],
+                                'codigo'            => $dat['codigo'],
+                                'cubicacion'        => $dat['cubicacion'],
+                                'estado'            => $dat['estado'],
+                                'estatus'           => $dat['estatus'],
+                                'id_material'       => $dat['id_material'],
+                                'id_origen'         => $dat['id_origen'],
+                                'material'          => $dat['material'],
+                                'origen'            => $dat['origen'],
+                                'registro'          => $dat['registro'],
+                                'registro_primer_toque' => $dat['registro_primer_toque'],
+                                'timestamp_llegada' => $dat['timestamp_llegada'],
+                                'fechaLlegada' => $dat['fechaLlegada'],
+                                'tipo'              => $dat['tipo'],
+                                'tiro'              => $dat['tiro'],
+                                'importe'           => $dat['importe'],
+                                'valido'            => $dat['valido'],
+                                'conflicto'         => $dat['conflicto'],
+                                'conflicto_pdf'     => $dat['conflicto_pdf'],
+                                'conflicto_pagable' => $dat['conflicto_pagable'],
+                                'cierre'            => $cierre->existe
+                        ];
+                        dd($datos);
+                    }
+
+                }
+               // dd($data);
             }
             else if ($request->get('action') == 'validar') {
                 $data = [];
