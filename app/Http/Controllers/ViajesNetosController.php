@@ -126,8 +126,10 @@ class ViajesNetosController extends Controller
             else if($request->get('action') == 'detalle_conflicto'){
                 $id_conflicto = $request->get("id_conflicto");
                 $id_viaje = $request->get("id_viaje");
+                //dd($id_viaje);
                 $conflicto = \App\Models\Conflictos\ConflictoEntreViajes::find($id_conflicto);
                 $viaje = ViajeNeto::find($id_viaje);
+
                 $pagable = $viaje->conflicto_pagable;
                 $detalles = $conflicto->detalles;
                 if($pagable){
@@ -138,16 +140,26 @@ class ViajesNetosController extends Controller
                     $data["motivo"] = null;
                     $data["aprobo_pago"] = null;
                 }
-                foreach($detalles as $detalle){
-                    $data["conflictos"][] = [
-                        "id"=>$detalle->viaje_neto->IdViajeNeto,
-                        "code"=>$detalle->viaje_neto->Code,
-                        "fecha_registro"=>$detalle->viaje_neto->timestamp_carga->format("d-m-Y h:i:s"),
-                        "fecha_salida"=>$detalle->viaje_neto->timestamp_salida->format("d-m-Y h:i:s"),
-                        "fecha_llegada"=>$detalle->viaje_neto->timestamp_llegada->format("d-m-Y h:i:s"),
-                    ];
+               $fecha =  Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
+                //dd($fecha);
+                $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+                foreach ($cierres as $cierre){
+                    $data["cierre"] = $cierre->existe;
                 }
 
+                foreach($detalles as $detalle){
+                        $data["conflictos"][] = [
+                            "id"=>$detalle->viaje_neto->IdViajeNeto,
+                            "code"=>$detalle->viaje_neto->Code,
+                            "fecha_registro"=>$detalle->viaje_neto->timestamp_carga->format("d-m-Y h:i:s"),
+                            "fecha_salida"=>$detalle->viaje_neto->timestamp_salida->format("d-m-Y h:i:s"),
+                            "fecha_llegada"=>$detalle->viaje_neto->timestamp_llegada->format("d-m-Y h:i:s"),
+                        ];
+
+
+
+                }
+               dd($data);
                 return response()->json( $data);
             }
             else if($request->get('action') == 'en_conflicto'){
@@ -177,20 +189,19 @@ class ViajesNetosController extends Controller
 
 
                 $viajes_netos = $query->get();
-
+                $datos =[];
                 $data = ViajeNetoTransformer::transform($viajes_netos);
                 foreach ($data as $dat) {
 
-                    //dd($dat['timestamp_llegada']);
                     $fecha =  Carbon::createFromFormat('Y-m-d', $dat['fechaLlegada']);
                     $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
-                    //dd($cierres);
+
                     foreach ($cierres as $cierre) {
                         $datos [] = [
                                 'id'                => $dat['id'],
                                 'autorizo'          => $dat['autorizo'],
                                 'camion'            => $dat['camion'],
-                                'codigo'            => $dat['codigo'],
+                                'Code'            => $dat['codigo'],
                                 'cubicacion'        => $dat['cubicacion'],
                                 'estado'            => $dat['estado'],
                                 'estatus'           => $dat['estatus'],
@@ -201,7 +212,8 @@ class ViajesNetosController extends Controller
                                 'registro'          => $dat['registro'],
                                 'registro_primer_toque' => $dat['registro_primer_toque'],
                                 'timestamp_llegada' => $dat['timestamp_llegada'],
-                                'fechaLlegada' => $dat['fechaLlegada'],
+                                'FechaLlegada' => $dat['fechaLlegada'],
+                                'HoraLlegada' => $dat['horaLlegada'],
                                 'tipo'              => $dat['tipo'],
                                 'tiro'              => $dat['tiro'],
                                 'importe'           => $dat['importe'],
@@ -209,12 +221,14 @@ class ViajesNetosController extends Controller
                                 'conflicto'         => $dat['conflicto'],
                                 'conflicto_pdf'     => $dat['conflicto_pdf'],
                                 'conflicto_pagable' => $dat['conflicto_pagable'],
-                                'cierre'            => $cierre->existe
+                                'cierre'            => $cierre->existe,
+                                'fecha_hora_carga' =>$dat['fecha_hora_carga']
                         ];
-                        dd($datos);
+
                     }
 
                 }
+                $data = $datos;
                // dd($data);
             }
             else if ($request->get('action') == 'validar') {
