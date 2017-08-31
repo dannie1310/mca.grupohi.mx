@@ -144,9 +144,9 @@ class ViajesNetosController extends Controller
                         $data["conflictos"][] = [
                             "id"=>$detalle->viaje_neto->IdViajeNeto,
                             "code"=>$detalle->viaje_neto->Code,
-                            "fecha_registro"=>$detalle->viaje_neto->timestamp_carga->format("d-m-Y h:i:s"),
-                            "fecha_salida"=>$detalle->viaje_neto->timestamp_salida->format("d-m-Y h:i:s"),
-                            "fecha_llegada"=>$detalle->viaje_neto->timestamp_llegada->format("d-m-Y h:i:s"),
+                            "fecha_registro"=>$detalle->viaje_neto->timestamp_carga->format("d-m-Y G:i:s"),
+                            "fecha_salida"=>$detalle->viaje_neto->timestamp_salida->format("d-m-Y G:i:s"),
+                            "fecha_llegada"=>$detalle->viaje_neto->timestamp_llegada->format("d-m-Y G:i:s"),
                         ];
                 }
                 $fecha =  Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
@@ -196,6 +196,7 @@ class ViajesNetosController extends Controller
                     $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
 
                     foreach ($cierres as $cierre) {
+
                         $datos [] = [
                                 'id'                => $dat['id'],
                                 'autorizo'          => $dat['autorizo'],
