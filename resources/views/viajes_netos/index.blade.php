@@ -304,27 +304,19 @@
                                           <td>
                                               @{{detalle_conflicto.fecha_llegada}}
                                           </td>
-                                                <td>
-                                                    @{{ conflicto.cierres }}
-                                                </td>
                                       </tr>
                                         </tbody>
                                   </table>
                                       </div>
                                   </div>
-                                  <div class="row" ><div class="col-md-12"><textarea name="motivo" class="form-control" placeholder="Ingrese el motivo para aprobar el pago."></textarea></div></div>
+                                  <div class="row" v-if="conflicto.cierres == 0" ><div class="col-md-12"><textarea name="motivo" class="form-control" placeholder="Ingrese el motivo para aprobar el pago."></textarea></div></div>
                                   {!! Form::close() !!}
                               </div>
                               <div class="modal-footer">
                                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                                 @if (Auth::user()->can(['poner-viajes-conflicto-pagables']))
-                                      <div  v-if="conflicto.cierres == 0">
-                                        <button type="button" class="btn btn-success" @click="confirmarPonerPagable">Es Pagable</button>
-                                      </div>
-                                      <div v-else>
-                                          <button type="button" class="btn btn-default" data-dismiss="modal">Perido Cerrado</button>
-                                      </div>
-                                @endif
+                                     <button type="button" class="btn btn-success" @click="confirmarPonerPagable" v-if="conflicto.cierres == 0">Es Pagable</button>
+                                 @endif
                             </div>
                             </div><!-- /.modal-content -->
                           </div><!-- /.modal-dialog -->
