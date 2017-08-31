@@ -140,13 +140,6 @@ class ViajesNetosController extends Controller
                     $data["motivo"] = null;
                     $data["aprobo_pago"] = null;
                 }
-               $fecha =  Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
-                //dd($fecha);
-                $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
-                foreach ($cierres as $cierre){
-                    $data["cierre"] = $cierre->existe;
-                }
-
                 foreach($detalles as $detalle){
                         $data["conflictos"][] = [
                             "id"=>$detalle->viaje_neto->IdViajeNeto,
@@ -155,11 +148,17 @@ class ViajesNetosController extends Controller
                             "fecha_salida"=>$detalle->viaje_neto->timestamp_salida->format("d-m-Y h:i:s"),
                             "fecha_llegada"=>$detalle->viaje_neto->timestamp_llegada->format("d-m-Y h:i:s"),
                         ];
-
-
-
                 }
-               dd($data);
+                $fecha =  Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
+                //dd($fecha);
+                $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+                $c = null;
+                foreach ($cierres as $cierre){
+                    $c = $cierre->existe;
+                }
+
+                $data["cierres"] = $c;
+               // dd(response()->json( $data));
                 return response()->json( $data);
             }
             else if($request->get('action') == 'en_conflicto'){
@@ -229,7 +228,6 @@ class ViajesNetosController extends Controller
 
                 }
                 $data = $datos;
-               // dd($data);
             }
             else if ($request->get('action') == 'validar') {
                 $data = [];

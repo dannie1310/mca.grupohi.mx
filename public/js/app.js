@@ -45985,6 +45985,7 @@ Vue.component('viajes-index', {
         return {
             'viajes_netos': [],
             'conflicto': [],
+            'cierres': "",
             'viaje_neto_seleccionado': "",
             'id_conflicto': "",
             'cargando': false,

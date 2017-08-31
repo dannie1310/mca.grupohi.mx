@@ -287,6 +287,7 @@
                                           <td style="text-align: center">
                                                Fecha Llegada
                                           </td>
+
                                       </tr>
                                         </thead>
                                         <tbody>
@@ -303,6 +304,9 @@
                                           <td>
                                               @{{detalle_conflicto.fecha_llegada}}
                                           </td>
+                                                <td>
+                                                    @{{ conflicto.cierres }}
+                                                </td>
                                       </tr>
                                         </tbody>
                                   </table>
@@ -312,11 +316,16 @@
                                   {!! Form::close() !!}
                               </div>
                               <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                                 @if (Auth::user()->can(['poner-viajes-conflicto-pagables']))
-                                <button type="button" class="btn btn-success" @click="confirmarPonerPagable">Es Pagable</button>
+                                      <div  v-if="conflicto.cierres == 0">
+                                        <button type="button" class="btn btn-success" @click="confirmarPonerPagable">Es Pagable</button>
+                                      </div>
+                                      <div v-else>
+                                          <button type="button" class="btn btn-default" data-dismiss="modal">Perido Cerrado</button>
+                                      </div>
                                 @endif
-                              </div>
+                            </div>
                             </div><!-- /.modal-content -->
                           </div><!-- /.modal-dialog -->
                         </div><!-- /.modal -->
@@ -328,7 +337,7 @@
                             <div class="modal-content">
                               <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">DETALLES DEL CONFLICTO</h4>
+                                <h4 class="modal-title">DETALLES DEL CONFLICTO </h4>
                               </div>
                                 <div class="modal-body"  >
                                   {!! Form::open(['route' => ['viajes_netos.update'], 'method' => 'patch', 'class' => 'form_pagable']) !!}
@@ -380,7 +389,7 @@
                                   {!! Form::close() !!}
                               </div>
                               <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar </button>
                               </div>
                             </div><!-- /.modal-content -->
                           </div><!-- /.modal-dialog -->
