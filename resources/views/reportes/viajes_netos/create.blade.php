@@ -8,37 +8,68 @@
     @include('partials.errors')
     {!! Form::open(['method' => 'GET', 'route' => ['reportes.viajes_netos.show'], 'id' => 'form_reporte_viajes_netos']) !!}
     <input type="hidden" name="action" value />
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>FECHA INICIAL</label>
-                <input type="text" class="date start form-control" name="FechaInicial" value="{{ old('FechaInicial') }}" />
+    @if (Auth::user()->can(['visualizar-reporte-diario-viajes-netos']))
+        <div class="row">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label>FECHA</label>
+                    <input type="text" class="date start form-control"  id="fecha" name="FechaInicial" value="{{ old('FechaInicial') }}" />
+                </div>
+            </div>
+            <div class="col-md-2 hide">
+                <div class="form-group">
+                    <label>HORA</label>
+                    <input type="text" class="form-control" name="HoraInicial" value="00:00:00 am" />
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>HORA INICIAL</label>
-                <input type="text" class="time start form-control" name="HoraInicial" value="{{ old('HoraInicial') }}" />
+        <div class="row hide">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>FECHA Final</label>
+                    <input type="text" class="form-control" id="fecha_f" name="FechaFinal" value="0" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>HORA Final</label>
+                    <input type="text" class="time end form-control" name="HoraFinal" value="11:59:59 pm" />
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>FECHA FINAL</label>
-                <input type="text" class="date end form-control" name="FechaFinal" value="{{ old('FechaFinal') }}" />
+    @else
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>FECHA INICIAL</label>
+                    <input type="text" class="date start form-control" name="FechaInicial" value="{{ old('FechaInicial') }}" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>HORA INICIAL</label>
+                    <input type="text" class="time start form-control" name="HoraInicial" value="{{ old('HoraInicial') }}" />
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>HORA FINAL</label>
-                <input type="text" class="time end form-control" name="HoraFinal" value="{{ old('HoraFinal') }}" />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>FECHA FINAL</label>
+                    <input type="text" class="date end form-control" name="FechaFinal" value="{{ old('FechaFinal') }}" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>HORA FINAL</label>
+                    <input type="text" class="time end form-control" name="HoraFinal" value="{{ old('HoraFinal') }}" />
+                </div>
             </div>
         </div>
-    </div>
+    @endif
     <div class="row">
         <div class="form-group">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <div class="form-group">
                     <label>ESTATUS</label>
                     {!! Form::select('Estatus', [0 => 'TODOS', 1 => 'VALIDADOS', 2 => 'SIN VALIDAR'], old('Estatus'), ['class' => 'form-control']) !!}
@@ -55,6 +86,12 @@
 @stop
 @section('scripts')
     <script>
+
+        $('.fecha').keyup(function () {
+            var aux = $(this).val();
+            $('.fecha_f').val(aux);
+
+        })
         $('.view').off().on('click', function (e) {
             e.preventDefault();
             $('input[name=action]').val('view');

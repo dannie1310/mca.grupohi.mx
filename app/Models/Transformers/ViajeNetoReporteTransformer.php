@@ -17,9 +17,12 @@ class ViajeNetoReporteTransformer extends AbstractTransformer
 {
     public static function toArray(Request $request, $horaInicial, $horaFinal, $estatus) {
         ini_set('memory_limit','2048M');
+        if($request->FechaFinal == 0){
+            $timestamp_final = $request->get('FechaInicial') . ' ' . $horaFinal;
+        }else {
+            $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
+        }
         $timestamp_inicial = $request->get('FechaInicial') . ' ' . $horaInicial;
-        $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
-
 
         $SQL = "SELECT 
     DATE_FORMAT(v.FechaLlegada, '%d-%m-%Y') AS Fecha,

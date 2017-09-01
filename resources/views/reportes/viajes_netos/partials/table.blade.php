@@ -17,8 +17,15 @@
         <td colspan="2"  align="center">
             <div align="left">
                 <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;">VIAJES NETOS DEL PERÍODO (</font>
-                <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
-                <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</font></div></td>
+                @if (Auth::user()->can(['visualizar-reporte-diario-viajes-netos']))
+                    <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
+                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraFinal']; ?>)</font>
+                @else
+                    <font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?></font>
+                    <font color="#000000" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"> AL </font><font color="#666666" style="font-family:'Trebuchet MS'; font-weight:bold;font-size:14px;"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</font>
+                @endif
+
+            </div></td>
     </tr>
     <tr>
         <td>&nbsp;</td>
@@ -156,7 +163,11 @@
                                 <td class="Titulo">NO EXISTEN ACARREOS EJECUTADOS EN EL PERIODO: </td>
                             </tr>
                             <tr>
-                                <td class="Titulo">DEL:<span class="Estilo1"> <?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?> </span>AL: <span class="Estilo1"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</span></font></td>
+                                @if (Auth::user()->can(['visualizar-reporte-diario-viajes-netos']))
+                                    <td class="Titulo">DEL:<span class="Estilo1"> <?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?> </span>AL: <span class="Estilo1"><?PHP echo $request['FechaInicial'] . ' ' . $request['HoraFinal']; ?>)</span></font></td>
+                                @else
+                                    <td class="Titulo">DEL:<span class="Estilo1"> <?PHP echo $request['FechaInicial'] . ' ' . $request['HoraInicial']; ?> </span>AL: <span class="Estilo1"><?PHP echo $request['FechaFinal'] . ' ' . $request['HoraFinal']; ?>)</span></font></td>
+                                @endif
                             </tr>
 
                             <tr>
