@@ -13,13 +13,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Themsaid\Transformers\AbstractTransformer;
 
-class ViajeNetoReporteTransformer extends AbstractTransformer
+class ViajeNetoReporteCompletoTransformer extends AbstractTransformer
 {
     public static function toArray(Request $request, $horaInicial, $horaFinal, $estatus) {
         ini_set('memory_limit','2048M');
 
-        $timestamp_final = $request->get('FechaInicial') . ' ' . $horaFinal;
-
+        $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
         $timestamp_inicial = $request->get('FechaInicial') . ' ' . $horaInicial;
 
         $SQL = "SELECT 
@@ -209,7 +208,7 @@ FROM
       ";
         $r = collect(DB::connection('sca')->select(DB::raw($SQL)))->chunk(1000);
         //dd($r);
-	  DB::connection('sca')->disableQueryLog();
+        DB::connection('sca')->disableQueryLog();
         return $r;
     }
 }

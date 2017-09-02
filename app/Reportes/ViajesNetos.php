@@ -11,6 +11,7 @@ namespace App\Reportes;
 
 use App\Facades\Context;
 use App\Models\Proyecto;
+use App\Models\Transformers\ViajeNetoReporteCompletoTransformer;
 use App\Models\Transformers\ViajeNetoReporteTransformer;
 use App\User;
 use Carbon\Carbon;
@@ -48,7 +49,11 @@ class ViajesNetos
                 $this->estatus = 'in (0,10,20,30)';
                 break;
         }
-        $this->data = ViajeNetoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
+        if($request->FechaLlegada == 0) {
+            $this->data = ViajeNetoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
+        }else{
+            $this->data = ViajeNetoReporteCompletoTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
+        }
     }
 
     /**

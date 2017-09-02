@@ -44,21 +44,14 @@
                     <td >&nbsp;</td>
                 </tr>
                 <tr>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td colspan="26">&nbsp;</td>
-                        <td colspan="3" bgcolor="969696">
-                            <div align="center">
-                                <font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Tarifa</font></font>
-                            </div>
-                        </td>
-                    @else
+
                         <td colspan="24">&nbsp;</td>
                         <td colspan="3" bgcolor="969696">
                             <div align="center">
                                 <font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Tarifa</font></font>
                             </div>
                         </td>
-                    @endif
+
 
                 </tr>
                 <tr bgcolor="#0A8FC7">
@@ -74,10 +67,6 @@
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Sindicato Camion</font></div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Sindicato Viaje</font></div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Empresa Viaje</font></div></td>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Sindicato Conciliado</font></div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Empresa Conciliado</font></div></td>
-                    @endif
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Salida</font></div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Hora Salida</font></div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Llegada</font></div></td>
@@ -94,18 +83,8 @@
                     <td bgcolor="C0C0C0"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Km Sub. </font></div></td>
                     <td bgcolor="C0C0C0"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Km Adc.</font></div></td>
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Importe</font> </div></td>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Estatus</font> </div></td>
-                    @endif
                     <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Ticket</font> </div></td>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Conciliaci&oacute;n</font> </div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Conciliaci&oacute;n</font> </div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Estado Conciliaci&oacute;n</font> </div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Viajes en Conflicto</font> </div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">IMEI</font> </div></td>
-                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Perfil</font> </div></td>
-                    @endif
+
                 </tr>
                 <?php $key_global =0; ?>
                 @foreach($data as $chunk)
@@ -140,10 +119,7 @@
                     <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Camion; ?></font></div></td>
                     <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->placas; ?></font></div></td>
                     <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->PlacasCaja; ?></font></div></td>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->SindicatoCamion; ?></font></div></td>
-                        <td width="70"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Sindicato; ?></font></div></td>
-                    @endif
+
                     <td width="150"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Empresa; ?></font></div></td>
                     <td width="70"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->SindicatoConci; ?></font></div></td>
                     <td width="150"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Empresaconci; ?></font></div></td>
@@ -163,18 +139,9 @@
                     <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->tarifa_material_ks,2,".",",");; ?></font></div></td>
                     <td width="30"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->tarifa_material_ka,2,".",","); ?></font></div></td>
                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo number_format($item->ImporteTotal_M,2,".",","); ?></font></div></td>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td width="80"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Estatus; ?></font></div></td>
-                    @endif
+
                     <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->code; ?></font></div></td>
-                    @if (Auth::user()->can(!['visualizar-reporte-diario-viajes-netos']))
-                        <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->idconciliacion; ?></font></div></td>
-                        <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->fecha_conciliacion; ?></font></div></td>
-                        <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->estado_string; ?></font></div></td>
-                        <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->conflictos; ?></font></div></td>
-                        <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->imei; ?></font></div></td>
-                        <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->perfil; ?></font></div></td>
-                    @endif
+
                 </tr>
                       @endforeach
                       @endforeach

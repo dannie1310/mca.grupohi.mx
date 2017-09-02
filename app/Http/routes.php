@@ -153,6 +153,14 @@ Route::group(['prefix' => 'reportes'], function () {
         'as'   => 'reportes.viajes_netos.show',
         'uses' => 'ReportesController@viajes_netos_show'
     ]);
+    Route::get('viajes_netos/completo/create', [
+        'as'   => 'reportes.viajes_netos.completo.create',
+        'uses' => 'ReportesController@viajes_netos_completo_create'
+    ]);
+    Route::get('viajes_netos/completo/show', [
+        'as'   => 'reportes.viajes_netos.completo.show',
+        'uses' => 'ReportesController@viajes_netos_completo_show'
+    ]);
     Route::get('inicio_viajes/create', [
         'as'   => 'reportes.inicio_viajes.create',
         'uses' => 'ReportesController@inicio_viajes_create'

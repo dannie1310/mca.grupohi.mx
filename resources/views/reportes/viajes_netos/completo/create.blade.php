@@ -2,37 +2,37 @@
 
 @section('content')
     <h1>REPORTES</h1>
-    {!! Breadcrumbs::render('reportes.viajes_netos')  !!}
+    {!! Breadcrumbs::render('reportes.viajes_netos.completo')  !!}
     <hr>
     <h3>BUSCAR VIAJES</h3>
     @include('partials.errors')
-    {!! Form::open(['method' => 'GET', 'route' => ['reportes.viajes_netos.show'], 'id' => 'form_reporte_viajes_netos']) !!}
+    {!! Form::open(['method' => 'GET', 'route' => ['reportes.viajes_netos.completo.show'], 'id' => 'form_reporte_viajes_netos']) !!}
     <input type="hidden" name="action" value />
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <div class="form-group">
-                    <label>FECHA</label>
-                    <input type="text" class="date start form-control"  id="fecha" name="FechaInicial" value="{{ old('FechaInicial') }}" />
+                    <label>FECHA INICIAL</label>
+                    <input type="text" class="date start form-control" name="FechaInicial" value="{{ old('FechaInicial') }}" />
                 </div>
             </div>
-            <div class="col-md-2 hide">
+            <div class="col-md-6">
                 <div class="form-group">
-                    <label>HORA</label>
-                    <input type="text" class="form-control" name="HoraInicial" value="00:00:00 am" />
+                    <label>HORA INICIAL</label>
+                    <input type="text" class="time start form-control" name="HoraInicial" value="{{ old('HoraInicial') }}" />
                 </div>
             </div>
         </div>
-        <div class="row hide">
+        <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>FECHA Final</label>
-                    <input type="text" class="form-control" id="fecha_f" name="FechaFinal" value="0" />
+                    <label>FECHA FINAL</label>
+                    <input type="text" class="date end form-control" name="FechaFinal" value="{{ old('FechaFinal') }}" />
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>HORA Final</label>
-                    <input type="text" class="time end form-control" name="HoraFinal" value="11:59:59 pm" />
+                    <label>HORA FINAL</label>
+                    <input type="text" class="time end form-control" name="HoraFinal" value="{{ old('HoraFinal') }}" />
                 </div>
             </div>
         </div>
