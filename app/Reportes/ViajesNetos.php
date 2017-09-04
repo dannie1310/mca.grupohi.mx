@@ -49,7 +49,8 @@ class ViajesNetos
                 $this->estatus = 'in (0,10,20,30)';
                 break;
         }
-        if($request->FechaLlegada == 0) {
+
+        if($request->FechaFinal == 0) {
             $this->data = ViajeNetoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
         }else{
             $this->data = ViajeNetoReporteCompletoTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
@@ -65,9 +66,16 @@ class ViajesNetos
             Flash::error('Ningún viaje neto coincide con los datos de consulta');
             return redirect()->back()->withInput();
         }
-        return response()->view('reportes.viajes_netos.partials.table', ['data' => $this->data, 'request' => $this->request])
-            ->header('Content-type','text/csv')
-            ->header('Content-Disposition' , 'filename=ViajesNetos_'.date("d-m-Y").'_'.date("H.i.s",time()).'.cvs');
+
+        if($this->request->FechaFinal==0) {
+            return response()->view('reportes.viajes_netos.partials.table', ['data' => $this->data, 'request' => $this->request])
+                ->header('Content-type', 'text/csv')
+                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . '.cvs');
+        }else{
+            return response()->view('reportes.viajes_netos.completo.table', ['data' => $this->data, 'request' => $this->request])
+                ->header('Content-type', 'text/csv')
+                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . '.cvs');
+        }
     }
 
     public function show() {
@@ -76,8 +84,15 @@ class ViajesNetos
             Flash::error('Ningún viaje neto coincide con los datos de consulta');
             return redirect()->back()->withInput();
         }
-        return view('reportes.viajes_netos.show')
-            ->withData($this->data)
-            ->withRequest($this->request->all());
+
+        if($this->request->FechaFinal==0) {
+            return view('reportes.viajes_netos.show')
+                ->withData($this->data)
+                ->withRequest($this->request->all());
+        }else{
+            return view('reportes.viajes_netos.completo.show')
+                ->withData($this->data)
+                ->withRequest($this->request->all());
+        }
     }
 }

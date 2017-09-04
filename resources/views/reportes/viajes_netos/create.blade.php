@@ -9,7 +9,7 @@
     {!! Form::open(['method' => 'GET', 'route' => ['reportes.viajes_netos.show'], 'id' => 'form_reporte_viajes_netos']) !!}
     <input type="hidden" name="action" value />
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="form-group">
                     <label>FECHA</label>
                     <input type="text" class="date start form-control"  id="fecha" name="FechaInicial" value="{{ old('FechaInicial') }}" />
@@ -37,16 +37,7 @@
             </div>
         </div>
 
-    <div class="row">
-        <div class="form-group">
-            <div class="col-md-8">
-                <div class="form-group">
-                    <label>ESTATUS</label>
-                    {!! Form::select('Estatus', [0 => 'TODOS', 1 => 'VALIDADOS', 2 => 'SIN VALIDAR'], old('Estatus'), ['class' => 'form-control']) !!}
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-success excel">GENERAR REPORTE</button>
         <button type="submit" class="btn btn-primary view">VISTA PREVIA</button>

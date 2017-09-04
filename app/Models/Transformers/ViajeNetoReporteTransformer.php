@@ -198,8 +198,7 @@ FROM
         conflictos_entre_viajes conflictos_entre_viajes) Subquery ON (DATE_FORMAT(timestamp, '%Y-%m-%d') = Subquery.maximo)
     GROUP BY conflictos_entre_viajes.id) AS cev ON (cev.id = cevd.idconflicto)
       WHERE
-          v.Estatus " . $estatus  . "
-      AND
+         
       CAST(CONCAT(v.FechaLlegada,
                     ' ',
                     v.HoraLlegada)
@@ -207,8 +206,9 @@ FROM
       group by IdViajeNeto
       ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus
       ";
+       // dd($SQL);
         $r = collect(DB::connection('sca')->select(DB::raw($SQL)))->chunk(1000);
-        //dd($r);
+
 	  DB::connection('sca')->disableQueryLog();
         return $r;
     }
