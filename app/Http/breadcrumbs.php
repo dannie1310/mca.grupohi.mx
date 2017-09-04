@@ -310,7 +310,7 @@ Breadcrumbs::register('reportes.viajes_netos.completo', function($breadcrumbs) {
     $breadcrumbs->push('VIAJES NETOS COMPLETO', route('reportes.viajes_netos.completo.create'));
 });
 Breadcrumbs::register('reportes.viajes_netos', function($breadcrumbs) {
-    $breadcrumbs->push('VIAJES NETOS', route('reportes.viajes_netos.create'));
+    $breadcrumbs->push('VIAJES NETOS DIARIO', route('reportes.viajes_netos.create'));
 });
 Breadcrumbs::register('reportes.inicio_viajes', function($breadcrumbs) {
     $breadcrumbs->push('INICIO VIAJES', route('reportes.inicio_viajes.create'));
