@@ -137,22 +137,30 @@
     </ul>
   </li>
 @endif
-  @if(Auth::user()->can(['consulta-viajes-netos']))
-  <li class="dropdown">
-      <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
-          Reportes<span class="caret"></span>
-      </a>
-      <ul class="dropdown-menu" role="menu">
-          <li><a href="{{ route('reportes.inicio_viajes.create') }}">Inicio Viajes</a></li>
-          <li><a href="{{ route('reportes.viajes_netos.create') }}">Viajes Netos Diario</a></li>
-          @if(Auth::user()->can(['visualizar-reporte-viajes-netos']))
-            <li><a href="{{ route('reportes.viajes_netos.completo.create') }}">Viajes Netos Completos</a></li>
-          @endif
-          <li><a href="{{ route('reportes.conciliacion_detalle.create') }}">Conciliaciones Detallado</a></li>
-      </ul>
-  </li>
+  @if(Auth::user()->can(['visualizar-reporte-inicio-viajes']) || Auth::user()->can(['visualizar-reporte-viajes-diarios']) || Auth::user()->can(['visualizar-reporte-viajes-netos']) || Auth::user()->can(['visualizar-reporte-viajes-netos-auditoria']) || Auth::user()->can(['visualizar-reporte-conciliacion']))
+      <li class="dropdown">
+          <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
+              Reportes<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu">
+              @if(Auth::user()->can(['visualizar-reporte-inicio-viajes']))
+                  <li><a href="{{ route('reportes.inicio_viajes.create') }}">Inicio Viajes</a></li>
+              @endif
+              @if(Auth::user()->can(['visualizar-reporte-viajes-diarios']))
+                  <li><a href="{{ route('reportes.viajes_netos.create') }}">Viajes Netos Diario</a></li>
+              @endif
+              @if(Auth::user()->can(['visualizar-reporte-viajes-netos']))
+                  <li><a href="{{ route('reportes.viajes_netos.completo.create') }}">Viajes Netos Completos</a></li>
+              @endif
+              @if(Auth::user()->can(['visualizar-reporte-viajes-netos-auditoria']))
+                  <li><a href="{{ route('reportes.viajes_netos.completo.create') }}">Viajes Netos Completos (Auditoría)</a></li>
+              @endif
+              @if(Auth::user()->can(['visualizar-reporte-conciliacion']))
+                  <li><a href="{{ route('reportes.conciliacion_detalle.create') }}">Conciliaciones Detallado</a></li>
+              @endif
+          </ul>
+      </li>
   @endif
-
   @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema']))
 
       <li class="dropdown">
