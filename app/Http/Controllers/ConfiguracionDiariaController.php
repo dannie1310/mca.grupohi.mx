@@ -48,8 +48,8 @@ class ConfiguracionDiariaController extends Controller
         return response()->json([
             'origenes' => OrigenTransformer::transform(Origen::where('origenes.Estatus', '=', 1)->orderBy('Descripcion', 'ASC')->get()),
             'tiros'    => TiroTransformer::transform(Tiro::where('tiros.Estatus', '=', 1)->orderBy('Descripcion', 'ASC')->get()),
-            'esquemas' => EsquemaConfiguracionTransformer::transform(Esquema::orderBy('name', 'ASC')->get()),
-            'perfiles' => Perfiles::orderBy('name', 'ASC')->get(),
+            'esquemas' => EsquemaConfiguracionTransformer::transform(Esquema::where('configuracion_esquemas_cat.estatus', '=', 1)->orderBy('name', 'ASC')->get()),
+            'perfiles' => Perfiles::where('configuracion_perfiles_cat.estatus', '=', 1)->orderBy('name', 'ASC')->get(),
             'checadores' => UserConfiguracionTransformer::transform(User_1::checadores()->orderBy('igh.usuario.nombre')->get()),
             'telefonos' => Telefono::NoAsignados()->get()
         ]);
