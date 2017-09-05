@@ -239,14 +239,7 @@
                                     <td>@{{ detalle.registro }}</td>
                                     <td>@{{ detalle.timestamp_llegada }}</td>
                                     <td>@{{ detalle.material }}</td>
-                                    <td style="text-align: right">
-                                        <span v-if="conciliacion.estado == 0">
-                                            <a href="#" @click="cambiar_cubicacion(detalle)" style="text-decoration: underline">@{{ detalle.cubicacion_camion }} m<sup>3</sup></a>
-                                        </span>
-                                        <span v-else>
-                                            @{{ detalle.cubicacion_camion }} m<sup>3</sup>
-                                        </span>
-                                    </td>
+                                    <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup> </td>
                                     <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                         @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                         <td v-if="conciliacion.estado == 0">
@@ -287,14 +280,7 @@
                                     <td>@{{ detalle.registro }}</td>
                                     <td>@{{ detalle.timestamp_llegada }}</td>
                                     <td>@{{ detalle.material }}</td>
-                                    <td style="text-align: right">
-                                        <span v-if="conciliacion.estado == 0">
-                                            <a href="#" @click="cambiar_cubicacion(detalle)" style="text-decoration: underline">@{{ detalle.cubicacion_camion }} m<sup>3</sup></a>
-                                        </span>
-                                        <span v-else>
-                                            @{{ detalle.cubicacion_camion }} m<sup>3</sup>
-                                        </span>
-                                    </td>
+                                    <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup></td>
                                     <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                     @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                         <td v-if="conciliacion.estado == 0">
