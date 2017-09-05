@@ -70,6 +70,7 @@ class DetalleAdministracionController extends Controller
 
             ////////////Rol usuario
             foreach ($usuarios as $usuario) {
+
                 $rol_usuario = array();
                 if (count($usuario['roles']) > 0) {
                     foreach ($roles as $rol) {

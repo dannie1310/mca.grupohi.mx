@@ -34,6 +34,7 @@ class User_1 extends User
 
         return $query->join('sca_configuracion.usuarios_proyectos as scaconf','igh.usuario.idusuario','=','scaconf.id_usuario_intranet')
             ->where('scaconf.id_proyecto','=',Context::getId())
+            ->where('scaconf.estatus','=','1')
             ->select('igh.usuario.*');
     }
 
