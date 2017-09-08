@@ -309,7 +309,7 @@ class Conciliacion extends Model
         return $this->hasOne(ConciliacionCancelacion::class, 'idconciliacion');
     }
 
-    public function cerrar()
+    public function cerrar($id)
     {
         DB::connection('sca')->beginTransaction();
 
@@ -326,6 +326,38 @@ class Conciliacion extends Model
             if ($this->estado != 0) {
                 throw new \Exception("No se puede cerrar la conciliación ya que su estado actual es " . $this->estado_str);
             }
+
+            $repetidos="SELECT count(idviaje_neto) AS CALCULATED_COLUMN1,
+                   conciliacion_detalle.idconciliacion_detalle,
+                   conciliacion_detalle.idviaje_neto,
+                   viajesnetos.Code,
+                   group_concat(conciliacion.idconciliacion),
+                   group_concat(conciliacion.fecha_conciliacion),
+                   viajes.Importe,
+                   viajes.IdViaje
+              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_detalle conciliacion_detalle
+                      INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos
+                         ON     (conciliacion_detalle.idviaje_neto =
+                                    viajesnetos.IdViajeNeto)
+                            AND (viajesnetos.IdViajeNeto =
+                                    conciliacion_detalle.idviaje_neto))
+                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion conciliacion
+                        ON     (conciliacion_detalle.idconciliacion =
+                                   conciliacion.idconciliacion)
+                           AND (conciliacion.idconciliacion =
+                                conciliacion_detalle.idconciliacion))
+                   INNER JOIN prod_sca_pista_aeropuerto_2.viajes viajes
+                      ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
+             WHERE     (conciliacion.fecha_conciliacion >= '2017-07-01 00:00:00')
+                   AND conciliacion_detalle.estado = 1
+                   AND conciliacion.idconciliacion = '{$id}'
+            GROUP BY conciliacion_detalle.idviaje_neto, viajesnetos.Code
+            HAVING count(idviaje_neto) > 1";
+
+            $r = DB::connection('sca')->select(DB::raw($repetidos));
+
+
+                //cambiar estatus de un registro
             $this->estado = 1;
             $this->IdCerro = auth()->user()->idusuario;
             $this->FechaHoraCierre = Carbon::now();
@@ -333,6 +365,17 @@ class Conciliacion extends Model
 
             foreach ($this->viajes() as $v) {
                 $viaje = Viaje::find($v->IdViaje);
+                if($r!=null){
+                    foreach ($r as $item){
+                        if($v->code == $item->Code){
+                            $detalle = ConciliacionDetalle::find($item->idconciliacion_detalle);
+                            $detalle->update([
+                                'id_checador' =>'-1',
+                             'motivo' => "Duplicacion de viaje en una conciliacion"
+                            ]);
+                        }
+                    }
+                }
                 if ($viaje->IdSindicato != $this->idsindicato) {
                     $sindicato_anterior = $viaje->IdSindicato;
                     $viaje->IdSindicato = $this->idsindicato;

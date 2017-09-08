@@ -121,7 +121,7 @@ class ConciliacionesController extends Controller
             $conciliacion = Conciliacion::findOrFail($id);
 
             if($request->get('action') == 'cerrar') {
-                $conciliacion->cerrar();
+                $conciliacion->cerrar($id);
             } else if ($request->get('action') == 'aprobar') {
                 $conciliacion->aprobar();
             } else if($request->get('action') == 'detalles') {
