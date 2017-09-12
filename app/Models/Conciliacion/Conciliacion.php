@@ -373,6 +373,12 @@ class Conciliacion extends Model
                             $detalle->update([
                                 'estado' =>'-1'
                             ]);
+                            ConciliacionDetalleCancelacion::create([
+                                'idconciliaciondetalle' => $item->idconciliacion_detalle,
+                                'motivo' => 'Viaje Duplicado en la conciliacion',
+                                'fecha_hora_cancelacion' => Carbon::now(),
+                                'idcancelo' => auth()->user()->idusuario
+                            ]);
                         }
                     }
                 }
