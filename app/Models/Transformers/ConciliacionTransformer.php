@@ -14,10 +14,49 @@ use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Themsaid\Transformers\AbstractTransformer;
 use App\Models\Conciliacion\ConciliacionDetalleNoConciliado;
+use Illuminate\Support\Facades\DB;
 class ConciliacionTransformer extends AbstractTransformer
 {
     public function transformModel(Model $conciliacion)
     {
+        $duplicidad ="SELECT count(idviaje_neto) AS num,
+                   conciliacion_detalle.idconciliacion_detalle,
+                   conciliacion_detalle.idviaje_neto,
+                   viajesnetos.Code,
+                   group_concat(conciliacion.idconciliacion)
+              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_detalle conciliacion_detalle
+                      INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos
+                         ON     (conciliacion_detalle.idviaje_neto =
+                                    viajesnetos.IdViajeNeto)
+                            AND (viajesnetos.IdViajeNeto =
+                                    conciliacion_detalle.idviaje_neto))
+                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion conciliacion
+                        ON     (conciliacion_detalle.idconciliacion =
+                                   conciliacion.idconciliacion)
+                           AND (conciliacion.idconciliacion =
+                                conciliacion_detalle.idconciliacion))
+                   INNER JOIN prod_sca_pista_aeropuerto_2.viajes viajes
+                      ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
+             WHERE   conciliacion_detalle.estado = 1
+                   AND conciliacion.idconciliacion = '{$conciliacion->idconciliacion}'
+            GROUP BY conciliacion_detalle.idviaje_neto, viajesnetos.Code
+            HAVING count(idviaje_neto) > 1";
+
+        $datos = DB::connection('sca')->select(DB::raw($duplicidad));
+        $num ="";
+        $code ="";
+        $duplicados =[];
+        foreach ($datos as $d) {
+            $num = $d->num;
+            $code = $d->Code;
+            $duplicados = $d->num==null ? [] :[
+                [
+                'numduplicado' =>$num,
+                'codeduplicado'=>$code
+                ]
+            ];
+        }
+
         $output = [
             'id'    => $conciliacion->idconciliacion,
             'num_viajes'    => $conciliacion->conciliacionDetalles->where('estado', '=', 1)->count(),
@@ -50,7 +89,8 @@ class ConciliacionTransformer extends AbstractTransformer
             'porcentaje_importe_viajes_manuales' => $conciliacion->porcentaje_importe_viajes_manuales,
             'porcentaje_volumen_viajes_manuales' => $conciliacion->porcentaje_volumen_viajes_manuales,
             'importe_viajes_moviles' => $conciliacion->importe_viajes_moviles_f,
-            'volumen_viajes_moviles' => $conciliacion->volumen_viajes_moviles_f
+            'volumen_viajes_moviles' => $conciliacion->volumen_viajes_moviles_f,
+            'duplicados' => $duplicados
         ];
 
         return $output;

@@ -186,15 +186,16 @@
                             </div>
                         </div>
 
-                         <div v-if="conciliacion.numduplicado != 0" class="col-md-6">
-                            <div class="panel panel-default">
+                         <div v-if="conciliacion.duplicados.length != 0" class="col-md-6">
+                            <div class="panel panel-danger">
                                 <div class="panel panel-heading">
                                     DETALLES DE VIAJES DUPLICADOS
                                 </div>
-                                <div class="panel-body">
+                                <div class="panel-body" v-for="detalle in conciliacion.duplicados">
                                    <strong>Existen los siguientes viajes duplicados: </strong><br>
-                                    <strong>Code : </strong>@{{ conciliacion.code }}<br>
+                                   <strong>Code : </strong>@{{ detalle.codeduplicado }} <strong> # repeticiones:  </strong>@{{ detalle.numduplicado }}
                                 </div>
+                                <span class="label label-danger">Para eliminar los duplicados, cierre la conciliación o eliminelos manualmente si cuenta con dicho permiso.</span>
                             </div>
                         </div>
                         <span v-if="conciliacion.estado == -1  || conciliacion.estado == -2">

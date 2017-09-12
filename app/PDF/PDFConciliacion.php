@@ -339,8 +339,8 @@ class PDFConciliacion extends Rotation
     }
     
     function pagado() {
-       
-        
+
+
         $this->SetWidths(array(.25* $this->WidthTotal,.25 * $this->WidthTotal));
         $this->SetFont('Arial', 'B', 6.5);
         $this->SetStyles(array('DF',  'DF'));
@@ -358,7 +358,7 @@ class PDFConciliacion extends Rotation
         $this->Row(array(number_format($this->conciliacion->VolumenPagado, 2, '.', ','),number_format($this->conciliacion->ImportePagado, 2, '.', ',')));
         $this->encola = '';
     }
-    
+
 
     function items_moviles()
     {
@@ -859,19 +859,64 @@ class PDFConciliacion extends Rotation
         $this->AliasNbPages();
         $this->AddPage();
         $this->SetAutoPageBreak(true,4.5);
-        if(count($this->conciliacion->conciliacionDetalles)>0){
-            $this->items_manuales();
-            $this->items_moviles();
+        $duplicidad = DB::connection('sca')->select(DB::raw("SELECT count(idviaje_neto) AS num,
+                   conciliacion_detalle.idconciliacion_detalle,
+                   conciliacion_detalle.idviaje_neto,
+                   viajesnetos.Code,
+                   group_concat(conciliacion.idconciliacion)
+              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_detalle conciliacion_detalle
+                      INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos
+                         ON     (conciliacion_detalle.idviaje_neto =
+                                    viajesnetos.IdViajeNeto)
+                            AND (viajesnetos.IdViajeNeto =
+                                    conciliacion_detalle.idviaje_neto))
+                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion conciliacion
+                        ON     (conciliacion_detalle.idconciliacion =
+                                   conciliacion.idconciliacion)
+                           AND (conciliacion.idconciliacion =
+                                conciliacion_detalle.idconciliacion))
+                   INNER JOIN prod_sca_pista_aeropuerto_2.viajes viajes
+                      ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
+             WHERE   conciliacion_detalle.estado = 1
+                   AND conciliacion.idconciliacion = '{$this->conciliacion->idconciliacion}'
+            GROUP BY conciliacion_detalle.idviaje_neto, viajesnetos.Code
+            HAVING count(idviaje_neto) > 1"));
+
+        if($duplicidad != []){
+                 // $this->SetWidths(array(.25* $this->WidthTotal,.25 * $this->WidthTotal));
+            $this->SetFont('Arial', '', 30);
+            //$this->SetFont('Arial', 'B', 9.5);
+            //$this->SetStyles(array('DF',  'DF'));
+            /*$this->Cell(0.15 * $this->WidthTotal, 0.45, utf8_decode("EXISTEN VIAJES DUPLICADOS, PARA ELIMINARLOS CIERRE"), '', 0, 'LB');
+            $this->ln(0.5);
+            $this->Cell(0.15 * $this->WidthTotal, 0.45, utf8_decode(" LA CONCILIACIÓN"), '', 0, 'LB');*/
+
+            $this->RotatedText(2,10,utf8_decode("EXISTEN VIAJES DUPLICADOS."),0);
+            $this->RotatedText(2,12,utf8_decode("PARA ELIMINARLOS CIERRE LA"),0);
+            $this->RotatedText(2,14,utf8_decode("CONCILIACIÓN"),0);
+            $this->SetTextColor('0,0,0');
+
+            $this->encola = '';
+            $this->ln(1);
+
+
+
+        }
+        else {
+            if (count($this->conciliacion->conciliacionDetalles) > 0) {
+                $this->items_manuales();
+                $this->items_moviles();
+                $this->Ln(0.75);
+                $this->total();
+            }
             $this->Ln(0.75);
-            $this->total();
-        }
-        $this->Ln(0.75);
-        if($this->conciliacion->es_historico){
-            $this->pagado();
-        }
-        
-        if(count($this->conciliacion->conciliacionDetallesNoConciliados())>0){
-            $this->items_no_conciliados();
+            if ($this->conciliacion->es_historico) {
+                $this->pagado();
+            }
+
+            if (count($this->conciliacion->conciliacionDetallesNoConciliados()) > 0) {
+                $this->items_no_conciliados();
+            }
         }
         $this->Output('I', 'Conciliacion.pdf', 1);
         exit;
