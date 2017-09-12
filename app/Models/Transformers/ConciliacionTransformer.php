@@ -46,17 +46,16 @@ class ConciliacionTransformer extends AbstractTransformer
         $num ="";
         $code ="";
         $duplicados =[];
+        $i = 0;
         foreach ($datos as $d) {
-            $num = $d->num;
-            $code = $d->Code;
-            $duplicados = $d->num==null ? [] :[
-                [
-                'numduplicado' =>$num,
-                'codeduplicado'=>$code
-                ]
-            ];
-        }
+            $duplicados[$i] =[
+                'numduplicado' => $d->num,
+                'codeduplicado'=> $d->Code
+                ];
+            $i++;
 
+        }
+        
         $output = [
             'id'    => $conciliacion->idconciliacion,
             'num_viajes'    => $conciliacion->conciliacionDetalles->where('estado', '=', 1)->count(),
