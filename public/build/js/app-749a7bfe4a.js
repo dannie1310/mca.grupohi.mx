@@ -43324,6 +43324,8 @@ Vue.component('conciliaciones-edit', {
                 'detalles': [],
                 'detalles_nc': []
             },
+            'numduplicado': '',
+            'code': '',
             'form': {
                 'errors': []
             },
@@ -43383,6 +43385,7 @@ Vue.component('conciliaciones-edit', {
 
     created: function created() {
         this.fetchConciliacion();
+        this.duplicados();
     },
 
     computed: {
@@ -43432,13 +43435,14 @@ Vue.component('conciliaciones-edit', {
             this.$http.get(url).then(function (response) {
                 _this.conciliacion = response.body.conciliacion;
                 _this2.fetching = false;
+                _this.code = response.body.Code;
+                _this.numduplicado = response.body.duplicados;
                 _this.fecha_cambio = _this.conciliacion.fecha;
             }, function (error) {
                 _this2.fetching = false;
                 App.setErrorsOnForm(_this.form, error.body);
             });
         },
-
         confirmarRegistro: function confirmarRegistro(e) {
             var _this3 = this;
 
@@ -43672,6 +43676,7 @@ Vue.component('conciliaciones-edit', {
                     if (response.status_code == 201) {
                         if (response.detalles != null) {
                             _this.conciliacion.detalles.push(response.detalles);
+                            _this.duplicado.push(response.duplicados);
 
                             _this.guardando = false;
                             swal({

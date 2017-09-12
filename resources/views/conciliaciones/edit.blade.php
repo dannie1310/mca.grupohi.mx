@@ -185,6 +185,18 @@
                                 </div>
                             </div>
                         </div>
+
+                         <div v-if="conciliacion.numduplicado != 0" class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel panel-heading">
+                                    DETALLES DE VIAJES DUPLICADOS
+                                </div>
+                                <div class="panel-body">
+                                   <strong>Existen los siguientes viajes duplicados: </strong><br>
+                                    <strong>Code : </strong>@{{ conciliacion.code }}<br>
+                                </div>
+                            </div>
+                        </div>
                         <span v-if="conciliacion.estado == -1  || conciliacion.estado == -2">
                             <div class="col-md-6">
                                 <div class="panel panel-default">

@@ -330,7 +330,6 @@ class Conciliacion extends Model
             $repetidos="SELECT count(idviaje_neto) AS CALCULATED_COLUMN1,
                    conciliacion_detalle.idconciliacion_detalle,
                    conciliacion_detalle.idviaje_neto,
-                   conciliacion_detalle.idconciliacion,
                    viajesnetos.Code,
                    group_concat(conciliacion.idconciliacion),
                    group_concat(conciliacion.fecha_conciliacion),
@@ -373,12 +372,6 @@ class Conciliacion extends Model
                             $detalle = ConciliacionDetalle::find($item->idconciliacion_detalle);
                             $detalle->update([
                                 'estado' =>'-1'
-                            ]);
-                            ConciliacionDetalleCancelacion::create([
-                                'idconciliaciondetalle' => $item->idconciliacion_detalle,
-                                'motivo' => 'Viaje Duplicado en la conciliacion',
-                                'fecha_hora_cancelacion' => Carbon::now(),
-                                'idcancelo' => auth()->user()->idusuario
                             ]);
                         }
                     }
