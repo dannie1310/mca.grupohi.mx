@@ -7,41 +7,115 @@
         <li>{!! link_to_route('proyectos', 'Cambiar De Proyecto') !!}</li>
     </ul>
   </li>
-  @if (Auth::user()->can(['control-catalogos']))
+  @if ( Auth::user()->can(['consultar-historico'])
+  || Auth::user()->can(['crear-centroscostos'])
+  || Auth::user()->can(['crear-empresas'])
+  || Auth::user()->can(['crear-etapas'])
+  || Auth::user()->can(['crear-impresoras'])
+  || Auth::user()->can(['crear-marcas'])
+  || Auth::user()->can(['crear-materiales'])
+  || Auth::user()->can(['crear-operadores'])
+  || Auth::user()->can(['crear-origenes'])
+  || Auth::user()->can(['crear-rutas'])
+  || Auth::user()->can(['crear-sindicatos'])
+  || Auth::user()->can(['crear-tarifas-material'])
+  || Auth::user()->can(['crear-telefonos'])
+  || Auth::user()->can(['crear-tiros'])
+  || Auth::user()->can(['desactivar-camiones'])
+  || Auth::user()->can(['desactivar-centroscostos'])
+  || Auth::user()->can(['desactivar-empresas'])
+  || Auth::user()->can(['desactivar-etapas'])
+  || Auth::user()->can(['desactivar-impresoras'])
+  || Auth::user()->can(['desactivar-marcas'])
+  || Auth::user()->can(['desactivar-materiales'])
+  || Auth::user()->can(['desactivar-operadores'])
+  || Auth::user()->can(['desactivar-origenes'])
+  || Auth::user()->can(['desactivar-rutas'])
+  || Auth::user()->can(['desactivar-sindicatos'])
+  || Auth::user()->can(['desactivar-tarifas-material'])
+  || Auth::user()->can(['desactivar-telefonos'])
+  || Auth::user()->can(['desactivar-tiros'])
+  || Auth::user()->can(['editar-camiones'])
+  || Auth::user()->can(['editar-centroscostos'])
+  || Auth::user()->can(['editar-empresas'])
+  || Auth::user()->can(['editar-etapas'])
+  || Auth::user()->can(['editar-impresoras'])
+  || Auth::user()->can(['editar-marcas'])
+  || Auth::user()->can(['editar-materiales'])
+  || Auth::user()->can(['editar-operadores'])
+  || Auth::user()->can(['editar-origenes'])
+  || Auth::user()->can(['editar-rutas'])
+  || Auth::user()->can(['editar-sindicatos'])
+  || Auth::user()->can(['editar-tarifas-material'])
+  || Auth::user()->can(['editar-telefonos'])
+  || Auth::user()->can(['editar-tiros']))
+
   <li class="dropdown">
     <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
         Catálogos <span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-        <li><a href="{{ route('centroscostos.index') }}">Centros De Costo</a></li>
-        <li><a href="{{ route('camiones.index') }}">Camiones</a></li>
-        <li><a href="{{ route('empresas.index') }}">Empresas</a></li>
-        <li><a href="{{ route('etapas.index') }}">Etapas De Proyecto</a></li>
-        <li class="dropdown-submenu">
-            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Factores De Abundamiento</a>
-            <ul class="dropdown-menu">
-                <li><a tabindex="-1" href="{{ route('fda_material.index') }}">Por Material</a></li>
-                <li><a tabindex="-1" href="{{ route('fda_banco_material.index') }}">Por Banco Y Material</a></li>
-            </ul>
-        </li>
-        <li><a href="{{ route('impresoras.index') }}">Impresoras</a></li>
-        <li><a href="{{ route('marcas.index') }}">Marcas</a></li>
-        <li><a href="{{ route('materiales.index') }}">Materiales</a></li>
-        <li><a href="{{ route('operadores.index') }}">Operadores</a></li>
-        <li><a href="{{ route('origenes.index') }}">Origenes</a></li>
-        <li><a href="{{ route('origenes_usuarios.index') }}">Origenes Por Usuario</a></li>
-        <li><a href="{{ route('rutas.index') }}">Rutas</a></li>
-        <li><a href="{{ route('sindicatos.index') }}">Sindicatos</a></li>
-        <li><a href="{{ route('telefonos.index') }}">Teléfonos</a></li>
-        <li><a href="{{ route('tiros.index') }}">Tiros</a></li>
-        <li class="dropdown-submenu">
-            <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Tarifas</a>
-            <ul class="dropdown-menu">
-                <li><a tabindex="-1" href="{{ route('tarifas_material.index') }}">Tarifas Por Material</a></li>
-                <li><a tabindex="-1" href="{{ route('tarifas_peso.index') }}">Tarifas Por Peso</a></li>
-                <li><a tabindex="-1" href="{{ route('tarifas_tiporuta.index') }}">Tarifas Por Tipo De Ruta</a></li>
-            </ul>
-        </li>
+        @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['crear-centroscostos']) || Auth::user()->can(['desactivar-centroscostos']) || Auth::user()->can(['editar-centroscostos']))
+            <li><a href="{{ route('centroscostos.index') }}">Centros De Costo</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['desactivar-camiones']) || Auth::user()->can(['editar-camiones']))
+            <li><a href="{{ route('camiones.index') }}">Camiones</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['crear-empresas']) || Auth::user()->can(['desactivar-empresas']) || Auth::user()->can(['editar-empresas']))
+             <li><a href="{{ route('empresas.index') }}">Empresas</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['crear-etapas'])|| Auth::user()->can(['desactivar-etapas'])|| Auth::user()->can(['editar-etapas']))
+            <li><a href="{{ route('etapas.index') }}">Etapas De Proyecto</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico']))
+            <li class="dropdown-submenu">
+                <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Factores De Abundamiento</a>
+                <ul class="dropdown-menu">
+                    <li><a tabindex="-1" href="{{ route('fda_material.index') }}">Por Material</a></li>
+                    <li><a tabindex="-1" href="{{ route('fda_banco_material.index') }}">Por Banco Y Material</a></li>
+                </ul>
+            </li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['crear-impresoras']) || Auth::user()->can(['desactivar-impresoras']) || Auth::user()->can(['editar-impresoras']))
+            <li><a href="{{ route('impresoras.index') }}">Impresoras</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-marcas'])|| Auth::user()->can(['desactivar-marcas'])|| Auth::user()->can(['editar-marcas']))
+           <li><a href="{{ route('marcas.index') }}">Marcas</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-materiales'])|| Auth::user()->can(['desactivar-materiales'])|| Auth::user()->can(['editar-materiales']))
+            <li><a href="{{ route('materiales.index') }}">Materiales</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-operadores'])|| Auth::user()->can(['desactivar-operadores'])|| Auth::user()->can(['editar-operadores']))
+            <li><a href="{{ route('operadores.index') }}">Operadores</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-origenes'])|| Auth::user()->can(['desactivar-origenes'])|| Auth::user()->can(['editar-origenes']))
+            <li><a href="{{ route('origenes.index') }}">Origenes</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-origenes'])|| Auth::user()->can(['desactivar-origenes'])|| Auth::user()->can(['editar-origenes']))
+            <li><a href="{{ route('origenes_usuarios.index') }}">Origenes Por Usuario</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-rutas'])|| Auth::user()->can(['desactivar-rutas'])|| Auth::user()->can(['editar-rutas']))
+            <li><a href="{{ route('rutas.index') }}">Rutas</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-sindicatos'])|| Auth::user()->can(['desactivar-sindicatos'])|| Auth::user()->can(['editar-sindicatos']))
+            <li><a href="{{ route('sindicatos.index') }}">Sindicatos</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-telefonos'])|| Auth::user()->can(['desactivar-telefonos'])|| Auth::user()->can(['editar-telefonos']))
+            <li><a href="{{ route('telefonos.index') }}">Teléfonos</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-tiros'])|| Auth::user()->can(['desactivar-tiros'])|| Auth::user()->can(['editar-tiros']))
+            <li><a href="{{ route('tiros.index') }}">Tiros</a></li>
+        @endif
+        @if(Auth::user()->can(['consultar-historico'])|| Auth::user()->can(['crear-tarifas-material'])|| Auth::user()->can(['desactivar-tarifas-material'])|| Auth::user()->can(['editar-tarifas-material']))
+            <li class="dropdown-submenu">
+                <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Tarifas</a>
+                <ul class="dropdown-menu">
+                    <li><a tabindex="-1" href="{{ route('tarifas_material.index') }}">Tarifas Por Material</a></li>
+                    <li><a tabindex="-1" href="{{ route('tarifas_peso.index') }}">Tarifas Por Peso</a></li>
+                    <li><a tabindex="-1" href="{{ route('tarifas_tiporuta.index') }}">Tarifas Por Tipo De Ruta</a></li>
+                </ul>
+            </li>
+        @endif
     </ul>
   </li>
   @endif
