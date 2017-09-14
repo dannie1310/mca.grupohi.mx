@@ -67,7 +67,7 @@
         @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['crear-etapas'])|| Auth::user()->can(['desactivar-etapas'])|| Auth::user()->can(['editar-etapas']))
             <li><a href="{{ route('etapas.index') }}">Etapas De Proyecto</a></li>
         @endif
-        @if(Auth::user()->can(['consultar-historico']))
+        @if(Auth::user()->can(['consultar-historico']) || Auth::user()->can(['factores-abundamiento']))
             <li class="dropdown-submenu">
                 <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Factores De Abundamiento</a>
                 <ul class="dropdown-menu">
