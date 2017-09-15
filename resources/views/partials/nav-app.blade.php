@@ -105,7 +105,7 @@
         @if(Auth::user()->can(['consultar-historico'])||  Auth::user()->can(['consultar-origenes'])||  Auth::user()->can(['crear-origenes'])|| Auth::user()->can(['desactivar-origenes'])|| Auth::user()->can(['editar-origenes']))
             <li><a href="{{ route('origenes.index') }}">Origenes</a></li>
         @endif
-        @if(Auth::user()->can(['consultar-historico'])||  Auth::user()->can(['consultar-origenes'])||  Auth::user()->can(['crear-origenes'])|| Auth::user()->can(['desactivar-origenes'])|| Auth::user()->can(['editar-origenes']))
+        @if(Auth::user()->can(['consultar-historico'])||  Auth::user()->can(['consultar-origenes_x_usuario'])||  Auth::user()->can(['crear-origenes_x_usuario'])|| Auth::user()->can(['desactivar-origenes_x_usuario'])|| Auth::user()->can(['editar-origenes_x_usuario']))
             <li><a href="{{ route('origenes_usuarios.index') }}">Origenes Por Usuario</a></li>
         @endif
         @if(Auth::user()->can(['consultar-historico'])||  Auth::user()->can(['consultar-rutas'])||  Auth::user()->can(['crear-rutas'])|| Auth::user()->can(['desactivar-rutas'])|| Auth::user()->can(['editar-rutas']))
