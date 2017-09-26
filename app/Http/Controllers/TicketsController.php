@@ -142,11 +142,11 @@ class TicketsController extends Controller
                 }
 
                 $t = DateTime::createFromFormat("ymdHis", $exp[3]);
-                $fechaS = $t->format("d/m/y");
+                $fechaS = $t->format("Y-m-d");
                 $horaS = $t->format("H:i:s");
 
                 $d = DateTime::createFromFormat("ymdHis", $exp[5]);
-                $fechaL = $d->format("d/m/y");
+                $fechaL = $d->format("Y-m-d");
                 $horaL = $d->format("H:i:s");
 
                // dd("INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].",5)");
