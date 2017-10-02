@@ -140,7 +140,7 @@
             </td>
             <td>
                 {!! Form::open(['route' => ['conciliaciones.destroy', $conciliacion]]) !!}
-                @if($conciliacion->estado == -1 || $conciliacion->estado == -2 || !Auth::user()->can(['cancelar-conciliacion']))
+                @if($conciliacion->estado == -1 || $conciliacion->estado == -2 || $conciliacion->estado == 2 || !Auth::user()->can(['cancelar-conciliacion']))
                     <button disabled class="btn btn-danger btn-xs "><span class="glyphicon glyphicon-remove"></span></button>
                 @else
                     <button class="btn btn-danger btn-xs cancelar_conciliacion"><span class="glyphicon glyphicon-remove"></span></button>
