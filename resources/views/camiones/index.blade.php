@@ -41,7 +41,7 @@
           <td>{{ isset($camion->operador->Nombre) ? $camion->operador->Nombre : 'SIN OPERADOR' }}</td>
           <td>{{ $camion->CubicacionReal}} m<sup>3</sup></td>
           <td>{{ $camion->CubicacionParaPago}} m<sup>3</sup></td>
-            <td>{{ $camion->created_at }}</td>
+            <td>{{ $camion->FechaAlta }} {{ $camion->HoraAlta }}</td>
             <td>{{ $camion->user_registro }}</td>
 
             <td>{{ $camion->present()->estatus }}</td>
