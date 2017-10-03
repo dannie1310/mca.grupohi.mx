@@ -249,14 +249,14 @@
           </ul>
       </li>
   @endif
-  @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema','auditoria-resumen-configuracion']))
+  @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema']))
 
       <li class="dropdown">
           <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
               Administración<span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu">
-              @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema','auditoria-resumen-configuracion']))
+              @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema','auditoria']))
                   <li><a href="{{ route('administracion.roles_permisos') }}">Configuración general</a></li>
               @endif
               <li><a href="{{ route('detalle.configuracion') }}">Detalle configuración</a></li>
