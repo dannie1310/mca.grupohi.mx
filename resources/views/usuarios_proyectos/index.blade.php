@@ -2,9 +2,9 @@
 
 @section('content')
     <h1>USUARIOS ASIGNADOS A PROYECTOS
-
+        @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema']))
         <a href="{{ route('usuario_proyecto.create') }}" class="btn btn-success pull-right" ><i class="fa fa-plus"></i> NUEVA ASIGNACIÓN </a>
-
+        @endif
     </h1>
     {!! Breadcrumbs::render('usuario_proyecto.index') !!}
     <hr>
@@ -47,11 +47,13 @@
                      <td>@if($usuario->estatus==1)<span>Activado</span>@else <span>Desactivado</span> @endif</td>
                      <td style="width: 100px;">
                          <a href="{{ route('usuario_proyecto.show', $usuario->id_usuario) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
-                         <a href="{{ route('usuario_proyecto.edit', $usuario->id_usuario) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-                         @if($usuario->estatus == 1)
-                             <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_usuario({{$usuario->id_usuario}},1)"><i class="fa fa-remove"></i></button>
-                         @else
-                             <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_usuario({{$usuario->id_usuario}},0)"><i class="fa fa-check"></i></button>
+                         @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema']))
+                             <a href="{{ route('usuario_proyecto.edit', $usuario->id_usuario) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
+                             @if($usuario->estatus == 1)
+                                 <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_usuario({{$usuario->id_usuario}},1)"><i class="fa fa-remove"></i></button>
+                             @else
+                                 <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_usuario({{$usuario->id_usuario}},0)"><i class="fa fa-check"></i></button>
+                             @endif
                          @endif
 
 

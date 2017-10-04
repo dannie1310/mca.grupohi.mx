@@ -27,7 +27,7 @@ class UsuarioProyectoController extends Controller
      */
     public function index()
     {
-        if(auth()->user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])) {
+        if(auth()->user()->hasRole(['administrador-permisos','administrador-sistema'])|| auth()->user()->can('consulta-asignacion-proyecto')) {
             $user = auth()->user();
             $isAdmin = $user->hasRole('administrador-sistema');
 

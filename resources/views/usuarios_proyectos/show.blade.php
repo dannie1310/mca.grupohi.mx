@@ -1,7 +1,9 @@
 @extends('layout')
 @section('content')
     <h1>DETALLE DE USUARIO A PROYECTO</h1>
+    @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema']))
     <a href="{{ route('usuario_proyecto.edit', $usuario[0]->id_usuario) }}" class="btn btn-info pull-right"><i class="fa fa-edit"></i> Editar</a>
+    @endif
     </h1>
     {!! Breadcrumbs::render('usuario_proyecto.show', $usuario[0]->id_usuario) !!}
     <hr>
