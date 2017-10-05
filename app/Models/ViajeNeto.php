@@ -154,11 +154,8 @@ class ViajeNeto extends Model
                 foreach ($data as $key => $estatus) {
                     $viaje = ViajeNeto::findOrFail($key);
                     $viaje->Estatus = $estatus;
-                    $fecha =Carbon::createFromFormat('Y-m-d', $viaje->FechaLlegada);
-
-                    $s = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
-
-                    if ($s[0]->existe == 0) {
+                    $s = ViajeNeto::validandoCierre($viaje->FechaLlegada);
+                    if ($s == 0) {
                         if ($estatus == '22') {
                             $viaje->Rechazo = auth()->user()->idusuario;
                             $viaje->FechaHoraRechazo = Carbon::now()->toDateTimeString();
@@ -225,11 +222,9 @@ class ViajeNeto extends Model
                     $fecha_salida = Carbon::createFromFormat('Y-m-d H:i', $viaje['FechaLlegada'] . ' ' . $viaje['HoraLlegada'])
                         ->subMinutes($ruta->cronometria->TiempoMinimo);
 
-                    $s = DB::connection('sca')->select(DB::raw("
-                        SELECT COUNT(*) as existe FROM cierres_periodo
-                        where mes = '{$fecha_salida->month}' and anio = '{$fecha_salida->year}'"));
+                    $s = ViajeNeto::validandoCierre($viaje['FechaLlegada']);
 
-                    if ($s[0]->existe == 0) {
+                    if ($s == 0) {
                         $proyecto_local = ProyectoLocal::where('IdProyectoGlobal', '=', $request->session()->get('id'))->first();
                         $extra = [
                             'FechaCarga' => Carbon::now()->toDateString(),
@@ -1034,5 +1029,14 @@ class ViajeNeto extends Model
                 DB::raw("CONCAT(viajesnetos.FechaCarga, ' ', viajesnetos.HoraCarga) as fecha_hora_carga")
             )
             ->groupBy('viajesnetos.IdViajeNeto');
+    }
+
+
+    public static function validandoCierre($FechaLlegada){
+        $fecha = Carbon::createFromFormat('Y-m-d', $FechaLlegada);
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+
+        return $cierres[0]->existe;
+
     }
 }
