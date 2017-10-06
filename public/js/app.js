@@ -43243,8 +43243,9 @@ require('./vue-components/corte-edit');
 require('./vue-components/configuracion-diaria');
 require('./vue-components/roles-permisos');
 require('./vue-components/tickets-validar');
+require('./vue-components/periodocierre-administracion');
 
-},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/configuracion-diaria":41,"./vue-components/corte-create":42,"./vue-components/corte-edit":43,"./vue-components/errors":44,"./vue-components/fda-bancomaterial":45,"./vue-components/fda-material":46,"./vue-components/global-errors":47,"./vue-components/origenes-usuarios":48,"./vue-components/roles-permisos":49,"./vue-components/tickets-validar":53,"./vue-components/viajes-completa":54,"./vue-components/viajes-index":55,"./vue-components/viajes-manual":56,"./vue-components/viajes-modificar":57,"./vue-components/viajes-revertir":58,"./vue-components/viajes-validar":59}],39:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/configuracion-diaria":41,"./vue-components/corte-create":42,"./vue-components/corte-edit":43,"./vue-components/errors":44,"./vue-components/fda-bancomaterial":45,"./vue-components/fda-material":46,"./vue-components/global-errors":47,"./vue-components/origenes-usuarios":48,"./vue-components/periodocierre-administracion":49,"./vue-components/roles-permisos":50,"./vue-components/tickets-validar":54,"./vue-components/viajes-completa":55,"./vue-components/viajes-index":56,"./vue-components/viajes-manual":57,"./vue-components/viajes-modificar":58,"./vue-components/viajes-revertir":59,"./vue-components/viajes-validar":60}],39:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -43324,8 +43325,6 @@ Vue.component('conciliaciones-edit', {
                 'detalles': [],
                 'detalles_nc': []
             },
-            'numduplicado': '',
-            'code': '',
             'form': {
                 'errors': []
             },
@@ -43385,7 +43384,6 @@ Vue.component('conciliaciones-edit', {
 
     created: function created() {
         this.fetchConciliacion();
-        this.duplicados();
     },
 
     computed: {
@@ -43435,14 +43433,13 @@ Vue.component('conciliaciones-edit', {
             this.$http.get(url).then(function (response) {
                 _this.conciliacion = response.body.conciliacion;
                 _this2.fetching = false;
-                _this.code = response.body.Code;
-                _this.numduplicado = response.body.duplicados;
                 _this.fecha_cambio = _this.conciliacion.fecha;
             }, function (error) {
                 _this2.fetching = false;
                 App.setErrorsOnForm(_this.form, error.body);
             });
         },
+
         confirmarRegistro: function confirmarRegistro(e) {
             var _this3 = this;
 
@@ -43676,7 +43673,6 @@ Vue.component('conciliaciones-edit', {
                     if (response.status_code == 201) {
                         if (response.detalles != null) {
                             _this.conciliacion.detalles.push(response.detalles);
-                            _this.duplicado.push(response.duplicados);
 
                             _this.guardando = false;
                             swal({
@@ -44912,7 +44908,7 @@ Vue.component('app-errors', {
     template: require('./templates/errors.html')
 });
 
-},{"./templates/errors.html":50}],45:[function(require,module,exports){
+},{"./templates/errors.html":51}],45:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-bancomaterial', {
@@ -45133,7 +45129,7 @@ Vue.component('global-errors', {
   }
 });
 
-},{"./templates/global-errors.html":51}],48:[function(require,module,exports){
+},{"./templates/global-errors.html":52}],48:[function(require,module,exports){
 'use strict';
 
 Vue.component('origenes-usuarios', {
@@ -45208,7 +45204,73 @@ Vue.component('origenes-usuarios', {
     }
 });
 
-},{"./templates/origenes-usuarios.html":52}],49:[function(require,module,exports){
+},{"./templates/origenes-usuarios.html":53}],49:[function(require,module,exports){
+'use strict';
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Created by DBENITEZ on 05/10/2017.
+ */
+Vue.component('periodocierre-administracion', {
+    data: function data() {
+        return {
+            usuarios: [],
+            cierres_periodo: [],
+
+            selected_usuario_id: '',
+            selected_usuario: {},
+            cargando: false,
+            guardando: false,
+            form: {
+                errors: []
+            }
+        };
+    },
+    created: function created() {
+        this.init();
+    },
+    methods: _defineProperty({
+        init: function init() {
+            var url = App.host + '/administracion/cierre_usuario_configuracion/cierre_periodo/init';
+            var _this = this;
+            $.ajax({
+                type: 'GET',
+                url: url,
+                beforeSend: function beforeSend() {
+                    _this.cargando = true;
+                },
+                success: function success(response) {
+                    _this.usuarios = response.usuarios;
+                    _this.cierres_periodo = response.cierres;
+                },
+                error: function error(_error) {
+                    if (_error.status == 422) {
+                        App.setErrorsOnForm(_this.form, _error.responseJSON);
+                    } else if (_error.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error.responseText)
+                        });
+                    }
+                },
+                complete: function complete() {
+                    _this.cargando = false;
+                }
+            });
+        },
+        select_usuario: function select_usuario() {
+            var indice = $("#rol").prop('selectedIndex');
+        }
+    }, 'select_usuario', function select_usuario() {
+
+        var indice = $("#selUser").prop('selectedIndex');
+    })
+
+});
+
+},{}],50:[function(require,module,exports){
 'use strict';
 
 Vue.component('roles-permisos', {
@@ -45394,25 +45456,6 @@ Vue.component('roles-permisos', {
                 });
             } else {
                 Vue.set(this, 'selected_rol', {});
-            }
-        },
-        select_usuario: function select_usuario() {
-
-            var indice = $("#selUser").prop('selectedIndex');
-
-            $("#leftPermisoValues").empty();
-            $("#rightPermisoValues").empty();
-
-            if (this.selected_usuario_id) {
-                Vue.set(this, 'selected_usuario', this.usuarios[indice - 1]);
-                this.rolesDisponibles.forEach(function (roles) {
-                    $("#leftPermisoValues").append("<option id='" + roles.id + "' value='" + roles.id + "'>" + roles.display_name + "</option>");
-                });
-                this.selected_usuario.roles.forEach(function (roles) {
-                    $("#rightPermisoValues").append("<option id='" + roles.id + "' value='" + roles.id + "'>" + roles.display_name + "</option>");
-                });
-            } else {
-                Vue.set(this, 'selected_usuario', {});
             }
         },
 
@@ -45702,13 +45745,13 @@ Vue.component('roles-permisos', {
     }
 });
 
-},{}],50:[function(require,module,exports){
-module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],51:[function(require,module,exports){
-module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
+module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],52:[function(require,module,exports){
-module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
 },{}],53:[function(require,module,exports){
+module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+},{}],54:[function(require,module,exports){
 'use strict';
 
 Vue.component('tickets-validar', {
@@ -45762,7 +45805,7 @@ Vue.component('tickets-validar', {
 
 });
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 function timeStamp(type) {
@@ -45982,7 +46025,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-index', {
@@ -46247,7 +46290,7 @@ Vue.component('viajes-index', {
     }
 });
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -46431,7 +46474,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -46605,7 +46648,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -46746,7 +46789,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 // register modal component

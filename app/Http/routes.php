@@ -214,6 +214,9 @@ Route::resource('user.roles', 'UserRolesController');
 //Rutas de Administración
 Route::group(['prefix' => 'administracion', 'middleware' => ['ability:administrador-sistema|administrador-permisos,auditoria-resumen-configuracion|consulta-asignacion-proyecto']], function () {
     Route::get('roles_permisos', 'RolesPermisosController@roles_permisos')->name('administracion.roles_permisos');
+    Route::get('cierre_usuario_configuracion/cierre_periodo','AdministracionCierrePeriodoController@index')->name('validar-cierre-periodo.configuracion');
+    Route::get('cierre_usuario_configuracion/cierre_periodo/init','AdministracionCierrePeriodoController@init');
+    Route::get('cierre_usuario_configuracion/cierre_periodo_save', 'AdministracionCierrePeriodoController@cierre_store')->name('cierre_usuario.store');
     Route::get('roles_permisos/init', 'RolesPermisosController@init');
     Route::post('roles_permisos/roles', 'RolesPermisosController@roles_store')->name('roles.store');
     Route::post('roles_permisos/permisos', 'RolesPermisosController@permisos_store')->name('permisos.store');

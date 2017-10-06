@@ -16,3 +16,4 @@ require('./vue-components/corte-edit');
 require('./vue-components/configuracion-diaria');
 require('./vue-components/roles-permisos');
 require('./vue-components/tickets-validar');
+require('./vue-components/periodocierre-administracion');

@@ -190,25 +190,7 @@ Vue.component('roles-permisos', {
                 Vue.set(this, 'selected_rol', {});
             }
         },
-        select_usuario: function () {
 
-            var indice=$("#selUser").prop('selectedIndex');
-
-            $("#leftPermisoValues").empty();
-            $("#rightPermisoValues").empty();
-
-            if(this.selected_usuario_id) {
-                Vue.set(this, 'selected_usuario', this.usuarios[indice-1]);
-                this.rolesDisponibles.forEach(function (roles) {
-                    $("#leftPermisoValues").append("<option id='"+roles.id+"' value='"+roles.id+"'>"+roles.display_name+"</option>");
-                });
-                this.selected_usuario.roles.forEach(function (roles) {
-                    $("#rightPermisoValues").append("<option id='"+roles.id+"' value='"+roles.id+"'>"+roles.display_name+"</option>");
-                });
-            } else {
-                Vue.set(this, 'selected_usuario', {});
-            }
-        },
 
         stop_propagation: function (e) {
             e.stopPropagation();
