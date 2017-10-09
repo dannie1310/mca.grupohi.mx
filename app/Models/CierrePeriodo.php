@@ -15,12 +15,13 @@ class CierrePeriodo extends Model
 
     public $timestamps = false;
 
-    public static function cierres(){
+    public static function cierres()
+    {
         $cierres = CierrePeriodo::orderBy('idcierre')->get();
 
-        foreach ($cierres as $cierre){
+        foreach ($cierres as $cierre) {
 
-            $extra []= [
+            $extra [] = [
                 'idcierre' => $cierre->idcierre,
                 'mes' => $cierre->mes,
                 'mesNombre' => self::nombreMeses($cierre->mes),
@@ -31,44 +32,45 @@ class CierrePeriodo extends Model
         return $extra;
     }
 
-    public static function nombreMeses($mes){
+    public static function nombreMeses($mes)
+    {
 
-        switch ($mes){
+        switch ($mes) {
             case 1:
-                $nombre='Enero';
+                $nombre = 'Enero';
                 break;
             case 2:
-                $nombre='Febrero';
+                $nombre = 'Febrero';
                 break;
             case 3:
-                $nombre='Marzo';
+                $nombre = 'Marzo';
                 break;
             case 4:
-                $nombre='Abril';
+                $nombre = 'Abril';
                 break;
             case 5:
-                $nombre='Mayo';
+                $nombre = 'Mayo';
                 break;
             case 6:
-                $nombre='Junio';
+                $nombre = 'Junio';
                 break;
             case 7:
-                $nombre='Julio';
+                $nombre = 'Julio';
                 break;
             case 8:
-                $nombre='Agosto';
+                $nombre = 'Agosto';
                 break;
             case 9:
-                $nombre='Septiembre';
+                $nombre = 'Septiembre';
                 break;
             case 10:
-                $nombre='Octubre';
+                $nombre = 'Octubre';
                 break;
             case 11:
-                $nombre='Noviembre';
+                $nombre = 'Noviembre';
                 break;
             case 12:
-                $nombre='Diciembre';
+                $nombre = 'Diciembre';
                 break;
         }
         return $nombre;

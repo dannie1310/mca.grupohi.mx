@@ -5,12 +5,12 @@ namespace App\Models;
 use App\Models\Cortes\CorteCambio;
 use App\Models\Cortes\CorteDetalle;
 use App\User;
+use Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Conciliacion\ConciliacionDetalle;
-use Conflictos\ConflictoEntreViajesDetalle;
 use App\Models\Conflictos\ViajeNetoConflictoPagable;
 use App\Models\FolioValeManual;
 use Jenssegers\Date\Date;
@@ -1033,10 +1033,27 @@ class ViajeNeto extends Model
 
 
     public static function validandoCierre($FechaLlegada){
+        /* Bloqueo de cierre de periodo
+            1 : Cierre de periodo
+            0 : Periodo abierto.
+        */
         $fecha = Carbon::createFromFormat('Y-m-d', $FechaLlegada);
         $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
 
-        return $cierres[0]->existe;
+        $validarUss=ValidacionCierrePeriodo::usuario_cierres(Auth::user()->idusuario,$fecha->month,$fecha->year);
+
+        if($cierres[0]->existe == 1) {
+            if ($validarUss == NULL) {
+                $datos = 1;
+            }else {
+                $datos = 0;
+            }
+        }else{
+            $datos = $cierres[0]->existe;
+        }
+
+        return $datos;
+
 
     }
 }

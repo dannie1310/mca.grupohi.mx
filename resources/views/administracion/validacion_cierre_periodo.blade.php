@@ -45,7 +45,21 @@
                                     </div>
                                 </div>
 
-
+                                <div class="row">
+                                    <h4><label style="cursor: pointer">Selecciona el periodo</label></h4>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>FECHA INICIAL</label>
+                                            <input type="text" name="FechaInicial" class="form-control" v-datepicker>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>FECHA FINAL </label>
+                                            <input type="text" name="FechaFinal" class="form-control" v-datepicker>
+                                        </div>
+                                    </div>
+                                </div>
 
                         </div>
                     </div>
