@@ -216,7 +216,7 @@ Route::group(['prefix' => 'administracion', 'middleware' => ['ability:administra
     Route::get('roles_permisos', 'RolesPermisosController@roles_permisos')->name('administracion.roles_permisos');
     Route::get('cierre_usuario_configuracion/cierre_periodo','AdministracionCierrePeriodoController@index')->name('validar-cierre-periodo.configuracion');
     Route::get('cierre_usuario_configuracion/cierre_periodo/init','AdministracionCierrePeriodoController@init');
-    Route::get('cierre_usuario_configuracion/cierre_periodo_save', 'AdministracionCierrePeriodoController@cierre_store')->name('cierre_usuario.store');
+    Route::post('cierre_usuario_configuracion/cierre_periodo/save', 'AdministracionCierrePeriodoController@save')->name('cierre.save');
     Route::get('roles_permisos/init', 'RolesPermisosController@init');
     Route::post('roles_permisos/roles', 'RolesPermisosController@roles_store')->name('roles.store');
     Route::post('roles_permisos/permisos', 'RolesPermisosController@permisos_store')->name('permisos.store');

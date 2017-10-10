@@ -45207,8 +45207,6 @@ Vue.component('origenes-usuarios', {
 },{"./templates/origenes-usuarios.html":53}],49:[function(require,module,exports){
 'use strict';
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 /**
  * Created by DBENITEZ on 05/10/2017.
  */
@@ -45230,7 +45228,22 @@ Vue.component('periodocierre-administracion', {
     created: function created() {
         this.init();
     },
-    methods: _defineProperty({
+    directives: {
+        datepicker: {
+            inserted: function inserted(el) {
+                $(el).datepicker({
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true,
+                    clearBtn: true,
+                    todayHighlight: true,
+                    endDate: '0d'
+                });
+                $(el).val(App.timeStamp(1));
+            }
+        }
+    },
+    methods: {
         init: function init() {
             var url = App.host + '/administracion/cierre_usuario_configuracion/cierre_periodo/init';
             var _this = this;
@@ -45262,11 +45275,51 @@ Vue.component('periodocierre-administracion', {
         },
         select_usuario: function select_usuario() {
             var indice = $("#rol").prop('selectedIndex');
-        }
-    }, 'select_usuario', function select_usuario() {
+        },
+        add_permiso_click: function add_permiso_click(e) {
 
-        var indice = $("#selUser").prop('selectedIndex');
-    })
+            e.preventDefault();
+
+            var _this = this;
+            var form = $('#cierre_form');
+            var url = form.attr('action');
+            var type = form.attr('method');
+            var idsSeleccionados = [];
+            $("#seleccionValues option").each(function (index) {
+                idsSeleccionados.push(this.id);
+            });
+            $.ajax({
+                type: type,
+                url: url,
+                data: {
+                    'permisos_cierre': idsSeleccionados,
+                    'usuario': $('#selUser').val()
+                },
+                beforeSend: function beforeSend() {
+                    _this.guardando = true;
+                },
+                success: function success(response) {
+                    _this.roles.push(response.rol);
+                    $("#cierre_form")[0].reset();
+                    swal("Correcto!", "Se ha creado correctamente tu rol.", "success");
+                },
+                error: function error(_error2) {
+                    if (_error2.status == 422) {
+                        App.setErrorsOnForm(_this.form, _error2.responseJSON);
+                    } else if (_error2.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error2.responseText)
+                        });
+                    }
+                },
+                complete: function complete() {
+                    _this.guardando = false;
+                }
+            });
+        }
+    }
 
 });
 
@@ -45456,6 +45509,25 @@ Vue.component('roles-permisos', {
                 });
             } else {
                 Vue.set(this, 'selected_rol', {});
+            }
+        },
+        select_usuario: function select_usuario() {
+
+            var indice = $("#selUser").prop('selectedIndex');
+
+            $("#leftPermisoValues").empty();
+            $("#rightPermisoValues").empty();
+
+            if (this.selected_usuario_id) {
+                Vue.set(this, 'selected_usuario', this.usuarios[indice - 1]);
+                this.rolesDisponibles.forEach(function (roles) {
+                    $("#leftPermisoValues").append("<option id='" + roles.id + "' value='" + roles.id + "'>" + roles.display_name + "</option>");
+                });
+                this.selected_usuario.roles.forEach(function (roles) {
+                    $("#rightPermisoValues").append("<option id='" + roles.id + "' value='" + roles.id + "'>" + roles.display_name + "</option>");
+                });
+            } else {
+                Vue.set(this, 'selected_usuario', {});
             }
         },
 

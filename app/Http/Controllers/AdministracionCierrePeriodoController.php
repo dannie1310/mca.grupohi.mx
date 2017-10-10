@@ -112,4 +112,11 @@ class AdministracionCierrePeriodoController extends Controller
         //
     }
 
+    public function save(Request $request)
+    {
+        //
+        dd($request->permisos_cierre);
+    }
+
+
 }

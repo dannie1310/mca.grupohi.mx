@@ -28,7 +28,16 @@ class ValidacionCierrePeriodo extends Model
         return $this->hasMany(CierrePeriodo::class, "idcierre", "idcierre_periodo");
     }
 
-    public static function usuario_cierres($id, $mes, $anio){
+    public static function usuario_cierres($id){
+
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT * FROM validacion_x_cierre_periodo vcp
+                                                            inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
+                                                            where vcp.idusuario = {$id} and now() between fecha_inicio and fecha_fin;"));
+
+        return $cierres;
+
+    }
+    public static function permiso_usuario($id, $mes, $anio){
 
         $cierres = DB::connection('sca')->select(DB::raw("SELECT * FROM validacion_x_cierre_periodo vcp
                                                             inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
