@@ -21,7 +21,7 @@
                                                 <div class="form-group">
                                                     <label class="control-label col-sm-5" >Seleccione Usuario:</label>
                                                     <div class="col-sm-12">
-                                                        <select class="input form-control" v-on:change="select_usuario" v-model="selected_usuario_id" id="usuario">
+                                                        <select class="input form-control" id="selUser"  v-on:change="select_usuario" v-model="selected_usuario_id" id="usuario">
                                                             <option value="">[--Seleccione--]</option>
                                                             <option v-for="usuario in usuarios" v-bind:value="usuario.id">@{{ usuario.nombre }}</option>
                                                         </select>
@@ -39,32 +39,49 @@
                                         <div class="row">
                                             <div  class="col-sm-10">
                                                 <center><b>Habilitar Periodos Cerrados</b></center>
-                                                <select id="seleccionValues" size="20" class="form-control"   multiple>
-                                                    <option v-for="cierre in cierres_periodo" v-bind:id="cierre.idcierre" v-bind:value="cierre.idcierre">@{{ cierre.mesNombre }} @{{ cierre.anio }}</option>
+                                                <select id="seleccionValues" size="20" class="form-control" v-model="select" multiple>
+                                                    <option v-for="cierre in cierres_periodo"  v-bind:value="cierre.idcierre">@{{ cierre.mesNombre }} @{{ cierre.anio }}</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="row">
-                                            <h4><label style="cursor: pointer">Selecciona el periodo</label></h4>
+                                            <h4><label style="cursor: pointer">Selecciona la Fecha Inicial</label></h4>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>FECHA INICIAL</label>
-                                                    <input type="text" name="FechaInicial" class="form-control" v-datepicker>
+                                                    <label>FECHA</label>
+                                                    <input type="text" id="FechaInicial"  name="FechaInicial" class="form-control" v-datepicker>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>FECHA FINAL </label>
-                                                    <input type="text" name="FechaFinal" class="form-control" v-datepicker>
+                                                    <label>HORA </label>
+                                                    <input type="text" id="HoraInicial" name="HoraInicial" class="form-control" v-timepicker>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <h4><label style="cursor: pointer">Selecciona la Fecha Final</label></h4>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>FECHA FINAL</label>
+                                                    <input type="text" id="FechaFinal"  name="FechaFinal" class="form-control" v-datepicker>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>HORA FINAL </label>
+                                                    <input type="text" id="HoraFinal" name="HoraFinal" class="form-control" v-timepicker>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-success"  v-on:click="add_permiso_click">Agregar </button>
+                                            <button type="button" class="btn btn-success"  id="btnCierre" :disabled="guardando"   v-on:click="add_permiso_click">Agregar </button>
                                         </div>
                                     </div>
                                 </div>

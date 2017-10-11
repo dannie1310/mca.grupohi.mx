@@ -12,7 +12,7 @@ class ValidacionCierrePeriodo extends Model
     use \Laracasts\Presenter\PresentableTrait;
 
     protected $connection = 'sca';
-    protected $table = 'validacion_x_cierre_periodo;';
+    protected $table = 'validacion_x_cierre_periodo';
     protected $primaryKey = 'id';
     protected $fillable = [
         'idusuario',

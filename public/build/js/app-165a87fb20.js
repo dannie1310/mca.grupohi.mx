@@ -45215,7 +45215,7 @@ Vue.component('periodocierre-administracion', {
         return {
             usuarios: [],
             cierres_periodo: [],
-
+            select: [],
             selected_usuario_id: '',
             selected_usuario: {},
             cargando: false,
@@ -45234,15 +45234,23 @@ Vue.component('periodocierre-administracion', {
                 $(el).datepicker({
                     format: 'yyyy-mm-dd',
                     language: 'es',
-                    autoclose: true,
-                    clearBtn: true,
-                    todayHighlight: true,
-                    endDate: '0d'
+                    autoclose: true
                 });
                 $(el).val(App.timeStamp(1));
             }
+        },
+        timepicker: {
+            inserted: function inserted(el) {
+                $(el).timepicker({
+                    format: 'HH:mm:ss',
+                    language: 'es',
+                    autoclose: true
+                });
+                $(el).val('12:00:00');
+            }
         }
     },
+    computed: {},
     methods: {
         init: function init() {
             var url = App.host + '/administracion/cierre_usuario_configuracion/cierre_periodo/init';
@@ -45275,33 +45283,36 @@ Vue.component('periodocierre-administracion', {
         },
         select_usuario: function select_usuario() {
             var indice = $("#rol").prop('selectedIndex');
+            if (this.selected_usuario_id) {
+                Vue.set(this, 'selected_usuario', this.usuarios[indice - 1]);
+            } else {
+                Vue.set(this, 'selected_usuario', {});
+            }
         },
         add_permiso_click: function add_permiso_click(e) {
-
             e.preventDefault();
 
             var _this = this;
             var form = $('#cierre_form');
             var url = form.attr('action');
             var type = form.attr('method');
-            var idsSeleccionados = [];
-            $("#seleccionValues option").each(function (index) {
-                idsSeleccionados.push(this.id);
-            });
             $.ajax({
                 type: type,
                 url: url,
                 data: {
-                    'permisos_cierre': idsSeleccionados,
-                    'usuario': $('#selUser').val()
+                    'cierresSelect': _this.select,
+                    'usuario': $('#selUser').val(),
+                    'fecha_inicial': $('#FechaInicial').val(),
+                    'fecha_final': $('#FechaFinal').val()
                 },
                 beforeSend: function beforeSend() {
                     _this.guardando = true;
+                    $("#btnCierre").prop("disabled", true);
                 },
                 success: function success(response) {
-                    _this.roles.push(response.rol);
-                    $("#cierre_form")[0].reset();
-                    swal("Correcto!", "Se ha creado correctamente tu rol.", "success");
+                    _this.usuarios = response.usuarios;
+                    _this.cierres_periodo = response.cierres;
+                    swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
                 },
                 error: function error(_error2) {
                     if (_error2.status == 422) {
@@ -45316,6 +45327,7 @@ Vue.component('periodocierre-administracion', {
                 },
                 complete: function complete() {
                     _this.guardando = false;
+                    $("#btnCierre").prop("disabled", false);
                 }
             });
         }

@@ -9,6 +9,7 @@ use App\User;
 use App\User_1;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class AdministracionCierrePeriodoController extends Controller
 {
@@ -115,7 +116,40 @@ class AdministracionCierrePeriodoController extends Controller
     public function save(Request $request)
     {
         //
-        dd($request->permisos_cierre);
+     // dd($request->usuario,$request->cierresSelect);
+        $this->validate($request, [
+            'usuario' => 'required|string',
+            'fecha_inicio' => 'required|date_format:"Y-m-d',
+            'fecha_final'=>'required|date_format:"Y-m-d'
+        ], [
+            'usuario' => 'Debe seleccionar un usuario',
+            'fecha_inicio' => 'Debe seleccionar una fecha de inicio valida'. $request->fecha_inicio,
+            'fecha_final' => 'Debe seleccionar una fecha final valida'. $request->fecha_final,
+        ]);
+        foreach ($request->cierresSelect as $cierre) {
+            //dd($cierre, $usuario);
+            DB::connection('sca')
+                ->table('validacion_x_cierre_periodo')
+                ->insert(
+                    [
+                        'idusuario' => $request->usuario,
+                        'fecha_inicio' => $request->fecha_inicial,
+                        'fecha_fin'=> $request->fecha_final,
+                        'usuario_registro' => '3250',
+                        'idcierre_periodo' => $cierre
+                    ]
+                );
+
+        }
+
+        $usuarios=User_1::with('roles')->habilitados()->orderBy('nombre')->orderBy('apaterno')->orderBy('amaterno')->get();
+        $cierres= CierrePeriodo::cierres();
+        $data = [
+            'usuarios'=>UsuarioCierresPeriodoTransformers::transform($usuarios),
+            'cierres'=>$cierres
+        ];
+
+        return response()->json($data);
     }
 
 
