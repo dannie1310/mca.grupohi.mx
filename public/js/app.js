@@ -45234,7 +45234,8 @@ Vue.component('periodocierre-administracion', {
                 $(el).datepicker({
                     format: 'yyyy-mm-dd',
                     language: 'es',
-                    autoclose: true
+                    autoclose: true,
+                    startDate: '0d'
                 });
                 $(el).val(App.timeStamp(1));
             }
@@ -45242,11 +45243,11 @@ Vue.component('periodocierre-administracion', {
         timepicker: {
             inserted: function inserted(el) {
                 $(el).timepicker({
-                    format: 'HH:mm:ss',
+                    format: 'HH:mm',
                     language: 'es',
                     autoclose: true
                 });
-                $(el).val('12:00:00');
+                $(el).val(App.timeStamp(2));
             }
         }
     },
@@ -45303,7 +45304,9 @@ Vue.component('periodocierre-administracion', {
                     'cierresSelect': _this.select,
                     'usuario': $('#selUser').val(),
                     'fecha_inicial': $('#FechaInicial').val(),
-                    'fecha_final': $('#FechaFinal').val()
+                    'hora_inicial': $('#HoraInicial').val(),
+                    'fecha_final': $('#FechaFinal').val(),
+                    'hora_final': $('#HoraFinal').val()
                 },
                 beforeSend: function beforeSend() {
                     _this.guardando = true;
