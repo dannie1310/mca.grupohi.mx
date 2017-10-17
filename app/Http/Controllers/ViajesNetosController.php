@@ -623,7 +623,7 @@ class ViajesNetosController extends Controller
                 return view('viajes_netos.edit')
                     ->withSindicatos(Sindicato::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdSindicato'))
                     ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
-                    ->withCierre(CierrePeriodo::query()->get())
+                    ->withCierre(CierrePeriodo::cierresPeriodos())
                     ->withAction('validar');
             }
                 else{

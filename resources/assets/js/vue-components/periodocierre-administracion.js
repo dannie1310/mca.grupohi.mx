@@ -108,6 +108,7 @@ Vue.component('periodocierre-administracion',{
                 success: function (response) {
                     _this.usuarios = response.usuarios;
                     _this.cierres_periodo = response.cierres;
+
                     swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
                 },
                 error: function (error) {

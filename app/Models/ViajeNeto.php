@@ -1041,14 +1041,14 @@ class ViajeNeto extends Model
         $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
         $validarUss=ValidacionCierrePeriodo::permiso_usuario(Auth::user()->idusuario,$fecha->month,$fecha->year);
 
-        if($cierres[0]->existe == 1) {
+        if($cierres[0]->existe != 0) {
             if ($validarUss == NULL) {
                 $datos = 1;
             }else {
                 $datos = 0;
             }
         }else{
-            $datos = $cierres[0]->existe;
+            $datos = 0;
         }
 
         return $datos;

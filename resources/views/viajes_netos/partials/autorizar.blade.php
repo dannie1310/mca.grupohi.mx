@@ -34,8 +34,7 @@
                     <td>{{ $viaje->Observaciones }}</td>
 
                 @foreach($cierre as $item)
-
-                        @if($item->mes == $fecha->month && $item->anio == $fecha->year && $cierres->mes==$item->mes && $item->anio == $cierres->anio)
+                        @if($item['mes'] == $fecha->month && $item['anio'] == $fecha->year)
                                 <?php $find++; ?>
                         @endif
                 @endforeach

@@ -85,24 +85,17 @@ class CierrePeriodo extends Model
        */
 
         $cierres = DB::connection('sca')->select(DB::raw("SELECT * FROM cierres_periodo"));
-        $validarUss=ValidacionCierrePeriodo::usuario_cierres(Auth::user()->idusuario);
         $extra=[];
-        $permisos=[];
-        foreach ($cierres as $c){
-            foreach ($validarUss as $valida){
-                if($c->mes == $valida->mes && $c->anio == $valida->anio){
-                    $permisos [] = [
-                        'idcierre' => $c->idcierre,
-                        'mes' => $c->mes,
-                        'anio' => $c->anio
-                    ];
-                }else{
-                    $extra [] = [
-                        'idcierre' => $c->idcierre,
-                        'mes' => $c->mes,
-                        'anio' => $c->anio
-                    ];
-                }
+
+        foreach ($cierres as $c) {
+            $a = ValidacionCierrePeriodo::cierreUsuario(Auth::user()->idusuario, $c->mes, $c->anio);
+
+            if ($a == 0) {
+                $extra [] = [
+                    'idcierre' => $c->idcierre,
+                    'mes' => $c->mes,
+                    'anio' => $c->anio
+                ];
             }
         }
         return $extra;
