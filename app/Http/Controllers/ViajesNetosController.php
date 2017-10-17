@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CierrePeriodo;
 use App\Models\MotivoCargaManual;
 use App\Models\Transformers\ViajeNetoTransformer;
+use App\Models\ValidacionCierrePeriodo;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -21,6 +22,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
 use Zizaco\Entrust\Entrust;
+use Auth;
 
 class ViajesNetosController extends Controller
 {
@@ -633,7 +635,7 @@ class ViajesNetosController extends Controller
 
                 return view('viajes_netos.edit')
                     ->withViajes(ViajeNeto::registradosManualmente()->get())
-                    ->withCierre(CierrePeriodo::query()->get())
+                    ->withCierre(CierrePeriodo::cierresPeriodos())
                     ->withAction('autorizar');
             }else{
                 Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');

@@ -249,7 +249,7 @@
           </ul>
       </li>
   @endif
-  @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])|| Auth::user()->can('auditoria-resumen-configuracion'))
+  @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])|| Auth::user()->can(['auditoria-resumen-configuracion','permisos_cierre_x_periodo']))
 
       <li class="dropdown">
           <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
@@ -259,7 +259,9 @@
               @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema','auditoria'])|| Auth::user()->can('auditoria-resumen-configuracion'))
                   <li><a href="{{ route('administracion.roles_permisos') }}">Configuración general</a></li>
               @endif
-              <li><a href="{{ route('validar-cierre-periodo.configuracion') }}">Validación de Periodo Cerrado por Usuario</a></li>
+              @if(Auth::user()->hasRole(['administrador-sistema'])||Auth::user()->can('permisos_cierre_x_periodo'))
+                  <li><a href="{{ route('validar-cierre-periodo.configuracion') }}">Validación de Periodo Cerrado por Usuario</a></li>
+              @endif
               <li><a href="{{ route('detalle.configuracion') }}">Detalle configuración</a></li>
           <!-- <li><a href="{{ route('usuarios_sistema.index') }}">Alta de usuarios</a></li> -->
               @if(Auth::user()->hasRole(['administrador-permisos','administrador-sistema'])||Auth::user()->can('consulta-asignacion-proyecto'))

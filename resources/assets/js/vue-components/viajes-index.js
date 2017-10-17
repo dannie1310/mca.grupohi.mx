@@ -21,7 +21,7 @@ Vue.component('viajes-index', {
                 $(el).datepicker({
                     format: 'yyyy-mm-dd',
                     language: 'es',
-                    autoclose: true,
+                    autoclose: true,autoclose: true,
                     clearBtn: true,
                     todayHighlight: true,
                     endDate: '0d'

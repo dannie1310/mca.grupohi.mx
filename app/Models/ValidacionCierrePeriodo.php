@@ -42,8 +42,11 @@ class ValidacionCierrePeriodo extends Model
         $cierres = DB::connection('sca')->select(DB::raw("SELECT * FROM validacion_x_cierre_periodo vcp
                                                             inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
                                                             where vcp.idusuario = {$id} and now() between fecha_inicio and fecha_fin and  cp.mes=$mes and cp.anio=$anio;"));
-
-        return $cierres;
+        if($cierres!=[]){
+            return NULL;
+        }else {
+            return $cierres;
+        }
 
     }
 

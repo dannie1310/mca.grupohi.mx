@@ -45243,11 +45243,10 @@ Vue.component('periodocierre-administracion', {
         timepicker: {
             inserted: function inserted(el) {
                 $(el).timepicker({
-                    format: 'HH:mm',
+                    format: 'hh:mm a',
                     language: 'es',
                     autoclose: true
                 });
-                $(el).val(App.timeStamp(2));
             }
         }
     },

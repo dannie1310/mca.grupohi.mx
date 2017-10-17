@@ -57,7 +57,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>HORA </label>
-                                                    <input type="text" id="HoraInicial" name="HoraInicial" class="form-control" v-timepicker>
+                                                    <input type="text" id="HoraInicial" name="HoraInicial" format="HH:mm a" class="form-control"  v-timepicker>
                                                 </div>
                                             </div>
                                         </div>

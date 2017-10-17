@@ -81,7 +81,7 @@
                                 <td>@{{ viaje.Material }}</td>
                                 <td>@{{ viaje.Codigo }}</td>
 
-                                <td  v-if="viaje.cierre == 0">
+                                <td  v-if="viaje.cierres == 0">
                                     <a id="show-modal" @click="showModal(viaje)">
                                         Modificar
                                     </a>

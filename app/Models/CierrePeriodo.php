@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Auth;
 
 class CierrePeriodo extends Model
 {
@@ -74,5 +76,35 @@ class CierrePeriodo extends Model
                 break;
         }
         return $nombre;
+    }
+
+    public static function cierresPeriodos(){
+        /* Bloqueo de cierre de periodo
+           1 : Cierre de periodo
+           0 : Periodo abierto.
+       */
+
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT * FROM cierres_periodo"));
+        $validarUss=ValidacionCierrePeriodo::usuario_cierres(Auth::user()->idusuario);
+        $extra=[];
+        $permisos=[];
+        foreach ($cierres as $c){
+            foreach ($validarUss as $valida){
+                if($c->mes == $valida->mes && $c->anio == $valida->anio){
+                    $permisos [] = [
+                        'idcierre' => $c->idcierre,
+                        'mes' => $c->mes,
+                        'anio' => $c->anio
+                    ];
+                }else{
+                    $extra [] = [
+                        'idcierre' => $c->idcierre,
+                        'mes' => $c->mes,
+                        'anio' => $c->anio
+                    ];
+                }
+            }
+        }
+        return $extra;
     }
 }
