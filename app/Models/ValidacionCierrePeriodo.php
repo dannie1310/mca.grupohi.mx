@@ -63,6 +63,7 @@ class ValidacionCierrePeriodo extends Model
                                                             inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
                                                             left join sca_configuracion.vw_usuarios u ON u.id_usuario = vcp.idusuario
                                                             order by vcp.fecha_inicio"));
+        $extra = array();
         foreach ($historial as $h){
             $extra [] = [
                 'idcierre' => $h->idcierre,
