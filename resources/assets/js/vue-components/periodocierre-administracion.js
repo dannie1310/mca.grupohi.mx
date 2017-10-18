@@ -9,6 +9,7 @@ Vue.component('periodocierre-administracion',{
             select:[],
             selected_usuario_id: '',
             selected_usuario: {},
+            historico:[],
             cargando: false,
             guardando: false,
             form: {
@@ -57,6 +58,7 @@ Vue.component('periodocierre-administracion',{
                 success: function (response) {
                     _this.usuarios = response.usuarios;
                     _this.cierres_periodo = response.cierres;
+                    _this.historico = response.historico;
                 },
                 error: function (error) {
                     if (error.status == 422) {
@@ -108,7 +110,7 @@ Vue.component('periodocierre-administracion',{
                 success: function (response) {
                     _this.usuarios = response.usuarios;
                     _this.cierres_periodo = response.cierres;
-
+                    _this.historico = response.historico;
                     swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
                 },
                 error: function (error) {

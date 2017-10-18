@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\Context;
 use App\Models\CierrePeriodo;
 use App\Models\Transformers\UsuarioCierresPeriodoTransformers;
+use App\Models\ValidacionCierrePeriodo;
 use Illuminate\Http\Request;
 use App\User;
 use App\User_1;
@@ -34,7 +35,8 @@ class AdministracionCierrePeriodoController extends Controller
 
         $data = [
             'usuarios'=>UsuarioCierresPeriodoTransformers::transform($usuarios),
-            'cierres'=>$cierres
+            'cierres'=>$cierres,
+            'historico'=>ValidacionCierrePeriodo::DatosPermisosUsuarios()
         ];
 
         return response()->json($data);
@@ -166,7 +168,8 @@ class AdministracionCierrePeriodoController extends Controller
         $cierres= CierrePeriodo::cierres();
         $data = [
             'usuarios'=>UsuarioCierresPeriodoTransformers::transform($usuarios),
-            'cierres'=>$cierres
+            'cierres'=>$cierres,
+            'historico'=>ValidacionCierrePeriodo::DatosPermisosUsuarios()
         ];
 
         return response()->json($data);

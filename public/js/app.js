@@ -45218,6 +45218,7 @@ Vue.component('periodocierre-administracion', {
             select: [],
             selected_usuario_id: '',
             selected_usuario: {},
+            historico: [],
             cargando: false,
             guardando: false,
             form: {
@@ -45264,6 +45265,7 @@ Vue.component('periodocierre-administracion', {
                 success: function success(response) {
                     _this.usuarios = response.usuarios;
                     _this.cierres_periodo = response.cierres;
+                    _this.historico = response.historico;
                 },
                 error: function error(_error) {
                     if (_error.status == 422) {
@@ -45314,6 +45316,7 @@ Vue.component('periodocierre-administracion', {
                 success: function success(response) {
                     _this.usuarios = response.usuarios;
                     _this.cierres_periodo = response.cierres;
+                    _this.historico = response.historico;
                     swal("Correcto!", "Se ha creado correctamente la configuracion.", "success");
                 },
                 error: function error(_error2) {
@@ -46114,6 +46117,8 @@ Vue.component('viajes-manual-completa', {
 },{}],56:[function(require,module,exports){
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 Vue.component('viajes-index', {
     data: function data() {
         return {
@@ -46134,14 +46139,12 @@ Vue.component('viajes-index', {
     directives: {
         datepicker: {
             inserted: function inserted(el) {
-                $(el).datepicker({
+                var _$$datepicker;
+
+                $(el).datepicker((_$$datepicker = {
                     format: 'yyyy-mm-dd',
                     language: 'es',
-                    autoclose: true,
-                    clearBtn: true,
-                    todayHighlight: true,
-                    endDate: '0d'
-                });
+                    autoclose: true }, _defineProperty(_$$datepicker, 'autoclose', true), _defineProperty(_$$datepicker, 'clearBtn', true), _defineProperty(_$$datepicker, 'todayHighlight', true), _defineProperty(_$$datepicker, 'endDate', '0d'), _$$datepicker));
                 $(el).val(App.timeStamp(1));
             }
         },

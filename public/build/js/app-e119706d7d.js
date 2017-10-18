@@ -46114,6 +46114,8 @@ Vue.component('viajes-manual-completa', {
 },{}],56:[function(require,module,exports){
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 Vue.component('viajes-index', {
     data: function data() {
         return {
@@ -46134,14 +46136,12 @@ Vue.component('viajes-index', {
     directives: {
         datepicker: {
             inserted: function inserted(el) {
-                $(el).datepicker({
+                var _$$datepicker;
+
+                $(el).datepicker((_$$datepicker = {
                     format: 'yyyy-mm-dd',
                     language: 'es',
-                    autoclose: true,
-                    clearBtn: true,
-                    todayHighlight: true,
-                    endDate: '0d'
-                });
+                    autoclose: true }, _defineProperty(_$$datepicker, 'autoclose', true), _defineProperty(_$$datepicker, 'clearBtn', true), _defineProperty(_$$datepicker, 'todayHighlight', true), _defineProperty(_$$datepicker, 'endDate', '0d'), _$$datepicker));
                 $(el).val(App.timeStamp(1));
             }
         },

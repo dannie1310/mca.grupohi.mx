@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <h1>ADMINISTRACIÓN DE PERMISOS PARA CAMBIOS EN LOS PERIODOS CERRADOS</h1>
+    <h1>REGISTRO DE PERMISOS PARA CAMBIOS EN LOS PERIODOS CERRADOS</h1>
     <div id="app">
         <global-errors></global-errors>
         <periodocierre-administracion inline-template>
@@ -85,9 +85,32 @@
                                         </div>
                                     </div>
                                 </div>
-                    </div>
-                </div>
+                                </div>
+                            </div>
+                            <div  class="col-md-12">
+                                <center><h4><b>Historico</b></h4></center>
+
+                                <table class="table table-bordered">
+                                   <thead>
+                                        <tr>
+                                            <th>Nombre del Usuario</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Final</th>
+                                            <th>Mes y año permitido</th>
+                                        </tr>
+                                   </thead>
+                                    <tbody>
+                                    <tr v-for="historico in historico">
+                                        <th>@{{ historico.nombre }}</th>
+                                        <th>@{{ historico.fecha_inicio }}</th>
+                                        <th>@{{ historico.fecha_fin }}</th>
+                                        <th>@{{ historico.mes }} @{{ historico.anio }}</th>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </form>
+
                     </div>
 
             </section>
