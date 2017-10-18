@@ -112,7 +112,7 @@ class ViajesNetosController extends Controller
                             'Sindicato' => (String)$viaje->sindicato,
                             'Empresa' => (String)$viaje->empresa,
                             'Codigo' => $viaje->Code,
-                            'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
                         ];
                     }
                 }
