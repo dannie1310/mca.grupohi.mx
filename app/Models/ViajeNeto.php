@@ -478,7 +478,7 @@ class ViajeNeto extends Model
                     'IdEmpresaAnterior' => $this->IdEmpresa,
                     'IdEmpresaNuevo'    => $data['IdEmpresa'],
                     'FechaRegistro'     => Carbon::now()->toDateTimeString(),
-                    'Registro'          => auth()->user()->idusuario
+                    'Modifico'          => auth()->user()->idusuario
                 ]);
                 $this->IdEmpresa = $data['IdEmpresa'];
             }
