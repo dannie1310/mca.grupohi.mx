@@ -2,11 +2,11 @@
 
 @section('content')
     <h1>REPORTES</h1>
-    {!! Breadcrumbs::render('reportes.viajes_netos')  !!}
+    {!! Breadcrumbs::render('reportes.viajes_netos.diario')  !!}
     <hr>
     <h3>BUSCAR VIAJES</h3>
     @include('partials.errors')
-    {!! Form::open(['method' => 'GET', 'route' => ['reportes.viajes_netos.show'], 'id' => 'form_reporte_viajes_netos']) !!}
+    {!! Form::open(['method' => 'GET', 'route' => ['reportes.viajes_netos.diario.show'], 'id' => 'form_reporte_viajes_netos']) !!}
     <input type="hidden" name="action" value />
         <div class="row">
             <div class="col-md-12">

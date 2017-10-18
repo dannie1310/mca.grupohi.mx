@@ -146,11 +146,11 @@ Route::group(['prefix' => 'xls'], function () {
 //Reportes Routes
 Route::group(['prefix' => 'reportes'], function () {
     Route::get('viajes_netos/create', [
-        'as'   => 'reportes.viajes_netos.create',
+        'as'   => 'reportes.viajes_netos.diario.create',
         'uses' => 'ReportesController@viajes_netos_create'
     ]);
     Route::get('viajes_netos/show', [
-        'as'   => 'reportes.viajes_netos.show',
+        'as'   => 'reportes.viajes_netos.diario.show',
         'uses' => 'ReportesController@viajes_netos_show'
     ]);
     Route::get('viajes_netos/completo/create', [
@@ -160,6 +160,14 @@ Route::group(['prefix' => 'reportes'], function () {
     Route::get('viajes_netos/completo/show', [
         'as'   => 'reportes.viajes_netos.completo.show',
         'uses' => 'ReportesController@viajes_netos_completo_show'
+    ]);
+    Route::get('viajes_netos/auditoria/create', [
+        'as'   => 'reportes.viajes_netos.auditoria.create',
+        'uses' => 'ReportesController@viajes_netos_auditoria_create'
+    ]);
+    Route::get('viajes_netos/auditoria/show', [
+        'as'   => 'reportes.viajes_netos.auditoria.show',
+        'uses' => 'ReportesController@viajes_netos_auditoria_show'
     ]);
     Route::get('inicio_viajes/create', [
         'as'   => 'reportes.inicio_viajes.create',

@@ -11,6 +11,7 @@ namespace App\Reportes;
 
 use App\Facades\Context;
 use App\Models\Proyecto;
+use App\Models\Transformers\ViajeNetoReporteAuditoriaTransformer;
 use App\Models\Transformers\ViajeNetoReporteCompletoTransformer;
 use App\Models\Transformers\ViajeNetoReporteTransformer;
 use App\User;
@@ -27,16 +28,18 @@ class ViajesNetos
     protected $horaFinal;
     protected $request;
     protected $data;
+    protected $tipo;
 
     /**
      * ViajesNetos constructor.
      * @param Request $request
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, $i)
     {
         $this->request = $request;
         $this->horaInicial = Carbon::createFromFormat('g:i:s a', $request->get('HoraInicial'))->toTimeString();
         $this->horaFinal = Carbon::createFromFormat('g:i:s a', $request->get('HoraFinal'))->toTimeString();
+        $this->tipo = $i;
 
         switch ($request->get('Estatus')) {
             case '0':
@@ -52,8 +55,10 @@ class ViajesNetos
 
         if($request->FechaFinal == 0) {
             $this->data = ViajeNetoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
-        }else{
+        }elseif($this->tipo==1){
             $this->data = ViajeNetoReporteCompletoTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
+        }elseif ($this->tipo==2){
+            $this->data = ViajeNetoReporteAuditoriaTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
         }
     }
 
@@ -68,13 +73,17 @@ class ViajesNetos
         }
 
         if($this->request->FechaFinal==0) {
-            return response()->view('reportes.viajes_netos.partials.table', ['data' => $this->data, 'request' => $this->request])
+            return response()->view('reportes.viajes_netos.diario.table', ['data' => $this->data, 'request' => $this->request])
                 ->header('Content-type', 'text/csv')
-                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . '.cvs');
-        }else{
+                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . ' Diarios.cvs');
+        }elseif ($this->tipo==1){
             return response()->view('reportes.viajes_netos.completo.table', ['data' => $this->data, 'request' => $this->request])
                 ->header('Content-type', 'text/csv')
-                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . '.cvs');
+                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . ' Completo.cvs');
+        }elseif($this->tipo==2) {
+            return response()->view('reportes.viajes_netos.auditoria.table', ['data' => $this->data, 'request' => $this->request])
+                ->header('Content-type', 'text/csv')
+                ->header('Content-Disposition', 'filename=ViajesNetos_' . date("d-m-Y") . '_' . date("H.i.s", time()) . ' Auditoria.cvs');
         }
     }
 
@@ -86,11 +95,16 @@ class ViajesNetos
         }
 
         if($this->request->FechaFinal==0) {
-            return view('reportes.viajes_netos.show')
+            return view('reportes.viajes_netos.diario.show')
                 ->withData($this->data)
                 ->withRequest($this->request->all());
-        }else{
+        }elseif($this->tipo==1){
             return view('reportes.viajes_netos.completo.show')
+                ->withData($this->data)
+                ->withRequest($this->request->all());
+        }
+        elseif ($this->tipo==2){
+            return view('reportes.viajes_netos.auditoria.show')
                 ->withData($this->data)
                 ->withRequest($this->request->all());
         }

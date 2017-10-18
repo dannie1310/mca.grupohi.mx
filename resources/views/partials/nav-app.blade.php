@@ -235,13 +235,13 @@
                   <li><a href="{{ route('reportes.inicio_viajes.create') }}">Inicio Viajes</a></li>
               @endif
               @if(Auth::user()->can(['visualizar-reporte-viajes-diarios']))
-                  <li><a href="{{ route('reportes.viajes_netos.create') }}">Viajes Netos Diario</a></li>
+                  <li><a href="{{ route('reportes.viajes_netos.diario.create') }}">Viajes Netos Diario</a></li>
               @endif
               @if(Auth::user()->can(['visualizar-reporte-viajes-netos']))
                   <li><a href="{{ route('reportes.viajes_netos.completo.create') }}">Viajes Netos Completos</a></li>
               @endif
               @if(Auth::user()->can(['visualizar-reporte-viajes-netos-auditoria']))
-                  <li><a href="{{ route('reportes.viajes_netos.completo.create') }}">Viajes Netos Completos (Auditoría)</a></li>
+                  <li><a href="{{ route('reportes.viajes_netos.auditoria.create') }}">Viajes Netos Completos (Auditoría)</a></li>
               @endif
               @if(Auth::user()->can(['visualizar-reporte-conciliacion']))
                   <li><a href="{{ route('reportes.conciliacion_detalle.create') }}">Conciliaciones Detallado</a></li>
