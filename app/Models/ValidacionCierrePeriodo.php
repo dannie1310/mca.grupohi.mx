@@ -59,29 +59,23 @@ class ValidacionCierrePeriodo extends Model
         return $cierres[0]->permiso;
     }
     public static function DatosPermisosUsuarios(){
-        $historial = DB::connection('sca')->select(DB::raw("SELECT distinct(vcp.id), vcp.fecha_inicio, vcp.fecha_fin, cp.idcierre, cp.mes, cp.anio,u.nombre FROM validacion_x_cierre_periodo vcp
+        $historial = DB::connection('sca')->select(DB::raw("SELECT distinct(vcp.id), vcp.fecha_inicio, vcp.fecha_fin, cp.idcierre, cp.mes, cp.anio,u.nombre, 
+                                                            IF(now() < fecha_fin,1,0) AS estatus FROM validacion_x_cierre_periodo vcp
                                                             inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
                                                             left join sca_configuracion.vw_usuarios u ON u.id_usuario = vcp.idusuario
                                                             order by vcp.fecha_inicio"));
-        $vigentes = DB::connection('sca')->select(DB::raw("SELECT  vcp.*, cp.* FROM validacion_x_cierre_periodo vcp
-                                                            inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
-                                                            where now() < fecha_fin"));
+
         $extra = array();
-        foreach ($historial as $h){
-            if($vigentes != []) {
-                foreach ($vigentes as $v) {
-                    //if()
-                    $extra [] = [
-                        'idcierre' => $h->idcierre,
-                        'mes' => CierrePeriodo::nombreMeses($h->mes),
-                        'anio' => $h->anio,
-                        'nombre' => $h->nombre,
-                        'fecha_inicio' => $h->fecha_inicio,
-                        'fecha_fin' => $h->fecha_fin,
-                        'estatus' =>0
-                    ];
-                }
-            }
+        foreach ($historial as $h) {
+            $extra [] = [
+                'idcierre' => $h->idcierre,
+                'mes' => CierrePeriodo::nombreMeses($h->mes),
+                'anio' => $h->anio,
+                'nombre' => $h->nombre,
+                'fecha_inicio' => $h->fecha_inicio,
+                'fecha_fin' => $h->fecha_fin,
+                'estatus' => $h->estatus
+            ];
         }
         return $extra;
     }
