@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Auth;
 
 class Viaje extends Model
 {
@@ -126,7 +127,7 @@ class Viaje extends Model
         }else if($tipo == 1){
             $dato ="and viajes.code ='{$codigo}'";
         }
-        $sql = "SELECT viajes.*, tiros.Descripcion AS Tiro,
+        $sql =  DB::connection('sca')->select(DB::raw("SELECT viajes.*, tiros.Descripcion AS Tiro,
                 camiones.Economico AS Camion,
                 viajes.CubicacionCamion AS Cubicacion,
                 origenes.Descripcion AS Origen,
@@ -140,11 +141,68 @@ class Viaje extends Model
                 left join origenes on viajes.IdOrigen = origenes.IdOrigen
                 left join materiales on viajes.IdMaterial = materiales.IdMaterial
                 left join cierres_periodo as c on c.mes = DATE_FORMAT(viajes.FechaLlegada, '%m') and DATE_FORMAT(viajes.FechaLlegada, '%Y')  = c.anio
-                where viajes.Estatus in (0, 10, 20)".$dato;
+                where viajes.Estatus in (0, 10, 20)".$dato));
 
-        return DB::connection('sca')->select(DB::raw($sql));
+        $existe = array();
+        $permiso = 0;
+        $anio=0;
+        $mes=0;
+        foreach ($sql as  $s){
+            $permiso=ValidacionCierrePeriodo::cierreUsuario(Auth::user()->idusuario, $s->mes, $s->anio);
+            if($permiso== 1){
+                $anio=NULL;
+                $mes =NULL;
+            }else{
+                $anio =$s->anio;
+                $mes =$s->mes;
+            }
+            $existe[]=[
+                'IdViaje'=>$s->IdViaje,
+                'IdViajeNeto'=>$s->IdViajeNeto,
+                'IdSindicato'=>$s->IdSindicato,
+                'IdEmpresa'=>$s->IdEmpresa,
+                'FechaCarga'=>$s->FechaCarga,
+                'HoraCarga'=>$s->HoraCarga,
+                'Camion'=>$s->Camion,
+                'IdMaquinaria'=>$s->IdMaquinaria,
+                'HorasEfectivas'=>$s->HorasEfectivas,
+                'CubicacionCamion'=>$s->CubicacionCamion,
+                'Origen'=>$s->Origen,
+                'FechaSalida'=>$s->FechaSalida,
+                'HoraSalida'=>$s->HoraSalida,
+                'Tiro'=>$s->Tiro,
+                'FechaLlegada'=>$s->FechaLlegada,
+                'HoraLlegada'=>$s->HoraLlegada,
+                'IdMaterial'=>$s->IdMaterial,
+                'FactorAbundamiento'=>$s->FactorAbundamiento,
+                'IdChecador'=>$s->IdChecador,
+                'Creo'=>$s->Creo,
+                'TiempoViaje'=>$s->TiempoViaje,
+                'IdRuta'=>$s->IdRuta,
+                'Distancia'=>$s->Distancia,
+                'TPrimerKM'=>$s->TPrimerKM,
+                'TKMSubsecuente'=>$s->TKMSubsecuente,
+                'VolumenPrimerKM'=>$s->VolumenPrimerKM,
+                'VolumenKMSubsecuentes'=>$s->VolumenKMSubsecuentes,
+                'Volumen'=>$s->Volumen,
+                'ImportePrimerKM'=>$s->ImportePrimerKM,
+                'ImporteKMSubsecuentes'=>$s->ImporteKMSubsecuentes,
+                'Importe'=>$s->Importe,
+                'Observaciones'=>$s->Observaciones,
+                'TipoTarifa'=>$s->TipoTarifa,
+                'code'=>$s->code,
+                'Elimino'=>$s->Elimino,
+                'Modifico'=>$s->Modifico,
+                'Cubicacion'=>$s->Cubicacion,
+                'Material'=>$s->Material,
+                'Codigo'=>$s->Codigo,
+                'anio'=>$anio,
+                'mes'=>$mes
+            ];
 
+        }
 
+        return $existe;
     }
 
     public function revertir() {
