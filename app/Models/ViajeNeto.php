@@ -478,7 +478,7 @@ class ViajeNeto extends Model
                     'IdEmpresaAnterior' => $this->IdEmpresa,
                     'IdEmpresaNuevo'    => $data['IdEmpresa'],
                     'FechaRegistro'     => Carbon::now()->toDateTimeString(),
-                    'Modifico'          => auth()->user()->idusuario
+                    'Registro'          => auth()->user()->idusuario
                 ]);
                 $this->IdEmpresa = $data['IdEmpresa'];
             }
@@ -536,7 +536,7 @@ class ViajeNeto extends Model
                 ]);
                 $this->CubicacionCamion = $data['CubicacionCamion'];
             }
-
+            $this->Modifico = auth()->user()->idusuario;
             $this->save();
 
             DB::connection('sca')->commit();
