@@ -148,7 +148,11 @@ class Viaje extends Model
         $anio=0;
         $mes=0;
         foreach ($sql as  $s){
-            $permiso=ValidacionCierrePeriodo::cierreUsuario(Auth::user()->idusuario, $s->mes, $s->anio);
+            if($s->mes == NULL && $s->anio==NULL){
+                $permiso=1;
+            }else {
+                $permiso = ValidacionCierrePeriodo::cierreUsuario(Auth::user()->idusuario, $s->mes, $s->anio);
+            }
             if($permiso== 1){
                 $anio=NULL;
                 $mes =NULL;

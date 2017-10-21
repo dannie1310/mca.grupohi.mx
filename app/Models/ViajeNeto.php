@@ -432,6 +432,7 @@ class ViajeNeto extends Model
                 .($this->deductiva ? $this->deductiva->id : 'NULL'). ","
                 .($this->deductiva ? $this->deductiva->estatus : 'NULL') .
                 ",@a, @v);";
+
             DB::connection("sca")->statement($statement);
 
             $result = DB::connection('sca')->select('SELECT @a,@v');
