@@ -328,3 +328,11 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 //Route::group(['middleware' => ['permission:consulta-solicitud-actualizar']], function () {
     Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
 //});
+
+
+/**
+ * Conceptos Routes
+ */
+Route::get('conceptos/jstree', 'ConceptoController@getRoot');
+Route::get('conceptos/{id}/jstree', 'ConceptoController@getNode');
+

@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\Models\Proyecto;
+
 interface Context
 {
     /**
@@ -11,6 +13,8 @@ interface Context
      * @return void
      */
     public function setDatabaseName($name);
+    public function setDatabaseNameCadeco($name);
+
 
     /**
      * Get the database name of the current context
@@ -18,6 +22,7 @@ interface Context
      * @return string
      */
     public function getDatabaseName();
+    public function getDatabaseNameCadeco();
 
     /**
      * Set the id value filter data in the current context
@@ -26,6 +31,7 @@ interface Context
      * @return void
      */
     public function setId($id);
+    public function setIdCadeco($id);
 
     /**
      * Get the tenant id value for the current context
@@ -33,6 +39,7 @@ interface Context
      * @return mixed
      */
     public function getId();
+    public function getIdCadeco();
 
     /**
      * Tells if the context is set
@@ -47,4 +54,7 @@ interface Context
      * @return boolean
      */
     public function notEstablished();
+
+    public function setProyecto(Proyecto $proyecto);
+    public function getProyecto();
 }

@@ -19,6 +19,7 @@
         <th>Registró</th>
         <th>Estatus</th>
         <th>Acciones</th>
+        <th>Concepto</th>
       </tr>
     </thead>
     <tbody>
@@ -40,6 +41,13 @@
               <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_tiro({{$tiro->IdTiro}})"><i class="fa fa-check"></i></button>
             @endif
               @endpermission
+          </td>
+          <td title="{{ $tiro->concepto() ? $tiro->concepto()->path : '' }}">
+                @if($tiro->concepto())
+                  <a>{{ $tiro->concepto() }}</a>
+                @else
+                  <a href="">Asignar</a>
+                @endif
           </td>
         </tr>
       @endforeach

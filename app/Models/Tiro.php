@@ -6,6 +6,7 @@ use App\Models\ConfiguracionDiaria\Configuracion;
 use App\Models\ConfiguracionDiaria\Esquema;
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
+use Illuminate\Support\Facades\DB;
 use Jenssegers\Date\Date;
 class Tiro extends Model
 {
@@ -49,5 +50,9 @@ class Tiro extends Model
     }
     public function user_registro(){
         return $this->belongsTo(\App\User::class, 'usuario_registro','idusuario');
+    }
+    public function concepto() {
+        $id_concepto = DB::connection('sca')->table('tiros_conceptos')->select('id_concepto')->where('id_tiro', '=', $this->IdTiro)->whereNull('fin_vigencia')->first();
+        return \App\Models\Concepto::find($id_concepto);
     }
 }

@@ -31,6 +31,11 @@ class ContextSession implements Context
         $this->session->put('database_name', $name);
     }
 
+    public function setDatabaseNameCadeco($name)
+    {
+        $this->session->put('database_name_cadeco', $name);
+    }
+
     /**
      * Get the database name of the current context
      * @return string
@@ -38,6 +43,11 @@ class ContextSession implements Context
     public function getDatabaseName()
     {
         return $this->session->get('database_name');
+    }
+
+    public function getDatabaseNameCadeco()
+    {
+        return $this->session->get('database_name_cadeco');
     }
 
     /**
@@ -48,6 +58,11 @@ class ContextSession implements Context
     public function setId($id)
     {
         $this->session->put('id', $id);
+    }
+
+    public function setIdCadeco($id)
+    {
+        $this->session->put('id_cadeco', $id);
     }
 
     /**
@@ -61,6 +76,10 @@ class ContextSession implements Context
         $this->session->put('proyecto', $proyecto);
     }
 
+    public function getProyecto() {
+        $this->session->get('proyecto');
+    }
+
     /**
      *
      * @return mixed
@@ -68,6 +87,11 @@ class ContextSession implements Context
     public function getId()
     {
         return $this->session->get('id');
+    }
+
+    public function getIdCadeco()
+    {
+        return $this->session->get('id_cadeco');
     }
 
     /**
