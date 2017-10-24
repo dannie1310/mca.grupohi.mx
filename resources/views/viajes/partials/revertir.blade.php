@@ -75,7 +75,7 @@
                             <td>@{{ viaje.Cubicacion  }}</td>
                             <td>@{{ viaje.Material }}</td>
                             <td>@{{ viaje.Codigo }}</td>
-                            <td v-if="viaje.mes == null">
+                            <td v-if="viaje.CierrePeriodo == 0">
                                 <span v-if="viaje.Estatus != -1">
                                 <a href="#" @click="revertir(viaje)" style="text-decoration: underline">Revertir</a>
                                 </span>
