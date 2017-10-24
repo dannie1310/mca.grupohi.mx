@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Auth;
+use Carbon\Carbon;
 
 class ValidacionCierrePeriodo extends Model
 {
@@ -78,5 +80,11 @@ class ValidacionCierrePeriodo extends Model
             ];
         }
         return $extra;
+    }
+    public static function cierreUsuarioFecha($fecha){
+        $f = Carbon::createFromFormat('Y-m-d', $fecha);
+        $cierrescerrados= CierrePeriodo::cierrePeriodo($f->month,$f->year);
+
+        return $cierrescerrados;
     }
 }

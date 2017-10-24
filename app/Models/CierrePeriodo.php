@@ -100,4 +100,22 @@ class CierrePeriodo extends Model
         }
         return $extra;
     }
+
+    public static function cierrePeriodo($mes,$anio){
+
+
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT * FROM cierres_periodo where anio=$anio and mes=$mes"));
+
+        if($cierres != NULL){
+            $a = ValidacionCierrePeriodo::cierreUsuario(Auth::user()->idusuario, $mes, $anio);
+
+            if ($a == 0) {
+                return 1;
+            }else {
+                return 0;
+            }
+         }else{
+            return 0; //abierto
+        }
+    }
 }
