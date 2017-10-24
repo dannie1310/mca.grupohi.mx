@@ -74,7 +74,7 @@ class ViajesController extends Controller
                         'Codigo' => 'required'
                     ]);
                     //$data = Viaje::scopeParaRevertirPeriodo(1," "," ",$request->get('Codigo'));
-                    $viajes = Viaje::ParaRevertir()->whereIn('code','=',$request->get('Codigo'))->get();
+                    $viajes = Viaje::ParaRevertir()->where('code','=',$request->get('Codigo'))->get();
                     $data = ViajeTransformerRevertir::transform($viajes);
                 }
             }
