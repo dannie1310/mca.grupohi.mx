@@ -46,7 +46,7 @@
                 @if($tiro->concepto())
                   <a>{{ $tiro->concepto() }}</a>
                 @else
-                  <a href="" data-toggle="modal" data-target="#myModal" >Asignar</a>
+                  <a href="" data-toggle="modal" data-target="#myModal" onclick="setIdTiro({{$tiro->IdTiro}})">Asignar</a>
                 @endif
           </td>
         </tr>
@@ -76,7 +76,7 @@
                 <div class="form-group">
                     {!! Form::label('actividad', 'Actividad:') !!}
                     <div class="input-group">
-                        <select class="form-control" style="z-index:20" id="concepto-select" ></select>
+                        <select class="form-control" id="concepto-select" ></select>
                         <div type="button" class="input-group-addon btn" onclick="showTree()">
                             <i class="fa fa-fw fa-sitemap"></i>
                         </div>
@@ -86,6 +86,7 @@
                 <div id="jstree"></div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="asignar()">Asignar</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -95,6 +96,12 @@
 
 @section('scripts')
   <script>
+      var id_tiro;
+
+      function setIdTiro(id) {
+          id_tiro = id;
+      }
+
       var auth_config = {
           auto_filter: true,
           col_0: 'input',
@@ -172,8 +179,9 @@
               });
       }
 
-      $('#concepto-select').select2({
+      var select_settings = {
           width: '100%',
+          language: "es",
           ajax: {
               url: '{{route('conceptos.lists')}}',
               dataType: 'json',
@@ -191,9 +199,9 @@
                   return { results : results};
               }
           }
-      }).on('select2:select', function (e) {
-          $('#id_concepto').val(e.params.data.id);
-      });
+      }
+
+
 
       // JsTree Configuration
       var jstreeConf = {
@@ -244,27 +252,21 @@
       });
 
       // On hide the BS modal, get the selected node and destroy the jstree
-      /*$('#myModal').on('shown.bs.modal', function (e) {
-          $('#jstree').jstree(jstreeConf);
+      $('#myModal').on('shown.bs.modal', function (e) {
+          $('#concepto-select').select2(select_settings).on('select2:select', function (e) {
+              $('#id_concepto').val(e.params.data.id);
+          });
       }).on('hidden.bs.modal', function (e) {
           var jstree = $('#jstree').jstree(true);
-          var node = jstree.get_selected(true)[0];
-
-          if (node) {
-              $('#id_concepto').val(node.id);
-              $('#actividad').val(node.text);
-          }
-
-          jstree.destroy();
+          if(jstree)
+              jstree.destroy();
+          $('#concepto-select').select2('destroy');
+          $("#concepto-select option:selected").each(function () {
+              $(this).remove();
+          });
       });
-      */
 
       function showTree() {
-          var jstree = $('#jstree').jstree(true);
-          if (jstree) {
-              jstree.destroy();
-          }
-
           $('#jstree').jstree(jstreeConf);
       }
 

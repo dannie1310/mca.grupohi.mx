@@ -30286,6 +30286,10 @@ return numeral;
 }));
 
 },{}],15:[function(require,module,exports){
+/*! Select2 4.0.3 | https://github.com/select2/select2/blob/master/LICENSE.md */
+
+(function(){if(jQuery&&jQuery.fn&&jQuery.fn.select2&&jQuery.fn.select2.amd)var e=jQuery.fn.select2.amd;return e.define("select2/i18n/es",[],function(){return{errorLoading:function(){return"La carga falló"},inputTooLong:function(e){var t=e.input.length-e.maximum,n="Por favor, elimine "+t+" car";return t==1?n+="ácter":n+="acteres",n},inputTooShort:function(e){var t=e.minimum-e.input.length,n="Por favor, introduzca "+t+" car";return t==1?n+="ácter":n+="acteres",n},loadingMore:function(){return"Cargando más resultados…"},maximumSelected:function(e){var t="Sólo puede seleccionar "+e.maximum+" elemento";return e.maximum!=1&&(t+="s"),t},noResults:function(){return"No se encontraron resultados"},searching:function(){return"Buscando…"}}}),{define:e.define,require:e.require}})();
+},{}],16:[function(require,module,exports){
 /*!
  * Select2 4.0.3
  * https://select2.github.io
@@ -36012,7 +36016,7 @@ S2.define('jquery.select2',[
   return select2;
 }));
 
-},{"jquery":12}],16:[function(require,module,exports){
+},{"jquery":12}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -36045,7 +36049,7 @@ var defaultParams = {
 
 exports['default'] = defaultParams;
 module.exports = exports['default'];
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -36181,7 +36185,7 @@ exports['default'] = {
   handleCancel: handleCancel
 };
 module.exports = exports['default'];
-},{"./handle-dom":18,"./handle-swal-dom":20,"./utils":23}],18:[function(require,module,exports){
+},{"./handle-dom":19,"./handle-swal-dom":21,"./utils":24}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -36373,7 +36377,7 @@ exports.fadeIn = fadeIn;
 exports.fadeOut = fadeOut;
 exports.fireClick = fireClick;
 exports.stopEventPropagation = stopEventPropagation;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -36453,7 +36457,7 @@ var handleKeyDown = function handleKeyDown(event, params, modal) {
 
 exports['default'] = handleKeyDown;
 module.exports = exports['default'];
-},{"./handle-dom":18,"./handle-swal-dom":20}],20:[function(require,module,exports){
+},{"./handle-dom":19,"./handle-swal-dom":21}],21:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -36621,7 +36625,7 @@ exports.openModal = openModal;
 exports.resetInput = resetInput;
 exports.resetInputError = resetInputError;
 exports.fixVerticalPosition = fixVerticalPosition;
-},{"./default-params":16,"./handle-dom":18,"./injected-html":21,"./utils":23}],21:[function(require,module,exports){
+},{"./default-params":17,"./handle-dom":19,"./injected-html":22,"./utils":24}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36664,7 +36668,7 @@ var injectedHTML =
 
 exports["default"] = injectedHTML;
 module.exports = exports["default"];
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -36890,7 +36894,7 @@ var setParameters = function setParameters(params) {
 
 exports['default'] = setParameters;
 module.exports = exports['default'];
-},{"./handle-dom":18,"./handle-swal-dom":20,"./utils":23}],23:[function(require,module,exports){
+},{"./handle-dom":19,"./handle-swal-dom":21,"./utils":24}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -36964,7 +36968,7 @@ exports.hexToRgb = hexToRgb;
 exports.isIE8 = isIE8;
 exports.logStr = logStr;
 exports.colorLuminance = colorLuminance;
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -37268,7 +37272,7 @@ if (typeof window !== 'undefined') {
   _extend$hexToRgb$isIE8$logStr$colorLuminance.logStr('SweetAlert is a frontend module!');
 }
 module.exports = exports['default'];
-},{"./modules/default-params":16,"./modules/handle-click":17,"./modules/handle-dom":18,"./modules/handle-key":19,"./modules/handle-swal-dom":20,"./modules/set-params":22,"./modules/utils":23}],25:[function(require,module,exports){
+},{"./modules/default-params":17,"./modules/handle-click":18,"./modules/handle-dom":19,"./modules/handle-key":20,"./modules/handle-swal-dom":21,"./modules/set-params":23,"./modules/utils":24}],26:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -38818,7 +38822,7 @@ module.exports = exports['default'];
   }
 }.call(this));
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /*!
  * vue-resource v1.3.4
  * https://github.com/pagekit/vue-resource
@@ -40388,7 +40392,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 module.exports = plugin;
 
-},{"got":7}],27:[function(require,module,exports){
+},{"got":7}],28:[function(require,module,exports){
 (function (global){
 /*!
  * Vue.js v2.5.2
@@ -50944,7 +50948,7 @@ return Vue$3;
 })));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 window.$ = window.jQuery = require('jquery');
@@ -50964,6 +50968,7 @@ window._ = require('underscore');
 window.numeral = require('numeral');
 require('./scripts');
 window.jstree = require('jstree');
+require('select2/dist/js/i18n/es');
 
 //Production
 //window.Vue = require('vue/dist/vue.min.js');
@@ -50981,7 +50986,7 @@ if ($('#app').length) {
     });
 }
 
-},{"./scripts":29,"./vue-components":39,"bootstrap-datepicker":1,"bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js":2,"bootstrap-fileinput":3,"bootstrap-fileinput/js/locales/es.js":4,"bootstrap-sass":5,"bootstrap-submenu":6,"datepair.js":8,"jquery":12,"jquery-timepicker/jquery.timepicker.js":9,"jquery-treegrid/js/jquery.treegrid.js":10,"jquery-ui":11,"jstree":13,"numeral":14,"select2":15,"sweetalert":24,"underscore":25,"vue-resource":26,"vue/dist/vue.js":27}],29:[function(require,module,exports){
+},{"./scripts":30,"./vue-components":40,"bootstrap-datepicker":1,"bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js":2,"bootstrap-fileinput":3,"bootstrap-fileinput/js/locales/es.js":4,"bootstrap-sass":5,"bootstrap-submenu":6,"datepair.js":8,"jquery":12,"jquery-timepicker/jquery.timepicker.js":9,"jquery-treegrid/js/jquery.treegrid.js":10,"jquery-ui":11,"jstree":13,"numeral":14,"select2":16,"select2/dist/js/i18n/es":15,"sweetalert":25,"underscore":26,"vue-resource":27,"vue/dist/vue.js":28}],30:[function(require,module,exports){
 'use strict';
 
 require('./scripts/camiones');
@@ -50994,7 +50999,7 @@ require('./scripts/etapas');
 require('./scripts/viajes');
 require('./scripts/conciliaciones');
 
-},{"./scripts/camiones":30,"./scripts/centroscostos":31,"./scripts/conciliaciones":32,"./scripts/etapas":33,"./scripts/globales":34,"./scripts/marcas":35,"./scripts/rutas":36,"./scripts/tarifas":37,"./scripts/viajes":38}],30:[function(require,module,exports){
+},{"./scripts/camiones":31,"./scripts/centroscostos":32,"./scripts/conciliaciones":33,"./scripts/etapas":34,"./scripts/globales":35,"./scripts/marcas":36,"./scripts/rutas":37,"./scripts/tarifas":38,"./scripts/viajes":39}],31:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -51143,7 +51148,7 @@ $(document).ready(function () {
     }
 });
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -51343,7 +51348,7 @@ function toggleCentroCosto(e, url) {
     });
 }
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 /**
@@ -51399,7 +51404,7 @@ $('.cancelar_conciliacion').off().on('click', function (e) {
     });
 });
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 $(".etapas_destroy").off().on("click", function (event) {
@@ -51438,7 +51443,7 @@ $(".etapas_destroy").off().on("click", function (event) {
     });
 });
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 $(function () {
@@ -51576,7 +51581,7 @@ $('.list-group a').click(function (e) {
     }
 });
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 $(".marcas_destroy").off().on("click", function (event) {
@@ -51615,7 +51620,7 @@ $(".marcas_destroy").off().on("click", function (event) {
     });
 });
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -51747,7 +51752,7 @@ $(document).ready(function () {
     }
 });
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 $(document).ready(function () {
@@ -51801,7 +51806,7 @@ $(document).ready(function () {
     }
 });
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 if ($('#viajes_netos_autorizar').length) {
@@ -51878,7 +51883,7 @@ if ($('#viaje_neto_validar').length) {
     });
 }
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 require('./vue-components/global-errors');
@@ -51901,7 +51906,7 @@ require('./vue-components/roles-permisos');
 require('./vue-components/tickets-validar');
 require('./vue-components/periodocierre-administracion');
 
-},{"./vue-components/conciliaciones-create":40,"./vue-components/conciliaciones-edit":41,"./vue-components/configuracion-diaria":42,"./vue-components/corte-create":43,"./vue-components/corte-edit":44,"./vue-components/errors":45,"./vue-components/fda-bancomaterial":46,"./vue-components/fda-material":47,"./vue-components/global-errors":48,"./vue-components/origenes-usuarios":49,"./vue-components/periodocierre-administracion":50,"./vue-components/roles-permisos":51,"./vue-components/tickets-validar":55,"./vue-components/viajes-completa":56,"./vue-components/viajes-index":57,"./vue-components/viajes-manual":58,"./vue-components/viajes-modificar":59,"./vue-components/viajes-revertir":60,"./vue-components/viajes-validar":61}],40:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":41,"./vue-components/conciliaciones-edit":42,"./vue-components/configuracion-diaria":43,"./vue-components/corte-create":44,"./vue-components/corte-edit":45,"./vue-components/errors":46,"./vue-components/fda-bancomaterial":47,"./vue-components/fda-material":48,"./vue-components/global-errors":49,"./vue-components/origenes-usuarios":50,"./vue-components/periodocierre-administracion":51,"./vue-components/roles-permisos":52,"./vue-components/tickets-validar":56,"./vue-components/viajes-completa":57,"./vue-components/viajes-index":58,"./vue-components/viajes-manual":59,"./vue-components/viajes-modificar":60,"./vue-components/viajes-revertir":61,"./vue-components/viajes-validar":62}],41:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -51968,7 +51973,7 @@ Vue.component('conciliaciones-create', {
     }
 });
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-edit', {
@@ -52568,7 +52573,7 @@ Vue.component('conciliaciones-edit', {
     }
 });
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 
 /**
@@ -53043,7 +53048,7 @@ Vue.component('configuracion-diaria', {
     }
 });
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict';
 
 Vue.component('corte-create', {
@@ -53207,7 +53212,7 @@ Vue.component('corte-create', {
     }
 });
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 
 Vue.component('corte-edit', {
@@ -53555,7 +53560,7 @@ Vue.component('corte-edit', {
     }
 });
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 
 Vue.component('app-errors', {
@@ -53564,7 +53569,7 @@ Vue.component('app-errors', {
     template: require('./templates/errors.html')
 });
 
-},{"./templates/errors.html":52}],46:[function(require,module,exports){
+},{"./templates/errors.html":53}],47:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-bancomaterial', {
@@ -53670,7 +53675,7 @@ Vue.component('fda-bancomaterial', {
     }
 });
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-material', {
@@ -53759,7 +53764,7 @@ Vue.component('fda-material', {
     }
 });
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -53785,7 +53790,7 @@ Vue.component('global-errors', {
   }
 });
 
-},{"./templates/global-errors.html":53}],49:[function(require,module,exports){
+},{"./templates/global-errors.html":54}],50:[function(require,module,exports){
 'use strict';
 
 Vue.component('origenes-usuarios', {
@@ -53860,7 +53865,7 @@ Vue.component('origenes-usuarios', {
     }
 });
 
-},{"./templates/origenes-usuarios.html":54}],50:[function(require,module,exports){
+},{"./templates/origenes-usuarios.html":55}],51:[function(require,module,exports){
 'use strict';
 
 /**
@@ -53996,7 +54001,7 @@ Vue.component('periodocierre-administracion', {
 
 });
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 Vue.component('roles-permisos', {
@@ -54490,13 +54495,13 @@ Vue.component('roles-permisos', {
     }
 });
 
-},{}],52:[function(require,module,exports){
-module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],53:[function(require,module,exports){
-module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
+module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],54:[function(require,module,exports){
-module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
 },{}],55:[function(require,module,exports){
+module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+},{}],56:[function(require,module,exports){
 'use strict';
 
 Vue.component('tickets-validar', {
@@ -54550,7 +54555,7 @@ Vue.component('tickets-validar', {
 
 });
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 function timeStamp(type) {
@@ -54770,7 +54775,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -55035,7 +55040,7 @@ Vue.component('viajes-index', {
     }
 });
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -55219,7 +55224,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -55393,7 +55398,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -55534,7 +55539,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -55724,6 +55729,6 @@ Vue.component('viajes-validar', {
     }
 });
 
-},{}]},{},[28]);
+},{}]},{},[29]);
 
 //# sourceMappingURL=app.js.map

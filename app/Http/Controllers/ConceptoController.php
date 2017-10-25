@@ -39,10 +39,8 @@ class ConceptoController extends Controller
 
         $node = $concepto->getHijos();
 
-
         $resp=ConceptoTreeTransformer::transform($node);
 
-        // $data = Fractal::createData($resource);
         return response()->json($resp, 200);
 
     }
