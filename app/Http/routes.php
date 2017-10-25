@@ -336,4 +336,5 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 Route::get('conceptos', 'ConceptoController@lists')->name('conceptos.lists');
 Route::get('conceptos/jstree', 'ConceptoController@getRoot');
 Route::get('conceptos/{id}/jstree', 'ConceptoController@getNode');
-
+// Ruta para asignar concepto Cadeco a Tiros
+Route::post('tiros/asignar_concepto', 'TirosController@asignar_concepto');

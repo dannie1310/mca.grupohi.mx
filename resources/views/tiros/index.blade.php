@@ -46,7 +46,7 @@
                 @if($tiro->concepto())
                   <a>{{ $tiro->concepto() }}</a>
                 @else
-                  <a href="" data-toggle="modal" data-target="#myModal" onclick="setIdTiro({{$tiro->IdTiro}})">Asignar</a>
+                  <a href="" data-toggle="modal" data-target="#myModal" onclick="datosTiro('{{$tiro->IdTiro}}' , '{{ $tiro->Descripcion}}')">Asignar</a>
                 @endif
           </td>
         </tr>
@@ -69,8 +69,8 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h3 class="modal-title" id="myModalLabel">Presupuesto de Obra</h3>
-                <p class="alert alert-warning text-center">Seleccione un concepto y de clic en cerrar para asignarlo.</p>
+                <h3 class="modal-title" id="myModalLabel">Asignación de Concepto</h3>
+                <p class="alert alert-warning text-center" id="titulo"></p>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -86,7 +86,7 @@
                 <div id="jstree"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" onclick="asignar()">Asignar</button>
+                <button type="button" class="btn btn-success" onclick="validar_tiro()">Asignar</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -96,11 +96,12 @@
 
 @section('scripts')
   <script>
-      var id_tiro;
-
-      function setIdTiro(id) {
-          id_tiro = id;
+      var idTiro;
+      function datosTiro(id, desc) {
+          idTiro = id;
+          $('#titulo').text('Seleccione el Concepto que desea asignar al Tiro ' + desc);
       }
+
 
       var auth_config = {
           auto_filter: true,
@@ -179,6 +180,29 @@
               });
       }
 
+      function validar_tiro() {
+
+          swal({
+              title: "¡Asignar Concepto!",
+              text: "¿Esta seguro de que deseas asignar el concepto?",
+              type: "warning",
+              showCancelButton: true,
+              closeOnConfirm: true,
+              confirmButtonText: "Si, Asignar",
+              cancelButtonText: "No, Cancelar",
+              showLoaderOnConfirm: true
+
+          },
+          function(){
+              asignar();
+          });
+      }
+
+      function asignar() {
+          var url=App.host +"/tiros/asignar_concepto";
+          alert(idTiro  + ' ' + $('#id_concepto').val());
+      }
+
       var select_settings = {
           width: '100%',
           language: "es",
@@ -200,7 +224,6 @@
               }
           }
       }
-
 
 
       // JsTree Configuration
@@ -241,15 +264,23 @@
           'plugins': ['types']
       };
 
-      $('#jstree').on("after_open.jstree", function (e, data) {
-          if (data.instance.get_type(data.node) == 'default') {
-              data.instance.set_type(data.node, 'opened');
-          }
-      }).on("after_close.jstree", function (e, data) {
-          if (data.instance.get_type(data.node) == 'opened') {
-              data.instance.set_type(data.node, 'default');
-          }
-      });
+      function conf_tree() {
+          $('#jstree').on("after_open.jstree", function (e, data) {
+              if (data.instance.get_type(data.node) == 'default') {
+                  data.instance.set_type(data.node, 'opened');
+              }
+          }).on("after_close.jstree", function (e, data) {
+              if (data.instance.get_type(data.node) == 'opened') {
+                  data.instance.set_type(data.node, 'default');
+              }
+          }).on("select_node.jstree", function(event, node) {
+              $('#id_concepto').val(node.node.id);
+              var new_settings = $.extend({}, select_settings);
+              new_settings.data = [{id: node.node.id, text: node.node.text}];
+              $('#concepto-select').select2('destroy').empty().select2(new_settings);
+
+          });
+      }
 
       // On hide the BS modal, get the selected node and destroy the jstree
       $('#myModal').on('shown.bs.modal', function (e) {
@@ -260,14 +291,19 @@
           var jstree = $('#jstree').jstree(true);
           if(jstree)
               jstree.destroy();
-          $('#concepto-select').select2('destroy');
+         // $('#concepto-select').select2('destroy');
           $("#concepto-select option:selected").each(function () {
               $(this).remove();
           });
+          $('#id_concepto').val('');
       });
 
       function showTree() {
+          var jstree = $('#jstree').jstree(true);
+          if(jstree)
+              jstree.destroy();
           $('#jstree').jstree(jstreeConf);
+          conf_tree();
       }
 
   </script>
