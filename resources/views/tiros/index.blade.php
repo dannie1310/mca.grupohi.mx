@@ -46,7 +46,7 @@
                 @if($tiro->concepto())
                   <a>{{ $tiro->concepto() }}</a>
                 @else
-                  <a href="">Asignar</a>
+                  <a href="" data-toggle="modal" data-target="#myModal" >Asignar</a>
                 @endif
           </td>
         </tr>
@@ -60,6 +60,37 @@
   </form>
 </div>
 @stop
+
+<!-- Modal -->
+<div class="modal fade" id="myModal"  role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title" id="myModalLabel">Presupuesto de Obra</h3>
+                <p class="alert alert-warning text-center">Seleccione un concepto y de clic en cerrar para asignarlo.</p>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    {!! Form::label('actividad', 'Actividad:') !!}
+                    <div class="input-group">
+                        <select class="form-control" style="z-index:20" id="concepto-select" ></select>
+                        <div type="button" class="input-group-addon btn" onclick="showTree()">
+                            <i class="fa fa-fw fa-sitemap"></i>
+                        </div>
+                        {!! Form::hidden('id_concepto', null, ['class' => 'form-control', 'id' => 'id_concepto']) !!}
+                    </div>
+                </div>
+                <div id="jstree"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @section('scripts')
@@ -141,6 +172,101 @@
               });
       }
 
+      $('#concepto-select').select2({
+          width: '100%',
+          ajax: {
+              url: '{{route('conceptos.lists')}}',
+              dataType: 'json',
+              data: function (params) {
+                  var query = {
+                      q: params.term,
+                  }
+                  return query;
+              },
+              processResults: function (data) {
+                  var results = [];
+                  $.each(data.conceptos, function (id, concepto) {
+                      results.push({id: concepto.id_concepto, text: concepto.descripcion})
+                  })
+                  return { results : results};
+              }
+          }
+      }).on('select2:select', function (e) {
+          $('#id_concepto').val(e.params.data.id);
+      });
+
+      // JsTree Configuration
+      var jstreeConf = {
+          'core' : {
+              'multiple': false,
+              'data': {
+                  "url": function(node) {
+                      if (node.id === "#") {
+                          var id_concepto = $('#id_concepto').val();
+                          if (! id_concepto) {
+                              return App.host + '/conceptos/jstree';
+                          } else {
+                              return App.host + '/conceptos/' + id_concepto + '/jstree';
+                          }
+                      }
+                      return App.host + '/conceptos/' + node.id + '/jstree';
+                  },
+                  "data": function (node) {
+                      return { "id" : node.id };
+                  }
+              }
+          },
+          'types': {
+              'default': {
+                  'icon': 'fa fa-folder-o text-success'
+              },
+              'medible': {
+                  'icon': 'fa fa-file-text'
+              },
+              'material' : {
+                  'icon': 'fa fa-briefcase'
+              },
+              'opened' : {
+                  'icon': 'fa fa-folder-open-o text-success'
+              }
+          },
+          'plugins': ['types']
+      };
+
+      $('#jstree').on("after_open.jstree", function (e, data) {
+          if (data.instance.get_type(data.node) == 'default') {
+              data.instance.set_type(data.node, 'opened');
+          }
+      }).on("after_close.jstree", function (e, data) {
+          if (data.instance.get_type(data.node) == 'opened') {
+              data.instance.set_type(data.node, 'default');
+          }
+      });
+
+      // On hide the BS modal, get the selected node and destroy the jstree
+      /*$('#myModal').on('shown.bs.modal', function (e) {
+          $('#jstree').jstree(jstreeConf);
+      }).on('hidden.bs.modal', function (e) {
+          var jstree = $('#jstree').jstree(true);
+          var node = jstree.get_selected(true)[0];
+
+          if (node) {
+              $('#id_concepto').val(node.id);
+              $('#actividad').val(node.text);
+          }
+
+          jstree.destroy();
+      });
+      */
+
+      function showTree() {
+          var jstree = $('#jstree').jstree(true);
+          if (jstree) {
+              jstree.destroy();
+          }
+
+          $('#jstree').jstree(jstreeConf);
+      }
 
   </script>
 @endsection

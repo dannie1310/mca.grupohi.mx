@@ -333,6 +333,7 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 /**
  * Conceptos Routes
  */
+Route::get('conceptos', 'ConceptoController@lists')->name('conceptos.lists');
 Route::get('conceptos/jstree', 'ConceptoController@getRoot');
 Route::get('conceptos/{id}/jstree', 'ConceptoController@getNode');
 

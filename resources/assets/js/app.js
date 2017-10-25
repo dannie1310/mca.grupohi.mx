@@ -14,6 +14,7 @@ require('select2');
 window._ = require('underscore');
 window.numeral = require('numeral');
 require('./scripts');
+window.jstree = require('jstree');
 
 //Production
 //window.Vue = require('vue/dist/vue.min.js');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Concepto;
 use App\Models\Transformers\ConceptoTreeTransformer;
+use Illuminate\Http\Request;
 
 class ConceptoController extends Controller
 {
@@ -44,5 +45,20 @@ class ConceptoController extends Controller
         // $data = Fractal::createData($resource);
         return response()->json($resp, 200);
 
+    }
+
+    /**
+     * Muestra una lista de los conceptos del presupuesto de obra
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function lists(Request $request)
+    {
+        if ($request->has('q')) {
+            $conceptos = Concepto::search($request->get('q'));
+
+            return response()->json(['conceptos' => $conceptos]);
+        }
     }
 }

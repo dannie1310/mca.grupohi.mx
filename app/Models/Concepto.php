@@ -73,4 +73,12 @@ class Concepto extends \Ghi\Core\Models\Concepto
             ->where('nivel', 'like', $this->nivel_hijos)
             ->get();
     }
+
+    public static function search($search) {
+        return static::where('id_obra', Context::getIdCadeco())
+            ->where('descripcion', 'LIKE', '%' . $search . '%')
+            ->orWhere('clave_concepto', 'LIKE', '%' . $search . '%')
+            ->limit(5)
+            ->get();
+    }
 }
