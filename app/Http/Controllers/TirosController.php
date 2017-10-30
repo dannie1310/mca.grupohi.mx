@@ -180,7 +180,10 @@ class TirosController extends Controller
 
         $tiro->asignar_concepto($request->id_concepto);
 
-        return response()->json(['hecho']);
-        //TODO: Corregir response
+        return response()->json([
+            'status_code' => 200,
+            'mensaje' => 'Asignación guardada correctamente',
+        ]);
+
     }
 }

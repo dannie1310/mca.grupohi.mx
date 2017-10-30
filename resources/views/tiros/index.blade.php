@@ -43,8 +43,8 @@
               @endpermission
           </td>
           <td title="{{ $tiro->concepto() ? $tiro->concepto()->path : '' }}">
-                @if(true)
-                  <a onclick="aviso('Pandita', '{{ $tiro->IdTiro }}', '{{ $tiro->Descripcion}}')">Pandita</a>
+                @if($tiro->concepto())
+                  <a onclick="aviso('{{$tiro->concepto()}}', '{{ $tiro->IdTiro }}', '{{ $tiro->Descripcion}}')">{{$tiro->concepto()}}</a>
                 @else
                   <a href="" data-toggle="modal" data-target="#myModal" onclick="datosTiro('{{$tiro->IdTiro}}' , '{{ $tiro->Descripcion}}')">Asignar</a>
                 @endif
@@ -240,17 +240,24 @@
                   swal({
                       type: "success",
                       title: '¡Correcto!',
-                      text: 'Asignación guardada correctamente'
+                      text: data.mensaje
                   });
-
-
-                  //window.location = xhr.getResponseHeader('Location');
+                  window.location.reload();
               },
+              error: function(error) {
+                  var salida = '';
+                  $.each($.parseJSON(error.responseText), function (ind, elem) {
+                      salida += elem + '\n';
+                  });
+                  swal({
+                      type: 'error',
+                      title: '¡Error!',
+                      text: salida
+                  });
+              }
           });
           $('#myModal').modal('hide');
 
-
-          //alert(idTiro  + ' ' + $('#id_concepto').val());
       }
 
       var select_settings = {
