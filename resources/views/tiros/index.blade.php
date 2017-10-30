@@ -43,8 +43,8 @@
               @endpermission
           </td>
           <td title="{{ $tiro->concepto() ? $tiro->concepto()->path : '' }}">
-                @if($tiro->concepto())
-                  <a>{{ $tiro->concepto() }}</a>
+                @if(true)
+                  <a onclick="aviso('Pandita', '{{ $tiro->IdTiro }}', '{{ $tiro->Descripcion}}')">Pandita</a>
                 @else
                   <a href="" data-toggle="modal" data-target="#myModal" onclick="datosTiro('{{$tiro->IdTiro}}' , '{{ $tiro->Descripcion}}')">Asignar</a>
                 @endif
@@ -102,6 +102,30 @@
           $('#titulo').text('Seleccione el Concepto que desea asignar al Tiro ' + desc);
       }
 
+      function aviso(concepto, id, desc) {
+          swal({
+                  title: "¡Asignar Concepto!",
+                  text: "El tiro " + desc + " esta asignado al Concepto " + concepto + "\n¿Desea actualizar el Concepto del tiro mencionado?",
+                  type: "info",
+                  showCancelButton: true,
+                  closeOnConfirm: true,
+                  confirmButtonText: "Si, Actualizar",
+                  cancelButtonText: "No, Cancelar",
+                  showLoaderOnConfirm: true
+
+              },
+              function(){
+                  datosTiro(id, desc);
+                  $('#myModal').modal('show');
+              });
+
+
+          /*confirmar=confirm('El tiro ' + desc + ' esta asignado al Concepto ' + concepto + '\n¿Desea actualizar el Concepto del tiro mencionado?' );
+          if (confirmar) {
+              datosTiro(id, desc);
+              $('#myModal').modal('show');
+          }*/
+      }
 
       var auth_config = {
           auto_filter: true,
@@ -200,7 +224,32 @@
 
       function asignar() {
           var url=App.host +"/tiros/asignar_concepto";
-          alert(idTiro  + ' ' + $('#id_concepto').val());
+
+          $.ajax({
+              type: 'POST',
+              url: url,
+              data: {
+                  id_tiro: idTiro,
+                  id_concepto: $('#id_concepto').val()
+              },
+              beforeSend: function beforeSend() {
+                  self.guardando = true;
+              },
+              success: function (data, textStatus, xhr) {
+                  swal({
+                      type: "success",
+                      title: '¡Correcto!',
+                      text: 'Asignación guardada correctamente'
+                  });
+
+
+                  //window.location = xhr.getResponseHeader('Location');
+              },
+          });
+          $('#myModal').modal('hide');
+
+
+          //alert(idTiro  + ' ' + $('#id_concepto').val());
       }
 
       var select_settings = {

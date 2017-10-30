@@ -32,7 +32,7 @@ class Tiro extends Model
     public function __toString() {
         return $this->Descripcion;
     }
-    
+
     public function viajesNetos() {
         return $this->hasMany(ViajeNeto::class, 'IdTiro');
     }
@@ -54,5 +54,11 @@ class Tiro extends Model
     public function concepto() {
         $id_concepto = DB::connection('sca')->table('tiros_conceptos')->select('id_concepto')->where('id_tiro', '=', $this->IdTiro)->whereNull('fin_vigencia')->first();
         return \App\Models\Concepto::find($id_concepto);
+    }
+
+    public function asignar_concepto($id_concepto) {
+        // tiro es $this;
+
+
     }
 }

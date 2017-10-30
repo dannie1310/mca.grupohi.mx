@@ -15,8 +15,8 @@ class TirosController extends Controller
 {
     
     function __construct() {
-        $this->middleware('auth');
-        $this->middleware('context');
+        //$this->middleware('auth');
+        //$this->middleware('context');
         $this->middleware('permission:desactivar-tiros', ['only' => ['destroy']]);
         $this->middleware('permission:crear-tiros', ['only' => ['create', 'store']]);
 
@@ -167,6 +167,7 @@ class TirosController extends Controller
     }
 
     public function asignar_concepto(Request $request){
+        //dd($request->id_concepto);
         $this->validate($request, [
             'id_concepto'=>'required',
             'id_tiro'=>'required'
@@ -174,6 +175,8 @@ class TirosController extends Controller
             'id_concepto.required' => 'Debe seleccionar un concepto'
         ]);
 
-        $tiro = Tiro::find($request->id_tiro);
+        //$tiro = Tiro::find($request->id_tiro);
+
+        //$tiro->asignar_concepto($request->id_concepto);
     }
 }
