@@ -167,16 +167,20 @@ class TirosController extends Controller
     }
 
     public function asignar_concepto(Request $request){
-        //dd($request->id_concepto);
         $this->validate($request, [
             'id_concepto'=>'required',
             'id_tiro'=>'required'
         ], [
-            'id_concepto.required' => 'Debe seleccionar un concepto'
+            'id_concepto.required' => 'Debe seleccionar un concepto',
+            'id_tiro.required' => 'Debe seleccionar un Tiro'
         ]);
 
-        //$tiro = Tiro::find($request->id_tiro);
 
-        //$tiro->asignar_concepto($request->id_concepto);
+        $tiro = Tiro::find($request->id_tiro);
+
+        $tiro->asignar_concepto($request->id_concepto);
+
+        return response()->json(['hecho']);
+        //TODO: Corregir response
     }
 }

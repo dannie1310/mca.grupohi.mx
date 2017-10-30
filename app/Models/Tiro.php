@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\Models\ConfiguracionDiaria\Configuracion;
 use App\Models\ConfiguracionDiaria\Esquema;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Jenssegers\Date\Date;
 class Tiro extends Model
@@ -53,12 +55,40 @@ class Tiro extends Model
     }
     public function concepto() {
         $id_concepto = DB::connection('sca')->table('tiros_conceptos')->select('id_concepto')->where('id_tiro', '=', $this->IdTiro)->whereNull('fin_vigencia')->first();
-        return \App\Models\Concepto::find($id_concepto);
+        return \App\Models\Concepto::find($id_concepto != null ? $id_concepto->id_concepto : null);
     }
 
     public function asignar_concepto($id_concepto) {
-        // tiro es $this;
 
+        DB::connection('sca')->beginTransaction();
 
+        try {
+
+            if($this->concepto()) {
+                DB::connection('sca')->table('tiros_conceptos')
+                    ->where('id_tiro', '=', $this->IdTiro)
+                    ->whereNull('fin_vigencia')
+                    ->update([
+                        'registro' => Auth::user()->idusuario,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                        'fin_vigencia' => Carbon::now()->subSecond()
+                    ]);
+            }
+
+            DB::connection('sca')->table('tiros_conceptos')->insert([
+                'id_concepto' => $id_concepto,
+                'id_tiro' => $this->IdTiro,
+                'registro' => Auth::user()->idusuario,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+                'inicio_vigencia' => Carbon::now()
+            ]);
+
+            DB::connection('sca')->commit();
+        } catch (\Exception $e) {
+            DB::connection('sca')->rollback();
+            return $e->getMessage();
+        }
     }
 }

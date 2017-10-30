@@ -17,7 +17,7 @@ class CreateTirosConceptosTable extends Migration
             $table->integer('id_tiro')->unsigned();
             $table->integer('id_concepto');
             $table->timestamp('inicio_vigencia');
-            $table->timestamp('fin_vigencia');
+            $table->timestamp('fin_vigencia')->nullable();
             $table->integer('registro');
             $table->timestamps();
         });

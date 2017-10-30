@@ -99,19 +99,20 @@
       var idTiro;
       function datosTiro(id, desc) {
           idTiro = id;
-          $('#titulo').text('Seleccione el Concepto que desea asignar al Tiro ' + desc);
+          $('#titulo').text(('Seleccione el Concepto que desea asignar al Tiro ' + desc).toUpperCase());
       }
 
       function aviso(concepto, id, desc) {
           swal({
-                  title: "¡Asignar Concepto!",
-                  text: "El tiro " + desc + " esta asignado al Concepto " + concepto + "\n¿Desea actualizar el Concepto del tiro mencionado?",
-                  type: "info",
-                  showCancelButton: true,
-                  closeOnConfirm: true,
-                  confirmButtonText: "Si, Actualizar",
-                  cancelButtonText: "No, Cancelar",
-                  showLoaderOnConfirm: true
+              title: "¡Asignar Concepto!",
+              text: "El tiro <strong>" + desc + "</strong> esta asignado al Concepto <strong>" + concepto + "</strong>\n¿Desea actualizar el Concepto del tiro mencionado?",
+              type: "info",
+              showCancelButton: true,
+              closeOnConfirm: true,
+              confirmButtonText: "Si, Actualizar",
+              cancelButtonText: "No, Cancelar",
+              showLoaderOnConfirm: true,
+              html: true
 
               },
               function(){
