@@ -261,7 +261,7 @@
       }
 
       var select_settings = {
-          width: '100%',
+          dropdownAutoWidth : true,
           language: "es",
           ajax: {
               url: '{{route('conceptos.lists')}}',
