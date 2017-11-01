@@ -183,6 +183,8 @@ class TirosController extends Controller
         return response()->json([
             'status_code' => 200,
             'mensaje' => 'Asignación guardada correctamente',
+            'concepto' => $tiro->concepto(),
+            'tiro' => $tiro
         ]);
 
     }

@@ -42,11 +42,11 @@
             @endif
               @endpermission
           </td>
-          <td title="{{ $tiro->concepto() ? $tiro->concepto()->path : '' }}">
+          <td id="{{$tiro->IdTiro}}" title="{{ $tiro->concepto() ? $tiro->concepto()->path : '' }}">
                 @if($tiro->concepto())
                   <a onclick="aviso('{{$tiro->concepto()}}', '{{ $tiro->IdTiro }}', '{{ $tiro->Descripcion}}')">{{$tiro->concepto()}}</a>
                 @else
-                  <a href="" data-toggle="modal" data-target="#myModal" onclick="datosTiro('{{$tiro->IdTiro}}' , '{{ $tiro->Descripcion}}')">Asignar</a>
+                  <a href="" data-toggle="modal" data-target="#myModal" onclick="datosTiro('{{$tiro->IdTiro}}' , '{{ $tiro->Descripcion}}')">--ASIGNAR--</a>
                 @endif
           </td>
         </tr>
@@ -74,7 +74,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    {!! Form::label('actividad', 'Actividad:') !!}
+                    {!! Form::label('concepto', 'Concepto:') !!}
                     <div class="input-group">
                         <select class="form-control" id="concepto-select" ></select>
                         <div type="button" class="input-group-addon btn" onclick="showTree()">
@@ -242,7 +242,11 @@
                       title: '¡Correcto!',
                       text: data.mensaje
                   });
-                  window.location.reload();
+
+                    var concept = data.concepto.descripcion.replace(/"/g, '&quot;');
+                  $('#' + idTiro)
+                      .attr('title', "'" + data.concepto.path +"'")
+                      .html('<a onclick="aviso('+ "'" + concept + "'" +','+ "'" + data.tiro.IdTiro + "'" +','+ "'" + data.tiro.Descripcion + "'" +')">'+ data.concepto.descripcion +'</a>');
               },
               error: function(error) {
                   var salida = '';
@@ -348,7 +352,6 @@
           var jstree = $('#jstree').jstree(true);
           if(jstree)
               jstree.destroy();
-         // $('#concepto-select').select2('destroy');
           $("#concepto-select option:selected").each(function () {
               $(this).remove();
           });

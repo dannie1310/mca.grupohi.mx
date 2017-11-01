@@ -8,6 +8,7 @@ use App\Facades\Context;
 class Concepto extends \Ghi\Core\Models\Concepto
 {
 
+    protected $appends = ['path'];
 
     /**
      * @return bool|string
