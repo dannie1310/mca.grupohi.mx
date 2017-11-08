@@ -34,6 +34,12 @@
         {!! Form::text('KMAdicional', null, ['class' => 'form-control', 'placeholder' => '0']) !!}
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+            <label for="idtarifas_tipo">TIPO DE TARIFA</label>
+            {!! Form::select('idtarifas_tipo', $tipos, null, ['placeholder' => '--SELECCIONE--', 'class' => 'form-control']) !!}
+    </div>
+</div>
 <div class="form-group col-md-12" style="text-align: center; margin-top: 20px">
     {!! Form::submit('Guardar', ['class' => 'btn btn-success']) !!}
 </div>

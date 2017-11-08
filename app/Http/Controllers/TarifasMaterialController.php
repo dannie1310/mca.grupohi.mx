@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TarifasTipoMaterial;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -35,7 +36,8 @@ class TarifasMaterialController extends Controller
             return response()->json($material->tarifaMaterial->toArray());
         }
         return view('tarifas.material.index')
-                ->withTarifas(TarifaMaterial::all());
+                ->withTarifas(TarifaMaterial::all())
+                ->withTipos(TarifasTipoMaterial::all());
     }
 
     /**
@@ -44,7 +46,7 @@ class TarifasMaterialController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Requests\CreateTarifaPesoRequest $request)
+    public function store(Requests\CreateTarifaMaterialRequest $request)
     {
         $request->request->add([
             'Fecha_Hora_Registra' => Carbon::now()->toDateTimeString(),
@@ -108,6 +110,7 @@ class TarifasMaterialController extends Controller
                 $tsv->FinVigencia = $fin_vigencia;
                 $tsv->save();
             }
+
             TarifaMaterial::create($request->all());
 //             return view('tarifas.material.index')
 //            ->withTarifas(TarifaMaterial::all());
@@ -180,7 +183,8 @@ class TarifasMaterialController extends Controller
     public function create()
     {
         $materiales = Material::orderBy("descripcion")->lists("Descripcion","IdMaterial");
+        $tipos = TarifasTipoMaterial::all()->lists("nombre","idtarifas_tipo");
         $fecha_actual = date("d-m-Y");
-        return view('tarifas.material.create')->withMateriales($materiales)->withFechaActual($fecha_actual);
+        return view('tarifas.material.create')->withMateriales($materiales)->withFechaActual($fecha_actual)->withTipos($tipos);
     }
 }

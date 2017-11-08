@@ -21,6 +21,7 @@
                 <th>Tarifa KM Adicionales</th>
                 <th>Inicio de Vigencia</th>
                 <th>Fin de Vigencia</th>
+                <th>Tipo Tarifa</th>
                 <th>Registro</th>
                 <th>Fecha Hora Registro</th>
                 <th>Estado</th>
@@ -42,6 +43,15 @@
                 <td>{{ $tarifa->KMAdicional }}</td>
                 <td>{{ $tarifa->InicioVigencia->format("d-m-Y h:i:s") }}</td>
                 <td>{{ $tarifa->FinVigenciaTarifa }}</td>
+                @if($tarifa->idtarifas_tipo != null)
+                  @foreach($tipos as $tipo)
+                      @if($tipo->idtarifas_tipo == $tarifa->idtarifas_tipo)
+                        <td>{{ $tipo->nombre }}</td>
+                      @endif
+                  @endforeach
+                @else
+                        <td>NO ASIGNADO</td>
+                @endif
                 <td>{{ $tarifa->registro->present()->NombreCompleto }}</td>
                 <td>{{ $tarifa->Fecha_Hora_Registra->format("d-m-Y h:i:s") }}</td>
                 <td>{{ $tarifa->estatus_string }}</td>
