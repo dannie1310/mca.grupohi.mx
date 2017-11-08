@@ -315,15 +315,17 @@ class CSVController extends Controller
 
     public function tarifas_material()
     {
-        $headers = ["ID", "Material", "Primer KM", "KM Subsecuente", "KM Adicional", "Fecha y Hora Registro", "Estatus", "Registra", "Inicio Vigencia", "Fin Vigencia"];
+        $headers = ["ID", "Material", "Primer KM", "KM Subsecuente", "KM Adicional", "Tipo Tarifa", "Fecha y Hora Registro", "Estatus", "Registra", "Inicio Vigencia", "Fin Vigencia"];
         $items = TarifaMaterial::leftJoin('materiales', 'tarifas.IdMaterial', '=', 'materiales.IdMaterial')
             ->leftJoin('igh.usuario', 'tarifas.Registra', '=', 'igh.usuario.idusuario')
+            ->leftJoin('tarifas_tipo_material','tarifas_tipo_material.idtarifas_tipo','=','tarifas.idtarifas_tipo')
             ->select(
                 "tarifas.IdTarifa",
                 "materiales.Descripcion",
                 "tarifas.PrimerKM",
                 "tarifas.KMSubsecuente",
                 "tarifas.KMAdicional",
+                "tarifas_tipo_material.nombre",
                 "tarifas.Fecha_Hora_Registra",
                 "tarifas.Estatus",
                 DB::raw("CONCAT(igh.usuario.nombre, ' ', igh.usuario.apaterno, ' ', igh.usuario.amaterno)"),
