@@ -445,3 +445,26 @@ Breadcrumbs::register('solicitud-actualizacion.show', function ($breadcrumbs, $s
     $breadcrumbs->parent('solicitud-actualizacion.index');
     $breadcrumbs->push($solicitud->Economico, route('solicitud-actualizacion.show', $solicitud));
 });
+
+//Control de Suministro
+
+//Conciliaciones
+
+Breadcrumbs::register('conciliaciones.suministro.index', function($breadcrumbs) {
+    $breadcrumbs->push('CONCILIACIONES SUMINISTRO', route('conciliaciones.suministro.index'));
+});
+
+Breadcrumbs::register('conciliaciones.suministro.show', function($breadcrumbs, $conciliacion) {
+    $breadcrumbs->parent('conciliaciones.suministro.index');
+    $breadcrumbs->push($conciliacion->idconciliacion, route('conciliaciones.suministro.show', $conciliacion));
+});
+
+Breadcrumbs::register('conciliaciones.suministro.create', function($breadcrumbs) {
+    $breadcrumbs->parent('conciliaciones.suministro.index');
+    $breadcrumbs->push('NUEVA CONCILIACIÓN SUMINISTRO', route('conciliaciones.suministro.create'));
+});
+
+Breadcrumbs::register('conciliaciones.suministro.edit', function($breadcrumbs, $conciliacion) {
+    $breadcrumbs->parent('conciliaciones.suministro.show', $conciliacion);
+    $breadcrumbs->push('EDITAR CONCILIACIÓN SUMINISTRO', route('conciliaciones.suministro.edit', $conciliacion));
+});

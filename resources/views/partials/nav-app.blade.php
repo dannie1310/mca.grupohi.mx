@@ -270,7 +270,16 @@
           </ul>
       </li>
   @endif
-
+  @if(Auth::user()->can(['control_suministro']))
+      <li class="dropdown">
+          <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
+              Operación Suministro<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu">
+              <li><a href="{{ route('conciliaciones.suministro.index') }}">Conciliaciones</a></li>
+          </ul>
+      </li>
+  @endif
 @else
   <li><a href="{{ route('proyectos') }}">Proyectos</a></li>
 @endif

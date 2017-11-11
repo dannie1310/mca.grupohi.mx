@@ -328,3 +328,12 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 //Route::group(['middleware' => ['permission:consulta-solicitud-actualizar']], function () {
     Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
 //});
+
+// Rutas Control de Suministro
+
+//Route::resource('conciliacionesSuministro', 'ConciliacionesSuministroController');
+Route::get('conciliacion/suministro', 'ConciliacionesSuministroController@index')->name('conciliaciones.suministro.index');
+Route::post('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@store')->name('conciliaciones.suministro.detalles.store');
+Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@index')->name('conciliaciones.suministro.detalles.index');
+Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');
+Route::get('conciliacion_info_carga/suministro/{filename}', 'ConciliacionesSuministroDetallesController@detalle_carga')->name('conciliacion.suministro.info');
