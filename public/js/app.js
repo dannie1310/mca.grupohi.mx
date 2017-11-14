@@ -44191,7 +44191,7 @@ Vue.component('conciliaciones-suministro-edit', {
             e.preventDefault();
 
             var _this = this;
-            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            var url = App.host + '/conciliacion/suministro/' + _this.conciliacion.id;
 
             if (!this.conciliados.length) {
                 swal({
@@ -44250,7 +44250,7 @@ Vue.component('conciliaciones-suministro-edit', {
         aprobar: function aprobar(e) {
             e.preventDefault();
             var _this = this;
-            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            var url = App.host + '/conciliacion/suministro/' + _this.conciliacion.id;
             swal({
                 title: "¡Aprobar Conciliación!",
                 text: "¿Desea aprobar la conciliación?",
@@ -44299,7 +44299,7 @@ Vue.component('conciliaciones-suministro-edit', {
             this.form.errors = [];
             this.guardando = true;
 
-            var url = $('.form_registrar').attr('action');
+            var url = App.host + '/conciliacion/suministro/' + conciliacion.idconciliacion + '/edit';
             var data = $('.form_registrar').serialize();
 
             $.ajax({
@@ -44499,7 +44499,7 @@ Vue.component('conciliaciones-suministro-edit', {
 
         eliminar_detalle: function eliminar_detalle(idconciliacion_detalle) {
             var _this = this;
-            var url = App.host + '/conciliacion/' + this.conciliacion.id + '/detalles/' + idconciliacion_detalle;
+            var url = App.host + '/conciliacion/suministro/' + this.conciliacion.id + '/detalles/' + idconciliacion_detalle;
             swal({
                 title: "¡Cancelar viaje de la Conciliación!",
                 text: "¿Esta seguro de que deseas quitar el viaje de la conciliación?",

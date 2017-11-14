@@ -3,6 +3,9 @@
 namespace App\Models\Transformers;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\InicioViaje;
+use App\User;
+use Themsaid\Transformers\AbstractTransformer;
 
 class ConciliacionSuministroDetalleNoConciliadoTransformer extends AbstractTransformer
 {

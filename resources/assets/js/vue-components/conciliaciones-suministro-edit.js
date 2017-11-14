@@ -311,7 +311,7 @@ Vue.component('conciliaciones-suministro-edit', {
             this.form.errors = [];
             this.guardando = true;
 
-            var url = $('.form_registrar').attr('action');
+            var url = App.host + '/conciliacion/suministro/' + conciliacion.idconciliacion + '/edit'
             var data = $('.form_registrar').serialize();
 
             $.ajax({

@@ -338,6 +338,7 @@ Route::post('conciliacion/suministro/{conciliacion}/show','ConciliacionesSuminis
 Route::get('conciliacion/suministro/create','ConciliacionesSuministroController@create')->name('conciliaciones.suministro.create');
 Route::post('conciliacion/suminitro/new','ConciliacionesSuministroController@store');
 Route::get('conciliacion/suministro/{conciliacion}/edit', 'ConciliacionesSuministroController@edit');
+Route::get('conciliacion/suministro/{conciliacion}/edit', 'ConciliacionesSuministroController@edit')->name('conciliaciones.suministro.edit');
 Route::post('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@store')->name('conciliaciones.suministro.detalles.store');
 Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@index')->name('conciliaciones.suministro.detalles.index');
 Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');
