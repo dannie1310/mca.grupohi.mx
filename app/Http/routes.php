@@ -343,3 +343,5 @@ Route::post('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSu
 Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@index')->name('conciliaciones.suministro.detalles.index');
 Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');
 Route::get('conciliacion_info_carga/suministro/{filename}', 'ConciliacionesSuministroDetallesController@detalle_carga')->name('conciliacion.suministro.info');
+
+Route::get('inicioviajes', 'InicioViajesController@index')->name('inicioviajes.index');

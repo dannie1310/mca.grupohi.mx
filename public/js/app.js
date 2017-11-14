@@ -44421,7 +44421,7 @@ Vue.component('conciliaciones-suministro-edit', {
             this.guardando = true;
 
             var data = $('.form_buscar').serialize();
-            this.$http.get(App.host + '/viajes?tipo=conciliar&' + data).then(function (response) {
+            this.$http.get(App.host + '/inicioviajes?tipo=conciliar&' + data).then(function (response) {
                 _this.resultados = response.body.data;
                 if (_this.resultados.length) {
                     _this.guardando = false;
