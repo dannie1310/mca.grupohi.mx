@@ -9,6 +9,8 @@ require('./vue-components/viajes-validar');
 require('./vue-components/viajes-modificar');
 require('./vue-components/conciliaciones-create');
 require('./vue-components/conciliaciones-edit');
+require('./vue-components/conciliaciones-suministro-create');
+require('./vue-components/conciliaciones-suministro-edit');
 require('./vue-components/viajes-revertir');
 require('./vue-components/viajes-index');
 require('./vue-components/corte-create');

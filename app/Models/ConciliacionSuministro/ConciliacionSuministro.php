@@ -46,7 +46,7 @@ class ConciliacionSuministro extends Model
     protected $dates = ['timestamp','fecha_conciliacion', 'FechaHoraCierre', 'FechaHoraAprobacion'];
     protected $presenter = ModelPresenter::class;
 
-    public function conciliacionDetalles()
+    public function conciliacionSuministroDetalles()
     {
         return $this->hasMany(ConciliacionSuministroDetalle::class, 'idconciliacion');
     }
@@ -119,6 +119,7 @@ class ConciliacionSuministro extends Model
     public function viajes()
     {
         $viajes = new Collection();
+
         foreach ($this->conciliacionSuministroDetalles->where('estado', 1) as $cd) {
             $viajes->push($cd->viaje);
         }
@@ -207,18 +208,18 @@ class ConciliacionSuministro extends Model
         return $this->hasMany(ConciliacionSuministroDetalle::class, 'idconciliacion', 'idconciliacion');
     }
 
-    public function getVolumenAttribute()
+   /* public function getVolumenAttribute()
     {
         $results = DB::connection("sca")->select("select sum(CubicacionCamion) as Volumen "
             . "from conciliacion_suministro "
             . "left join conciliacion_suministro_detalle on conciliacion_suministro.idconciliacion = conciliacion_suministro_detalle.idconciliacion "
-            . "left join inicio_viajes on conciliacion_suministro_detalle.idviaje = inicio_viajes.IdViaje where conciliacion_suministro.idconciliacion = " . $this->idconciliacion . " "
+            . "left join inicio_viajes on conciliacion_suministro_detalle.idviaje = inicio_viajes.IdInicioViajes where conciliacion_suministro.idconciliacion = " . $this->idconciliacion . " "
             . "and conciliacion_suministro_detalle.estado = 1 "
             . "group by conciliacion_suministro.idconciliacion limit 1");
         return $results ? $results[0]->Volumen : 0;
-    }
+    }*/
 
-    public function getImporteAttribute()
+    /*public function getImporteAttribute()
     {
         $results = DB::connection("sca")->select("select sum(Importe) as Importe "
             . "from conciliacion_suministro "
@@ -227,7 +228,7 @@ class ConciliacionSuministro extends Model
             . "and conciliacion_suministro_detalle.estado = 1 "
             . "group by conciliacion_suministro.idconciliacion limit 1");
         return $results ? $results[0]->Importe : 0;
-    }
+    }*/
 
     public function getImportePagadoFAttribute(){
         return number_format($this->ImportePagado, 2, ".",",");

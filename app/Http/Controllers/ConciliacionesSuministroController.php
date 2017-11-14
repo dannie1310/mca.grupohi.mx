@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ConciliacionSuministro\ConciliacionSuministro;
+
+use App\Models\Camion;
+use App\Models\Transformers\ConciliacionSuministroTransformer;
+use App\Models\Transformers\ConciliacionTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Models\Empresa;
+use App\Models\Sindicato;
+use App\Models\ConciliacionSuministro\ConciliacionSuministro;
+use Carbon\Carbon;
 
 class ConciliacionesSuministroController extends Controller
 {
@@ -27,6 +34,7 @@ class ConciliacionesSuministroController extends Controller
     public function index(Request $request)
     {
         $conciliaciones = $this->buscar($request->get('buscar'), 15);
+
         return view('control_suministro.conciliaciones.index')
             ->withContador(1)
             ->withConciliaciones($conciliaciones);
@@ -49,7 +57,6 @@ class ConciliacionesSuministroController extends Controller
             ->select(DB::raw("conciliacion_suministro.*"))
             ->groupBy('conciliacion_suministro.idconciliacion')
             ->orderBy('idconciliacion',"DESC")
-
             ->paginate($howMany);
 
     }
@@ -61,7 +68,9 @@ class ConciliacionesSuministroController extends Controller
      */
     public function create()
     {
-        //
+        return view('control_suministro.conciliaciones.create')
+            ->withEmpresas(Empresa::orderBy('razonSocial', 'ASC')->lists('razonSocial', 'IdEmpresa'))
+            ->withSindicatos(Sindicato::orderBy('nombreCorto', 'ASC')->lists('nombreCorto', 'IdSindicato'));
     }
 
     /**
@@ -70,9 +79,26 @@ class ConciliacionesSuministroController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Requests\CreateConciliacionRequest $request)
     {
-        //
+        $conciliacion = ConciliacionSuministro::create([
+            'fecha_conciliacion' => $request->get('fecha'),
+            'idsindicato'        => $request->get('idsindicato'),
+            'idempresa'          => $request->get('idempresa'),
+            'ImportePagado'      => $request->get('importe_pagado'),
+            'VolumenPagado'      => $request->get('volumen_pagado'),
+            'fecha_inicial'      => Carbon::now()->toDateString(),
+            'fecha_final'        => Carbon::now()->toDateString(),
+            'estado'             => 0,
+            'IdRegistro'         => auth()->user()->idusuario,
+            'Folio'              => $request->get('folio'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'status_code' => 200,
+            'conciliacion' => $conciliacion
+        ], 200);
     }
 
     /**
@@ -81,9 +107,20 @@ class ConciliacionesSuministroController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function show(Request $request, $id) {
+
+        if($request->ajax()) {
+            $conciliacion = ConciliacionSuministroTransformer::transform(ConciliacionSuministro::find($id));
+
+            return response()->json([
+                'status_code' => 200,
+                'conciliacion' => $conciliacion
+            ]);
+        }
+        $conciliacion = ConciliacionSuministro::find($id);
+
+        return view('control_suministro.conciliaciones.show')
+            ->withConciliacion($conciliacion);
     }
 
     /**
@@ -92,9 +129,11 @@ class ConciliacionesSuministroController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        //
+        return view('control_suministro.conciliaciones.edit')
+            ->withConciliacion(ConciliacionSuministro::findOrFail($id))
+            ->withCamiones(Camion::lists('Economico', 'IdCamion'));
     }
 
     /**

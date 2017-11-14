@@ -129,11 +129,12 @@ class Conciliacion extends Model
     public function viajes_manuales()
     {
         $viajes = new Collection();
-        foreach ($this->conciliacionDetalles->where('estado', 1) as $cd) {
+        foreach ($this->conciliacionDetalles->where('esta5do', 1) as $cd) {
             if($cd->viaje->Estatus == 20) {
                 $viajes->push($cd->viaje);
             }
         }
+        dd($viajes);
         return $viajes;
     }
 

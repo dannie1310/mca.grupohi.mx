@@ -333,6 +333,11 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 
 //Route::resource('conciliacionesSuministro', 'ConciliacionesSuministroController');
 Route::get('conciliacion/suministro', 'ConciliacionesSuministroController@index')->name('conciliaciones.suministro.index');
+Route::get('conciliacion/suministro/{conciliacion}/show','ConciliacionesSuministroController@show');
+Route::post('conciliacion/suministro/{conciliacion}/show','ConciliacionesSuministroController@show')->name('conciliaciones.suministro.show');
+Route::get('conciliacion/suministro/create','ConciliacionesSuministroController@create')->name('conciliaciones.suministro.create');
+Route::post('conciliacion/suminitro/new','ConciliacionesSuministroController@store');
+Route::get('conciliacion/suministro/{conciliacion}/edit', 'ConciliacionesSuministroController@edit');
 Route::post('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@store')->name('conciliaciones.suministro.detalles.store');
 Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@index')->name('conciliaciones.suministro.detalles.index');
 Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');

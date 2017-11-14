@@ -1,9 +1,8 @@
 @extends('layout_width')
 
 @section('content')
-    <h1>
-    {!! Breadcrumbs::render('conciliaciones.suministro.index')  !!}
-       @if(Auth::user()->can(['generar-conciliacion']))
+    <h1>{{ strtoupper(trans('strings.conciliaciones')).' SUMINISTRO'}}
+        @if(Auth::user()->can(['generar-conciliacion']))
             <a href="{{ route('conciliaciones.suministro.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> {{ trans('strings.new_conciliacion') }}</a>
         @endif
     </h1>
@@ -79,7 +78,7 @@
                     <td>{{$conciliacion->fecha_conciliacion->format("d-m-Y")}}</td>
                     <td>{{$conciliacion->sindicato->Descripcion}}</td>
                     <td>{{$conciliacion->empresa}}</td>
-                    <td style="text-align: right">{{$conciliacion->conciliacionDetalles->where('estado', 1)->count()}}</td>
+                    <td style="text-align: right">{{$conciliacion->conciliacionSuministroDetalles->where('estado', 1)->count()}}</td>
                     <td style="text-align: right">{{$conciliacion->volumen_f}}</td>
 
                     <td style="text-align: right">
@@ -149,7 +148,7 @@
                         {!! Form::close() !!}
                     </td>
                     <td>
-                        @if($conciliacion->conciliacionDetalles->where('estado', 1)->count() && Auth::user()->can(['ver-pdf']))
+                        @if($conciliacion->conciliacionSuministroDetalles->where('estado', 1)->count() && Auth::user()->can(['ver-pdf']))
                             <a href="{{ route('pfd.conciliacion', $conciliacion) }}" class="btn btn-default btn-xs"><i class="fa fa-file-pdf-o"></i></a>
                         @else
                             <a class="btn btn-default btn-xs" disabled><i class="fa fa-file-pdf-o"></i></a>
