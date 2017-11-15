@@ -3,7 +3,7 @@
 <hr>
 <div id="app">
     <global-errors></global-errors>
-    <viajes-revertir inline-template>
+    <viajes-revertir inline-template v-cloak>
         <section>
             <app-errors v-bind:form="form"></app-errors>
             <hr>

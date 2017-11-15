@@ -4,7 +4,7 @@
     <h1>REGISTRO DE PERMISOS PARA CAMBIOS EN LOS PERIODOS CERRADOS</h1>
     <div id="app">
         <global-errors></global-errors>
-        <periodocierre-administracion inline-template>
+        <periodocierre-administracion inline-template v-cloak>
             <section>
                 <app-errors v-bind:form="form"></app-errors>
 

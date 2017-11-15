@@ -9,7 +9,7 @@
 @include('partials.errors')
 <div id="app">
     <global-errors></global-errors>
-    <fda-bancomaterial inline-template>
+    <fda-bancomaterial inline-template v-cloak>
         <section>
             <app-errors v-bind:form="form"></app-errors>
             <div class="form-horizontal rcorners ">

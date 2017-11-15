@@ -53,4 +53,27 @@ class InicioViaje extends Model
         return $this->hasMany(ConciliacionSuministroDetalle::class, 'idviaje','IdInicioViaje');
     }
 
+    public function scopePorConciliar($query) {
+        return $query->leftJoin('conciliacion_suministro_detalle', 'inicioviajes.IdInicioViaje', '=', 'conciliacion_suministro_detalle.idviaje')
+            ->where(function($query){
+                $query->whereNull('conciliacion_suministro_detalle.idviaje')
+                    ->orWhere('conciliacion_suministro_detalle.estado', '=', '-1');
+            });
+    }
+
+    public function scopeConciliados($query) {
+        return $query->leftJoin('conciliacion_suministro_detalle', 'inicioviajes.IdInicioViaje', '=', 'conciliacion_suministro_detalle.idviaje')
+            ->where(function($query){
+                $query->whereNotNull('conciliacion_suministro_detalle.idviaje')
+                    ->orWhere('conciliacion_suministro_detalle.estado', '!=', '-1');
+            });
+    }
+    public function disponible() {
+        foreach ($this->conciliacionDetalles as $conciliacionDetalle) {
+            if ($conciliacionDetalle->estado == 1) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

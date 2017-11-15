@@ -10,7 +10,7 @@
 
     <div id="app">
         <global-errors></global-errors>
-        <configuracion-diaria inline-template rol_checador="{{ $rol->id }}">
+        <configuracion-diaria inline-template v-cloak rol_checador="{{ $rol->id }}">
             <section>
                 <div v-if="cargando" class="row">
                     <h4 style="text-align: center"><i class="fa fa-spinner fa-spin fa-lg"></i> CARGANDO </h4>

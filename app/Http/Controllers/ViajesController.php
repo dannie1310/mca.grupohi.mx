@@ -26,8 +26,8 @@ class ViajesController extends Controller
      */
     public function index(Request $request)
     {
+        dd($request);
         if($request->ajax()) {
-            dd("cons");
             if($request->get('tipo') == 'conciliar') {
                 $this->validate($request, [
                     'IdCamion' => 'exists:sca.camiones,IdCamion',

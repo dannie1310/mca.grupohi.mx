@@ -344,4 +344,4 @@ Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSum
 Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');
 Route::get('conciliacion_info_carga/suministro/{filename}', 'ConciliacionesSuministroDetallesController@detalle_carga')->name('conciliacion.suministro.info');
 
-Route::get('inicioviajes', 'InicioViajesController@index')->name('inicioviajes.index');
+Route::get('inicioviajes', 'InicioSuministroController@index');
