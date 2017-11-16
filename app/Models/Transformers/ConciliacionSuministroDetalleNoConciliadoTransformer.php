@@ -15,7 +15,7 @@ class ConciliacionSuministroDetalleNoConciliadoTransformer extends AbstractTrans
         $output = [
             'id' => $detalle_nc->id,
             'idmotivo' => $detalle_nc->idmotivo,
-            'idviaje_neto' => $detalle_nc->idviaje_neto,
+            'idinicioviaje' => $detalle_nc->idinicioviaje,
             'idviaje' => $detalle_nc->idviaje,
             'Code' => $detalle_nc->Code,
             'detalle' =>($detalle_nc->detalle),

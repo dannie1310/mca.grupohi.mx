@@ -134,7 +134,6 @@ class Conciliacion extends Model
                 $viajes->push($cd->viaje);
             }
         }
-        dd($viajes);
         return $viajes;
     }
 
