@@ -54,7 +54,7 @@ class InicioViaje extends Model
     }
 
     public function scopePorConciliar($query) {
-        return $query->leftJoin('conciliacion_suministro_detalle', 'inicioviajes.IdInicioViaje', '=', 'conciliacion_suministro_detalle.idviaje')
+        return $query->leftJoin('conciliacion_suministro_detalle', 'inicio_viajes.IdInicioViajes', '=', 'conciliacion_suministro_detalle.idviaje')
             ->where(function($query){
                 $query->whereNull('conciliacion_suministro_detalle.idviaje')
                     ->orWhere('conciliacion_suministro_detalle.estado', '=', '-1');
@@ -62,7 +62,7 @@ class InicioViaje extends Model
     }
 
     public function scopeConciliados($query) {
-        return $query->leftJoin('conciliacion_suministro_detalle', 'inicioviajes.IdInicioViaje', '=', 'conciliacion_suministro_detalle.idviaje')
+        return $query->leftJoin('conciliacion_suministro_detalle', 'inicio_viajes.IdInicioViajes', '=', 'conciliacion_suministro_detalle.idviaje')
             ->where(function($query){
                 $query->whereNotNull('conciliacion_suministro_detalle.idviaje')
                     ->orWhere('conciliacion_suministro_detalle.estado', '!=', '-1');

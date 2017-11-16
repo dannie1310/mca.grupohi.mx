@@ -52,7 +52,12 @@ class InicioViajesController extends Controller
                 $data = InicioViajeTransformer::transform($filter);
 
             }
+            return response()->json([
+                'status_code' => 200,
+                'data' => $data
+            ]);
         }
+
     }
 
     /**

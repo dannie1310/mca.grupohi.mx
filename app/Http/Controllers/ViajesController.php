@@ -26,7 +26,6 @@ class ViajesController extends Controller
      */
     public function index(Request $request)
     {
-        dd($request);
         if($request->ajax()) {
             if($request->get('tipo') == 'conciliar') {
                 $this->validate($request, [

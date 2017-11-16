@@ -4,6 +4,7 @@ namespace App\Models\ConciliacionSuministro;
 
 use App\Models\InicioCamion;
 use App\Models\InicioViaje;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class ConciliacionSuministroDetalleNoConciliado extends Model
@@ -42,7 +43,8 @@ class ConciliacionSuministroDetalleNoConciliado extends Model
         if($this->conciliacion->estado != 0 && $this->estado != -1 ){
             throw new \Exception("No se pueden relacionar más viajes fallidos a la conciliación.");
         }else{
-            $preexistente = $this->conciliacion->ConciliacionSuministroDetallesNoConciliados->where('idmotivo',$this->idmotivo)
+
+            $preexistente = $this->conciliacion->ConciliacionDetallesNoConciliados->where('idmotivo',$this->idmotivo)
                 ->where('Code', $this->Code)
                 ->where('idinicioviaje', $this->idinicioviaje)
                 ->where('detalle', $this->detalle)
