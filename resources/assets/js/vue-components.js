@@ -19,3 +19,4 @@ require('./vue-components/configuracion-diaria');
 require('./vue-components/roles-permisos');
 require('./vue-components/tickets-validar');
 require('./vue-components/periodocierre-administracion');
+require('./vue-components/suministro-index');

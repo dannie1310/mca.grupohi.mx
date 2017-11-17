@@ -329,7 +329,29 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
     Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
 //});
 
+
+
+
 // Rutas Control de Suministro
+
+Route::get('suministro_netos', 'InicioSuministroController@index')->name('suministro_netos.index');
+Route::get('suministro_netos/create', 'InicioSuministroController@create')->name('suministro_netos.create');
+Route::group(['prefix' => 'suministro_netos'], function() {
+    Route::post('completa', 'InicioSuministroController@store');
+    Route::post('manual', [
+        'as' => 'suministro_netos.manual.store',
+        'uses' => 'InicioSuministroController@store',
+        'middleware' => ['permission:ingresar-viajes-manuales']
+    ]);
+});
+Route::get('suministro_netos/edit' , 'InicioSuministroController@edit')->name('suministro_netos.edit');
+Route::patch('suministro_netos', 'InicioSuministroController@update')->name('suministro_netos.update');
+Route::group(['prefix' => 'suministro_netos'], function() {
+    Route::patch('autorizar', 'InicioSuministroController@update')->name('suministro_netos.autorizar');
+});
+Route::get('suministro_netos/{viaje_neto}', 'InicioSuministroController@show')->name('suministro_netos.show');
+
+
 
 //Route::resource('conciliacionesSuministro', 'ConciliacionesSuministroController');
 Route::get('conciliacion/suministro', 'ConciliacionesSuministroController@index')->name('conciliaciones.suministro.index');
@@ -344,6 +366,6 @@ Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSum
 Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');
 Route::get('conciliacion_info_carga/suministro/{filename}', 'ConciliacionesSuministroDetallesController@detalle_carga')->name('conciliacion.suministro.info');
 
-Route::get('inicioviajes', 'InicioSuministroController@index')->name('inicioviajes.index');
-Route::patch('inicioviajes/{viaje}', 'InicioSuministroController@update');
-Route::get('inicioviajes/edit', 'InicioSuministroController@edit')->name('inicioviajes.edit');
+Route::get('inicioviajes', 'InicioViajesController@index')->name('inicioviajes.index');
+Route::patch('inicioviajes/{viaje}', 'InicioViajesController@update');
+Route::get('inicioviajes/edit', 'InicioViajesController@edit')->name('inicioviajes.edit');

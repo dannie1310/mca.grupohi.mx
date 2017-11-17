@@ -43246,8 +43246,9 @@ require('./vue-components/configuracion-diaria');
 require('./vue-components/roles-permisos');
 require('./vue-components/tickets-validar');
 require('./vue-components/periodocierre-administracion');
+require('./vue-components/suministro-index');
 
-},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/conciliaciones-suministro-create":41,"./vue-components/conciliaciones-suministro-edit":42,"./vue-components/configuracion-diaria":43,"./vue-components/corte-create":44,"./vue-components/corte-edit":45,"./vue-components/errors":46,"./vue-components/fda-bancomaterial":47,"./vue-components/fda-material":48,"./vue-components/global-errors":49,"./vue-components/origenes-usuarios":50,"./vue-components/periodocierre-administracion":51,"./vue-components/roles-permisos":52,"./vue-components/tickets-validar":56,"./vue-components/viajes-completa":57,"./vue-components/viajes-index":58,"./vue-components/viajes-manual":59,"./vue-components/viajes-modificar":60,"./vue-components/viajes-revertir":61,"./vue-components/viajes-validar":62}],39:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":39,"./vue-components/conciliaciones-edit":40,"./vue-components/conciliaciones-suministro-create":41,"./vue-components/conciliaciones-suministro-edit":42,"./vue-components/configuracion-diaria":43,"./vue-components/corte-create":44,"./vue-components/corte-edit":45,"./vue-components/errors":46,"./vue-components/fda-bancomaterial":47,"./vue-components/fda-material":48,"./vue-components/global-errors":49,"./vue-components/origenes-usuarios":50,"./vue-components/periodocierre-administracion":51,"./vue-components/roles-permisos":52,"./vue-components/suministro-index":53,"./vue-components/tickets-validar":57,"./vue-components/viajes-completa":58,"./vue-components/viajes-index":59,"./vue-components/viajes-manual":60,"./vue-components/viajes-modificar":61,"./vue-components/viajes-revertir":62,"./vue-components/viajes-validar":63}],39:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -45583,7 +45584,7 @@ Vue.component('app-errors', {
     template: require('./templates/errors.html')
 });
 
-},{"./templates/errors.html":53}],47:[function(require,module,exports){
+},{"./templates/errors.html":54}],47:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-bancomaterial', {
@@ -45804,7 +45805,7 @@ Vue.component('global-errors', {
   }
 });
 
-},{"./templates/global-errors.html":54}],50:[function(require,module,exports){
+},{"./templates/global-errors.html":55}],50:[function(require,module,exports){
 'use strict';
 
 Vue.component('origenes-usuarios', {
@@ -45879,7 +45880,7 @@ Vue.component('origenes-usuarios', {
     }
 });
 
-},{"./templates/origenes-usuarios.html":55}],51:[function(require,module,exports){
+},{"./templates/origenes-usuarios.html":56}],51:[function(require,module,exports){
 'use strict';
 
 /**
@@ -46510,12 +46511,280 @@ Vue.component('roles-permisos', {
 });
 
 },{}],53:[function(require,module,exports){
-module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
+'use strict';
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Created by DBENITEZ on 16/11/2017.
+ */
+Vue.component('suministro-index', {
+    data: function data() {
+        return {
+            'viajes_netos': [],
+            'conflicto': [],
+            'cierres': "",
+            'viaje_neto_seleccionado': "",
+            'id_conflicto': "",
+            'cargando': false,
+            'guardando': false,
+            'form': {
+                'errors': [],
+                'estado': ''
+            },
+            'ver_mas': false
+        };
+    },
+    directives: {
+        datepicker: {
+            inserted: function inserted(el) {
+                var _$$datepicker;
+
+                $(el).datepicker((_$$datepicker = {
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true }, _defineProperty(_$$datepicker, 'autoclose', true), _defineProperty(_$$datepicker, 'clearBtn', true), _defineProperty(_$$datepicker, 'todayHighlight', true), _defineProperty(_$$datepicker, 'endDate', '0d'), _$$datepicker));
+                $(el).val(App.timeStamp(1));
+            }
+        },
+
+        select2: {
+            inserted: function inserted(el) {
+                $(el).select2({
+                    placeholder: "--SELECCIONE--",
+                    closeOnSelect: false
+                });
+            }
+        },
+
+        modal_conflicto: {
+            //data-toggle="modal" data-target="#detalles_conflicto"
+        }
+    },
+    methods: {
+        buscar_en_conflicto: function buscar_en_conflicto(e) {
+            e.preventDefault();
+            var _this = this;
+
+            var data = $('.form_buscar_en_conflicto').serialize();
+            var url = App.host + '/suministro_netos?action=en_conflicto';
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: data,
+                beforeSend: function beforeSend() {
+                    _this.cargando = true;
+                    _this.viajes_netos = [];
+                    _this.form.errors = [];
+                    $('#partials_errors').empty();
+                },
+                success: function success(response) {
+                    if (!response.viajes_netos.length) {
+                        swal('¡Sin Resultados!', 'Ningún viaje coincide con los datos de consulta', 'warning');
+                    } else {
+                        _this.viajes_netos = response.viajes_netos;
+                    }
+                },
+                error: function error(_error) {
+                    if (_error.status == 422) {
+                        App.setErrorsOnForm(_this.form, _error.responseJSON);
+                    } else if (_error.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error.responseText)
+                        });
+                    }
+                },
+                complete: function complete() {
+                    _this.cargando = false;
+                }
+            });
+        },
+        buscar: function buscar(e) {
+            e.preventDefault();
+            $('input[name=type]').val('');
+            var _this = this;
+
+            var data = $('.form_buscar').serialize();
+            var url = App.host + '/suministro_netos?action=index';
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: data,
+                beforeSend: function beforeSend() {
+                    _this.cargando = true;
+                    _this.viajes_netos = [];
+                    _this.form.errors = [];
+                    $('#partials_errors').empty();
+                },
+                success: function success(response) {
+                    if (!response.viajes_netos.length) {
+                        swal('¡Sin Resultados!', 'Ningún viaje coincide con los datos de consulta', 'warning');
+                    } else {
+                        _this.viajes_netos = response.viajes_netos;
+                    }
+                },
+                error: function error(_error2) {
+                    if (_error2.status == 422) {
+                        App.setErrorsOnForm(_this.form, _error2.responseJSON);
+                    } else if (_error2.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error2.responseText)
+                        });
+                    }
+                },
+                complete: function complete() {
+                    _this.cargando = false;
+                }
+            });
+        },
+        fetchDetalleConflicto: function fetchDetalleConflicto(id_conflicto, id_viaje) {
+            var _this2 = this;
+
+            //console.log('fetchDetalle',id_conflicto);
+            this.fetching = true;
+            var _this = this;
+            _this.viaje_neto_seleccionado = id_viaje;
+            _this.id_conflicto = id_conflicto;
+            //           console.log(_this.viaje_neto_seleccionado);
+            //            var url = $('#id_conciliacion').val();
+            this.$http.get('suministro_netos?action=detalle_conflicto&id_conflicto=' + id_conflicto + '&id_viaje=' + id_viaje).then(function (response) {
+                _this.conflicto = response.body;
+                _this2.fetching = false;
+            }, function (error) {
+                _this2.fetching = false;
+                App.setErrorsOnForm(_this.form, error.body);
+            });
+        },
+        confirmarPonerPagable: function confirmarPonerPagable(e) {
+            var _this3 = this;
+
+            e.preventDefault();
+
+            swal({
+                title: "¿Desea continuar?",
+                text: "¿Esta seguro de permitir que el viaje sea pagado?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                confirmButtonColor: "#ec6c62"
+            }, function () {
+                return _this3.PonerPagable();
+            });
+        },
+        PonerPagable: function PonerPagable() {
+            var _this = this;
+            var url = $('.form_pagable').attr('action');
+            var data = $('.form_pagable').serialize() + '&IdViajeNeto=' + _this.viaje_neto_seleccionado + '&IdConflicto=' + _this.id_conflicto;
+            var idviaje_neto = _this.viaje_neto_seleccionado;
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'PATCH',
+                beforeSend: function beforeSend() {
+                    _this.guardando = true;
+                },
+                success: function success(response) {
+                    swal('¡Hecho!', 'Datos actualizados correctamente', 'success');
+                },
+                error: function error(_error3) {
+                    if (_error3.status == 422) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error3.responseJSON)
+                        });
+                    } else if (_error3.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error3.responseText)
+                        });
+                        //_this.fetchConciliacion();
+                    }
+                },
+                complete: function complete() {
+                    _this.guardando = false;
+                    $('#detalles_conflicto').modal('hide');
+                }
+            });
+        },
+        detalle_conflicto: function detalle_conflicto(id_conflicto, id_viaje) {
+
+            this.fetchDetalleConflicto(id_conflicto, id_viaje);
+            $("#detalles_conflicto").modal("show");
+        },
+        detalle_conflicto_pagable: function detalle_conflicto_pagable(id_conflicto, id_viaje) {
+
+            this.fetchDetalleConflicto(id_conflicto, id_viaje);
+            $("#detalles_conflicto_pagable").modal("show");
+        },
+        pdf: function pdf(e) {
+            e.preventDefault();
+
+            var url = App.host + '/pdf/suministro_netos';
+
+            $('.form_buscar').attr('action', url);
+            $('.form_buscar').attr('target', '_blank');
+            $('.form_buscar').attr('method', 'GET');
+            $('.form_buscar').submit();
+        },
+        pdf_conflicto: function pdf_conflicto(e) {
+            e.preventDefault();
+
+            var url = App.host + '/pdf/suministro_netos_conflicto';
+
+            $('.form_buscar_en_conflicto').attr('action', url);
+            $('.form_buscar_en_conflicto').attr('target', '_blank');
+            $('.form_buscar_en_conflicto').attr('method', 'GET');
+            $('.form_buscar_en_conflicto').submit();
+        },
+        excel: function excel(e) {
+            e.preventDefault();
+            var url = App.host + '/suministro_netos';
+
+            $('input[name=type]').val('excel');
+            $('.form_buscar').attr('action', url);
+            $('.form_buscar').attr('method', 'GET');
+            $('.form_buscar').submit();
+        },
+        toogle_show_all: function toogle_show_all() {
+            if (this.show_all) {
+                this.show_all = false;
+            } else {
+                this.show_all = true;
+            }
+        },
+        formato: function formato(val) {
+            return numeral(val).format('0,0.00');
+        },
+        ver_mas_function: function ver_mas_function() {
+            if (this.ver_mas) {
+                //TODO: Ocultar Columnas con clase .ocultar y ver_mas = false;
+                $('.ocultar').fadeOut(1000);
+                this.ver_mas = false;
+            } else {
+                //TODO: Mostrar Columnas con clase .ocultar  y ver_mas = true
+                $('.ocultar').fadeIn(1000);
+                this.ver_mas = true;
+            }
+        }
+    }
+});
+
 },{}],54:[function(require,module,exports){
-module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
+module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],55:[function(require,module,exports){
-module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
 },{}],56:[function(require,module,exports){
+module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+},{}],57:[function(require,module,exports){
 'use strict';
 
 Vue.component('tickets-validar', {
@@ -46569,7 +46838,7 @@ Vue.component('tickets-validar', {
 
 });
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 function timeStamp(type) {
@@ -46789,7 +47058,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -47054,7 +47323,7 @@ Vue.component('viajes-index', {
     }
 });
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -47238,7 +47507,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -47412,7 +47681,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -47553,7 +47822,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 // register modal component

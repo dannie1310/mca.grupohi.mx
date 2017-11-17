@@ -543,22 +543,23 @@ class ViajesNetosController extends Controller
                 return (new Viajes($data))->excel();
             } else
                 if ($request->get('action') == 'en_conflicto') {
-                if(auth()->user()->can('consultar-viajes-conflicto')){
-                    return view('viajes_netos.index')
-                        ->withAction('en_conflicto');}
-                        else{
-                            Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
-                            return redirect()->back();
-                        }
-            } else {
-                if(auth()->user()->can('consulta-viajes')){
-                    return view('viajes_netos.index')
-                        ->withAction('');
-                }else{
-                    Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
-                    return redirect()->back();
+                    if(auth()->user()->can('consultar-viajes-conflicto')){
+                        return view('viajes_netos.index')
+                            ->withAction('en_conflicto');
+                    }
+                    else{
+                                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                                return redirect()->back();
+                    }
+                }else {
+                    if(auth()->user()->can('consulta-viajes')){
+                        return view('viajes_netos.index')
+                            ->withAction('');
+                    }else{
+                        Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                        return redirect()->back();
+                    }
                 }
-            }
         }
     }
 

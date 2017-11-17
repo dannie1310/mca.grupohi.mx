@@ -468,3 +468,32 @@ Breadcrumbs::register('conciliaciones.suministro.edit', function($breadcrumbs, $
     $breadcrumbs->parent('conciliaciones.suministro.show', $conciliacion);
     $breadcrumbs->push('EDITAR CONCILIACIÓN SUMINISTRO', route('conciliaciones.suministro.edit', $conciliacion));
 });
+
+
+//suministro viajes
+
+Breadcrumbs::register('suministro_netos.index', function ($breadcrumbs) {
+    $breadcrumbs->push('VIAJES SUMINISTRO', route('suministro_netos.index'));
+});
+
+Breadcrumbs::register('suministro_netos.carga_manual', function($breadcrumbs) {
+    $breadcrumbs->parent('suministro_netos.index');
+    $breadcrumbs->push('REGISTRO SUMINISTRO', route('suministro_netos.create', ['action' => 'create']));
+});
+
+Breadcrumbs::register('suministro_netos.autorizar', function($breadcrumbs) {
+    $breadcrumbs->push('AUTORIZACIÓN DE SUMINISTRO', route('suministro_netos.edit', ['action' => 'autorizar']));
+});
+
+Breadcrumbs::register('suministro_netos.validar', function($breadcrumbs) {
+    $breadcrumbs->push('VALIDAR SUMINISTRO', route('suministro_netos.edit', ['action' => 'validar']));
+});
+
+Breadcrumbs::register('suministro_netos.modificar', function($breadcrumbs) {
+    $breadcrumbs->push('MODIFICAR SUMINISTRO', route('suministro_netos.edit', ['action' => 'modificar']));
+});
+
+//**viajes*** suministro
+Breadcrumbs::register('inicioviajes.revertir', function($breadcrumbs) {
+    $breadcrumbs->push('REVERTIR SUMINISTRO', route('inicioviajes.edit', ['action' => 'revertir']));
+});
