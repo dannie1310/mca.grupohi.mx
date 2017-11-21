@@ -283,78 +283,78 @@ class InicioSuministroController extends Controller
                     $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*')->whereNull('inicio_camion.id');
                     $query = InicioCamion::scopeReporte($query);
 
-                   /* foreach($request->get('Tipo', []) as $tipo) {
+                    foreach($request->get('Tipo', []) as $tipo) {
                         if($tipo == 'CM_C') {
-                            $q_cmc = DB::connection('sca')->table('viajesnetos');
-                            $q_cmc = ViajeNeto::scopeRegistradosManualmente($q_cmc);
-                            $q_cmc = ViajeNeto::scopeReporte($q_cmc);
-                            $q_cmc = ViajeNeto::scopeFechas($q_cmc, $fechas);
-                            $q_cmc = ViajeNeto::scopeConciliados($q_cmc, $request->Estado);
+                            $q_cmc = DB::connection('sca')->table('inicio_camion');
+                            $q_cmc = InicioCamion::scopeRegistradosManualmente($q_cmc);
+                            $q_cmc = InicioCamion::scopeReporte($q_cmc);
+                            $q_cmc = InicioCamion::scopeFechas($q_cmc, $fechas);
+                            $q_cmc = InicioCamion::scopeConciliados($q_cmc, $request->Estado);
                             $query->union($q_cmc);
                         }
                         if($tipo == 'CM_A') {
                             $q_cma = DB::connection('sca')->table('viajesnetos');
-                            $q_cma = ViajeNeto::scopeManualesAutorizados($q_cma);
-                            $q_cma = ViajeNeto::scopeReporte($q_cma);
-                            $q_cma = ViajeNeto::scopeFechas($q_cma, $fechas);
-                            $q_cma = ViajeNeto::scopeConciliados($q_cma, $request->Estado);
+                            $q_cma = InicioCamion::scopeManualesAutorizados($q_cma);
+                            $q_cma = InicioCamion::scopeReporte($q_cma);
+                            $q_cma = InicioCamion::scopeFechas($q_cma, $fechas);
+                            $q_cma = InicioCamion::scopeConciliados($q_cma, $request->Estado);
                             $query->union($q_cma);
                         }
                         if($tipo == 'CM_V') {
-                            $q_cmv = DB::connection('sca')->table('viajesnetos');
-                            $q_cmv = ViajeNeto::scopeManualesValidados($q_cmv);
-                            $q_cmv = ViajeNeto::scopeReporte($q_cmv);
-                            $q_cmv = ViajeNeto::scopeFechas($q_cmv, $fechas);
-                            $q_cmv = ViajeNeto::scopeConciliados($q_cmv, $request->Estado);
+                            $q_cmv = DB::connection('sca')->table('inicio_camion');
+                            $q_cmv = InicioCamion::scopeManualesValidados($q_cmv);
+                            $q_cmv = InicioCamion::scopeReporte($q_cmv);
+                            $q_cmv = InicioCamion::scopeFechas($q_cmv, $fechas);
+                            $q_cmv = InicioCamion::scopeConciliados($q_cmv, $request->Estado);
                             $query->union($q_cmv);
                         }
                         if($tipo == 'CM_R') {
-                            $q_cmr = DB::connection('sca')->table('viajesnetos');
-                            $q_cmr = ViajeNeto::scopeManualesRechazados($q_cmr);
-                            $q_cmr = ViajeNeto::scopeReporte($q_cmr);
-                            $q_cmr = ViajeNeto::scopeFechas($q_cmr, $fechas);
-                            $q_cmr = ViajeNeto::scopeConciliados($q_cmr, $request->Estado);
+                            $q_cmr = DB::connection('sca')->table('inicio_camion');
+                            $q_cmr = InicioCamion::scopeManualesRechazados($q_cmr);
+                            $q_cmr = InicioCamion::scopeReporte($q_cmr);
+                            $q_cmr = InicioCamion::scopeFechas($q_cmr, $fechas);
+                            $q_cmr = InicioCamion::scopeConciliados($q_cmr, $request->Estado);
                             $query->union($q_cmr);
                         }
                         if($tipo == 'CM_D') {
-                            $q_cmd = DB::connection('sca')->table('viajesnetos');
-                            $q_cmd = ViajeNeto::scopeManualesDenegados($q_cmd);
-                            $q_cmd = ViajeNeto::scopeReporte($q_cmd);
-                            $q_cmd = ViajeNeto::scopeFechas($q_cmd, $fechas);
-                            $q_cmd = ViajeNeto::scopeConciliados($q_cmd, $request->Estado);
+                            $q_cmd = DB::connection('sca')->table('inicio_camion');
+                            $q_cmd = InicioCamion::scopeManualesDenegados($q_cmd);
+                            $q_cmd = InicioCamion::scopeReporte($q_cmd);
+                            $q_cmd = InicioCamion::scopeFechas($q_cmd, $fechas);
+                            $q_cmd = InicioCamion::scopeConciliados($q_cmd, $request->Estado);
                             $query->union($q_cmd);
                         }
                         if($tipo == 'M_V') {
-                            $q_mv = DB::connection('sca')->table('viajesnetos');
-                            $q_mv = ViajeNeto::scopeMovilesValidados($q_mv);
-                            $q_mv = ViajeNeto::scopeReporte($q_mv);
-                            $q_mv = ViajeNeto::scopeFechas($q_mv, $fechas);
-                            $q_mv = ViajeNeto::scopeConciliados($q_mv, $request->Estado);
+                            $q_mv = DB::connection('sca')->table('inicio_camion');
+                            $q_mv = InicioCamion::scopeMovilesValidados($q_mv);
+                            $q_mv = InicioCamion::scopeReporte($q_mv);
+                            $q_mv = InicioCamion::scopeFechas($q_mv, $fechas);
+                            $q_mv = InicioCamion::scopeConciliados($q_mv, $request->Estado);
                             $query->union($q_mv);
                         }
                         if($tipo == 'M_A') {
-                            $q_ma = DB::connection('sca')->table('viajesnetos');
-                            $q_ma = ViajeNeto::scopeMovilesAutorizados($q_ma);
-                            $q_ma = ViajeNeto::scopeReporte($q_ma);
-                            $q_ma = ViajeNeto::scopeFechas($q_ma, $fechas);
-                            $q_ma = ViajeNeto::scopeConciliados($q_ma, $request->Estado);
+                            $q_ma = DB::connection('sca')->table('inicio_camion');
+                            $q_ma = InicioCamion::scopeMovilesAutorizados($q_ma);
+                            $q_ma = InicioCamion::scopeReporte($q_ma);
+                            $q_ma = InicioCamion::scopeFechas($q_ma, $fechas);
+                            $q_ma = InicioCamion::scopeConciliados($q_ma, $request->Estado);
                             $query->union($q_ma);
                         }
                         if($tipo == 'M_D') {
-                            $q_md = DB::connection('sca')->table('viajesnetos');
-                            $q_md = ViajeNeto::scopeMovilesDenegados($q_md);
-                            $q_md = ViajeNeto::scopeReporte($q_md);
-                            $q_md = ViajeNeto::scopeFechas($q_md, $fechas);
-                            $q_md = ViajeNeto::scopeConciliados($q_md, $request->Estado);
+                            $q_md = DB::connection('sca')->table('inicio_camion');
+                            $q_md = InicioCamion::scopeMovilesDenegados($q_md);
+                            $q_md = InicioCamion::scopeReporte($q_md);
+                            $q_md = InicioCamion::scopeFechas($q_md, $fechas);
+                            $q_md = InicioCamion::scopeConciliados($q_md, $request->Estado);
                             $query->union($q_md);
                         }
-                    }*/
+                    }
                 } else if($request->tipo_busqueda == 'codigo') {
                     $this->validate($request, [
                         'Codigo' => 'required'
                     ]);
-                    $query = DB::connection('sca')->table('viajesnetos')->select('viajesnetos.*')->where('viajesnetos.Code', '=', $request->Codigo);
-                    $query = ViajeNeto::scopeReporte($query);
+                    $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*')->where('inicio_camion.code', '=', $request->Codigo);
+                    $query = InicioCamion::scopeReporte($query);
                 }
 
                 $viajes_netos = $query->get();
