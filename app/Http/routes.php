@@ -328,3 +328,13 @@ Route::get('historico/origenes/{id}', 'HistoricoController@origenes');
 //Route::group(['middleware' => ['permission:consulta-solicitud-actualizar']], function () {
     Route::resource('solicitud-actualizacion', 'SolicitudActualizacionController');
 //});
+
+
+/**
+ * Conceptos Routes
+ */
+Route::get('conceptos', 'ConceptoController@lists')->name('conceptos.lists');
+Route::get('conceptos/jstree', 'ConceptoController@getRoot');
+Route::get('conceptos/{id}/jstree', 'ConceptoController@getNode');
+// Ruta para asignar concepto Cadeco a Tiros
+Route::post('tiros/asignar_concepto', 'TirosController@asignar_concepto');

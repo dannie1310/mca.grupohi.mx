@@ -172,6 +172,8 @@ return [
          */
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
 
+        Ghi\Core\Providers\RepositoryServiceProvider::class,
+
     ],
 
     /*

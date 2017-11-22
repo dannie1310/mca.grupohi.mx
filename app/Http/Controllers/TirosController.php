@@ -165,4 +165,27 @@ class TirosController extends Controller
         }
         return redirect()->back();
     }
+
+    public function asignar_concepto(Request $request){
+        $this->validate($request, [
+            'id_concepto'=>'required',
+            'id_tiro'=>'required'
+        ], [
+            'id_concepto.required' => 'Debe seleccionar un concepto',
+            'id_tiro.required' => 'Debe seleccionar un Tiro'
+        ]);
+
+
+        $tiro = Tiro::find($request->id_tiro);
+
+        $tiro->asignar_concepto($request->id_concepto);
+
+        return response()->json([
+            'status_code' => 200,
+            'mensaje' => 'Asignación guardada correctamente',
+            'concepto' => $tiro->concepto(),
+            'tiro' => $tiro
+        ]);
+
+    }
 }

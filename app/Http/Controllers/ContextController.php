@@ -33,8 +33,10 @@ class ContextController extends Controller
     public function set($databaseName, $id)
     {
         $this->context->setId($id);
+        $this->context->setIdCadeco($id);
         $this->context->setDatabaseName($databaseName);
-        
+        $this->context->setDatabaseNameCadeco($databaseName);
+
         return redirect()->route('index');
     }
 }

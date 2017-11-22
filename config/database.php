@@ -97,6 +97,16 @@ return [
             'prefix'   => '',
         ],
 
+        'cadeco' => [
+            'driver'   => 'sqlsrv',
+            'host'     => env('DB_HOST_CADECO', 'localhost'),
+            'database' => env('DB_DATABASE_CADECO', 'forge'),
+            'username' => env('DB_USERNAME_CADECO', 'forge'),
+            'password' => env('DB_PASSWORD_CADECO', ''),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+        ],
+
     ],
 
     /*
