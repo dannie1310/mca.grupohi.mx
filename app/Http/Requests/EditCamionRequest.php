@@ -27,8 +27,6 @@ class EditCamionRequest extends Request
             'IdSindicato'   => 'required|integer|exists:sca.sindicatos,IdSindicato',
             'Propietario'   => 'required|string',
             'IdOperador'    => 'required|integer|exists:sca.operadores,IdOperador',
-            'Economico'     => 'required|string|unique:sca.camiones,Economico,'.$this->route('camiones').',IdCamion',
-            'Placas'        => 'required|string|alpha_dash|max:10|unique:sca.camiones,Placas,'.$this->route('camiones').',IdCamion',
             'PlacasCaja'    => 'string|alpha_dash|max:10',
             'IdMarca'       => 'required|integer|exists:sca.marcas,IdMarca',
             'Modelo'        => 'required|string',
@@ -42,8 +40,8 @@ class EditCamionRequest extends Request
             'EspacioDeGato' => 'numeric',
             'Disminucion'   => 'numeric',
             'AlturaExtension'   => 'numeric',
-            'CubicacionReal'    => 'required|numeric',
-            'CubicacionParaPago'    => 'required|numeric',
+            'CubicacionReal'    => 'required|numeric|max:40.00',
+            'CubicacionParaPago'    => 'required|numeric|max:40.00',
             //Imagenes
             'Frente'        => 'mimes:jpeg,bmp,png,jpg,gif',
             'Dereche'       => 'mimes:jpeg,bmp,png,jpg,gif',
@@ -59,7 +57,9 @@ class EditCamionRequest extends Request
             'Economico.unique'      => 'Ya existe un camión con el siguiente Número Económico: ' . $this->Economico,
             'Placas.unique'         => 'Ya existe un camión con las siguientes Placas: ' . $this->Placas,
             'IdMarca.exists'        => 'No existe una :attribute con el Id: '. $this->IdMarca,
-            'IdBoton.exists'        => 'No existe un :attribute con el Id: '. $this->IdBoton
+            'IdBoton.exists'        => 'No existe un :attribute con el Id: '. $this->IdBoton,
+            'CubicacionReal.max'    => 'No puede ser mayor a 40.00 la cubicación real.',
+            'CubicacionParaPago.max'=> 'No puede ser mayor a 40.00 la cubicación para pago.'
         ];
     }
 }

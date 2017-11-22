@@ -35,11 +35,11 @@
         <div class="form-group">
             {!! Form::label('Economico','Económico', ['class' => 'control-label col-sm-1'])  !!}
             <div class="col-sm-3">
-                {!! Form::text('Economico',null, ['class' => 'form-control']) !!}
+                {!! Form::text('Economico',null, ['class' => 'form-control', 'disabled']) !!}
             </div>     
             {!! Form::label('Placas', 'Placas Camión', ['class' => 'control-label col-sm-1']) !!}
             <div class="col-sm-3">
-                {!! Form::text('Placas', null, ['class' => 'form-control']) !!}  
+                {!! Form::text('Placas', null, ['class' => 'form-control', 'disabled']) !!}
             </div>
             {!! Form::label('PlacasCaja', 'Placas Caja', ['class' => 'control-label col-sm-1']) !!}
             <div class="col-sm-3">
@@ -109,6 +109,7 @@
 <div class="form-horizontal col-md-10 col-md-offset-1 rcorners" style="margin-top: 20px">
     <fieldset>
         <legend class="scheduler-border"><i class="fa fa-arrows"></i> Información de Cubicación</legend>
+        @if($camion->CubicacionParaPago!=40)
         <div class="form-group">
             {!! Form::label('Ancho', 'Ancho', ['class' => 'control-label col-sm-1']) !!}
             <div class="col-sm-2">
@@ -142,9 +143,47 @@
             </div>
             {!! Form::label('CubicacionParaPago', 'Cubicación para Pago', ['class' => 'control-label col-sm-1']) !!}
             <div class="col-sm-2">
-                {!! Form::number('CubicacionParaPago', null, ['class' => 'form-control pago', 'readonly' => 'readonly', 'step' => 'any']) !!}
+            {!! Form::number('CubicacionParaPago', null, ['class' => 'form-control pago', 'readonly' => 'readonly', 'step' => 'any']) !!}
             </div>
         </div>
+        @elseif($camion->CubicacionParaPago==40)
+            <div class="form-group">
+                {!! Form::label('Ancho', 'Ancho', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('Ancho', null, ['class' => 'form-control ancho cubicacion', 'step' => 'any', 'disabled']) !!}
+                </div>
+                {!! Form::label('Largo', 'Largo', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('Largo', null, ['class' => 'form-control largo cubicacion', 'step' => 'any', 'disabled']) !!}
+                </div>
+                {!! Form::label('Alto', 'Alto', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('Alto', null, ['class' => 'form-control alto cubicacion', 'step' => 'any', 'disabled']) !!}
+                </div>
+                {!! Form::label('EspacioDeGato', 'Gato', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('EspacioDeGato', null, ['class' => 'form-control gato cubicacion', 'step' => 'any', 'disabled']) !!}
+                </div>
+            </div>
+            <div class="form-group">
+                {!! Form::label('Disminucion', 'Disminución', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('Disminucion', null, ['class' => 'form-control disminucion cubicacion', 'step' => 'any', 'disabled']) !!}
+                </div>
+                {!! Form::label('AlturaExtension', 'Extensión', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('AlturaExtension', null, ['class' => 'form-control extension cubicacion', 'step' => 'any', 'disabled']) !!}
+                </div>
+                {!! Form::label('CubicacionReal', 'Cubicación Real', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                    {!! Form::number('CubicacionReal', null, ['class' => 'form-control real', 'readonly' => 'readonly', 'step' => 'any', 'disabled']) !!}
+                </div>
+                {!! Form::label('CubicacionParaPago', 'Cubicación para Pago', ['class' => 'control-label col-sm-1']) !!}
+                <div class="col-sm-2">
+                {!! Form::number('CubicacionParaPago', null, ['class' => 'form-control pago', 'readonly' => 'readonly', 'step' => 'any', 'disabled']) !!}
+                </div>
+            </div>
+            @endif
     </fieldset>
 </div>   
 <div class="form-group col-md-12" style="text-align: center; margin-top: 20px">
