@@ -7,3 +7,4 @@ Homestead.json
 /public/uploads
 /public/php_errors.log
 /storage/exports
+/nbproject/private
