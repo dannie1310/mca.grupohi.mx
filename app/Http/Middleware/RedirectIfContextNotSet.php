@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Proyecto;
 use Flash;
 use Closure;
 use Redirect;
@@ -67,5 +68,12 @@ class RedirectIfContextNotSet
     private function setContext()
     {
         $this->config->set('database.connections.sca.database', $this->context->getDatabaseName());
+
+        $proyecto = Proyecto::find($this->context->getId());
+
+        $this->context->setDatabaseNameCadeco($proyecto->base_SAO);
+        $this->context->setIdCadeco($proyecto->id_obra_cadeco);
+
+        $this->config->set('database.connections.cadeco.database', $this->context->getDatabaseNameCadeco());
     }
 }
