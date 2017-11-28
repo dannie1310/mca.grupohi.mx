@@ -132,6 +132,13 @@
             <td><label for="CubicacionPago">Cubicación Pago:</label></td>
             <td><input type="text" class="form-control" value="{{ $camion->CubicacionParaPago }}" disabled></td>
             <td><input type="text" class="form-control" value="{{ $solicitud->CubicacionParaPago }}" disabled></td>
+            @if($solicitud->CubicacionParaPago > 40 )
+            <tr>
+                <td></td>
+                <td><p class="bg-danger">La Cubicación supera el máximo permitido - </p></td>
+                <td><p class="bg-danger">No se podra actualizar estos datos.</p></td>
+            </tr>
+            @endif
         </tr>
         <tr>
             <td colspan="3"><hr></td>
@@ -231,9 +238,12 @@
             <td colspan="3" align="center">
                 @if(Auth::user()->can(['aprobar-solicitud-actualizar']))
                     <div <?php if($solicitud->Estatus != 0 ){ echo 'hidden';}?>>
+                        @if($solicitud->CubicacionParaPago <= 40)
                         <button class="btn btn-success reactivar">Actualizar</button>
+                        @endif
                         <button class="btn btn-danger cancelar">Cancelar</button>
                     </div>
+
                 @endif
                 <a href="{{ route('solicitud-actualizacion.index') }}" class="btn btn-info pull-right">Regresar</a>
             </td>
@@ -270,7 +280,7 @@
                             form.submit();
                             swal("Actualizado!", "Camión Actualizado.", "success");
                         } else {
-                            swal("Cancelled", "Your imaginary file is safe :)", "error");
+                            swal("Error", "La cubicacion es mayor a lo permitido", "error");
                         }
                     });
 
