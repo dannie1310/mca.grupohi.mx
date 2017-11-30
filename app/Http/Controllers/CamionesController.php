@@ -181,7 +181,7 @@ class CamionesController extends Controller
                     ->where('IdCamion', $idCamion)
                     ->where('TipoC', $tipoC)->delete();
 
-                // $imagen->save();
+
             }
             
             ImagenCamion::create([

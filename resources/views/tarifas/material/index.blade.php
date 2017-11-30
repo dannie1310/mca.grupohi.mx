@@ -58,6 +58,9 @@
                 <td>{{ $tarifa->user_desactivo }}</td>
                 <td>{{ $tarifa->motivo }}</td>
                 <td>
+                    @permission('editar-tarifas-material')
+                        <a href="{{ route('tarifas_material.edit', $tarifa) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
+                    @endpermission
                     @permission('desactivar-tarifas-material')
                     @if($tarifa->Estatus == 1)
                         <button title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_tarifa({{$tarifa->IdTarifa}})"><i class="fa fa-remove"></i></button>

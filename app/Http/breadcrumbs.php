@@ -157,6 +157,17 @@ Breadcrumbs::register('tarifas_material.create', function($breadcrumbs){
     $breadcrumbs->push('NUEVA TARIFA POR MATERIAL', route('tarifas_material.create'));
 });
 
+Breadcrumbs::register('tarifas_material.edit', function($breadcrumbs, $tarifa){
+    $breadcrumbs->parent('tarifas_material.show', $tarifa);
+    $breadcrumbs->push('EDITAR', route('tarifas_material.edit', $tarifa));
+});
+
+Breadcrumbs::register('tarifas_material.show', function($breadcrumbs, $tarifa){
+    $breadcrumbs->parent('tarifas_material.index');
+    $breadcrumbs->push(strtoupper($tarifa->IdTarifa), route('tarifas_material.show', $tarifa));
+});
+
+
 //Catalogos->Tarifas por Peso
 
 Breadcrumbs::register('tarifas_peso.index', function($breadcrumbs){

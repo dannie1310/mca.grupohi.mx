@@ -140,13 +140,8 @@ class CamionImagenesController extends Controller
                 ->where('IdCamion', $idCamion)
                 ->where('TipoC', $tipoC)->delete();
 
-            // $imagen->save();
         }
-        
 
-
-        //$imagen -> Estatus = 0;
-        //$imagen -> save();
         return response()->json(['success' => true]);    
     }
 }
