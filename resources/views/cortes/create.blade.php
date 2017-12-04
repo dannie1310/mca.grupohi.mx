@@ -6,7 +6,7 @@
 <hr>
 <div id="app">
     <global-errors></global-errors>
-    <corte-create inline-template>
+    <corte-create inline-template v-cloak>
         <section>
             <app-errors v-bind:form="form"></app-errors>
             <h3>BUSCAR VIAJES</h3>

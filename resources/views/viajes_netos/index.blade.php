@@ -15,7 +15,7 @@
     <hr>
     <div id="app">
         <global-errors></global-errors>
-        <viajes-index inline-template>
+        <viajes-index inline-template v-cloak>
             <section>
                 <div id="partials_errors">
                 @include('partials.errors')

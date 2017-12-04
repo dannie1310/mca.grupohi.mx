@@ -4,7 +4,7 @@
 @include('partials.errors')
 <div id="app">
     <global-errors></global-errors>
-    <corte-edit inline-template>
+    <corte-edit inline-template v-cloak>
         <section>
             <h1>CORTE {{ $corte->id }} <small>({{ $corte->estado }})</small>
                 @if($corte->estatus == 1)

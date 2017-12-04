@@ -338,3 +338,44 @@ Route::get('conceptos/jstree', 'ConceptoController@getRoot');
 Route::get('conceptos/{id}/jstree', 'ConceptoController@getNode');
 // Ruta para asignar concepto Cadeco a Tiros
 Route::post('tiros/asignar_concepto', 'TirosController@asignar_concepto');
+
+
+
+
+// Rutas Control de Suministro
+
+Route::get('suministro_netos', 'InicioSuministroController@index')->name('suministro_netos.index');
+Route::get('suministro_netos/create', 'InicioSuministroController@create')->name('suministro_netos.create');
+Route::group(['prefix' => 'suministro_netos'], function() {
+    Route::post('completa', 'InicioSuministroController@store');
+    Route::post('manual', [
+        'as' => 'suministro_netos.manual.store',
+        'uses' => 'InicioSuministroController@store',
+        'middleware' => ['permission:ingresar-viajes-manuales']
+    ]);
+});
+Route::get('suministro_netos/edit' , 'InicioSuministroController@edit')->name('suministro_netos.edit');
+Route::patch('suministro_netos', 'InicioSuministroController@update')->name('suministro_netos.update');
+Route::group(['prefix' => 'suministro_netos'], function() {
+    Route::patch('autorizar', 'InicioSuministroController@update')->name('suministro_netos.autorizar');
+});
+Route::get('suministro_netos/{viaje_neto}', 'InicioSuministroController@show')->name('suministro_netos.show');
+
+
+
+//Route::resource('conciliacionesSuministro', 'ConciliacionesSuministroController');
+Route::get('conciliacion/suministro', 'ConciliacionesSuministroController@index')->name('conciliaciones.suministro.index');
+Route::get('conciliacion/suministro/{conciliacion}/show','ConciliacionesSuministroController@show');
+Route::post('conciliacion/suministro/{conciliacion}/show','ConciliacionesSuministroController@show')->name('conciliaciones.suministro.show');
+Route::get('conciliacion/suministro/create','ConciliacionesSuministroController@create')->name('conciliaciones.suministro.create');
+Route::post('conciliacion/suminitro/new','ConciliacionesSuministroController@store');
+Route::get('conciliacion/suministro/{conciliacion}/edit', 'ConciliacionesSuministroController@edit');
+Route::get('conciliacion/suministro/{conciliacion}/edit', 'ConciliacionesSuministroController@edit')->name('conciliaciones.suministro.edit');
+Route::post('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@store')->name('conciliaciones.suministro.detalles.store');
+Route::get('conciliacion/suministro/{conciliacion}/detalles', 'ConciliacionesSuministroDetallesController@index')->name('conciliaciones.suministro.detalles.index');
+Route::delete('conciliacion/suministro/{conciliacion}/detalles/{detalle}', 'ConciliacionesSuministroDetallesController@destroy')->name('conciliaciones.suministro.detalles.destroy');
+Route::get('conciliacion_info_carga/suministro/{filename}', 'ConciliacionesSuministroDetallesController@detalle_carga')->name('conciliacion.suministro.info');
+
+Route::get('inicioviajes', 'InicioViajesController@index')->name('inicioviajes.index');
+Route::patch('inicioviajes/{viaje}', 'InicioViajesController@update');
+Route::get('inicioviajes/edit', 'InicioViajesController@edit')->name('inicioviajes.edit');

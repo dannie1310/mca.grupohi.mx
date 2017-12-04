@@ -1,19 +1,19 @@
 @extends('layout')
 
 @section('content')
-<h1>CONCILIACIONES</h1>
-{!! Breadcrumbs::render('conciliaciones.create') !!}
-<hr>
-@include('partials.errors')
-<div id="app">
-    <global-errors></global-errors>
-    <conciliaciones-create inline-template v-cloak>
-        <section>
-            <app-errors v-bind:form="form"></app-errors>
+    <h1>CONCILIACIONES SUMINISTRO</h1>
+    {!! Breadcrumbs::render('conciliaciones.suministro.create') !!}
+    <hr>
+    @include('partials.errors')
+    <div id="app">
+        <global-errors></global-errors>
+        <conciliaciones-suministro-create inline-template v-cloak>
+            <section>
+                <app-errors v-bind:form="form"></app-errors>
             {!! Form::open(['class' => 'form_conciliacion_create']) !!}
-                <!-- Fecha, Folio, Empresa, Sindicato -->
+            <!-- Fecha, Folio, Empresa, Sindicato -->
                 <div class="row">
-                    
+
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="Empresa">Empresa: </label>
@@ -63,7 +63,7 @@
                         <input type="submit" value="Registrar" class="btn btn-success pull-right" @click="confirmarRegistro">
                     </div>
                 </div>
-            {!! Form::close() !!}
-        </section>
-    </conciliaciones-create>
+                {!! Form::close() !!}
+            </section>
+        </conciliaciones-suministro-create>
 @stop

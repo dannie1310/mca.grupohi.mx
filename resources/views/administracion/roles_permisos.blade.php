@@ -4,7 +4,7 @@
     <h1>ADMINISTRACIÓN DE ROLES Y PERMISOS</h1>
     <div id="app">
         <global-errors></global-errors>
-        <roles-permisos inline-template>
+        <roles-permisos inline-template v-cloak>
             <section>
                 <app-errors v-bind:form="form"></app-errors>
 

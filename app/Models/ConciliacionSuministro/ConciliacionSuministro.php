@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Models\Conciliacion;
+namespace App\Models\ConciliacionSuministro;
 
-use App\Models\Empresa;
-use App\Models\Ruta;
-use App\Models\Sindicato;
-use App\Models\Viaje;
-use App\Presenters\ModelPresenter;
+use App\Reportes\InicioViajes;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Empresa;
+use App\User;
+use App\Models\Sindicato;
+use App\Presenters\ModelPresenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use App\User;
 use Carbon\Carbon;
 use PhpParser\Node\Stmt\Return_;
-use App\Models\Conciliacion\ConciliacionDetalleNoConciliado;
-class Conciliacion extends Model
+use App\Models\ConciliacionSuministro\ConciliacionDetalleNoConciliado;
+
+class ConciliacionSuministro extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
-    
+
     const FECHA_HISTORICO = 20170409;
     const HOLGURA_IMPORTE = 50000;
     const HOLGURA_VOLUMEN = 175;
 
     protected $connection = 'sca';
-    protected $table = 'conciliacion';
+    protected $table = 'conciliacion_suministro';
     protected $primaryKey = 'idconciliacion';
     public $timestamps = false;
 
@@ -44,42 +44,39 @@ class Conciliacion extends Model
     protected $dates = ['timestamp','fecha_conciliacion', 'FechaHoraCierre', 'FechaHoraAprobacion'];
     protected $presenter = ModelPresenter::class;
 
-    public function rutas()
+    public function conciliacionSuministroDetalles()
     {
-        return $this->belongsToMany(Ruta::class, 'conciliacion_rutas', 'idconciliacion', 'IdRuta');
+        return $this->hasMany(ConciliacionSuministroDetalle::class, 'idconciliacion');
     }
 
-    public function conciliacionDetalles()
-    {
-        return $this->hasMany(ConciliacionDetalle::class, 'idconciliacion');
-    }
-    
     public function conciliacionDetallesNoConciliados()
     {
-        return $this->hasMany(ConciliacionDetalleNoConciliado::class, 'idconciliacion');
+        return $this->hasMany(ConciliacionSuministroDetalleNoConciliado::class, 'idconciliacion');
     }
 
     public function sindicato()
     {
         return $this->belongsTo(Sindicato::class, 'idsindicato');
     }
+
     public function getConciliacionDetallesNoConciliadosPDFAttribute(){
         $detalle_pdf = [];
-       foreach($this->conciliacionDetallesNoConciliados as $detalle){
-           if($detalle->idmotivo != 7){
-               $detalle_pdf[] = $detalle;
-           }
-       }
+        foreach($this->conciliacionSuministroDetallesNoConciliados as $detalle){
+            if($detalle->idmotivo != 7){
+                $detalle_pdf[] = $detalle;
+            }
+        }
         return $detalle_pdf;
     }
+
     public function materiales()
     {
         return DB::connection($this->connection)->select(DB::raw('
             SELECT viajes.IdMaterial, materiales.Descripcion as material 
-              FROM (viajes viajes 
+              FROM (inicio_viajes viajes 
                 INNER JOIN materiales materiales
                   ON (viajes.IdMaterial = materiales.IdMaterial))
-                RIGHT OUTER JOIN conciliacion_detalle conciliacion_detalle
+                RIGHT OUTER JOIN conciliacion_suministro_detalle conciliacion_detalle
 				  ON (conciliacion_detalle.idviaje = viajes.IdViaje)
 			  WHERE (conciliacion_detalle.idconciliacion = ' . $this->idconciliacion . ') 
 			  AND(conciliacion_detalle.estado = 1)
@@ -90,10 +87,10 @@ class Conciliacion extends Model
     public function materiales_manuales() {
         return DB::connection($this->connection)->select(DB::raw('
             SELECT viajes.IdMaterial, materiales.Descripcion as material 
-              FROM (viajes viajes 
+              FROM (inicio_viajes viajes 
                 INNER JOIN materiales materiales
                   ON (viajes.IdMaterial = materiales.IdMaterial))
-                RIGHT OUTER JOIN conciliacion_detalle conciliacion_detalle
+                RIGHT OUTER JOIN conciliacion_suministro_detalle conciliacion_detalle
 				  ON (conciliacion_detalle.idviaje = viajes.IdViaje)
 			  WHERE (conciliacion_detalle.idconciliacion = ' . $this->idconciliacion . ') 
 			  AND(conciliacion_detalle.estado = 1)
@@ -105,10 +102,10 @@ class Conciliacion extends Model
     public function materiales_moviles() {
         return DB::connection($this->connection)->select(DB::raw('
             SELECT viajes.IdMaterial, materiales.Descripcion as material 
-              FROM (viajes viajes 
+              FROM (inicio_viajes viajes 
                 INNER JOIN materiales materiales
                   ON (viajes.IdMaterial = materiales.IdMaterial))
-                RIGHT OUTER JOIN conciliacion_detalle conciliacion_detalle
+                RIGHT OUTER JOIN conciliacion_suministro_detalle conciliacion_detalle
 				  ON (conciliacion_detalle.idviaje = viajes.IdViaje)
 			  WHERE (conciliacion_detalle.idconciliacion = ' . $this->idconciliacion . ') 
 			  AND(conciliacion_detalle.estado = 1)
@@ -120,16 +117,19 @@ class Conciliacion extends Model
     public function viajes()
     {
         $viajes = new Collection();
-        foreach ($this->conciliacionDetalles->where('estado', 1) as $cd) {
+
+        foreach ($this->conciliacionSuministroDetalles->where('estado', 1) as $cd) {
             $viajes->push($cd->viaje);
         }
         return $viajes;
     }
 
+
+
     public function viajes_manuales()
     {
         $viajes = new Collection();
-        foreach ($this->conciliacionDetalles->where('esta5do', 1) as $cd) {
+        foreach ($this->conciliacionSuministroDetalles->where('estado', 1) as $cd) {
             if($cd->viaje->Estatus == 20) {
                 $viajes->push($cd->viaje);
             }
@@ -140,7 +140,7 @@ class Conciliacion extends Model
     public function viajes_moviles()
     {
         $viajes = new Collection();
-        foreach ($this->conciliacionDetalles->where('estado', 1) as $cd) {
+        foreach ($this->conciliacionSuministroDetalles->where('estado', 1) as $cd) {
             if($cd->viaje->Estatus == 0) {
                 $viajes->push($cd->viaje);
             }
@@ -152,10 +152,10 @@ class Conciliacion extends Model
     {
         return DB::connection($this->connection)->select(DB::raw('
             SELECT viajes.IdCamion, camiones.Economico as Economico 
-              FROM (viajes viajes 
+              FROM (inicio_viajes viajes 
                 INNER JOIN camiones camiones
                   ON (viajes.IdCamion = camiones.IdCamion))
-                RIGHT OUTER JOIN conciliacion_detalle conciliacion_detalle
+                RIGHT OUTER JOIN conciliacion_suministro_detalle conciliacion_detalle
 				  ON (conciliacion_detalle.idviaje = viajes.IdViaje)
 			  WHERE (conciliacion_detalle.idconciliacion = ' . $this->idconciliacion . ') 
 			  AND(conciliacion_detalle.estado = 1)
@@ -167,10 +167,10 @@ class Conciliacion extends Model
     {
         return DB::connection($this->connection)->select(DB::raw('
             SELECT viajes.IdCamion, camiones.Economico as Economico 
-              FROM (viajes viajes 
+              FROM (inicio_viajes viajes 
                 INNER JOIN camiones camiones
                   ON (viajes.IdCamion = camiones.IdCamion))
-                RIGHT OUTER JOIN conciliacion_detalle conciliacion_detalle
+                RIGHT OUTER JOIN conciliacion_suministro_detalle conciliacion_detalle
 				  ON (conciliacion_detalle.idviaje = viajes.IdViaje)
 			  WHERE (conciliacion_detalle.idconciliacion = ' . $this->idconciliacion . ') 
 			  AND(conciliacion_detalle.estado = 1)
@@ -183,10 +183,10 @@ class Conciliacion extends Model
     {
         return DB::connection($this->connection)->select(DB::raw('
             SELECT viajes.IdCamion, camiones.Economico as Economico 
-              FROM (viajes viajes 
+              FROM (inicio_viajes viajes 
                 INNER JOIN camiones camiones
                   ON (viajes.IdCamion = camiones.IdCamion))
-                RIGHT OUTER JOIN conciliacion_detalle conciliacion_detalle
+                RIGHT OUTER JOIN conciliacion_suministro_detalle conciliacion_detalle
 				  ON (conciliacion_detalle.idviaje = viajes.IdViaje)
 			  WHERE (conciliacion_detalle.idconciliacion = ' . $this->idconciliacion . ') 
 			  AND(conciliacion_detalle.estado = 1)
@@ -203,35 +203,35 @@ class Conciliacion extends Model
 
     public function partidas()
     {
-        return $this->hasMany(ConciliacionDetalle::class, 'idconciliacion', 'idconciliacion');
+        return $this->hasMany(ConciliacionSuministroDetalle::class, 'idconciliacion', 'idconciliacion');
     }
 
-    public function getVolumenAttribute()
+   /* public function getVolumenAttribute()
     {
         $results = DB::connection("sca")->select("select sum(CubicacionCamion) as Volumen "
-            . "from conciliacion "
-            . "left join conciliacion_detalle on conciliacion.idconciliacion = conciliacion_detalle.idconciliacion "
-            . "left join viajes on conciliacion_detalle.idviaje = viajes.IdViaje where conciliacion.idconciliacion = " . $this->idconciliacion . " "
-            . "and conciliacion_detalle.estado = 1 "
-            . "group by conciliacion.idconciliacion limit 1");
+            . "from conciliacion_suministro "
+            . "left join conciliacion_suministro_detalle on conciliacion_suministro.idconciliacion = conciliacion_suministro_detalle.idconciliacion "
+            . "left join inicio_viajes on conciliacion_suministro_detalle.idviaje = inicio_viajes.IdInicioViajes where conciliacion_suministro.idconciliacion = " . $this->idconciliacion . " "
+            . "and conciliacion_suministro_detalle.estado = 1 "
+            . "group by conciliacion_suministro.idconciliacion limit 1");
         return $results ? $results[0]->Volumen : 0;
-    }
+    }*/
 
-    public function getImporteAttribute()
+    /*public function getImporteAttribute()
     {
         $results = DB::connection("sca")->select("select sum(Importe) as Importe "
-            . "from conciliacion "
-            . "left join conciliacion_detalle on conciliacion.idconciliacion = conciliacion_detalle.idconciliacion "
-            . "left join viajes on conciliacion_detalle.idviaje = viajes.IdViaje where conciliacion.idconciliacion = " . $this->idconciliacion . " "
-            . "and conciliacion_detalle.estado = 1 "
-            . "group by conciliacion.idconciliacion limit 1");
+            . "from conciliacion_suministro "
+            . "left join conciliacion_suministro_detalle on conciliacion_suministro.idconciliacion = conciliacion_suministro_detalle.idconciliacion "
+            . "left join inicio_viajes on conciliacion_suministro_detalle.idviaje = inicio_viajes.IdViaje where conciliacion_suministro.idconciliacion = " . $this->idconciliacion . " "
+            . "and conciliacion_suministro_detalle.estado = 1 "
+            . "group by conciliacion_suministro.idconciliacion limit 1");
         return $results ? $results[0]->Importe : 0;
-    }
-    
+    }*/
+
     public function getImportePagadoFAttribute(){
         return number_format($this->ImportePagado, 2, ".",",");
     }
-    
+
     public function getImportePagadoAlertAttribute(){
         if($this->es_historico && !($this->ImportePagado >0) ){
             return "Pendiente";
@@ -246,7 +246,7 @@ class Conciliacion extends Model
             return $this->volumen_pagado_f;
         }
     }
-    
+
     public function getVolumenPagadoFAttribute(){
         return number_format($this->VolumenPagado, 2, ".",",");
     }
@@ -306,7 +306,7 @@ class Conciliacion extends Model
 
     public function cancelacion()
     {
-        return $this->hasOne(ConciliacionCancelacion::class, 'idconciliacion');
+        return $this->hasOne(ConciliacionSuministroCancelacion::class, 'idconciliacion');
     }
 
     public function cerrar($id)
@@ -314,66 +314,58 @@ class Conciliacion extends Model
         DB::connection('sca')->beginTransaction();
 
         try {
-            if ( ($this->es_historico && ($this->ImportePagado - Conciliacion::HOLGURA_IMPORTE)>$this->importe && ($this->VolumenPagado - Conciliacion::HOLGURA_VOLUMEN)>$this->volumen)) {
-                throw new \Exception("No se puede cerrar la conciliación por que el importe y volumen pagados son mayores al importe y volumen conciliados");
-            }
-            if ( ($this->es_historico && ($this->ImportePagado - Conciliacion::HOLGURA_IMPORTE)>$this->importe && ($this->VolumenPagado - Conciliacion::HOLGURA_VOLUMEN)<=$this->volumen)) {
-                throw new \Exception("No se puede cerrar la conciliación por que el importe pagado es mayor al importe conciliado");
-            }
-            if ( ($this->es_historico && ($this->ImportePagado - Conciliacion::HOLGURA_IMPORTE)<=$this->importe && ($this->VolumenPagado - Conciliacion::HOLGURA_VOLUMEN)>$this->volumen)) {
-                throw new \Exception("No se puede cerrar la conciliación por que el volumen pagado es mayor al volumen conciliado");
-            }
+
             if ($this->estado != 0) {
                 throw new \Exception("No se puede cerrar la conciliación ya que su estado actual es " . $this->estado_str);
             }
 
-            $repetidos="SELECT count(idviaje_neto) AS CALCULATED_COLUMN1,
-                   conciliacion_detalle.idconciliacion_detalle,
-                   conciliacion_detalle.idviaje_neto,
-                   viajesnetos.Code,
-                   group_concat(conciliacion.idconciliacion),
-                   group_concat(conciliacion.fecha_conciliacion),
-                   viajes.Importe,
-                   viajes.IdViaje
-              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_detalle conciliacion_detalle
-                      INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos
+            $repetidos="SELECT count(idinicioviaje) AS CALCULATED_COLUMN1,
+                   conciliacion_suministro_detalle.idconciliacion_detalle,
+                   conciliacion_suministro_detalle.idinicioviaje,
+                   inicio_camion.Code,
+                   group_concat(conciliacion_suministro.idconciliacion),
+                   group_concat(conciliacion_suministro.fecha_conciliacion),
+                   inicio_viajes.Importe,
+                   inicio_viajes.IdInicioViaje
+              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_suministro_detalle conciliacion_detalle
+                      INNER JOIN prod_sca_pista_aeropuerto_2.inicio_camion viajesnetos
                          ON     (conciliacion_detalle.idviaje_neto =
                                     viajesnetos.IdViajeNeto)
                             AND (viajesnetos.IdViajeNeto =
                                     conciliacion_detalle.idviaje_neto))
-                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion conciliacion
+                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion_suministro conciliacion
                         ON     (conciliacion_detalle.idconciliacion =
                                    conciliacion.idconciliacion)
                            AND (conciliacion.idconciliacion =
                                 conciliacion_detalle.idconciliacion))
-                   INNER JOIN prod_sca_pista_aeropuerto_2.viajes viajes
+                   INNER JOIN prod_sca_pista_aeropuerto_2.inicio_viajes viajes
                       ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
              WHERE     (conciliacion.fecha_conciliacion >= '2017-07-01 00:00:00')
                    AND conciliacion_detalle.estado = 1
                    AND conciliacion.idconciliacion = '{$id}'
-            GROUP BY conciliacion_detalle.idviaje_neto, viajesnetos.Code
-            HAVING count(idviaje_neto) > 1";
+            GROUP BY conciliacion_detalle.idinicioviaje, viajesnetos.Code
+            HAVING count(idinicioviaje) > 1";
 
             $r = DB::connection('sca')->select(DB::raw($repetidos));
 
 
-                //cambiar estatus de un registro
+            //cambiar estatus de un registro
             $this->estado = 1;
             $this->IdCerro = auth()->user()->idusuario;
             $this->FechaHoraCierre = Carbon::now();
             $this->save();
 
             foreach ($this->viajes() as $v) {
-                $viaje = Viaje::find($v->IdViaje);
+                $viaje = InicioViajes::find($v->IdInicioViaje);
                 if($r!=null){
                     foreach ($r as $item){
                         if($v->code == $item->Code){
 
-                            $detalle = ConciliacionDetalle::find($item->idconciliacion_detalle);
+                            $detalle = ConciliacionSuministroDetalle::find($item->idconciliacion_detalle);
                             $detalle->update([
                                 'estado' =>'-1'
                             ]);
-                            ConciliacionDetalleCancelacion::create([
+                            ConciliacionSuministroDetalleCancelacion::create([
                                 'idconciliaciondetalle' => $item->idconciliacion_detalle,
                                 'motivo' => 'Viaje Duplicado en la conciliacion',
                                 'fecha_hora_cancelacion' => Carbon::now(),
@@ -420,15 +412,6 @@ class Conciliacion extends Model
         DB::connection('sca')->beginTransaction();
 
         try {
-            if ( ($this->es_historico && ($this->ImportePagado - Conciliacion::HOLGURA_IMPORTE)>$this->importe && ($this->VolumenPagado - Conciliacion::HOLGURA_VOLUMEN)>$this->volumen)) {
-                throw new \Exception("No se puede aprobar la conciliaciòn por que el importe y volumen pagados son mayores al importe y volumen conciliados");
-            }
-            if ( ($this->es_historico && ($this->ImportePagado - Conciliacion::HOLGURA_IMPORTE)>$this->importe && ($this->VolumenPagado - Conciliacion::HOLGURA_VOLUMEN)<=$this->volumen)) {
-                throw new \Exception("No se puede aprobar la conciliaciòn por que el importe pagado es mayor al importe conciliado");
-            }
-            if ( ($this->es_historico && ($this->ImportePagado - Conciliacion::HOLGURA_IMPORTE)<=$this->importe && ($this->VolumenPagado - Conciliacion::HOLGURA_VOLUMEN)>$this->volumen)) {
-                throw new \Exception("No se puede aprobar la conciliaciòn por que el volumen pagado es mayor al volumen conciliado");
-            }
             if ($this->estado != 1) {
                 throw new \Exception("No se puede aprobar la conciliación ya que su estado actual es " . $this->estado_str);
             }
@@ -445,7 +428,7 @@ class Conciliacion extends Model
         }
     }
     public function getEsHistoricoAttribute(){
-        if($this->fecha_conciliacion->format("Ymd") <= Conciliacion::FECHA_HISTORICO){
+        if($this->fecha_conciliacion->format("Ymd") <= ConciliacionSuministro::FECHA_HISTORICO){
             RETURN TRUE;
         }else{
             RETURN FALSE;
@@ -463,16 +446,16 @@ class Conciliacion extends Model
 
             $this->estado = $this->estado == 0 ? -1 : -2;
 
-            ConciliacionCancelacion::create([
+            ConciliacionSuministroCancelacion::create([
                 'idconciliacion' => $this->idconciliacion,
                 'motivo' => $request->get('motivo'),
                 'fecha_hora_cancelacion' => Carbon::now(),
                 'idcancelo' => auth()->user()->idusuario
             ]);
 
-            foreach ($this->conciliacionDetalles as $detalle) {
+            foreach ($this->conciliacionSuministroDetalles as $detalle) {
 
-                ConciliacionDetalleCancelacion::create([
+                ConciliacionSuministroDetalleCancelacion::create([
                     'idconciliaciondetalle' => $detalle->idconciliacion_detalle,
                     'motivo' => $request->get('motivo'),
                     'fecha_hora_cancelacion' => Carbon::now()->toDateTimeString(),
@@ -508,9 +491,9 @@ class Conciliacion extends Model
     {
         if ($this->viajes()->count()) {
             $result = DB::connection('sca')->select(DB::raw("
-                SELECT min(v.FechaLlegada) as fecha_inicial FROM conciliacion c 
-                join conciliacion_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
-                join viajes v on (cd.idviaje = v.IdViaje)
+                SELECT min(v.FechaLlegada) as fecha_inicial FROM conciliacion_suministro c 
+                join conciliacion_suministro_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
+                join inicio_viajes v on (cd.idviaje = v.IdViaje)
                 where c.idconciliacion = {$this->idconciliacion} "))[0]->fecha_inicial;
             return Carbon::createFromFormat('Y-m-d', $result)->format('d-m-Y');
         } else {
@@ -522,9 +505,9 @@ class Conciliacion extends Model
     {
         if ($this->viajes()->count()) {
             $result = DB::connection('sca')->select(DB::raw("
-                SELECT max(v.FechaLlegada) as fecha_final FROM conciliacion c 
-                join conciliacion_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
-                join viajes v on (cd.idviaje = v.IdViaje)
+                SELECT max(v.FechaLlegada) as fecha_final FROM conciliacion_suministro c 
+                join conciliacion_suministro_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
+                join inicio_viajes v on (cd.idinicioviaje = v.IdInicioViaje)
                 where c.idconciliacion = {$this->idconciliacion} "))[0]->fecha_final;
             return Carbon::createFromFormat('Y-m-d', $result)->format('d-m-Y');
         } else {
@@ -538,29 +521,6 @@ class Conciliacion extends Model
         return $this->fecha_inicial != '' && $this->fecha_final != '' ? "DEL (" . $this->fecha_inicial . ") AL (" . $this->fecha_final . ")" : "SIN VIAJES";
     }
 
-    public function getImporteViajesManualesAttribute()
-    {
-        $results = DB::connection("sca")->select("select sum(Importe) as importe_viajes_manuales "
-            . "from conciliacion "
-            . "left join conciliacion_detalle on conciliacion.idconciliacion = conciliacion_detalle.idconciliacion "
-            . "left join viajes on conciliacion_detalle.idviaje = viajes.IdViaje where conciliacion.idconciliacion = " . $this->idconciliacion . " "
-            . "and conciliacion_detalle.estado = 1 "
-            . "and viajes.Estatus = 20 "
-            . "group by conciliacion.idconciliacion limit 1");
-        return $results ? $results[0]->importe_viajes_manuales : 0;
-    }
-
-    public function getVolumenViajesManualesAttribute()
-    {
-        $results = DB::connection("sca")->select("select sum(CubicacionCamion) as Volumen "
-            . "from conciliacion "
-            . "left join conciliacion_detalle on conciliacion.idconciliacion = conciliacion_detalle.idconciliacion "
-            . "left join viajes on conciliacion_detalle.idviaje = viajes.IdViaje where conciliacion.idconciliacion = " . $this->idconciliacion . " "
-            . "and conciliacion_detalle.estado = 1 "
-            . "and viajes.Estatus = 20 "
-            . "group by conciliacion.idconciliacion limit 1");
-        return $results ? $results[0]->Volumen : 0;
-    }
 
     public function getVolumenViajesManualesFAttribute()
     {

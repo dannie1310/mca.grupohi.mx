@@ -5,7 +5,7 @@
     <div id="app">
         <global-errors></global-errors>
         <tickets-validar
-                inline-template>
+                inline-template v-cloak>
             <section>
                 <div id="app" class="container">
                         <div class="row col-sm-12">

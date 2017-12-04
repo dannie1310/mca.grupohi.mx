@@ -270,7 +270,33 @@
           </ul>
       </li>
   @endif
-
+  @if(Auth::user()->can(['control_suministro']))
+      <li class="dropdown">
+          <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
+              Operación Suministro<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu">
+              <li><a href="{{ route('suministro_netos.index') }}">Viajes Suministro</a></li>
+              <li class="dropdown-submenu">
+                  <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Registrar Suministro</a>
+                  <ul class="dropdown-menu">
+                      <li class="dropdown-submenu">
+                          <a tabindex="-1" class="dropdown-toggle" data-toggle="dropdown">Carga Manual</a>
+                          <ul class="dropdown-menu">
+                                  <li><a tabindex="-2" href="{{ route('suministro_netos.create', ['action' => 'manual']) }}">Ingresar Viajes</a></li>
+                                  <li><a tabindex="-2" href="{{ route('suministro_netos.edit', ['action' => 'autorizar']) }}">Autorizar Viajes</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+              </li>
+              <li><a href="{{ route('suministro_netos.edit', ['action' => 'validar']) }}">Validar Viajes</a></li>
+              <li><a href="{{ route('suministro_netos.edit', ['action' => 'modificar']) }}">Modificar Viajes</a></li>
+              <li><a href="{{ route('suministro_netos.edit', ['action' => 'revertir']) }}">Revertir Viajes</a> </li>
+              <li><a href="{{ route('suministro_netos.index', ['action' => 'en_conflicto']) }}">Viajes en Conflicto</a> </li>
+              <li><a href="{{ route('conciliaciones.suministro.index') }}">Conciliaciones</a></li>
+          </ul>
+      </li>
+  @endif
 @else
   <li><a href="{{ route('proyectos') }}">Proyectos</a></li>
 @endif

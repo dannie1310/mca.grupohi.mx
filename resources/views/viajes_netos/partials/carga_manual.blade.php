@@ -3,7 +3,7 @@
 <hr>
 <div id="app">
     <global-errors></global-errors>
-    <viajes-manual inline-template>
+    <viajes-manual inline-template v-cloak>
         <section>
             <app-errors v-bind:form="form"></app-errors>
             {!! Form::open(['route' => ['viajes_netos.manual.store'], 'class' => 'form_carga_manual']) !!}

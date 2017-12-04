@@ -6,7 +6,7 @@
 <hr>
 <div id="app">
     <global-errors></global-errors>
-    <viajes-manual-completa inline-template>
+    <viajes-manual-completa inline-template v-cloak>
         <section>
             <app-errors v-bind:form="form"></app-errors>
             <div class="form-inline">

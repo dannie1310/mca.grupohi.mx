@@ -4,12 +4,12 @@
 @include('partials.errors')
 <div id="app">
     <global-errors></global-errors>
-    <conciliaciones-edit inline-template>
+    <conciliaciones-edit inline-template v-cloak>
         <section>
             <span v-if="fetching">
                 <div class="text-center"><i class="fa fa-spinner fa-pulse fa-2x"></i> <big>CARGANDO CONCILIACIÓN</big></div>
             </span>
-            <span v-else v-cloak>
+            <span v-else>
             <input name="id_conciliacion" type="hidden" id="id_conciliacion"  value="{{ route('conciliaciones.show', $conciliacion) }}">
             <h1>
                 CONCILIACIONES <small>(@{{ conciliacion.estado_str }})</small>
