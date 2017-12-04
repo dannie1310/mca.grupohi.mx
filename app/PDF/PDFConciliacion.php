@@ -892,7 +892,7 @@ class PDFConciliacion extends Rotation
         }
         else {
             if (count($this->conciliacion->conciliacionDetalles) > 0) {
-               // $this->items_manuales();
+                $this->items_manuales();
                 $this->items_moviles();
                 $this->Ln(0.75);
                 $this->total();
