@@ -50671,6 +50671,8 @@ require('./vue-components/viajes-validar');
 require('./vue-components/viajes-modificar');
 require('./vue-components/conciliaciones-create');
 require('./vue-components/conciliaciones-edit');
+require('./vue-components/conciliaciones-suministro-create');
+require('./vue-components/conciliaciones-suministro-edit');
 require('./vue-components/viajes-revertir');
 require('./vue-components/viajes-index');
 require('./vue-components/corte-create');
@@ -50679,8 +50681,9 @@ require('./vue-components/configuracion-diaria');
 require('./vue-components/roles-permisos');
 require('./vue-components/tickets-validar');
 require('./vue-components/periodocierre-administracion');
+require('./vue-components/suministro-index');
 
-},{"./vue-components/conciliaciones-create":41,"./vue-components/conciliaciones-edit":42,"./vue-components/configuracion-diaria":43,"./vue-components/corte-create":44,"./vue-components/corte-edit":45,"./vue-components/errors":46,"./vue-components/fda-bancomaterial":47,"./vue-components/fda-material":48,"./vue-components/global-errors":49,"./vue-components/origenes-usuarios":50,"./vue-components/periodocierre-administracion":51,"./vue-components/roles-permisos":52,"./vue-components/tickets-validar":56,"./vue-components/viajes-completa":57,"./vue-components/viajes-index":58,"./vue-components/viajes-manual":59,"./vue-components/viajes-modificar":60,"./vue-components/viajes-revertir":61,"./vue-components/viajes-validar":62}],41:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":41,"./vue-components/conciliaciones-edit":42,"./vue-components/conciliaciones-suministro-create":43,"./vue-components/conciliaciones-suministro-edit":44,"./vue-components/configuracion-diaria":45,"./vue-components/corte-create":46,"./vue-components/corte-edit":47,"./vue-components/errors":48,"./vue-components/fda-bancomaterial":49,"./vue-components/fda-material":50,"./vue-components/global-errors":51,"./vue-components/origenes-usuarios":52,"./vue-components/periodocierre-administracion":53,"./vue-components/roles-permisos":54,"./vue-components/suministro-index":55,"./vue-components/tickets-validar":59,"./vue-components/viajes-completa":60,"./vue-components/viajes-index":61,"./vue-components/viajes-manual":62,"./vue-components/viajes-modificar":63,"./vue-components/viajes-revertir":64,"./vue-components/viajes-validar":65}],41:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -51351,6 +51354,679 @@ Vue.component('conciliaciones-edit', {
 'use strict';
 
 /**
+ * Created by DBENITEZ on 13/11/2017.
+ */
+Vue.component('conciliaciones-suministro-create', {
+    data: function data() {
+        return {
+            'form': {
+                'errors': []
+            }
+        };
+    },
+    directives: {
+        datepicker: {
+            inserted: function inserted(el) {
+                $(el).datepicker({
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true,
+                    clearBtn: true,
+                    todayHighlight: true,
+                    endDate: '0d'
+                });
+                $(el).val(App.timeStamp(1));
+            }
+        }
+    },
+
+    methods: {
+        confirmarRegistro: function confirmarRegistro(e) {
+            var _this2 = this;
+
+            e.preventDefault();
+
+            swal({
+                title: "¿Desea continuar con el registro?",
+                text: "¿Esta seguro de que la información es correcta?",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "No"
+            }, function () {
+                return _this2.registrar();
+            });
+        },
+
+        registrar: function registrar() {
+            var _this = this;
+            this.form.errors = [];
+            var url = App.host + '/conciliacion/suminitro/new';
+            var data = $('.form_conciliacion_create').serialize();
+
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'POST',
+                success: function success(response) {
+                    var conciliacion = response.conciliacion;
+                    window.location.href = App.host + '/conciliacion/suministro/' + conciliacion.idconciliacion + '/edit';
+                },
+                error: function error(_error) {
+                    App.setErrorsOnForm(_this.form, _error.responseJSON);
+                }
+            });
+        }
+    }
+});
+
+},{}],44:[function(require,module,exports){
+'use strict';
+
+/**
+ * Created by DBENITEZ on 13/11/2017.
+ */
+Vue.component('conciliaciones-suministro-edit', {
+    data: function data() {
+        return {
+            'tipo': '',
+            'resultados': [],
+            'conciliacion': {
+                'id': '',
+                'detalles': [],
+                'detalles_nc': []
+            },
+            'form': {
+                'errors': []
+            },
+            'guardando': false,
+            'fetching': false,
+            'fecha_cambio': ''
+        };
+    },
+
+    directives: {
+        datepicker: {
+            inserted: function inserted(el) {
+                $(el).datepicker({
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true,
+                    clearBtn: true,
+                    todayHighlight: true,
+                    endDate: '0d'
+                });
+                $(el).val(App.timeStamp(1));
+            }
+        },
+
+        datepickerconciliacion: {
+            inserted: function inserted(el) {
+                $(el).datepicker({
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true,
+                    clearBtn: true,
+                    todayHighlight: true,
+                    endDate: '0d'
+                });
+            }
+        },
+
+        fileinput: {
+            inserted: function inserted(el) {
+                $(el).fileinput({
+                    language: 'es',
+                    theme: 'fa',
+                    showPreview: false,
+                    showUpload: true,
+                    uploadAsync: true,
+                    maxFileConut: 1,
+                    autoReplate: true,
+                    allowedFileExtensions: ['xls', 'xml', 'csv', 'xlsx'],
+                    layoutTemplates: {
+                        actionUpload: '',
+                        actionDelete: ''
+                    }
+                });
+            }
+        }
+    },
+
+    created: function created() {
+        this.fetchConciliacion();
+    },
+
+    computed: {
+        cancelados: function cancelados() {
+            var _this = this;
+            return _this.conciliacion.detalles.filter(function (detalle) {
+                if (detalle.estado === -1) {
+                    return true;
+                }
+                return false;
+            });
+        },
+
+        conciliados: function conciliados() {
+            var _this = this;
+            return _this.conciliacion.detalles.filter(function (detalle) {
+                if (detalle.estado === 1) {
+                    return true;
+                }
+                return false;
+            });
+        },
+
+        manuales: function manuales() {
+            var _this = this;
+            return _this.conciliacion.detalles.filter(function (detalle) {
+                return detalle.estatus_viaje >= 20 && detalle.estatus_viaje <= 29 && detalle.estado === 1;
+            });
+        },
+
+        moviles: function moviles() {
+            var _this = this;
+            return _this.conciliacion.detalles.filter(function (detalle) {
+                return detalle.estatus_viaje >= 0 && detalle.estatus_viaje <= 9 && detalle.estado === 1;
+            });
+        }
+    },
+
+    methods: {
+
+        fetchConciliacion: function fetchConciliacion() {
+            var _this2 = this;
+
+            this.fetching = true;
+            var _this = this;
+            var url = $('#id_conciliacion').val();
+            this.$http.get(url).then(function (response) {
+                _this.conciliacion = response.body.conciliacion;
+                _this2.fetching = false;
+                _this.fecha_cambio = _this.conciliacion.fecha;
+            }, function (error) {
+                _this2.fetching = false;
+                App.setErrorsOnForm(_this.form, error.body);
+            });
+        },
+
+        confirmarRegistro: function confirmarRegistro(e) {
+            var _this3 = this;
+
+            e.preventDefault();
+
+            swal({
+                title: "¿Desea continuar con la conciliación?",
+                text: "¿Esta seguro de que la información es correcta?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                confirmButtonColor: "#ec6c62"
+            }, function () {
+                return _this3.registrar();
+            });
+        },
+
+        cancelar: function cancelar(e) {
+            e.preventDefault();
+            var _this = this;
+            var url = $(e.target).attr('href');
+            swal({
+                title: "¡Cancelar Conciliación!",
+                text: "¿Esta seguro de que deseas cancelar la conciliación?",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                inputPlaceholder: "Motivo de la cancelación.",
+                confirmButtonText: "Si, Cancelar",
+                cancelButtonText: "No",
+                showLoaderOnConfirm: true
+
+            }, function (inputValue) {
+                if (inputValue === false) return false;
+                if (inputValue === "") {
+                    swal.showInputError("Escriba el motivo de la cancelación!");
+                    return false;
+                }
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        motivo: inputValue
+                    },
+                    success: function success(response) {
+                        if (response.status_code = 200) {
+                            swal({
+                                type: 'success',
+                                title: '¡Hecho!',
+                                text: 'Conciliación cancelada correctamente',
+                                showCancelButton: false,
+                                confirmButtonText: 'OK',
+                                closeOnConfirm: true
+                            }, function () {
+                                _this.fetchConciliacion();
+                            });
+                        }
+                    },
+                    error: function error(_error) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error.responseText)
+                        });
+                        _this.fetchConciliacion();
+                    }
+                });
+            });
+        },
+
+        cerrar: function cerrar(e) {
+            e.preventDefault();
+
+            var _this = this;
+            var url = App.host + '/conciliacion/suministro/' + _this.conciliacion.id;
+
+            if (!this.conciliados.length) {
+                swal({
+                    type: 'warning',
+                    title: "¡Cerrar Conciliación!",
+                    text: 'No se puede cerrar la conciliación ya que no tiene viajes conciliados',
+                    closeOnConfirm: true,
+                    showCancelButton: false,
+                    confirmButtonText: "OK"
+                });
+            } else {
+                swal({
+                    title: "¡Cerrar Conciliación!",
+                    text: "¿Desea cerrar la conciliación?",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonText: "Si, Cerrar",
+                    cancelButtonText: "No",
+                    showLoaderOnConfirm: true
+                }, function () {
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _method: 'PATCH',
+                            action: 'cerrar'
+                        },
+                        success: function success(response) {
+                            if (response.status_code = 200) {
+                                swal({
+                                    type: 'success',
+                                    title: '¡Hecho!',
+                                    text: 'Conciliación cerrada correctamente',
+                                    showCancelButton: false,
+                                    confirmButtonText: 'OK',
+                                    closeOnConfirm: true
+                                }, function () {
+                                    _this.fetchConciliacion();
+                                });
+                            }
+                        },
+                        error: function error(_error2) {
+                            swal({
+                                type: 'error',
+                                title: '¡Error!',
+                                text: App.errorsToString(_error2.responseText)
+                            });
+                            _this.fetchConciliacion();
+                        }
+                    });
+                });
+            }
+        },
+
+        aprobar: function aprobar(e) {
+            e.preventDefault();
+            var _this = this;
+            var url = App.host + '/conciliacion/suministro/' + _this.conciliacion.id;
+            swal({
+                title: "¡Aprobar Conciliación!",
+                text: "¿Desea aprobar la conciliación?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "Si, Aprobar",
+                cancelButtonText: "No",
+                showLoaderOnConfirm: true
+            }, function () {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _method: 'PATCH',
+                        action: 'aprobar'
+                    },
+                    success: function success(response) {
+                        if (response.status_code = 200) {
+                            swal({
+                                type: 'success',
+                                title: '¡Hecho!',
+                                text: 'Conciliación aprobada correctamente',
+                                showCancelButton: false,
+                                confirmButtonText: 'OK',
+                                closeOnConfirm: true
+                            }, function () {
+                                _this.fetchConciliacion();
+                            });
+                        }
+                    },
+                    error: function error(_error3) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error3.responseText)
+                        });
+                        _this.fetchConciliacion();
+                    }
+                });
+            });
+        },
+
+        registrar: function registrar() {
+            var _this = this;
+            this.form.errors = [];
+            this.guardando = true;
+
+            var url = App.host + '/conciliacion/suministro/' + conciliacion.idconciliacion + '/edit';
+            var data = $('.form_registrar').serialize();
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: data,
+                success: function success(response) {
+                    _this.guardando = false;
+                    $('#resultados').modal('hide');
+                    _this.resultados = [];
+
+                    swal({
+                        type: 'success',
+                        title: '¡Viajes Conciliados Correctamente!',
+                        text: response.registros + ' Viajes conciliados',
+                        showConfirmButton: true
+                    });
+
+                    _this.fetchConciliacion();
+                },
+                error: function error(_error4) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(_error4.responseText)
+                    });
+                    _this.fetchConciliacion();
+                }
+            });
+        },
+
+        agregar: function agregar(e) {
+            e.preventDefault();
+
+            this.form.errors = [];
+            var _this = this;
+            var url = $('.form_buscar').attr('action');
+            var data = $('.form_buscar').serialize();
+            this.guardando = true;
+
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'POST',
+                success: function success(response) {
+                    if (response.status_code == 201) {
+                        if (response.detalles != null) {
+                            _this.conciliacion.detalles.push(response.detalles);
+
+                            _this.guardando = false;
+                            swal({
+                                type: 'success',
+                                title: '¡Viaje Conciliado Correctamente!',
+                                text: response.registros + ' Viajes conciliados',
+                                showConfirmButton: false,
+                                timer: 500
+                            });
+                            _this.conciliacion.importe = response.importe;
+                            _this.conciliacion.volumen = response.volumen;
+                            _this.conciliacion.num_viajes += 1;
+                            _this.conciliacion.rango = response.rango;
+                            _this.conciliacion.importe_viajes_manuales = response.importe_viajes_manuales;
+                            _this.conciliacion.volumen_viajes_manuales = response.volumen_viajes_manuales;
+                            _this.conciliacion.porcentaje_importe_viajes_manuales = response.porcentaje_importe_viajes_manuales;
+                            _this.conciliacion.porcentaje_volumen_viajes_manuales = response.porcentaje_volumen_viajes_manuales;
+                            _this.conciliacion.volumen_viajes_moviles = response.volumen_viajes_moviles;
+                            _this.conciliacion.importe_viajes_moviles = response.importe_viajes_moviles;
+
+                            $('.ticket').val('');
+                            $('.ticket').focus();
+                        } else {
+                            _this.guardando = false;
+                            swal({
+                                type: 'warning',
+                                title: '¡Error!',
+                                text: response.msg,
+                                showConfirmButton: true,
+                                timer: 1500
+                            });
+
+                            $('.ticket').val('');
+                            $('.ticket').focus();
+                        }
+                    } else if (response.status_code == 500) {
+                        _this.conciliacion.detalles_nc.push(response.detalles_nc);
+                        _this.guardando = false;
+                        $('.ticket').val('');
+                        $('.ticket').focus();
+
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: response.detalles_nc.detalle_alert,
+                            html: true
+                        });
+                    }
+                },
+                error: function error(_error5) {
+                    _this.guardando = false;
+                    $('.ticket').val('');
+                    $('.ticket').focus();
+
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(_error5.responseText)
+                    });
+                }
+            });
+        },
+
+        buscar: function buscar(e) {
+            var _this4 = this;
+
+            e.preventDefault();
+
+            var _this = this;
+            this.form.errors = [];
+            this.guardando = true;
+
+            var data = $('.form_buscar').serialize();
+            this.$http.get(App.host + '/inicioviajes?tipo=conciliar&' + data).then(function (response) {
+                _this.resultados = response.body.data;
+                if (_this.resultados.length) {
+                    _this.guardando = false;
+                    $('#resultados').modal('show');
+                } else {
+                    _this.guardando = false;
+                    swal({
+                        type: 'warning',
+                        title: '¡Sin Resultados!',
+                        text: 'Ningún viaje coincide con los datos de consulta',
+                        showConfirmButton: true
+                    });
+                }
+            }, function (error) {
+                _this.guardando = false;
+                App.setErrorsOnForm(_this4.form, error.body);
+            });
+        },
+
+        cambiar_cubicacion: function cambiar_cubicacion(detalle) {
+
+            var _this = this;
+            swal({
+                title: "¡Cambiar Cubicación!",
+                text: "Cubicación Actual : " + detalle.cubicacion_camion,
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                inputPlaceholder: "Nueva Cubicación.",
+                confirmButtonText: "Si, Cambiar",
+                cancelButtonText: "No",
+                showLoaderOnConfirm: true
+            }, function (inputValue) {
+                if (inputValue === false) return false;
+                if (inputValue === "") {
+                    swal.showInputError("¡Escriba la nueva Cubicación!");
+                    return false;
+                }if (!$.isNumeric(inputValue)) {
+                    swal.showInputError("¡Por favor introduzca sólo números!");
+                    return false;
+                }
+                $.ajax({
+                    url: App.host + '/viajes/' + detalle.id,
+                    type: 'POST',
+                    data: {
+                        _method: 'PATCH',
+                        cubicacion: inputValue,
+                        tipo: 'cubicacion',
+                        id_conciliacion: _this.conciliacion.id
+                    },
+                    success: function success(response) {
+                        if (response.status_code = 200) {
+                            _this.fetchConciliacion();
+                            swal({
+                                type: 'success',
+                                title: '¡Hecho!',
+                                text: 'Cubicacion cambiada correctamente',
+                                showCancelButton: false,
+                                confirmButtonText: '' + 'OK',
+                                closeOnConfirm: true
+                            });
+                        }
+                    },
+                    error: function error(_error6) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error6.responseText)
+                        });
+                        _this.fetchConciliacion();
+                    }
+                });
+            });
+        },
+
+        eliminar_detalle: function eliminar_detalle(idconciliacion_detalle) {
+            var _this = this;
+            var url = App.host + '/conciliacion/suministro/' + this.conciliacion.id + '/detalles/' + idconciliacion_detalle;
+            swal({
+                title: "¡Cancelar viaje de la Conciliación!",
+                text: "¿Esta seguro de que deseas quitar el viaje de la conciliación?",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                inputPlaceholder: "Motivo de la cancelación.",
+                confirmButtonText: "Si, Quitar",
+                cancelButtonText: "No",
+                showLoaderOnConfirm: true
+
+            }, function (inputValue) {
+                if (inputValue === false) return false;
+                if (inputValue === "") {
+                    swal.showInputError("Escriba el motivo de la cancelación!");
+                    return false;
+                }
+                _this.guardando = true;
+                _this.$http.post(url, { _method: 'DELETE', motivo: inputValue }).then(function (response) {
+                    if (response.body.status_code == 200) {
+                        _this.guardando = false;
+                        _this.fetchConciliacion();
+                        swal({
+                            type: 'success',
+                            title: '¡Hecho!',
+                            text: 'Viaje cancelado correctamente',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            closeOnConfirm: true
+                        });
+                    }
+                }, function (error) {
+                    _this.guardando = false;
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.body)
+                    });
+                    _this.fetchConciliacion();
+                });
+            });
+        },
+
+        modificar_detalles: function modificar_detalles() {
+            var _this = this;
+            var url = $('.form_update').attr('action');
+            var data = $('.form_update').serialize();
+
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'POST',
+                beforeSend: function beforeSend() {
+                    _this.guardando = true;
+                },
+                success: function success(response) {
+                    swal('¡Hecho!', 'Datos actualizados correctamente', 'success');
+                    _this.conciliacion.importe_pagado = response.importe_pagado;
+                    _this.conciliacion.importe_pagado_sf = response.importe_pagado_sf;
+                    _this.conciliacion.volumen_pagado = response.volumen_pagado;
+                    _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
+                },
+                error: function error(_error7) {
+                    if (_error7.status == 422) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error7.responseJSON)
+                        });
+                    } else if (_error7.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error7.responseText)
+                        });
+                        _this.fetchConciliacion();
+                    }
+                },
+                complete: function complete() {
+                    _this.guardando = false;
+                    $('#detalles_conciliacion').modal('hide');
+                }
+            });
+        }
+    }
+});
+
+},{}],45:[function(require,module,exports){
+'use strict';
+
+/**
  * Created by JFEsquivel on 27/04/2017.
  */
 
@@ -51822,7 +52498,7 @@ Vue.component('configuracion-diaria', {
     }
 });
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 
 Vue.component('corte-create', {
@@ -51986,7 +52662,7 @@ Vue.component('corte-create', {
     }
 });
 
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 Vue.component('corte-edit', {
@@ -52334,7 +53010,7 @@ Vue.component('corte-edit', {
     }
 });
 
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 Vue.component('app-errors', {
@@ -52343,7 +53019,7 @@ Vue.component('app-errors', {
     template: require('./templates/errors.html')
 });
 
-},{"./templates/errors.html":53}],47:[function(require,module,exports){
+},{"./templates/errors.html":56}],49:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-bancomaterial', {
@@ -52449,7 +53125,7 @@ Vue.component('fda-bancomaterial', {
     }
 });
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-material', {
@@ -52538,7 +53214,7 @@ Vue.component('fda-material', {
     }
 });
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -52564,7 +53240,7 @@ Vue.component('global-errors', {
   }
 });
 
-},{"./templates/global-errors.html":54}],50:[function(require,module,exports){
+},{"./templates/global-errors.html":57}],52:[function(require,module,exports){
 'use strict';
 
 Vue.component('origenes-usuarios', {
@@ -52639,7 +53315,7 @@ Vue.component('origenes-usuarios', {
     }
 });
 
-},{"./templates/origenes-usuarios.html":55}],51:[function(require,module,exports){
+},{"./templates/origenes-usuarios.html":58}],53:[function(require,module,exports){
 'use strict';
 
 /**
@@ -52775,7 +53451,7 @@ Vue.component('periodocierre-administracion', {
 
 });
 
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict';
 
 Vue.component('roles-permisos', {
@@ -53269,13 +53945,281 @@ Vue.component('roles-permisos', {
     }
 });
 
-},{}],53:[function(require,module,exports){
-module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
-},{}],54:[function(require,module,exports){
-module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
 },{}],55:[function(require,module,exports){
-module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+'use strict';
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Created by DBENITEZ on 16/11/2017.
+ */
+Vue.component('suministro-index', {
+    data: function data() {
+        return {
+            'viajes_netos': [],
+            'conflicto': [],
+            'cierres': "",
+            'viaje_neto_seleccionado': "",
+            'id_conflicto': "",
+            'cargando': false,
+            'guardando': false,
+            'form': {
+                'errors': [],
+                'estado': ''
+            },
+            'ver_mas': false
+        };
+    },
+    directives: {
+        datepicker: {
+            inserted: function inserted(el) {
+                var _$$datepicker;
+
+                $(el).datepicker((_$$datepicker = {
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true }, _defineProperty(_$$datepicker, 'autoclose', true), _defineProperty(_$$datepicker, 'clearBtn', true), _defineProperty(_$$datepicker, 'todayHighlight', true), _defineProperty(_$$datepicker, 'endDate', '0d'), _$$datepicker));
+                $(el).val(App.timeStamp(1));
+            }
+        },
+
+        select2: {
+            inserted: function inserted(el) {
+                $(el).select2({
+                    placeholder: "--SELECCIONE--",
+                    closeOnSelect: false
+                });
+            }
+        },
+
+        modal_conflicto: {
+            //data-toggle="modal" data-target="#detalles_conflicto"
+        }
+    },
+    methods: {
+        buscar_en_conflicto: function buscar_en_conflicto(e) {
+            e.preventDefault();
+            var _this = this;
+
+            var data = $('.form_buscar_en_conflicto').serialize();
+            var url = App.host + '/suministro_netos?action=en_conflicto';
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: data,
+                beforeSend: function beforeSend() {
+                    _this.cargando = true;
+                    _this.viajes_netos = [];
+                    _this.form.errors = [];
+                    $('#partials_errors').empty();
+                },
+                success: function success(response) {
+                    if (!response.viajes_netos.length) {
+                        swal('¡Sin Resultados!', 'Ningún viaje coincide con los datos de consulta', 'warning');
+                    } else {
+                        _this.viajes_netos = response.viajes_netos;
+                    }
+                },
+                error: function error(_error) {
+                    if (_error.status == 422) {
+                        App.setErrorsOnForm(_this.form, _error.responseJSON);
+                    } else if (_error.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error.responseText)
+                        });
+                    }
+                },
+                complete: function complete() {
+                    _this.cargando = false;
+                }
+            });
+        },
+        buscar: function buscar(e) {
+            e.preventDefault();
+            $('input[name=type]').val('');
+            var _this = this;
+
+            var data = $('.form_buscar').serialize();
+            var url = App.host + '/suministro_netos?action=index';
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: data,
+                beforeSend: function beforeSend() {
+                    _this.cargando = true;
+                    _this.viajes_netos = [];
+                    _this.form.errors = [];
+                    $('#partials_errors').empty();
+                },
+                success: function success(response) {
+                    if (!response.viajes_netos.length) {
+                        swal('¡Sin Resultados!', 'Ningún viaje coincide con los datos de consulta', 'warning');
+                    } else {
+                        _this.viajes_netos = response.viajes_netos;
+                    }
+                },
+                error: function error(_error2) {
+                    if (_error2.status == 422) {
+                        App.setErrorsOnForm(_this.form, _error2.responseJSON);
+                    } else if (_error2.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error2.responseText)
+                        });
+                    }
+                },
+                complete: function complete() {
+                    _this.cargando = false;
+                }
+            });
+        },
+        fetchDetalleConflicto: function fetchDetalleConflicto(id_conflicto, id_viaje) {
+            var _this2 = this;
+
+            //console.log('fetchDetalle',id_conflicto);
+            this.fetching = true;
+            var _this = this;
+            _this.viaje_neto_seleccionado = id_viaje;
+            _this.id_conflicto = id_conflicto;
+            //           console.log(_this.viaje_neto_seleccionado);
+            //            var url = $('#id_conciliacion').val();
+            this.$http.get('suministro_netos?action=detalle_conflicto&id_conflicto=' + id_conflicto + '&id_viaje=' + id_viaje).then(function (response) {
+                _this.conflicto = response.body;
+                _this2.fetching = false;
+            }, function (error) {
+                _this2.fetching = false;
+                App.setErrorsOnForm(_this.form, error.body);
+            });
+        },
+        confirmarPonerPagable: function confirmarPonerPagable(e) {
+            var _this3 = this;
+
+            e.preventDefault();
+
+            swal({
+                title: "¿Desea continuar?",
+                text: "¿Esta seguro de permitir que el viaje sea pagado?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                confirmButtonColor: "#ec6c62"
+            }, function () {
+                return _this3.PonerPagable();
+            });
+        },
+        PonerPagable: function PonerPagable() {
+            var _this = this;
+            var url = $('.form_pagable').attr('action');
+            var data = $('.form_pagable').serialize() + '&IdViajeNeto=' + _this.viaje_neto_seleccionado + '&IdConflicto=' + _this.id_conflicto;
+            var idviaje_neto = _this.viaje_neto_seleccionado;
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'PATCH',
+                beforeSend: function beforeSend() {
+                    _this.guardando = true;
+                },
+                success: function success(response) {
+                    swal('¡Hecho!', 'Datos actualizados correctamente', 'success');
+                },
+                error: function error(_error3) {
+                    if (_error3.status == 422) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error3.responseJSON)
+                        });
+                    } else if (_error3.status == 500) {
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(_error3.responseText)
+                        });
+                        //_this.fetchConciliacion();
+                    }
+                },
+                complete: function complete() {
+                    _this.guardando = false;
+                    $('#detalles_conflicto').modal('hide');
+                }
+            });
+        },
+        detalle_conflicto: function detalle_conflicto(id_conflicto, id_viaje) {
+
+            this.fetchDetalleConflicto(id_conflicto, id_viaje);
+            $("#detalles_conflicto").modal("show");
+        },
+        detalle_conflicto_pagable: function detalle_conflicto_pagable(id_conflicto, id_viaje) {
+
+            this.fetchDetalleConflicto(id_conflicto, id_viaje);
+            $("#detalles_conflicto_pagable").modal("show");
+        },
+        pdf: function pdf(e) {
+            e.preventDefault();
+
+            var url = App.host + '/pdf/suministro_netos';
+
+            $('.form_buscar').attr('action', url);
+            $('.form_buscar').attr('target', '_blank');
+            $('.form_buscar').attr('method', 'GET');
+            $('.form_buscar').submit();
+        },
+        pdf_conflicto: function pdf_conflicto(e) {
+            e.preventDefault();
+
+            var url = App.host + '/pdf/suministro_netos_conflicto';
+
+            $('.form_buscar_en_conflicto').attr('action', url);
+            $('.form_buscar_en_conflicto').attr('target', '_blank');
+            $('.form_buscar_en_conflicto').attr('method', 'GET');
+            $('.form_buscar_en_conflicto').submit();
+        },
+        excel: function excel(e) {
+            e.preventDefault();
+            var url = App.host + '/suministro_netos';
+
+            $('input[name=type]').val('excel');
+            $('.form_buscar').attr('action', url);
+            $('.form_buscar').attr('method', 'GET');
+            $('.form_buscar').submit();
+        },
+        toogle_show_all: function toogle_show_all() {
+            if (this.show_all) {
+                this.show_all = false;
+            } else {
+                this.show_all = true;
+            }
+        },
+        formato: function formato(val) {
+            return numeral(val).format('0,0.00');
+        },
+        ver_mas_function: function ver_mas_function() {
+            if (this.ver_mas) {
+                //TODO: Ocultar Columnas con clase .ocultar y ver_mas = false;
+                $('.ocultar').fadeOut(1000);
+                this.ver_mas = false;
+            } else {
+                //TODO: Mostrar Columnas con clase .ocultar  y ver_mas = true
+                $('.ocultar').fadeIn(1000);
+                this.ver_mas = true;
+            }
+        }
+    }
+});
+
 },{}],56:[function(require,module,exports){
+module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
+},{}],57:[function(require,module,exports){
+module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
+},{}],58:[function(require,module,exports){
+module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+},{}],59:[function(require,module,exports){
 'use strict';
 
 Vue.component('tickets-validar', {
@@ -53329,7 +54273,7 @@ Vue.component('tickets-validar', {
 
 });
 
-},{}],57:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 function timeStamp(type) {
@@ -53549,7 +54493,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],58:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -53814,7 +54758,7 @@ Vue.component('viajes-index', {
     }
 });
 
-},{}],59:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -53998,7 +54942,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -54172,7 +55116,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],61:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -54313,7 +55257,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 // register modal component

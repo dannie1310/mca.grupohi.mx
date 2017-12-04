@@ -485,7 +485,7 @@ class PDFConciliacion extends Rotation
                     $this->SetAligns(array('L', 'R', 'R', 'R', 'R'));
                     $this->encola = "subtotal_camion";
                     $this->Row(array(utf8_decode('SUBTOTAL CAMIÓN'), $subtotal_camion[0]->NumViajes, '', number_format(($subtotal_camion[0]->CubicacionCamionSum), 2, '.', ','), number_format(utf8_decode($subtotal_camion[0]->Importe), 2, '.', ',')));
-                    if ($i < $numItems) {
+                    if($i < $numItems) {
                         $this->encola = 'items';
                     } else {
                         $this->encola = '';
@@ -495,9 +495,21 @@ class PDFConciliacion extends Rotation
 
             //Subtotal Material
             $subtotal_material = DB::connection('sca')->select(DB::raw('SELECT 
-							 COUNT(v.IdViaje) AS NumViajes,
-                            SUM(v.CubicacionCamion)  CubicacionCamionSum,
-                            SUM(v.Importe) AS Importe
+							count(v.IdViaje) as NumViajes, 
+							v.FechaLlegada, 
+							v.IdMaterial, 
+							v.IdOrigen, 
+							v.IdTiro, 
+							v.CubicacionCamion, 
+							v.Distancia as Distancia, 
+                                                        sum(v.CubicacionCamion) as CubicacionCamionSum,
+							sum(v.VolumenPrimerKM) as Vol1KM, 
+							sum(v.VolumenKMSubsecuentes) as VolSub, 
+							sum(v.VolumenKMAdicionales) as VolAdic, 
+							sum(v.ImportePrimerKM) as Imp1Km, 
+							sum(v.ImporteKMSubsecuentes) as ImpSub, 
+							sum(v.ImporteKMAdicionales) as ImpAdc, 
+							sum(v.Importe) as Importe 
 						FROM 
 							conciliacion_detalle c LEFT JOIN viajes v USING (IdViaje) 
 						WHERE 
@@ -714,7 +726,7 @@ class PDFConciliacion extends Rotation
             $this->SetRadius(array(0.2, 0, 0, 0, 0.2));
             $this->encola = 'subtotal_material';
             $this->Row(array('SUBTOTAL MATERIAL : ' . utf8_decode($this->material->material), $subtotal_material->NumViajes, '', number_format(($subtotal_material->CubicacionCamionSum), 2, '.', ','), number_format(utf8_decode($subtotal_material->Importe), 2, '.', ',')));
-            $this->ln(0.5);
+            $this->ln(0.25);
             $this->encola = 'nuevo_material';
         }
 
@@ -892,7 +904,7 @@ class PDFConciliacion extends Rotation
         }
         else {
             if (count($this->conciliacion->conciliacionDetalles) > 0) {
-                $this->items_manuales();
+               // $this->items_manuales();
                 $this->items_moviles();
                 $this->Ln(0.75);
                 $this->total();
