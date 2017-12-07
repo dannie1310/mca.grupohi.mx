@@ -89,7 +89,8 @@ Vue.component('suministro-index', {
         },
         buscar: function(e) {
             e.preventDefault();
-            $('input[name=type]').val('');
+            $('input[name=typ' +
+                'e]').val('');
             var _this = this;
 
             var data = $('.form_buscar').serialize();

@@ -62,7 +62,7 @@
                         {!! Form::close() !!}
                     </div>
                 @else
-                    <h3>BUSCAR VIAJES</h3>
+                    <h3>BUSCAR SUMINISTRO</h3>
                     {!! Form::open(['class' => 'form_buscar']) !!}
                     <input type="hidden" name="type" value>
                     <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="fecha" checked="checked">BUSCAR POR FECHA</label></h4>
@@ -97,9 +97,6 @@
                                 <label>TIPO DE VIAJES (*)</label>
                                 <span v-if="form.estado == 'C'">
                             <select id="tipo" name="Tipo[]" class="form-control" multiple="multiple" v-select2 :disabled="!form.estado">
-                                <optgroup label="CARGADOS MANUALMENTE">
-                                    <option value="CM_V">Manuales - Validados</option>
-                                </optgroup>
                                 <optgroup label="CARGADOS DESDE APLICACIÓN MÓVIL">
                                     <option value="M_V">Móviles - Validados</option>
                                 </optgroup>
@@ -107,13 +104,6 @@
                             </span>
                                 <span v-else>
                             <select id="tipo" name="Tipo[]" class="form-control" multiple="multiple" v-select2 :disabled="!form.estado">
-                                <optgroup label="CARGADOS MANUALMENTE">
-                                    <option value="CM_C">Manuales - Cargados</option>
-                                    <option value="CM_A">Manuales - Autorizados (Pend. Validar)</option>
-                                    <option value="CM_R">Manuales - Rechazados</option>
-                                    <option value="CM_V">Manuales - Validados</option>
-                                    <option value="CM_D">Manuales - Denegados</option>
-                                </optgroup>
                                 <optgroup label="CARGADOS DESDE APLICACIÓN MÓVIL">
                                     <option value="M_V">Móviles - Validados</option>
                                     <option value="M_A">Móviles - Pendientes de Validar</option>
@@ -163,15 +153,10 @@
                         <table v-tablefilter id="viajes_netos_index_table" class="table  table-striped table-bordered small">
                             <thead>
                             <tr style="background-color: #f9f9f9">
-                                <th colspan="5" style="text-align: center">INFORMACIÓN GENERAL DEL VIAJE</th>
-                                <th colspan="4" style="text-align: center">DETALLES DEL VIAJE</th>
+                                <th colspan="1" style="text-align: center"></th>
+                                <th colspan="3" style="text-align: center">INFORMACIÓN GENERAL DEL VIAJE</th>
+                                <th colspan="2" style="text-align: center">DETALLES DEL VIAJE</th>
                                 <th colspan="2" style="text-align: center">CAMIÓN</th>
-
-                                <!-- OCULTAR -->
-                                <th colspan="3" style="text-align: center" class="ocultar">EMPRESA</th>
-                                <th colspan="3" style="text-align: center" class="ocultar">SINDICATO</th>
-                                <!-- END -->
-
 
                                 <th colspan="3" style="text-align: center">CONCILIACIÓN</th>
                                 <th colspan="7" style="text-align: center">ESTADO DEL VIAJE</th>
@@ -179,14 +164,11 @@
                             <tr>
                                 <th style="text-align: center"> # </th>
                                 <th style="text-align: center"> TIPO </th>
-                                <th style="text-align: center"> FECHA LLEGADA </th>
-                                <th style="text-align: center"> HORA LLEGADA</th>
                                 <th style="text-align: center"> TICKET - CÓDIGO </th>
+                                <th style="text-align: center"> FECHA SALIDA </th>
 
                                 <th style="text-align: center"> ORIGEN</th>
-                                <th style="text-align: center"> TIRO </th>
                                 <th style="text-align: center"> MATERIAL </th>
-                                <th style="text-align: center"> IMPORTE </th>
 
                                 <th style="text-align: center"> ECONÓMICO </th>
                                 <th style="text-align: center"> CUBICACIÓN	</th>
@@ -219,25 +201,14 @@
 
                                 <td style="white-space: nowrap">@{{ index + 1 }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.tipo }}</td>
-                                <td style="white-space: nowrap">@{{ viaje_neto.FechaLlegada }}</td>
-                                <td style="white-space: nowrap">@{{ viaje_neto.HoraLlegada }}</td>
-                                <td style="white-space: nowrap">@{{ viaje_neto.Code }}</td>
+                                <td style="white-space: nowrap">@{{ viaje_neto.code }}</td>
+                                <td style="white-space: nowrap">@{{ viaje_neto.fecha_origen }}</td>
 
                                 <td style="white-space: nowrap">@{{ viaje_neto.origen }}</td>
-                                <td style="white-space: nowrap">@{{ viaje_neto.tiro }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.material }}</td>
-                                <td style="white-space: nowrap; text-align: right">$ @{{ formato(viaje_neto.importe) }}</td>
 
                                 <td style="white-space: nowrap">@{{ viaje_neto.camion }}</td>
                                 <td style="white-space: nowrap; text-align: right">@{{ viaje_neto.cubicacion }}</td>
-
-                                <td style="white-space: nowrap" class="ocultar">@{{ viaje_neto.empresa_camion }}</td>
-                                <td style="white-space: nowrap" class="ocultar">@{{ viaje_neto.empresa_viajeneto }}</td>
-                                <td style="white-space: nowrap" class="ocultar">@{{ viaje_neto.empresa_viaje }}</td>
-
-                                <td style="white-space: nowrap" class="ocultar">@{{ viaje_neto.sindicato_camion }}</td>
-                                <td style="white-space: nowrap" class="ocultar">@{{ viaje_neto.sindicato_viajeneto }}</td>
-                                <td style="white-space: nowrap" class="ocultar">@{{ viaje_neto.sindicato_viaje }}</td>
 
                                 <td style="white-space: nowrap">@{{ viaje_neto.concilio }}</td>
                                 <td style="white-space: nowrap">@{{ viaje_neto.id_conciliacion }}</td>

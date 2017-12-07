@@ -11,6 +11,14 @@ use App\Http\Controllers\Controller;
 
 class InicioViajesController extends Controller
 {
+
+    function __construct() {
+        $this->middleware('auth');
+        $this->middleware('context');
+
+        parent::__construct();
+    }
+
     /**
      * Display a listing of the resource.
      *

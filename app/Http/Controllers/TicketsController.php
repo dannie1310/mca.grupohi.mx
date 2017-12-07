@@ -21,6 +21,8 @@ class TicketsController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+
+        parent::__construct();
     }
 
     /**

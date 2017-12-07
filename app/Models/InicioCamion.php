@@ -44,6 +44,7 @@ class InicioCamion extends Model
     }
     public static function scopeReporte($query)
     {
+
        return $query
             ->leftJoin('igh.usuario as user_autorizo', 'inicio_camion.Aprobo', '=', 'user_autorizo.idusuario')
             ->leftJoin('camiones', 'inicio_camion.IdCamion', '=', 'camiones.IdCamion')
@@ -161,6 +162,18 @@ class InicioCamion extends Model
             ->where(function($query){
                 $query->whereNotNull('inicio_viajes.IdInicioViaje')
                     ->where('inicio_camion.estatus', 21);
+            });
+    }
+
+    public function scopePorValidar($query) {
+        return $query->select(DB::raw('inicio_camion.*'))
+            ->leftJoin('inicio_viajes', 'inicio_camion.id', '=', 'inicio_viajes.IdInicioCamion')
+            ->leftJoin('inicioviajesrechazados', 'inicio_camion.id', '=', 'inicioviajesrechazados.IdInicio')
+            ->where(function($query){
+                $query
+                    ->whereNull('inicio_viajes.IdInicioViajes')
+                    ->whereNull('inicioviajesrechazados.IdInicioViajeRechazado')
+                    ->whereIn('inicio_camion.Estatus', [0, 10, 20, 30]);
             });
     }
 
