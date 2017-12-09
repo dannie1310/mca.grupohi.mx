@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camion;
 use App\Models\InicioCamion;
+use App\Models\Material;
+use App\Models\Origen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\CierrePeriodo;
+use Carbon\Carbon;
+use phpDocumentor\Reflection\Types\String_;
+
 
 class InicioSuministroController extends Controller
 {
@@ -26,7 +32,7 @@ class InicioSuministroController extends Controller
     public function index(Request $request)//editar!!!
     {
         if($request->ajax()) {
-            if ($request->get('action') == 'modificar') {//modificar cuando se use
+            if ($request->get('action') == 'modificar') {
 
                 $data = [];
                 if($request->tipo_busqueda == 'fecha') {
@@ -36,31 +42,28 @@ class InicioSuministroController extends Controller
                     ]);
 
                     $viajes = InicioCamion::porValidar()
-                        ->whereBetween('inicio_camion.FechaSalida', [$request->get('FechaInicial'), $request->get('FechaFinal')])
+                        ->whereBetween('inicio_camion.fecha_origen', [$request->get('FechaInicial'), $request->get('FechaFinal')])
                         ->get();
 
                     foreach ($viajes as $viaje) {
 
                         $data [] = [
-                            'IdViajeNeto' => $viaje->IdViajeNeto,
-                            'FechaLlegada' => $viaje->FechaLlegada,
-                            'Tiro' => (String)$viaje->tiro,
-                            'IdTiro' => $viaje->tiro ? $viaje->tiro->IdTiro : '',
+                            'IdViajeNeto' => $viaje->id,
+                            'FechaLlegada' => $viaje->fecha_origen,
                             'Camion' => (String)$viaje->camion,
-                            'IdCamion' => $viaje->IdCamion,
-                            'HoraLlegada' => $viaje->HoraLlegada,
-                            'CubicacionCamion' => $viaje->CubicacionCamion,
-                            'Origen' => (String)$viaje->origen,
-                            'IdOrigen' => $viaje->origen ? $viaje->origen->IdOrigen : '',
+                            'Cubicacion' => $viaje->cubicacion,
+                            'Origen' => (String )$viaje->origen,
+                            'IdOrigen' => $viaje->idorigen,
                             'Material' => (String)$viaje->material,
-                            'IdMaterial' => $viaje->material ? $viaje->material->IdMaterial : '',
+                            'IdMaterial' => (String)$viaje->idmaterial,
+                            'Code' => (String) $viaje->code,
+                            'Valido' => $viaje->valido(),
                             'ShowModal' => false,
-                            'IdSindicato' => $viaje->IdSindicato,
-                            'IdEmpresa' => $viaje->IdEmpresa,
-                            'Sindicato' => (String)$viaje->sindicato,
-                            'Empresa' => (String)$viaje->empresa,
-                            'Codigo' => $viaje->Code,
-                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'Estado' => $viaje->estado(),
+                            'FolioMina' => $viaje->folioMina,
+                            'FolioSeguimiento' => $viaje->folioSeguimiento,
+                            'Volumen'=>$viaje->volumen,
+                            'cierre' => InicioCamion::validandoCierre($viaje->fecha_origen)
                         ];
                     }
                 } elseif ($request->tipo_busqueda == 'codigo') {
@@ -68,31 +71,27 @@ class InicioSuministroController extends Controller
                         'Codigo' => 'required'
                     ]);
 
-                    $viajes = ViajeNeto::porValidar()
-                        ->where('viajesnetos.Code', '=', $request->Codigo)
+                    $viajes = InicioCamion::porValidar()
+                        ->where('inicio_camion.code', '=', $request->Codigo)
                         ->get();
 
                     foreach ($viajes as $viaje) {
                         $data [] = [
-                            'IdViajeNeto' => $viaje->IdViajeNeto,
-                            'FechaLlegada' => $viaje->FechaLlegada,
-                            'Tiro' => (String)$viaje->tiro,
-                            'IdTiro' => $viaje->tiro ? $viaje->tiro->IdTiro : '',
+                            'IdViajeNeto' => $viaje->id,
+                            'FechaLlegada' => $viaje->fecha_origen,
                             'Camion' => (String)$viaje->camion,
-                            'IdCamion' => $viaje->IdCamion,
-                            'HoraLlegada' => $viaje->HoraLlegada,
-                            'CubicacionCamion' => $viaje->CubicacionCamion,
-                            'Origen' => (String)$viaje->origen,
-                            'IdOrigen' => $viaje->origen ? $viaje->origen->IdOrigen : '',
+                            'Cubicacion' => $viaje->cubicacion,
+                            'Origen' => (String )$viaje->origen,
+                            'IdOrigen' => $viaje->IdOrigen,
                             'Material' => (String)$viaje->material,
-                            'IdMaterial' => $viaje->material ? $viaje->material->IdMaterial : '',
+                            'Code' => isset($viaje->code) ? $viaje->code : "",
+                            'Valido' => $viaje->valido(),
                             'ShowModal' => false,
-                            'IdSindicato' => $viaje->IdSindicato,
-                            'IdEmpresa' => $viaje->IdEmpresa,
-                            'Sindicato' => (String)$viaje->sindicato,
-                            'Empresa' => (String)$viaje->empresa,
-                            'Codigo' => $viaje->Code,
-                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'Estado' => $viaje->estado(),
+                            'FolioMina' => $viaje->folioMina,
+                            'FolioSeguimiento' => $viaje->folioSeguimiento,
+                            'Volumen'=>$viaje->volumen,
+                            'cierre' => InicioCamion::validandoCierre($viaje->fecha_origen),
                         ];
                     }
                 }
@@ -199,39 +198,25 @@ class InicioSuministroController extends Controller
                         ->whereBetween('inicio_camion.fecha_origen', [$request->get('FechaInicial'), $request->get('FechaFinal')])
                         ->get();
 
-
                     foreach ($viajes as $viaje) {
-dd($viaje);
+
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
-                            'IdViajeNeto' => $viaje->IdViajeNeto,
-                            'FechaLlegada' => $viaje->FechaLlegada,
-                            'Tiro' => (String)$viaje->tiro,
+                            'IdViajeNeto' => $viaje->id,
+                            'FechaLlegada' => $viaje->fecha_origen,
                             'Camion' => (String)$viaje->camion,
-                            'HoraLlegada' => $viaje->HoraLlegada,
-                            'Cubicacion' => $viaje->CubicacionCamion,
+                            'Cubicacion' => $viaje->cubicacion,
                             'Origen' => (String )$viaje->origen,
                             'IdOrigen' => $viaje->IdOrigen,
-                            'IdSindicato' => isset($viaje->IdSindicato) ? $viaje->IdSindicato : '',
-                            'IdEmpresa' => isset($viaje->IdEmpresa) ? $viaje->IdEmpresa : '',
                             'Material' => (String)$viaje->material,
-                            'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
-                            'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
-                            'Code' => isset($viaje->Code) ? $viaje->Code : "",
+                            'Code' => isset($viaje->code) ? $viaje->code : "",
                             'Valido' => $viaje->valido(),
                             'ShowModal' => false,
-                            'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
                             'Estado' => $viaje->estado(),
-                            'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
-                            'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
-                            'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
-                            'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
-                            'Tara' => 0,
-                            'Bruto' => 0,
-                            'TipoTarifa' => 'm',
-                            'TipoFDA' => 'm',
-                            'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
-                            'Imagenes' => $viaje->imagenes
+                            'FolioMina' => $viaje->folioMina,
+                            'FolioSeguimiento' => $viaje->folioSeguimiento,
+                            'Volumen'=>$viaje->volumen,
+                            'cierre' => InicioCamion::validandoCierre($viaje->fecha_origen),
                         ];
                     }
 
@@ -239,40 +224,27 @@ dd($viaje);
                     $this->validate($request, [
                         'Codigo' => 'required'
                     ]);
-                    $viajes = ViajeNeto::porValidar()
-                        ->where('viajesnetos.Code', '=', $request->Codigo)
+                    $viajes = InicioCamion::porValidar()
+                        ->where('inicio_camion.code', '=', $request->Codigo)
                         ->get();
                     foreach($viajes as $viaje) {
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
-                            'IdViajeNeto' => $viaje->IdViajeNeto,
-                            'FechaLlegada' => $viaje->FechaLlegada,
-                            'Tiro' => (String)$viaje->tiro,
+                            'IdViajeNeto' => $viaje->id,
+                            'FechaLlegada' => $viaje->fecha_origen,
                             'Camion' => (String)$viaje->camion,
-                            'HoraLlegada' => $viaje->HoraLlegada,
                             'Cubicacion' => $viaje->CubicacionCamion,
                             'Origen' => (String )$viaje->origen,
                             'IdOrigen' => $viaje->IdOrigen,
-                            'IdSindicato' => isset($viaje->IdSindicato) ? $viaje->IdSindicato : '',
-                            'IdEmpresa' => isset($viaje->IdEmpresa) ? $viaje->IdEmpresa : '',
                             'Material' => (String)$viaje->material,
-                            'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
-                            'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
-                            'Code' => isset($viaje->Code) ? $viaje->Code : "",
+                            'Code' => isset($viaje->code) ? $viaje->code : "",
                             'Valido' => $viaje->valido(),
                             'ShowModal' => false,
-                            'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
                             'Estado' => $viaje->estado(),
-                            'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
-                            'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
-                            'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
-                            'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
-                            'Tara' => 0,
-                            'Bruto' => 0,
-                            'TipoTarifa' => 'm',
-                            'TipoFDA' => 'm',
-                            'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
-                            'Imagenes' => $viaje->imagenes
+                            'FolioMina' => $viaje->folioMina,
+                            'FolioSeguimiento' => $viaje->folioSeguimiento,
+                            'Volumen'=>$viaje->volumen,
+                            'cierre' => InicioCamion::validandoCierre($viaje->fecha_origen),
                         ];
                     }
                 }
@@ -548,7 +520,6 @@ dd($viaje);
     public function edit(Request $request)
     {
         //
-
         if($request->get('action') == 'validar') {
             if(auth()->user()->can('validar-viajes')) {
 
@@ -557,6 +528,18 @@ dd($viaje);
                     ->withAction('validar');
             }
             else{
+                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
+                return redirect()->back();
+            }
+        }
+        else if($request->get('action') == 'modificar') {
+            if(auth()->user()->can('modificar-viajes')) {
+                return view('control_suministro.edit')
+                    ->withOrigenes(Origen::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdOrigen'))
+                    ->withCamiones(Camion::orderBy('Economico', 'ASC')->lists('Economico', 'IdCamion'))
+                    ->withMateriales(Material::orderBy('Descripcion', 'ASC')->lists('Descripcion', 'IdMaterial'))
+                   ->withAction('modificar');
+            } else {
                 Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
                 return redirect()->back();
             }
@@ -570,9 +553,23 @@ dd($viaje);
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        if($request->get('type') == 'validar') {
+            $cubicacionNva=$request['data']['Cubicacion'];
+            $folioSeguimiento =$request['data']['FolioSeguimiento'];
+            $folioMina =$request['data']['FolioMina'];
+            $volumen =$request['data']['Volumen'];
+            $viaje_neto = InicioCamion::findOrFail($request->get('IdViajeNeto'));
+            if($folioMina==null || $folioSeguimiento ==null || $volumen == 0){
+                throw new \Exception('Ingregar el folio de mina, el de seguimiento y volumen');
+            }
+            if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion){
+                throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m3');
+            }
+            
+            return response()->json($viaje_neto->validar($request));
+        }
     }
 
     /**

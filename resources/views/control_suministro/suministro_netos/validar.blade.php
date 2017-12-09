@@ -53,43 +53,30 @@
                     <thead>
                         <tr>
                             <th rowspan="2">Código</th>
-                            <th rowspan="2">Fecha de Llegada</th>
-                            <th rowspan="2">Hora de Llegada</th>
-                            <th rowspan="2">Tiro</th>
+                            <th rowspan="2">Fecha</th>
                             <th rowspan="2">Camión</th>
+                            <th rowspan="2">CUbicacion</th>
                             <th rowspan="2">Origen</th>
                             <th rowspan="2">Material</th>
-                            <th rowspan="2">Tiempo</th>
-                            <th rowspan="2">Ruta</th>
-                            <th rowspan="2">Distancia</th>
-                            <th colspan="3">Tarifa</th>
-                            <th rowspan="2">Importe</th>
+                            <th rowspan="2">Folio Mina</th>
+                            <th rowspan="2">Folio Seguimiento</th>
+                            <th rowspan="2">Volumen</th>
                             <th rowspan="2">?</th>
                             <th rowspan="2">Validar</th>
-                            <th rowspan="2"></th>
-                        </tr>
-                        <tr>
-                            <th>1er Km</th>
-                            <th>Km Sub.</th>
-                            <th>Km Adc.</th>
+                             <td rowspan="1"></td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="viaje in viajes_netos">
                             <td>@{{ viaje.Code }}</td>
                             <td>@{{ viaje.FechaLlegada }}</td>
-                            <td>@{{ viaje.HoraLlegada }}</td>
-                            <td>@{{ viaje.Tiro }}</td>
                             <td>@{{ viaje.Camion }}</td>
+                            <td>@{{ viaje.Cubicacion }}</td>
                             <td>@{{ viaje.Origen }}</td>
                             <td>@{{ viaje.Material }}</td>
-                            <td>@{{ viaje.Tiempo }}</td>
-                            <td>@{{ viaje.Ruta }}</td>
-                            <td>@{{ viaje.Distancia }}</td>
-                            <td>@{{ viaje.PrimerKM }}</td>
-                            <td>@{{ viaje.KMSubsecuente }}</td>
-                            <td>@{{ viaje.KMAdicional }}</td>
-                            <td>@{{ viaje.Importe }}</td>
+                            <td>@{{ viaje.FolioMina }}</td>
+                            <td>@{{ viaje.FolioSeguimiento }}</td>
+                            <td>@{{ viaje.Volumen }}</td>
 
                             <td v-if="viaje.cierre == 0">
                                 <span v-if='viaje.Valido'>
@@ -110,38 +97,24 @@
                                 </a>
                                 <modal-validar v-if="viaje.ShowModal" @close="viaje.ShowModal = false">
                                     <h3 slot="header">Validar Viaje</h3>
-                                    <div slot="body" class="form-horizontal">
+                                    <div slot="body" class="form-vertical">
                                         <div class="row">
-                                            <div class="col-md-7">
-                                                <hr>
-                                                <div class="form-group">
-                                                    <label>Tipo Tarifa:</label>
-                                                    <select v-model="form.data.TipoTarifa" class="form-control input-sm">
-                                                        <option value="m">Material</option>
-                                                        <option value="r">Ruta</option>
-                                                        <option value="p">Peso</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>Tipo FDA:</label>
-                                                    <select v-model="form.data.TipoFDA" class="form-control input-sm">
-                                                        <option value="m">Material</option>
-                                                        <option value="bm">Ban-Mat</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 col-md-offset-1">
+                                           <div class="col-ms-4 col-md-offset-1">
                                                 <div class="form-group">
                                                     <label>Cubicación:</label>
                                                     <input type="number" step="any" class="form-control input-sm" v-model="form.data.Cubicacion">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Tara:</label>
-                                                    <input type="number" step="any" class="form-control input-sm" v-model="form.data.Tara">
+                                                    <label>Folio Mina:</label>
+                                                    <input type="text" step="any" class="form-control input-sm" v-model="form.data.FolioMina">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Bruto:</label>
-                                                    <input type="number" step="any" class="form-control input-sm" v-model="form.data.Bruto">
+                                                    <label>Folio Seguimiento:</label>
+                                                    <input type="text" step="any" class="form-control input-sm" v-model="form.data.FolioSeguimiento">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Volumen:</label>
+                                                    <input type="number" step="any" class="form-control input-sm" v-model="form.data.Volumen">
                                                 </div>
                                                 <hr>
                                                 <span v-if="viaje.Valido">
@@ -179,39 +152,7 @@
                             <td v-else>
                                Periodo Cerrado
                             </td>
-                            <td>
-                                <span v-if="viaje.Imagenes.length">
-                                    <button class="btn btn-xs btn-default" data-toggle="modal" v-bind:data-target="'.modal-lg-' + viaje.IdViajeNeto"><i class="fa fa-2x fa-photo"></i></button>
-                                    <div v-bind:class="'modal fade modal-lg-' + viaje.IdViajeNeto" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg">
-                                            <div class="modal-content">
-                                                <div v-bind:id="'carousel' + viaje.IdViajeNeto" class="carousel slide" data-ride="carousel">
-                                                    <!-- Wrapper for slides -->
-                                                    <div class="carousel-inner">
-                                                        <div v-for="imagen in viaje.Imagenes" v-bind:class="itemClass(viaje.Imagenes.indexOf(imagen))">
-                                                            <img class="img-responsive" v-bind:src="'data:image/png;base64,' + imagen.imagen">
-                                                            <div class="carousel-caption"><h1>Imagen del viaje @{{ viaje.Imagenes.indexOf(imagen) + 1 }}</h1></div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Controls -->
-                                                    <a class="left carousel-control" v-bind:href="'#carousel' + viaje.IdViajeNeto" role="button" data-slide="prev">
-                                                      <span class="glyphicon glyphicon-chevron-left"></span>
-                                                    </a>
-                                                    <a class="right carousel-control" v-bind:href="'#carousel' + viaje.IdViajeNeto" role="button" data-slide="next">
-                                                      <span class="glyphicon glyphicon-chevron-right"></span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </span>
-                                <span v-else>
-                                    <button class="btn btn-xs btn-default" disabled="disabled"><i class="fa fa-2x fa-photo"></i></button>
-                                </span>
-                            </td>
-
-
-                        </tr>
+                         </tr>
                     </tbody>
                 </table>
                 </span>

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Auth;
 class InicioCamion extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -166,15 +168,110 @@ class InicioCamion extends Model
     }
 
     public function scopePorValidar($query) {
-        return $query->select(DB::raw('inicio_camion.*'))
+        return $query->select(DB::raw('inicio_camion.*, camiones.idcamion as idcamion, camiones.economico as camion, camiones.CubicacionParaPago as cubicacion, origenes.descripcion as origen, origenes.idorigen AS idorigen, materiales.descripcion as material, materiales.idmaterial as idmaterial'))
             ->leftJoin('inicio_viajes', 'inicio_camion.id', '=', 'inicio_viajes.IdInicioCamion')
             ->leftJoin('inicioviajesrechazados', 'inicio_camion.id', '=', 'inicioviajesrechazados.IdInicio')
+            ->leftJoin('camiones', 'inicio_camion.idcamion', '=', 'camiones.idcamion')
+            ->leftJoin('origenes', 'origenes.idorigen', '=', 'inicio_camion.idorigen')
+            ->leftJoin('materiales', 'materiales.idmaterial', '=', 'inicio_camion.idmaterial')
             ->where(function($query){
                 $query
                     ->whereNull('inicio_viajes.IdInicioViajes')
                     ->whereNull('inicioviajesrechazados.IdInicioViajeRechazado')
-                    ->whereIn('inicio_camion.Estatus', [0, 10, 20, 30]);
+                    ->whereIn('inicio_camion.Estatus', [0, 10, 20, 30]);//cambiar estatus
             });
+    }
+
+    public function valido() {
+
+            if($this->idmaterial == 0 || $this->Estatus == 10 ) {
+                return false;
+            } else {
+                return true;
+            }
+    }
+
+    public function estado() {
+       if($this->Estatus == 10) {
+            return 'El suministro no puede ser registrado porque debe seleccionar primero su origen';
+       } elseif ($this->folioMina == null ) {
+           return 'El suministro no puede ser registrado porque debe ingresar su folio de mina';
+       }
+       elseif ($this->folioSeguimiento == null){
+           return 'El suministro no puede ser registrado porque debe ingresar su folio de seguimiento';
+       } else {
+            return 'El viaje es valido para su registro';
+       }
+    }
+
+    public static function validandoCierre($FechaLlegada){
+        /* Bloqueo de cierre de periodo
+            1 : Cierre de periodo
+            0 : Periodo abierto.
+        */
+
+        $fecha = Carbon::createFromFormat('Y-m-d H:m:i', $FechaLlegada);
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+        $validarUss=ValidacionCierrePeriodo::permiso_usuario(Auth::user()->idusuario,$fecha->month,$fecha->year);
+
+        if($cierres[0]->existe != 0) {
+            if ($validarUss == NULL) {
+                $datos = 1;
+            }else {
+                $datos = 0;
+            }
+        }else{
+            $datos = 0;
+        }
+
+        return $datos;
+    }
+
+    public function validar($request) { //editar para validar los viajes
+
+        $data = $request->get('data');
+
+        DB::connection('sca')->beginTransaction();
+        try {
+            $statement ="call sca_sp_registra_viaje_fda_v2("
+                .$data["Accion"].","
+                .$this->IdViajeNeto.","
+                ."0".","
+                ."0".","
+                .$this->origen->IdOrigen.","
+                .($this->IdSindicato ? $this->IdSindicato : 'NULL').","
+                .($data["IdSindicato"] ? $data['IdSindicato'] : 'NULL').","
+                .($this->IdEmpresa ? $this->IdEmpresa : 'NULL').","
+                .($data["IdEmpresa"] ? $data['IdEmpresa'] : 'NULL').","
+                .auth()->user()->idusuario.",'"
+                .$data["TipoTarifa"]."','"
+                .$data["TipoFDA"]."',"
+                .$data["Tara"].","
+                .$data["Bruto"].","
+                .$data["Cubicacion"].","
+                .$this->CubicacionCamion. ","
+                .($this->deductiva ? $this->deductiva->id : 'NULL'). ","
+                .($this->deductiva ? $this->deductiva->estatus : 'NULL') .
+                ",@a, @v);";
+
+            DB::connection("sca")->statement($statement);
+
+            $result = DB::connection('sca')->select('SELECT @a,@v');
+            if($result[0]->{'@a'} == 'ok') {
+                $msg = $data['Accion'] == 1 ? 'Viaje validado exitosamente' : 'Viaje Rechazado exitosamente';
+                $tipo = $data['Accion'] == 1 ? 'success' : 'info';
+            } else {
+                $msg = 'Error: ' . $result[0]->{'@v'};
+                $tipo = 'error';
+            }
+
+            DB::connection('sca')->commit();
+            return ['message' => $msg,
+                'tipo' => $tipo];
+        } catch (Exception $e) {
+            DB::connection('sca')->rollback();
+            throw $e;
+        }
     }
 
 }

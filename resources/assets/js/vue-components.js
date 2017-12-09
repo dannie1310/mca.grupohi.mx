@@ -21,3 +21,4 @@ require('./vue-components/tickets-validar');
 require('./vue-components/periodocierre-administracion');
 require('./vue-components/suministro-index');
 require('./vue-components/suministro-validar');
+require('./vue-components/suministro-modificar');

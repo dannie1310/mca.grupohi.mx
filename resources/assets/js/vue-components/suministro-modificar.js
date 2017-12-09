@@ -1,41 +1,30 @@
+/**
+ * Created by DBENITEZ on 08/12/2017.
+ */
 // register modal component
-Vue.component('modal-validar', {
+Vue.component('modal-modificar', {
     template: '#modal-template'
 });
 
-Vue.component('suministro-validar', {
-    data: function() {
+Vue.component('suministro-modificar', {
+    data : function() {
         return {
             'viajes_netos' : [],
-            'cierre' : [],
             'cargando' : false,
             'guardando' : false,
             'form' : {
                 'data' : {
-                    'Accion' : '',
+                    'Cubicacion' : '',
+                    'IdOrigen' : '',
+                    'IdMaterial' : '',
                     'FolioMina' : '',
                     'FolioSeguimiento' : '',
-                    'Cubicacion' : ''
+                    'Volumen' : ''
                 },
                 'errors' : []
             },
         }
     },
-
-    /*computed: {
-     getViajesByCode: function() {
-     var _this = this;
-     var search = RegExp(_this.datosConsulta.code);
-     return _this.viajes.filter(function(viaje) {
-     if(!viaje.Code.length && !_this.datosConsulta.code.length ) {
-     return true;
-     } else if (viaje.Code && (viaje.Code).match(search)) {
-     return true;
-     }
-     return false;
-     });
-     }
-     },*/
 
     directives: {
         datepicker: {
@@ -57,27 +46,28 @@ Vue.component('suministro-validar', {
                 var val_config = {
                     auto_filter: true,
                     watermark: [
-                        'Código',
-                        'Fecha Origen',
-                        'Camion',
+                        '#',
+                        'Fecha',
                         'Origen',
+                        'Camion',
+                        'Cubic.',
                         'Material',
-                        'Folio Mina',
-                        'Folio Seguimiento',
+                        'Código',
+                        'Folio de Mina',
+                        'Folio de Seguimiento',
                         'Volumen',
-                        '?',
-                        'Validar'
+                        'Modificar'
                     ],
-                    col_1: 'select',
+                    col_0: 'none',
+                    col_1: 'input',
+                    col_2: 'select',
                     col_3: 'select',
                     col_4: 'select',
-                    col_5: 'select',
-                    col_6: 'select',
-                    col_8: 'select',
-                    col_10: 'none',
-                    col_11: 'none',
-                    col_12: 'none',
-                    col_14: 'none',
+                    col_5: 'input',
+                    col_6: 'input',
+                    col_7: 'input',
+                    col_8: 'input',
+                    col_9: 'none',
 
                     base_path: App.tablefilterBasePath,
                     paging: false,
@@ -90,7 +80,7 @@ Vue.component('suministro-validar', {
                     help_instructions: false,
                     extensions: [{ name: 'sort' }]
                 };
-                var tf = new TableFilter('viajes_netos_validar', val_config);
+                var tf = new TableFilter('viajes_netos_modificar', val_config);
                 tf.init();
             }
         }
@@ -108,7 +98,7 @@ Vue.component('suministro-validar', {
             this.form.errors = [];
 
             var data = $('.form_buscar').serialize();
-            var url = App.host + '/suministro_netos?action=validar&' + data;
+            var url = App.host + '/suministro_netos?action=modificar&' + data;
 
             this.$http.get(url).then((response) => {
                 _this.cargando = false;
@@ -123,12 +113,12 @@ Vue.component('suministro-validar', {
             });
         },
 
-        validar: function(viaje) {
+        modificar: function(viaje) {
 
             var _this = this;
 
             swal({
-                    title: "¿Desea continuar con la validación?",
+                    title: "¿Desea continuar con la modificación?",
                     text: "¿Esta seguro de que la información es correcta?",
                     type: "warning",
                     showCancelButton: true,
@@ -141,35 +131,37 @@ Vue.component('suministro-validar', {
                     _this.form.errors = [];
                     var data = _this.form.data;
 
-                    _this.$http.post(App.host + '/suministro_netos', {'type' : 'validar', '_method' : 'PATCH', 'IdViajeNeto' : viaje.IdViajeNeto,  data}).then((response) => {
+                    _this.$http.post(App.host + '/suministro_netos', {'type' : 'modificar', '_method' : 'PATCH', 'IdViajeNeto' : viaje.IdViajeNeto,  data}).then((response) => {
                         swal({
                             type: response.body.tipo,
-                            title: '',
+                            title : '',
                             text: response.body.message,
-                            showConfirmButton: true
+                            showConfirmButton: true,
+                            html:true
                         });
 
-                        if(response.body.tipo == 'success' || response.body.tipo == 'info') {
-                            viaje.ShowModal = false;
-                            delete _this.viajes_netos[viaje];
-                            _this.viajes_netos.splice(_this.viajes_netos.indexOf(viaje), 1);
-                        }
+                        viaje.Cubicacion = response.body.viaje.Cubicacion;
+                        viaje.FolioMina = response.body.viaje.FolioMina;
+                        viaje.FolioSeguimiento = response.body.viaje.FolioSeguimiento;
+                        viaje.Origen = response.body.viaje.Origen;
+                        viaje.IdOrigen = response.body.viaje.IdOrigen;
+                        viaje.Material = response.body.viaje.Material;
+                        viaje.IdMaterial = response.body.viaje.IdMaterial;
+                        viaje.Volumen = response.body.viaje.Volumen;
 
+                        viaje.ShowModal = false;
                         _this.guardando = false;
                     }, (error) => {
                         _this.guardando = false;
                         viaje.ShowModal = false;
-                        swal('¡Error!', App.errorsToString(error.body), 'error');
+                        swal({
+                            type: 'error',
+                            title: '¡Error!',
+                            text: App.errorsToString(error.body),
+                            html: true
+                        });
                     });
                 });
-        },
-
-        itemClass: function(index) {
-            if(index == 0){
-                return 'item active';
-            } else {
-                return 'item';
-            }
         },
 
         showModal: function(viaje) {
@@ -178,14 +170,12 @@ Vue.component('suministro-validar', {
         },
 
         initializeData: function(viaje) {
-
-            this.form.data.Accion = viaje.Accion;
+            this.form.data.Cubicacion = viaje.Cubicacion;
+            this.form.data.IdOrigen = viaje.IdOrigen;
+            this.form.data.IdMaterial = viaje.IdMaterial;
             this.form.data.FolioMina = viaje.FolioMina;
             this.form.data.FolioSeguimiento = viaje.FolioSeguimiento;
             this.form.data.Volumen = viaje.Volumen;
-            this.form.data.Cubicacion = viaje.Cubicacion;
         }
     }
-});/**
- * Created by DBENITEZ on 06/12/2017.
- */
+});

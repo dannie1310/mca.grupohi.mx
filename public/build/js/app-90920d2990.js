@@ -50683,8 +50683,9 @@ require('./vue-components/tickets-validar');
 require('./vue-components/periodocierre-administracion');
 require('./vue-components/suministro-index');
 require('./vue-components/suministro-validar');
+require('./vue-components/suministro-modificar');
 
-},{"./vue-components/conciliaciones-create":41,"./vue-components/conciliaciones-edit":42,"./vue-components/conciliaciones-suministro-create":43,"./vue-components/conciliaciones-suministro-edit":44,"./vue-components/configuracion-diaria":45,"./vue-components/corte-create":46,"./vue-components/corte-edit":47,"./vue-components/errors":48,"./vue-components/fda-bancomaterial":49,"./vue-components/fda-material":50,"./vue-components/global-errors":51,"./vue-components/origenes-usuarios":52,"./vue-components/periodocierre-administracion":53,"./vue-components/roles-permisos":54,"./vue-components/suministro-index":55,"./vue-components/suministro-validar":56,"./vue-components/tickets-validar":60,"./vue-components/viajes-completa":61,"./vue-components/viajes-index":62,"./vue-components/viajes-manual":63,"./vue-components/viajes-modificar":64,"./vue-components/viajes-revertir":65,"./vue-components/viajes-validar":66}],41:[function(require,module,exports){
+},{"./vue-components/conciliaciones-create":41,"./vue-components/conciliaciones-edit":42,"./vue-components/conciliaciones-suministro-create":43,"./vue-components/conciliaciones-suministro-edit":44,"./vue-components/configuracion-diaria":45,"./vue-components/corte-create":46,"./vue-components/corte-edit":47,"./vue-components/errors":48,"./vue-components/fda-bancomaterial":49,"./vue-components/fda-material":50,"./vue-components/global-errors":51,"./vue-components/origenes-usuarios":52,"./vue-components/periodocierre-administracion":53,"./vue-components/roles-permisos":54,"./vue-components/suministro-index":55,"./vue-components/suministro-modificar":56,"./vue-components/suministro-validar":57,"./vue-components/tickets-validar":61,"./vue-components/viajes-completa":62,"./vue-components/viajes-index":63,"./vue-components/viajes-manual":64,"./vue-components/viajes-modificar":65,"./vue-components/viajes-revertir":66,"./vue-components/viajes-validar":67}],41:[function(require,module,exports){
 'use strict';
 
 Vue.component('conciliaciones-create', {
@@ -53020,7 +53021,7 @@ Vue.component('app-errors', {
     template: require('./templates/errors.html')
 });
 
-},{"./templates/errors.html":57}],49:[function(require,module,exports){
+},{"./templates/errors.html":58}],49:[function(require,module,exports){
 'use strict';
 
 Vue.component('fda-bancomaterial', {
@@ -53241,7 +53242,7 @@ Vue.component('global-errors', {
   }
 });
 
-},{"./templates/global-errors.html":58}],52:[function(require,module,exports){
+},{"./templates/global-errors.html":59}],52:[function(require,module,exports){
 'use strict';
 
 Vue.component('origenes-usuarios', {
@@ -53316,7 +53317,7 @@ Vue.component('origenes-usuarios', {
     }
 });
 
-},{"./templates/origenes-usuarios.html":59}],53:[function(require,module,exports){
+},{"./templates/origenes-usuarios.html":60}],53:[function(require,module,exports){
 'use strict';
 
 /**
@@ -54217,6 +54218,178 @@ Vue.component('suministro-index', {
 },{}],56:[function(require,module,exports){
 'use strict';
 
+/**
+ * Created by DBENITEZ on 08/12/2017.
+ */
+// register modal component
+Vue.component('modal-modificar', {
+    template: '#modal-template'
+});
+
+Vue.component('suministro-modificar', {
+    data: function data() {
+        return {
+            'viajes_netos': [],
+            'cargando': false,
+            'guardando': false,
+            'form': {
+                'data': {
+                    'Cubicacion': '',
+                    'IdOrigen': '',
+                    'IdMaterial': '',
+                    'FolioMina': '',
+                    'FolioSeguimiento': '',
+                    'Volumen': ''
+                },
+                'errors': []
+            }
+        };
+    },
+
+    directives: {
+        datepicker: {
+            inserted: function inserted(el) {
+                $(el).datepicker({
+                    format: 'yyyy-mm-dd',
+                    language: 'es',
+                    autoclose: true,
+                    clearBtn: true,
+                    todayHighlight: true,
+                    endDate: '0d'
+                });
+                $(el).val(App.timeStamp(1));
+            }
+        },
+
+        tablefilter: {
+            inserted: function inserted(el) {
+                var val_config = {
+                    auto_filter: true,
+                    watermark: ['#', 'Fecha', 'Origen', 'Camion', 'Cubic.', 'Material', 'Código', 'Folio de Mina', 'Folio de Seguimiento', 'Volumen', 'Modificar'],
+                    col_0: 'none',
+                    col_1: 'input',
+                    col_2: 'select',
+                    col_3: 'select',
+                    col_4: 'select',
+                    col_5: 'input',
+                    col_6: 'input',
+                    col_7: 'input',
+                    col_8: 'input',
+                    col_9: 'none',
+
+                    base_path: App.tablefilterBasePath,
+                    paging: false,
+                    rows_counter: false,
+                    rows_counter_text: 'Viajes: ',
+                    btn_reset: true,
+                    btn_reset_text: 'Limpiar',
+                    clear_filter_text: 'Limpiar',
+                    loader: true,
+                    help_instructions: false,
+                    extensions: [{ name: 'sort' }]
+                };
+                var tf = new TableFilter('viajes_netos_modificar', val_config);
+                tf.init();
+            }
+        }
+    },
+
+    methods: {
+
+        buscar: function buscar(e) {
+
+            e.preventDefault();
+
+            var _this = this;
+
+            this.cargando = true;
+            this.form.errors = [];
+
+            var data = $('.form_buscar').serialize();
+            var url = App.host + '/suministro_netos?action=modificar&' + data;
+
+            this.$http.get(url).then(function (response) {
+                _this.cargando = false;
+                if (!response.body.viajes_netos.length) {
+                    swal('¡Sin Resultados!', 'Ningún viaje coincide con los datos de consulta', 'warning');
+                } else {
+                    _this.viajes_netos = response.body.viajes_netos;
+                }
+            }, function (error) {
+                _this.cargando = false;
+                swal('¡Error!', App.errorsToString(error.body), 'error');
+            });
+        },
+
+        modificar: function modificar(viaje) {
+
+            var _this = this;
+
+            swal({
+                title: "¿Desea continuar con la modificación?",
+                text: "¿Esta seguro de que la información es correcta?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                confirmButtonColor: "#ec6c62"
+            }, function () {
+                _this.guardando = true;
+                _this.form.errors = [];
+                var data = _this.form.data;
+
+                _this.$http.post(App.host + '/suministro_netos', { 'type': 'modificar', '_method': 'PATCH', 'IdViajeNeto': viaje.IdViajeNeto, data: data }).then(function (response) {
+                    swal({
+                        type: response.body.tipo,
+                        title: '',
+                        text: response.body.message,
+                        showConfirmButton: true,
+                        html: true
+                    });
+
+                    viaje.Cubicacion = response.body.viaje.Cubicacion;
+                    viaje.FolioMina = response.body.viaje.FolioMina;
+                    viaje.FolioSeguimiento = response.body.viaje.FolioSeguimiento;
+                    viaje.Origen = response.body.viaje.Origen;
+                    viaje.IdOrigen = response.body.viaje.IdOrigen;
+                    viaje.Material = response.body.viaje.Material;
+                    viaje.IdMaterial = response.body.viaje.IdMaterial;
+                    viaje.Volumen = response.body.viaje.Volumen;
+
+                    viaje.ShowModal = false;
+                    _this.guardando = false;
+                }, function (error) {
+                    _this.guardando = false;
+                    viaje.ShowModal = false;
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.body),
+                        html: true
+                    });
+                });
+            });
+        },
+
+        showModal: function showModal(viaje) {
+            viaje.ShowModal = true;
+            this.initializeData(viaje);
+        },
+
+        initializeData: function initializeData(viaje) {
+            this.form.data.Cubicacion = viaje.Cubicacion;
+            this.form.data.IdOrigen = viaje.IdOrigen;
+            this.form.data.IdMaterial = viaje.IdMaterial;
+            this.form.data.FolioMina = viaje.FolioMina;
+            this.form.data.FolioSeguimiento = viaje.FolioSeguimiento;
+            this.form.data.Volumen = viaje.Volumen;
+        }
+    }
+});
+
+},{}],57:[function(require,module,exports){
+'use strict';
+
 // register modal component
 Vue.component('modal-validar', {
     template: '#modal-template'
@@ -54232,12 +54405,8 @@ Vue.component('suministro-validar', {
             'form': {
                 'data': {
                     'Accion': '',
-                    'IdSindicato': '',
-                    'IdEmpresa': '',
-                    'TipoTarifa': '',
-                    'TipoFDA': '',
-                    'Tara': '',
-                    'Bruto': '',
+                    'FolioMina': '',
+                    'FolioSeguimiento': '',
                     'Cubicacion': ''
                 },
                 'errors': []
@@ -54279,7 +54448,7 @@ Vue.component('suministro-validar', {
             inserted: function inserted(el) {
                 var val_config = {
                     auto_filter: true,
-                    watermark: ['Código', 'Fecha Llegada', 'Hora Llegada', 'Tiro', 'Camion', 'Origen', 'Material', 'Tiempo', 'Ruta', 'Distancia', '1er Km', 'Km Sub.', 'Km Adc.', 'Importe', '?', 'Validar'],
+                    watermark: ['Código', 'Fecha Origen', 'Camion', 'Origen', 'Material', 'Folio Mina', 'Folio Seguimiento', 'Volumen', '?', 'Validar'],
                     col_1: 'select',
                     col_3: 'select',
                     col_4: 'select',
@@ -54290,8 +54459,6 @@ Vue.component('suministro-validar', {
                     col_11: 'none',
                     col_12: 'none',
                     col_14: 'none',
-                    col_15: 'none',
-                    col_16: 'none',
 
                     base_path: App.tablefilterBasePath,
                     paging: false,
@@ -54393,12 +54560,9 @@ Vue.component('suministro-validar', {
         initializeData: function initializeData(viaje) {
 
             this.form.data.Accion = viaje.Accion;
-            this.form.data.IdSindicato = viaje.IdSindicato;
-            this.form.data.IdEmpresa = viaje.IdEmpresa;
-            this.form.data.TipoTarifa = viaje.TipoTarifa;
-            this.form.data.TipoFDA = viaje.TipoFDA;
-            this.form.data.Tara = viaje.Tara;
-            this.form.data.Bruto = viaje.Bruto;
+            this.form.data.FolioMina = viaje.FolioMina;
+            this.form.data.FolioSeguimiento = viaje.FolioSeguimiento;
+            this.form.data.Volumen = viaje.Volumen;
             this.form.data.Cubicacion = viaje.Cubicacion;
         }
     }
@@ -54406,13 +54570,13 @@ Vue.component('suministro-validar', {
     * Created by DBENITEZ on 06/12/2017.
     */
 
-},{}],57:[function(require,module,exports){
-module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],58:[function(require,module,exports){
-module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
+module.exports = '<div id="form-errors" v-cloak>\n  <div class="alert alert-danger" v-if="form.errors.length">\n    <ul>\n      <li v-for="error in form.errors">{{ error }}</li>\n    </ul>\n  </div>\n</div>';
 },{}],59:[function(require,module,exports){
-module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+module.exports = '<div class="alert alert-danger" v-show="errors.length">\n  <ul>\n    <li v-for="error in errors">{{ error }}</li>\n  </ul>\n</div>';
 },{}],60:[function(require,module,exports){
+module.exports = '<div class="table-responsive col-md-8 col-md-offset-2">\n    <select class="form-control"  v-model="usuario" v-on:change="fetchOrigenes">\n        <option value >--SELECCIONE UN USUARIO--</option>\n        <option v-for="usuario in usuarios" v-bind:value="usuario.id">\n            {{ usuario.nombre }}\n        </option>\n    </select>\n    <hr>\n    <table v-if="usuario" class="table table-hover" id="origenes_usuarios_table">\n        <thead>\n            <tr>\n                <th>Asignación</th>\n                <th>Origen</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for="origen in origenes">\n                <td>\n                    <img v-bind:style="{cursor: origen.cursor}" v-on:click="asignar(origen)" v-bind:src="origen.img" v-bind:title="origen.title"/>\n                </td>\n                <td>{{ origen.descripcion }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>';
+},{}],61:[function(require,module,exports){
 'use strict';
 
 Vue.component('tickets-validar', {
@@ -54466,7 +54630,7 @@ Vue.component('tickets-validar', {
 
 });
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 function timeStamp(type) {
@@ -54686,7 +54850,7 @@ Vue.component('viajes-manual-completa', {
     }
 });
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -54951,7 +55115,7 @@ Vue.component('viajes-index', {
     }
 });
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 Array.prototype.removeValue = function (name, value) {
@@ -55135,7 +55299,7 @@ Vue.component('viajes-manual', {
     }
 });
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -55309,7 +55473,7 @@ Vue.component('viajes-modificar', {
     }
 });
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 Vue.component('viajes-revertir', {
@@ -55450,7 +55614,7 @@ Vue.component('viajes-revertir', {
     }
 });
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 
 // register modal component
@@ -55515,7 +55679,7 @@ Vue.component('viajes-validar', {
             inserted: function inserted(el) {
                 var val_config = {
                     auto_filter: true,
-                    watermark: ['Código', 'Fecha Llegada', 'Hora Llegada', 'Tiro', 'Camion', 'Origen', 'Material', 'Tiempo', 'Ruta', 'Distancia', '1er Km', 'Km Sub.', 'Km Adc.', 'Importe', '?', 'Validar'],
+                    watermark: ['Código', 'Fecha', 'Camion', 'Origen', 'Material', '?', 'Validar'],
                     col_1: 'select',
                     col_3: 'select',
                     col_4: 'select',
