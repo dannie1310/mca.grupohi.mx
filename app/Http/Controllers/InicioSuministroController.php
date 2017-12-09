@@ -82,9 +82,10 @@ class InicioSuministroController extends Controller
                             'Camion' => (String)$viaje->camion,
                             'Cubicacion' => $viaje->cubicacion,
                             'Origen' => (String )$viaje->origen,
-                            'IdOrigen' => $viaje->IdOrigen,
+                            'IdOrigen' => $viaje->idorigen,
                             'Material' => (String)$viaje->material,
-                            'Code' => isset($viaje->code) ? $viaje->code : "",
+                            'IdMaterial' => (String)$viaje->idmaterial,
+                            'Code' => $viaje->code,
                             'Valido' => $viaje->valido(),
                             'ShowModal' => false,
                             'Estado' => $viaje->estado(),
@@ -569,6 +570,22 @@ class InicioSuministroController extends Controller
             }
             
             return response()->json($viaje_neto->validar($request));
+        }else if($request->get('type') == 'modificar') {
+
+            $cubicacionNva=$request['data']['Cubicacion'];
+            $folioSeguimiento =$request['data']['FolioSeguimiento'];
+            $folioMina =$request['data']['FolioMina'];
+            $volumen =$request['data']['Volumen'];
+
+            $viaje_neto = InicioCamion::findOrFail($request->get('IdViajeNeto'));
+
+            if($folioMina==null || $folioSeguimiento ==null || $volumen == 0){
+                throw new \Exception('Ingregar el folio de mina, el de seguimiento y volumen');
+            }
+            if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion || $volumen !=0 && $volumen>$viaje_neto->CubicacionCamion){
+                throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
+            }
+            return response()->json($viaje_neto->modificar($request));
         }
     }
 

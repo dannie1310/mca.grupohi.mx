@@ -274,4 +274,68 @@ class InicioCamion extends Model
         }
     }
 
+    public function modificar($request) {//modificar
+        $data = $request->get('data');
+        $viaje_aprobado = $this->viaje;
+        if($viaje_aprobado)
+            throw new \Exception("El este viaje suministrado no puede ser modificado porque ya se encuentra validado.");
+
+        DB::connection('sca')->beginTransaction();
+        try {
+
+            if($this->IdMaterial != $data['IdMaterial']) {//crear tablas
+                DB::connection('sca')->table('cambio_material')->insert([
+                    'IdViajeNeto'        => $this->IdViajeNeto ,
+                    'IdMaterialAnterior' => $this->IdMaterial,
+                    'IdMaterialNuevo'    => $data['IdMaterial'],
+                    'FechaRegistro'      => Carbon::now()->toDateTimeString(),
+                    'Registro'           => auth()->user()->idusuario
+                ]);
+                $this->IdMaterial = $data['IdMaterial'];
+            }
+
+            if($this->IdOrigen != $data['IdOrigen']) {
+                DB::connection('sca')->table('cambio_origen')->insert([
+                    'IdViajeNeto'      => $this->IdViajeNeto ,
+                    'IdOrigenAnterior' => $this->IdOrigen,
+                    'IdOrigenNuevo'    => $data['IdOrigen'],
+                    'FechaRegistro'    => Carbon::now()->toDateTimeString(),
+                    'Registro'         => auth()->user()->idusuario
+                ]);
+                $this->IdOrigen = $data['IdOrigen'];
+            }
+
+            if($this->CubicacionCamion != $data['CubicacionCamion']) {
+                DB::connection('sca')->table('cambio_cubicacion')->insert([
+                    'IdViajeNeto'   => $this->IdViajeNeto,
+                    'FechaRegistro' => Carbon::now()->toDateTimeString(),
+                    'VolumenViejo'  => $this->CubicacionCamion,
+                    'VolumenNuevo'  => $data['CubicacionCamion']
+                ]);
+                $this->CubicacionCamion = $data['CubicacionCamion'];
+            }
+            $this->Modifico = auth()->user()->idusuario;
+            $this->save();
+
+            DB::connection('sca')->commit();
+
+            return ['message' => 'Viaje Modificado Correctamente',
+                'tipo' => 'success',
+                'viaje' => [
+                    'CubicacionCamion' => $this->CubicacionCamion,
+                    'IdOrigen' => $this->IdOrigen,
+                    'Origen' => $this->origen->Descripcion,
+                    'Material' => $this->material->Descripcion,
+                    'IdMaterial' => $this->IdMaterial,
+                    'folioMina' => (String) $this->folioMina,
+                    'folioSeguimiento' => (String) $this->folioSeguimiento,
+                    'volumen' => $this->Volumen
+                ]
+            ];
+        } catch (Exception $e) {
+            DB::connection('sca')->rollback();
+            throw $e;
+        }
+    }
+
 }
