@@ -274,10 +274,10 @@ class InicioCamion extends Model
                 if($data["FolioMina"]=="") {
                     $data["FolioMina"] = null;
                 }
-                if($data["FolioSeguimiento"]) {
+                if($data["FolioSeguimiento"]=="") {
                     $data["FolioSeguimiento"] = null;
                 }
-                if($data["Volumen"]){
+                if($data["Volumen"]==""){
                     $data["Volumen"]='0.00';
                 }
                  DB::connection('sca')->table('inicioviajesrechazados')->insert([
@@ -316,9 +316,9 @@ class InicioCamion extends Model
         try {
 
             if($this->IdMaterial != $data['IdMaterial']) {//crear tablas
-                DB::connection('sca')->table('cambio_material')->insert([
-                    'IdViajeNeto'        => $this->IdViajeNeto ,
-                    'IdMaterialAnterior' => $this->IdMaterial,
+                DB::connection('sca')->table('cambio_suministro_material')->insert([
+                    'IdInicioCamion'        => $this->id ,
+                    'IdMaterialAnterior' => $this->idmaterial,
                     'IdMaterialNuevo'    => $data['IdMaterial'],
                     'FechaRegistro'      => Carbon::now()->toDateTimeString(),
                     'Registro'           => auth()->user()->idusuario
@@ -327,9 +327,9 @@ class InicioCamion extends Model
             }
 
             if($this->IdOrigen != $data['IdOrigen']) {
-                DB::connection('sca')->table('cambio_origen')->insert([
-                    'IdViajeNeto'      => $this->IdViajeNeto ,
-                    'IdOrigenAnterior' => $this->IdOrigen,
+                DB::connection('sca')->table('cambio_suministro_origen')->insert([
+                    'IdInicioCamion'      => $this->id ,
+                    'IdOrigenAnterior' => $this->idorigen,
                     'IdOrigenNuevo'    => $data['IdOrigen'],
                     'FechaRegistro'    => Carbon::now()->toDateTimeString(),
                     'Registro'         => auth()->user()->idusuario
@@ -337,14 +337,26 @@ class InicioCamion extends Model
                 $this->IdOrigen = $data['IdOrigen'];
             }
 
-            if($this->Cubicacion != $data['Cubicacion']) {
-                DB::connection('sca')->table('cambio_cubicacion')->insert([
-                    'IdViajeNeto'   => $this->IdViajeNeto,
+            if($this->CubicacionCamion != $data['Cubicacion']) {
+                DB::connection('sca')->table('cambio_suministro_volumen')->insert([
+                    'IdInicioCamion'   => $this->id,
                     'FechaRegistro' => Carbon::now()->toDateTimeString(),
                     'VolumenViejo'  => $this->CubicacionCamion,
-                    'VolumenNuevo'  => $data['CubicacionCamion']
+                    'VolumenNuevo'  => $data['Cubicacion']
                 ]);
-                $this->CubicacionCamion = $data['CubicacionCamion'];
+                $this->CubicacionCamion = $data['Cubicacion'];
+            }
+            if($this->folioMina != $data['FolioMina'] || $this->folioSeguimiento != $data['FolioSeguimiento']) {
+                DB::connection('sca')->table('cambio_folios_suministro')->insert([
+                    'IdInicioCamion'   => $this->id,
+                    'FechaRegistro' => Carbon::now()->toDateTimeString(),
+                    'FolioMinaAnterior'  => $this->folioMina,
+                    'FolioMinaNuevo'  => $data['FolioMina'],
+                    'FolioSegAnterior'  => $this->folioSeguimiento,
+                    'FolioSegNuevo'  => $data['FolioSeguimiento']
+                ]);
+                $this->folioSeguimiento = $data['FolioSeguimiento'];
+                $this->folioMina = $data['FolioMina'];
             }
             $this->Modifico = auth()->user()->idusuario;
             $this->save();
@@ -355,10 +367,10 @@ class InicioCamion extends Model
                 'tipo' => 'success',
                 'viaje' => [
                     'CubicacionCamion' => $this->CubicacionCamion,
-                    'IdOrigen' => $this->IdOrigen,
+                    'IdOrigen' => $this->idorigen,
                     'Origen' => $this->origen->Descripcion,
                     'Material' => $this->material->Descripcion,
-                    'IdMaterial' => $this->IdMaterial,
+                    'IdMaterial' => $this->idmaterial,
                     'folioMina' => (String) $this->folioMina,
                     'folioSeguimiento' => (String) $this->folioSeguimiento,
                     'volumen' => $this->Volumen

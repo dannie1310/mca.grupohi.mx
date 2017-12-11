@@ -579,9 +579,9 @@ class InicioSuministroController extends Controller
 
             $viaje_neto = InicioCamion::findOrFail($request->get('IdViajeNeto'));
 
-            if($folioMina==null || $folioSeguimiento ==null || $volumen == 0){
+            /*if($folioMina==null || $folioSeguimiento ==null || $volumen == 0){
                 throw new \Exception('Ingregar el folio de mina, el de seguimiento y volumen');
-            }
+            }*/
             if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion){
                 throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
             }
