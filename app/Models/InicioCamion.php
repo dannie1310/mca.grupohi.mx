@@ -178,7 +178,7 @@ class InicioCamion extends Model
                 $query
                     ->whereNull('inicio_viajes.IdInicioViajes')
                     ->whereNull('inicioviajesrechazados.IdInicioViajeRechazado')
-                    ->whereIn('inicio_camion.Estatus', [0, 10, 20, 30]);//cambiar estatus
+                    ->whereIn('inicio_camion.Estatus', [1, 10, 20, 30]);
             });
     }
 
@@ -196,10 +196,10 @@ class InicioCamion extends Model
             return 'El suministro no puede ser registrado porque debe seleccionar primero su origen';
        } elseif ($this->folioMina == null ) {
            return 'El suministro no puede ser registrado porque debe ingresar su folio de mina';
-       }
-       elseif ($this->folioSeguimiento == null){
+       }elseif ($this->folioSeguimiento == null){
            return 'El suministro no puede ser registrado porque debe ingresar su folio de seguimiento';
-       } else {
+       }
+       else {
             return 'El viaje es valido para su registro';
        }
     }
@@ -230,44 +230,76 @@ class InicioCamion extends Model
     public function validar($request) { //editar para validar los viajes
 
         $data = $request->get('data');
-
-        DB::connection('sca')->beginTransaction();
         try {
-            $statement ="call sca_sp_registra_viaje_fda_v2("
-                .$data["Accion"].","
-                .$this->IdViajeNeto.","
-                ."0".","
-                ."0".","
-                .$this->origen->IdOrigen.","
-                .($this->IdSindicato ? $this->IdSindicato : 'NULL').","
-                .($data["IdSindicato"] ? $data['IdSindicato'] : 'NULL').","
-                .($this->IdEmpresa ? $this->IdEmpresa : 'NULL').","
-                .($data["IdEmpresa"] ? $data['IdEmpresa'] : 'NULL').","
-                .auth()->user()->idusuario.",'"
-                .$data["TipoTarifa"]."','"
-                .$data["TipoFDA"]."',"
-                .$data["Tara"].","
-                .$data["Bruto"].","
-                .$data["Cubicacion"].","
-                .$this->CubicacionCamion. ","
-                .($this->deductiva ? $this->deductiva->id : 'NULL'). ","
-                .($this->deductiva ? $this->deductiva->estatus : 'NULL') .
-                ",@a, @v);";
+            DB::connection('sca')->beginTransaction();
+            if($data["Accion"] == 1) { //validar
+                $inicio_camion = InicioCamion::find($this->id);
+                if($data["Cubicacion"] < $data["Volumen"]){
+                    DB::connection('sca')->rollback();
+                    $msg = "EL volumen es mayor a la cubicacion del suministro.";
+                    return ['message' => $msg];
+                }
 
-            DB::connection("sca")->statement($statement);
+                DB::connection('sca')->table('inicio_viajes')->insert([
+                    'IdInicioCamion'        => $this->id,
+                    'FechaCarga' =>Carbon::now()->toDateTimeString(),
+                    'IdProyecto'    => 1,
+                    'IdCamion'      => $this->idcamion,
+                    'CubicacionCamion'  => $data["Cubicacion"],
+                    'IdOrigen'        => $this->idorigen ,
+                    'Fecha' => $this->fecha_origen,
+                    'IdMaterial'      => $this->idmaterial,
+                    'IdChecador'    => auth()->user()->idusuario,
+                    'creo'        => $this->idusuario,
+                    'Estatus'    => 0,
+                    'code'      => $this->code,
+                    'uidTAG'=> $this->uidTAG,
+                    'folioMina'        =>$data["FolioMina"],
+                    'folioSeguimiento' => $data["FolioSeguimiento"],
+                    'Volumen'    => $data["Volumen"],
+                    'numImpresion'      => $this->numImpresion,
+                    'Registro'           => auth()->user()->idusuario
+                ]);
 
-            $result = DB::connection('sca')->select('SELECT @a,@v');
-            if($result[0]->{'@a'} == 'ok') {
-                $msg = $data['Accion'] == 1 ? 'Viaje validado exitosamente' : 'Viaje Rechazado exitosamente';
-                $tipo = $data['Accion'] == 1 ? 'success' : 'info';
-            } else {
-                $msg = 'Error: ' . $result[0]->{'@v'};
-                $tipo = 'error';
+                $inicio_camion->estatus = 21; // Validado el viaje
+                $inicio_camion->Modifico = auth()->user()->idusuario;
+                /*$inicio_camion->folioMina = $data["FolioMina"];
+                $inicio_camion->folioSeguimiento = $data["FolioSeguimiento"];
+                $inicio_camion->volumen = $data["Volumen"];*/
+
+                $inicio_camion->save();
+
+                $msg = "Se valido el suministro";
+            }else if ($data["Accion"]== 0){ //Rechazar
+                if($data["FolioMina"]=="") {
+                    $data["FolioMina"] = null;
+                }
+                if($data["FolioSeguimiento"]) {
+                    $data["FolioSeguimiento"] = null;
+                }
+                if($data["Volumen"]){
+                    $data["Volumen"]='0.00';
+                }
+                 DB::connection('sca')->table('inicioviajesrechazados')->insert([
+                     'IdInicio'        => $this->id,
+                     'FechaRechazo' =>Carbon::now()->toDateTimeString(),
+                     'IdProyecto'    => 1,
+                     'IdCamion'      => $this->idcamion,
+                     'CubicacionCamion'  =>  $data["Cubicacion"],
+                     'IdOrigen'        => $this->idorigen ,
+                     'Fecha' => $this->fecha_origen,
+                     'IdMaterial'      => $this->idmaterial,
+                     'Rechazo'           => auth()->user()->idusuario,
+                     'Creo'        => $this->idusuario,
+                     'Estatus'    => $this->estatus,
+                     'folioMina'        =>$data["FolioMina"],
+                     'folioSeguimiento' => $data["FolioSeguimiento"],
+                     'Volumen'    => $data["Volumen"],
+                 ]);
+                $msg = "Se Rechazo el suministro correctamente.";
             }
-
             DB::connection('sca')->commit();
-            return ['message' => $msg,
-                'tipo' => $tipo];
+            return ['message' => $msg, 'tipo'=>"success"];
         } catch (Exception $e) {
             DB::connection('sca')->rollback();
             throw $e;
@@ -305,7 +337,7 @@ class InicioCamion extends Model
                 $this->IdOrigen = $data['IdOrigen'];
             }
 
-            if($this->CubicacionCamion != $data['CubicacionCamion']) {
+            if($this->Cubicacion != $data['Cubicacion']) {
                 DB::connection('sca')->table('cambio_cubicacion')->insert([
                     'IdViajeNeto'   => $this->IdViajeNeto,
                     'FechaRegistro' => Carbon::now()->toDateTimeString(),

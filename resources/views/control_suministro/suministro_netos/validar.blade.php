@@ -100,11 +100,11 @@
                                     <div slot="body" class="form-vertical">
                                         <div class="row">
                                            <div class="col-ms-4 col-md-offset-1">
-                                                <div class="form-group">
+                                                <div   class="form-group">
                                                     <label>Cubicación:</label>
                                                     <input type="number" step="any" class="form-control input-sm" v-model="form.data.Cubicacion">
                                                 </div>
-                                                <div class="form-group">
+                                                <div  class="form-group">
                                                     <label>Folio Mina:</label>
                                                     <input type="text" step="any" class="form-control input-sm" v-model="form.data.FolioMina">
                                                 </div>
