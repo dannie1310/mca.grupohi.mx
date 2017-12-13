@@ -133,6 +133,7 @@ class ConciliacionesController extends Controller
             $num = $d->num;
             $code =$d->Code;
         }*/
+            //dd(Conciliacion::findOrFail($id), Camion::lists('Economico', 'IdCamion') );
             return view('conciliaciones.edit')
                 ->withConciliacion(Conciliacion::findOrFail($id))
                 ->withCamiones(Camion::lists('Economico', 'IdCamion'));
@@ -212,5 +213,9 @@ class ConciliacionesController extends Controller
 
         return view('conciliaciones.show')
             ->withConciliacion($conciliacion);
+    }
+
+    public function conciliar($id){
+
     }
 }

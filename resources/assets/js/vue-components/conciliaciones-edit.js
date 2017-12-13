@@ -9,11 +9,22 @@ Vue.component('conciliaciones-edit', {
                 'detalles_nc' : []
             },
             'form' : {
-                'errors' : []
+                'errors' : [],
+                'costos' : [],
+                'id_costo' : '',
+                'token': '',
+                'usuario': '',
+                'clave': ''
             },
             'guardando'  : false,
             'fetching'   : false,
-            'fecha_cambio' : ''
+            'fecha_cambio' : '',
+            'api' : {
+                'token' : '',
+                'database_name':'SAO1814_PISTA_AEROPUERTO',
+                'id_obra': 1
+            }
+
         }
     },
 
@@ -254,7 +265,62 @@ Vue.component('conciliaciones-edit', {
             }
         },
 
-        aprobar: function(e) {
+        aprobar: function (e) {
+            e.preventDefault();
+            $('#sesionSAO').modal('show');
+        },
+
+        getToken: function (e) {
+            var _this = this;
+            var url = 'http://172.20.73.168/api/auth';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                success: function (response) {
+                    _this.api.token = response;
+                    $('#sesionSAO').modal('hide');
+                    swal({
+                            type: 'success',
+                            title: '¡Hecho!',
+                            text: 'Sesion Iniciada Correctamente',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            closeOnConfirm: true
+                        },
+                        function () {
+                            _this.getCostos(e);
+                        });
+                },
+                error: function (error) {
+                    alert('Error al Iniciar Sesión  '+error.toString());
+                }
+            })
+        },
+
+        getCostos: function(e){
+            var _this = this;
+            var url = 'http://172.20.73.168/api/conciliacion/costos';
+            $.ajax(
+                {
+                    url:url,
+                    type:'GET',
+                    data:{
+                        database_name: _this.api.database_name,
+                        id_obra: _this.api.id_obra,
+                        token: _this.api.token
+                    },
+                    success: function (response) {
+                        _this.form.costos = response;
+                        $('#tipo_gasto').modal('show');
+                    },
+                    error: function (error) {
+                        alert('Error al Recuperar la Lista de Gastos' + error.responseText);
+                    }
+                }
+            )
+        },
+
+        aprobar1: function(e) {
             e.preventDefault();
             var _this = this;
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;

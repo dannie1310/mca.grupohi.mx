@@ -51446,13 +51446,7 @@ $(".etapas_destroy").off().on("click", function (event) {
 },{}],35:[function(require,module,exports){
 'use strict';
 
-$(function () {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-});
+$(function () {});
 $('[data-submenu]').submenupicker();
 $('.fecha').datepicker({
     format: 'yyyy-mm-dd',
@@ -51987,11 +51981,22 @@ Vue.component('conciliaciones-edit', {
                 'detalles_nc': []
             },
             'form': {
-                'errors': []
+                'errors': [],
+                'costos': [],
+                'id_costo': '',
+                'token': '',
+                'usuario': '',
+                'clave': ''
             },
             'guardando': false,
             'fetching': false,
-            'fecha_cambio': ''
+            'fecha_cambio': '',
+            'api': {
+                'token': '',
+                'database_name': 'SAO1814_PISTA_AEROPUERTO',
+                'id_obra': 1
+            }
+
         };
     },
 
@@ -52235,6 +52240,59 @@ Vue.component('conciliaciones-edit', {
 
         aprobar: function aprobar(e) {
             e.preventDefault();
+            $('#sesionSAO').modal('show');
+        },
+
+        getToken: function getToken(e) {
+            var _this = this;
+            var url = 'http://172.20.73.168/api/auth';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function success(response) {
+                    _this.api.token = response;
+                    $('#sesionSAO').modal('hide');
+                    swal({
+                        type: 'success',
+                        title: '¡Hecho!',
+                        text: 'Sesion Iniciada Correctamente',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        closeOnConfirm: true
+                    }, function () {
+                        _this.getCostos(e);
+                    });
+                },
+                error: function error(_error3) {
+                    alert('Error al Iniciar Sesión  ' + _error3.toString());
+                }
+            });
+        },
+
+        getCostos: function getCostos(e) {
+            var _this = this;
+            var url = 'http://172.20.73.168/api/conciliacion/costos';
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    database_name: _this.api.database_name,
+                    id_obra: _this.api.id_obra,
+                    token: _this.api.token
+
+                },
+                success: function success(response) {
+                    _this.form.costos = response;
+                    $('#tipo_gasto').modal('show');
+                },
+                error: function error(_error4) {
+                    alert('Error al Recuperar la Lista de Gastos' + _error4.responseText);
+                }
+            });
+        },
+
+        aprobar1: function aprobar1(e) {
+            e.preventDefault();
             var _this = this;
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
             swal({
@@ -52268,11 +52326,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error3) {
+                    error: function error(_error5) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error3.responseText)
+                            text: App.errorsToString(_error5.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52306,11 +52364,11 @@ Vue.component('conciliaciones-edit', {
 
                     _this.fetchConciliacion();
                 },
-                error: function error(_error4) {
+                error: function error(_error6) {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error4.responseText)
+                        text: App.errorsToString(_error6.responseText)
                     });
                     _this.fetchConciliacion();
                 }
@@ -52383,7 +52441,7 @@ Vue.component('conciliaciones-edit', {
                         });
                     }
                 },
-                error: function error(_error5) {
+                error: function error(_error7) {
                     _this.guardando = false;
                     $('.ticket').val('');
                     $('.ticket').focus();
@@ -52391,7 +52449,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error5.responseText)
+                        text: App.errorsToString(_error7.responseText)
                     });
                 }
             });
@@ -52471,11 +52529,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error6) {
+                    error: function error(_error8) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error6.responseText)
+                            text: App.errorsToString(_error8.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52548,18 +52606,18 @@ Vue.component('conciliaciones-edit', {
                     _this.conciliacion.volumen_pagado = response.volumen_pagado;
                     _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
                 },
-                error: function error(_error7) {
-                    if (_error7.status == 422) {
+                error: function error(_error9) {
+                    if (_error9.status == 422) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error7.responseJSON)
+                            text: App.errorsToString(_error9.responseJSON)
                         });
-                    } else if (_error7.status == 500) {
+                    } else if (_error9.status == 500) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error7.responseText)
+                            text: App.errorsToString(_error9.responseText)
                         });
                         _this.fetchConciliacion();
                     }
