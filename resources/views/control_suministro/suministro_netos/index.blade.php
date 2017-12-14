@@ -1,16 +1,7 @@
 @extends('layout_width')
-@section('styles')
-    <style>
-        .ocultar{
-            display:none;
-        }
-
-
-    </style>
-@endsection
 @section('content')
 
-    <h1>VIAJES @if($action == 'en_conflicto')EN CONFLICTO @endif</h1>
+    <h1>SUMINISTRO @if($action == 'en_conflicto')EN CONFLICTO @endif</h1>
     {!! Breadcrumbs::render('suministro_netos.index') !!}
     <hr>
     <div id="app">
@@ -144,8 +135,6 @@
                 <section v-if="viajes_netos.length" id="results">
                     <h3>
                         RESULTADOS DE LA BÚSQUEDA
-                        <button v-if="!ver_mas" class="btn btn-info pull-right" v-on:click="ver_mas_function"><i class="fa fa-eye"></i> Ver Más </button>
-                        <button v-if="ver_mas" class="btn btn-info pull-right" v-on:click="ver_mas_function"><i class="fa fa-eye"></i> Ver Menos </button>
                     </h3>
 
                     <div class="table-responsive ">
@@ -173,14 +162,6 @@
                                 <th style="text-align: center"> ECONÓMICO </th>
                                 <th style="text-align: center"> CUBICACIÓN	</th>
 
-                                <!-- OCULTAR -->
-                                <th style="text-align: center" class="ocultar"> CAMIÓN </th>
-                                <th style="text-align: center" class="ocultar"> VIAJE NETO </th>
-                                <th style="text-align: center" class="ocultar"> VIAJE </th>
-                                <th style="text-align: center" class="ocultar"> CAMIÓN </th>
-                                <th style="text-align: center" class="ocultar"> VIAJE NETO </th>
-                                <th style="text-align: center" class="ocultar"> VIAJE </th>
-                                <!-- END -->
 
                                 <th style="text-align: center"> CONCILIÓ </th>
                                 <th style="text-align: center"> FOLIO </th>
@@ -238,7 +219,7 @@
                                         <h4 class="modal-title">DETALLES DEL CONFLICTO</h4>
                                     </div>
                                     <div class="modal-body"  >
-                                        {!! Form::open(['route' => ['viajes_netos.update'], 'method' => 'patch', 'class' => 'form_pagable']) !!}
+                                        {!! Form::open(['route' => ['suministro_netos.update'], 'method' => 'patch', 'class' => 'form_pagable']) !!}
                                         <input type="hidden" value="poner_pagable" name="type">
 
                                         <div class="row">
@@ -250,13 +231,16 @@
                                                             Código (Ticket)
                                                         </td>
                                                         <td style="text-align: center">
-                                                            Fecha Registro
+                                                            Fecha
                                                         </td>
                                                         <td style="text-align: center">
-                                                            Fecha Salida
+                                                            Folio Mina
                                                         </td>
                                                         <td style="text-align: center">
-                                                            Fecha Llegada
+                                                            Folio Seguimiento
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            Volumen
                                                         </td>
 
                                                     </tr>
@@ -270,10 +254,13 @@
                                                             @{{detalle_conflicto.fecha_registro}}
                                                         </td>
                                                         <td>
-                                                            @{{detalle_conflicto.fecha_salida}}
+                                                            @{{detalle_conflicto.folioMina}}
                                                         </td>
                                                         <td>
-                                                            @{{detalle_conflicto.fecha_llegada}}
+                                                            @{{detalle_conflicto.folioSeg}}
+                                                        </td>
+                                                        <td>
+                                                            @{{detalle_conflicto.volumen}}
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -303,7 +290,7 @@
                                         <h4 class="modal-title">DETALLES DEL CONFLICTO </h4>
                                     </div>
                                     <div class="modal-body"  >
-                                        {!! Form::open(['route' => ['viajes_netos.update'], 'method' => 'patch', 'class' => 'form_pagable']) !!}
+                                        {!! Form::open(['route' => ['suministro_netos.update'], 'method' => 'patch', 'class' => 'form_pagable']) !!}
                                         <input type="hidden" value="poner_pagable" name="type">
 
                                         <div class="row">
@@ -315,13 +302,16 @@
                                                             Código (Ticket)
                                                         </td>
                                                         <td style="text-align: center">
-                                                            Fecha Registro
+                                                            Fecha
                                                         </td>
                                                         <td style="text-align: center">
-                                                            Fecha Salida
+                                                            Folio Mina
                                                         </td>
                                                         <td style="text-align: center">
-                                                            Fecha Llegada
+                                                            Folio Seguimiento
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            Volumen
                                                         </td>
                                                     </tr>
                                                     </thead>
@@ -334,10 +324,13 @@
                                                             @{{detalle_conflicto.fecha_registro}}
                                                         </td>
                                                         <td>
-                                                            @{{detalle_conflicto.fecha_salida}}
+                                                            @{{detalle_conflicto.folioMina}}
                                                         </td>
                                                         <td>
-                                                            @{{detalle_conflicto.fecha_llegada}}
+                                                            @{{detalle_conflicto.folioSeg}}
+                                                        </td>
+                                                        <td>
+                                                            @{{detalle_conflicto.volumen}}
                                                         </td>
                                                     </tr>
                                                     </tbody>

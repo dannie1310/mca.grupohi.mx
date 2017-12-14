@@ -15,7 +15,7 @@ use \App\Models\ViajeNeto;
  */
 class ViajeNetoConflictoPagable extends Model {
     protected $connection = 'sca';
-    protected $table = 'zviajes_netos_conflictos_pagables';
+    protected $table = 'viajes_netos_conflictos_pagables';
     protected $primaryKey = 'id';
     protected $fillable = [
         'idviaje_neto', 

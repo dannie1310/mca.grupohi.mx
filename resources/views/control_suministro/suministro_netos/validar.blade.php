@@ -63,7 +63,6 @@
                             <th rowspan="2">Volumen</th>
                             <th rowspan="2">?</th>
                             <th rowspan="2">Validar</th>
-                             <td rowspan="1"></td>
                         </tr>
                     </thead>
                     <tbody>

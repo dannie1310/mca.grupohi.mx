@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Camion;
+use App\Models\ConflictosSuministros\InicioSuministroPagable;
 use App\Models\InicioCamion;
 use App\Models\Material;
 use App\Models\Origen;
+use App\Models\Transformers\InicioCamionTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
@@ -46,7 +48,6 @@ class InicioSuministroController extends Controller
                         ->get();
 
                     foreach ($viajes as $viaje) {
-
                         $data [] = [
                             'IdViajeNeto' => $viaje->id,
                             'FechaLlegada' => $viaje->fecha_origen,
@@ -101,10 +102,9 @@ class InicioSuministroController extends Controller
             else if($request->get('action') == 'detalle_conflicto'){
                 $id_conflicto = $request->get("id_conflicto");
                 $id_viaje = $request->get("id_viaje");
-                //dd($id_viaje);
-                $conflicto = \App\Models\Conflictos\ConflictoEntreViajes::find($id_conflicto);
-                $viaje = ViajeNeto::find($id_viaje);
-                $data["cierres"] = ViajeNeto::validandoCierre($viaje->FechaLlegada);
+                $conflicto = \App\Models\ConflictosSuministros\ConflictoSuministro::find($id_conflicto);
+                $viaje = InicioCamion::find($id_viaje);
+                $data["cierres"] = InicioCamion::validandoCierre($viaje->fecha_origen);
                 $pagable = $viaje->conflicto_pagable;
                 $detalles = $conflicto->detalles;
                 if($pagable){
@@ -117,17 +117,19 @@ class InicioSuministroController extends Controller
                 }
                 foreach($detalles as $detalle){
                     $data["conflictos"][] = [
-                        "id"=>$detalle->viaje_neto->IdViajeNeto,
-                        "code"=>$detalle->viaje_neto->Code,
-                        "fecha_registro"=>$detalle->viaje_neto->timestamp_carga->format("d-m-Y G:i:s"),
-                        "fecha_salida"=>$detalle->viaje_neto->timestamp_salida->format("d-m-Y G:i:s"),
-                        "fecha_llegada"=>$detalle->viaje_neto->timestamp_llegada->format("d-m-Y G:i:s"),
+                        "id"=>$detalle->viaje_neto->id,
+                        "code"=>$detalle->viaje_neto->code,
+                        "fecha_registro"=>$detalle->viaje_neto->fecha_origen,
+                        "folioMina"=>$detalle->viaje_neto->folioMina,
+                        "folioSeg"=>$detalle->viaje_neto->folioSeguimiento,
+                        "volumen"=>$detalle->viaje_neto->volumen
                     ];
                 }
                 //dd(response()->json( $data));
                 return response()->json( $data);
             }
             else if($request->get('action') == 'en_conflicto'){
+
                 if($request->get("tipo_busqueda") == "fecha"){
                     $this->validate($request, [
                         'FechaInicial' => 'required|date_format:"Y-m-d"',
@@ -147,45 +149,45 @@ class InicioSuministroController extends Controller
                 }
 
                 if($request->get("tipo_busqueda") == "fecha"){
-                    $query = ViajeNeto::EnConflicto()->Fechas($fechas);
+                    $query = InicioCamion::EnConflicto()->Fechas($fechas);
                 }else{
-                    $query = ViajeNeto::EnConflicto()->Codigo($codigo);
+                    $query = InicioCamion::EnConflicto()->Codigo($codigo);
                 }
 
 
                 $viajes_netos = $query->get();
                 $datos =[];
-                $data = ViajeNetoTransformer::transform($viajes_netos);
+             //   dd($viajes_netos);
+                $data = InicioCamionTransformer::transform($viajes_netos);
+             //   dd($data);
                 foreach ($data as $dat) {
+
                     $datos [] = [
                         'id' => $dat['id'],
                         'autorizo' => $dat['autorizo'],
                         'camion' => $dat['camion'],
-                        'Code' => $dat['codigo'],
+                        'code' => $dat['codigo'],
                         'cubicacion' => $dat['cubicacion'],
                         'estado' => $dat['estado'],
                         'estatus' => $dat['estatus'],
-                        'id_material' => $dat['id_material'],
-                        'id_origen' => $dat['id_origen'],
+                        'idmaterial' => $dat['idmaterial'],
+                        'idorigen' => $dat['idorigen'],
                         'material' => $dat['material'],
                         'origen' => $dat['origen'],
                         'registro' => $dat['registro'],
-                        'registro_primer_toque' => $dat['registro_primer_toque'],
-                        'timestamp_llegada' => $dat['timestamp_llegada'],
-                        'FechaLlegada' => $dat['fechaLlegada'],
-                        'HoraLlegada' => $dat['horaLlegada'],
+                        'fecha_origen' => $dat['timestamp_llegada'],
                         'tipo' => $dat['tipo'],
-                        'tiro' => $dat['tiro'],
-                        'importe' => $dat['importe'],
                         'valido' => $dat['valido'],
+                        'motivo' => $dat['motivo'],
                         'conflicto' => $dat['conflicto'],
                         'conflicto_pdf' => $dat['conflicto_pdf'],
                         'conflicto_pagable' => $dat['conflicto_pagable'],
-                        'cierre' => ViajeNeto::validandoCierre($dat['fechaLlegada']),
+                        'cierre' => InicioCamion::validandoCierre($dat['timestamp_llegada']),
                         'fecha_hora_carga' => $dat['fecha_hora_carga']
                     ];
                 }
                 $data = $datos;
+
             }
             else if ($request->get('action') == 'validar') {
                 $data = [];
@@ -234,7 +236,7 @@ class InicioSuministroController extends Controller
                             'IdViajeNeto' => $viaje->id,
                             'FechaLlegada' => $viaje->fecha_origen,
                             'Camion' => (String)$viaje->camion,
-                            'Cubicacion' => $viaje->CubicacionCamion,
+                            'Cubicacion' => $viaje->cubicacion,
                             'Origen' => (String )$viaje->origen,
                             'IdOrigen' => $viaje->IdOrigen,
                             'Material' => (String)$viaje->material,
@@ -260,7 +262,7 @@ class InicioSuministroController extends Controller
                     ]);
 
                     $fechas = $request->only(['FechaInicial', 'FechaFinal']);
-                    $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*')->whereNull('inicio_camion.id');
+                    $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*,  camiones.CubicacionParaPago AS cubicacion')->whereNull('inicio_camion.id');
                     $query = InicioCamion::scopeReporte($query);
 
                     foreach($request->get('Tipo', []) as $tipo) {
@@ -354,8 +356,8 @@ class InicioSuministroController extends Controller
                     ]);
 
                     $fechas = $request->only(['FechaInicial', 'FechaFinal']);
-                    $query = DB::connection('sca')->table('viajesnetos')->select('viajesnetos.*')->whereNull('viajesnetos.IdViajeNeto');
-                    $query = ViajeNeto::scopeReporte($query);
+                    $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*')->whereNull('inicio_camion.id');
+                    $query = InicioCamion::scopeReporte($query);
 
                     $tipos = [];
 
@@ -363,73 +365,73 @@ class InicioSuministroController extends Controller
                         if ($tipo == 'CM_C') {
                             array_push($tipos, 'Manuales - Cargados');
                             $q_cmc = DB::connection('sca')->table('viajesnetos');
-                            $q_cmc = ViajeNeto::scopeRegistradosManualmente($q_cmc);
-                            $q_cmc = ViajeNeto::scopeReporte($q_cmc);
-                            $q_cmc = ViajeNeto::scopeFechas($q_cmc, $fechas);
-                            $q_cmc = ViajeNeto::scopeConciliados($q_cmc, $request->Estado);
+                            $q_cmc = InicioCamion::scopeRegistradosManualmente($q_cmc);
+                            $q_cmc = InicioCamion::scopeReporte($q_cmc);
+                            $q_cmc = InicioCamion::scopeFechas($q_cmc, $fechas);
+                            $q_cmc = InicioCamion::scopeConciliados($q_cmc, $request->Estado);
                             $query->union($q_cmc);
                         }
                         if ($tipo == 'CM_A') {
                             array_push($tipos, 'Manuales - Autorizados (Pend. Validar)');
                             $q_cma = DB::connection('sca')->table('viajesnetos');
-                            $q_cma = ViajeNeto::scopeManualesAutorizados($q_cma);
-                            $q_cma = ViajeNeto::scopeReporte($q_cma);
-                            $q_cma = ViajeNeto::scopeFechas($q_cma, $fechas);
-                            $q_cma = ViajeNeto::scopeConciliados($q_cma, $request->Estado);
+                            $q_cma = InicioCamion::scopeManualesAutorizados($q_cma);
+                            $q_cma = InicioCamion::scopeReporte($q_cma);
+                            $q_cma = InicioCamion::scopeFechas($q_cma, $fechas);
+                            $q_cma = InicioCamion::scopeConciliados($q_cma, $request->Estado);
                             $query->union($q_cma);
                         }
                         if ($tipo == 'CM_V') {
                             array_push($tipos, 'Manuales - Validados');
                             $q_cmv = DB::connection('sca')->table('viajesnetos');
-                            $q_cmv = ViajeNeto::scopeManualesValidados($q_cmv);
-                            $q_cmv = ViajeNeto::scopeReporte($q_cmv);
-                            $q_cmv = ViajeNeto::scopeFechas($q_cmv, $fechas);
-                            $q_cmv = ViajeNeto::scopeConciliados($q_cmv, $request->Estado);
+                            $q_cmv = InicioCamion::scopeManualesValidados($q_cmv);
+                            $q_cmv = InicioCamion::scopeReporte($q_cmv);
+                            $q_cmv = InicioCamion::scopeFechas($q_cmv, $fechas);
+                            $q_cmv = InicioCamion::scopeConciliados($q_cmv, $request->Estado);
                             $query->union($q_cmv);
                         }
                         if ($tipo == 'CM_R') {
                             array_push($tipos, 'Manuales - Rechazados');
                             $q_cmr = DB::connection('sca')->table('viajesnetos');
-                            $q_cmr = ViajeNeto::scopeManualesRechazados($q_cmr);
-                            $q_cmr = ViajeNeto::scopeReporte($q_cmr);
-                            $q_cmr = ViajeNeto::scopeFechas($q_cmr, $fechas);
-                            $q_cmr = ViajeNeto::scopeConciliados($q_cmr, $request->Estado);
+                            $q_cmr = InicioCamion::scopeManualesRechazados($q_cmr);
+                            $q_cmr = InicioCamion::scopeReporte($q_cmr);
+                            $q_cmr = InicioCamion::scopeFechas($q_cmr, $fechas);
+                            $q_cmr = InicioCamion::scopeConciliados($q_cmr, $request->Estado);
                             $query->union($q_cmr);
                         }
                         if ($tipo == 'CM_D') {
                             array_push($tipos, 'Manuales - Denegados');
                             $q_cmd = DB::connection('sca')->table('viajesnetos');
-                            $q_cmd = ViajeNeto::scopeManualesDenegados($q_cmd);
-                            $q_cmd = ViajeNeto::scopeReporte($q_cmd);
-                            $q_cmd = ViajeNeto::scopeFechas($q_cmd, $fechas);
-                            $q_cmd = ViajeNeto::scopeConciliados($q_cmd, $request->Estado);
+                            $q_cmd = InicioCamion::scopeManualesDenegados($q_cmd);
+                            $q_cmd = InicioCamion::scopeReporte($q_cmd);
+                            $q_cmd = InicioCamion::scopeFechas($q_cmd, $fechas);
+                            $q_cmd = InicioCamion::scopeConciliados($q_cmd, $request->Estado);
                             $query->union($q_cmd);
                         }
                         if ($tipo == 'M_V') {
                             array_push($tipos, 'Móviles - Validados');
                             $q_mv = DB::connection('sca')->table('viajesnetos');
-                            $q_mv = ViajeNeto::scopeMovilesValidados($q_mv);
-                            $q_mv = ViajeNeto::scopeReporte($q_mv);
-                            $q_mv = ViajeNeto::scopeFechas($q_mv, $fechas);
-                            $q_mv = ViajeNeto::scopeConciliados($q_mv, $request->Estado);
+                            $q_mv = InicioCamion::scopeMovilesValidados($q_mv);
+                            $q_mv = InicioCamion::scopeReporte($q_mv);
+                            $q_mv = InicioCamion::scopeFechas($q_mv, $fechas);
+                            $q_mv = InicioCamion::scopeConciliados($q_mv, $request->Estado);
                             $query->union($q_mv);
                         }
                         if ($tipo == 'M_A') {
                             array_push($tipos, 'Móviles - Pendientes de Validar');
                             $q_ma = DB::connection('sca')->table('viajesnetos');
-                            $q_ma = ViajeNeto::scopeMovilesAutorizados($q_ma);
-                            $q_ma = ViajeNeto::scopeReporte($q_ma);
-                            $q_ma = ViajeNeto::scopeFechas($q_ma, $fechas);
-                            $q_ma = ViajeNeto::scopeConciliados($q_ma, $request->Estado);
+                            $q_ma = InicioCamion::scopeMovilesAutorizados($q_ma);
+                            $q_ma = InicioCamion::scopeReporte($q_ma);
+                            $q_ma = InicioCamion::scopeFechas($q_ma, $fechas);
+                            $q_ma = InicioCamion::scopeConciliados($q_ma, $request->Estado);
                             $query->union($q_ma);
                         }
                         if ($tipo == 'M_D') {
                             array_push($tipos, 'Móviles - Denegados');
                             $q_md = DB::connection('sca')->table('viajesnetos');
-                            $q_md = ViajeNeto::scopeMovilesDenegados($q_md);
-                            $q_md = ViajeNeto::scopeReporte($q_md);
-                            $q_md = ViajeNeto::scopeFechas($q_md, $fechas);
-                            $q_md = ViajeNeto::scopeConciliados($q_md, $request->Estado);
+                            $q_md = InicioCamion::scopeMovilesDenegados($q_md);
+                            $q_md = InicioCamion::scopeReporte($q_md);
+                            $q_md = InicioCamion::scopeFechas($q_md, $fechas);
+                            $q_md = InicioCamion::scopeConciliados($q_md, $request->Estado);
                             $query->union($q_md);
                         }
                     }
@@ -446,8 +448,8 @@ class InicioSuministroController extends Controller
                         'Codigo' => 'required'
                     ]);
 
-                    $query = DB::connection('sca')->table('viajesnetos')->select('viajesnetos.*')->where('viajesnetos.Code', '=', $request->Codigo);
-                    $query = ViajeNeto::scopeReporte($query);
+                    $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*')->where('inicio_camion.code', '=', $request->Codigo);
+                    $query = InicioCamion::scopeReporte($query);
 
                     $viajes_netos = $query->get();
                     $data = [
@@ -462,7 +464,7 @@ class InicioSuministroController extends Controller
             } else
                 if ($request->get('action') == 'en_conflicto') {
                     if (auth()->user()->can('consultar-viajes-conflicto')) {
-                        return view('viajes_netos.index')
+                        return view('control_suministro.suministro_netos.index')
                             ->withAction('en_conflicto');
                     } else {
                         Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
@@ -586,6 +588,10 @@ class InicioSuministroController extends Controller
                 throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m/3');
             }
             return response()->json($viaje_neto->modificar($request));
+
+        }else if($request->get('type') == 'poner_pagable') {
+            $viaje_neto = InicioCamion::findOrFail($request->get('IdViajeNeto'));
+            return response()->json($viaje_neto->poner_pagable($request));
         }
     }
 
