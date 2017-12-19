@@ -12,7 +12,6 @@ Vue.component('conciliaciones-edit', {
                 'errors' : [],
                 'costos' : [],
                 'id_costo' : '',
-                'token': '',
                 'usuario': '',
                 'clave': ''
             },
@@ -21,7 +20,7 @@ Vue.component('conciliaciones-edit', {
             'fecha_cambio' : '',
             'api' : {
                 'token' : '',
-                'database_name':'SAO1814_PISTA_AEROPUERTO',
+                'database_name': 'SAO1814_PISTA_AEROPUERTO',
                 'id_obra': 1
             }
 
@@ -267,63 +266,113 @@ Vue.component('conciliaciones-edit', {
 
         aprobar: function (e) {
             e.preventDefault();
+            var _this = this;
             $('#sesionSAO').modal('show');
+
         },
 
         getToken: function (e) {
             var _this = this;
-            var url = 'http://172.20.73.168/api/auth';
+            $('#sesionSAO').modal('hide');
+            var url = 'http://localhost:8003/api/auth';
             $.ajax({
                 url:url,
                 type: 'POST',
                 success: function (response) {
-                    _this.api.token = response;
-                    $('#sesionSAO').modal('hide');
+                   _this.api.token = response.token;
                     swal({
                             type: 'success',
                             title: '¡Hecho!',
-                            text: 'Sesion Iniciada Correctamente',
+                            text: 'Sesión Iniciada Correctamente',
                             showCancelButton: false,
                             confirmButtonText: 'OK',
                             closeOnConfirm: true
                         },
                         function () {
-                            _this.getCostos(e);
+                        _this.getCostos(e);
                         });
                 },
                 error: function (error) {
-                    alert('Error al Iniciar Sesión  '+error.toString());
+                    alert('Error al Iniciar Sesion  '+error);
                 }
             })
         },
 
         getCostos: function(e){
+            e.preventDefault();
             var _this = this;
-            var url = 'http://172.20.73.168/api/conciliacion/costos';
-            $.ajax(
-                {
-                    url:url,
-                    type:'GET',
-                    data:{
-                        database_name: _this.api.database_name,
-                        id_obra: _this.api.id_obra,
-                        token: _this.api.token
-                    },
-                    success: function (response) {
-                        _this.form.costos = response;
-                        $('#tipo_gasto').modal('show');
-                    },
-                    error: function (error) {
-                        alert('Error al Recuperar la Lista de Gastos' + error.responseText);
-                    }
+            var url = 'http://localhost:8003/api/conciliacion/costos';
+            $.ajax({
+                url: url,
+                type: 'GET',
+                headers:{
+                    database_name: 'SAO1814_PISTA_AEROPUERTO',
+                    id_obra: 1,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                success: function (response) {
+                    _this.form.costos = response;
+                    $('#tipo_gasto').modal('show');
+                },
+                error: function (error) {
+                    alert('Sin Datos ' + error.responseText);
                 }
-            )
+            });
+        },
+
+        conciliar: function(e){
+            e.preventDefault();
+            var _this = this;
+            var url = App.host + '/api/conciliar';
+            $.ajax({
+                url: url,
+                type: 'GET',
+                headers:{
+                    id_conciliacion: _this.conciliacion.id,
+                    id_costo: _this.form.id_costo
+                },
+                success: function (response) {
+                    _this.enviarConciliacion(response);
+                },error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al generar la Conciliación:\n' + err.message
+
+                    });
+                    $('#tipo_gasto').modal('hide');
+                }
+            });
+        },
+
+        enviarConciliacion: function (data) {
+            var _this = this;
+            var url = 'http://localhost:8003/api/conciliacion';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                headers:{
+                    database_name: 'SAO1814_PISTA_AEROPUERTO',
+                    id_obra: 1,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                data: data,
+                success: function (response) {
+                    alert(response);
+                    $('#tipo_gasto').modal('hide');
+                }, error: function (error) {
+                    alert('Error : ' + error.responseText);
+                    $('#tipo_gasto').modal('hide');
+                }
+            });
         },
 
         aprobar1: function(e) {
             e.preventDefault();
             var _this = this;
-            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            _this.aprobarmod(e);
+                var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
             swal({
                 title: "¡Aprobar Conciliación!",
                 text: "¿Desea aprobar la conciliación?",

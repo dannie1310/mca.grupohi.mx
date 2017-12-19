@@ -215,7 +215,4 @@ class ConciliacionesController extends Controller
             ->withConciliacion($conciliacion);
     }
 
-    public function conciliar($id){
-
-    }
 }

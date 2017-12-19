@@ -194,6 +194,7 @@ Route::get('conciliacion/{conciliacion}/detalles', 'ConciliacionesDetallesContro
 Route::delete('conciliacion/{conciliacion}/detalles/{detalle}', 'ConciliacionesDetallesController@destroy')->name('conciliaciones.detalles.destroy');
 Route::get('conciliacion_info_carga/{filename}', 'ConciliacionesDetallesController@detalle_carga')->name('conciliacion.info');
 
+
 Route::get('viajes', 'ViajesController@index')->name('viajes.index');
 Route::patch('viajes/{viaje}', 'ViajesController@update');
 Route::get('viajes/edit', 'ViajesController@edit')->name('viajes.edit');
@@ -281,6 +282,9 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
     $api->get('registro_camiones', 'App\Http\Controllers\API\RegistroCamionesController@lista');
     $api->post('registro_camiones/camion', 'App\Http\Controllers\API\RegistroCamionesController@camion_store');
     $api->post('registro_camiones/imagen', 'App\Http\Controllers\API\RegistroCamionesController@imagen_store');
+
+    $api->get('conciliar', 'App\Http\Controllers\ApiController@conciliar');
+
 
     //Authenticate Routes
     /*$api->post('authenticate', 'Ghi\Http\Controllers\Api\Auth\AuthController@authenticate');

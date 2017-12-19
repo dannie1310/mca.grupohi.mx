@@ -51984,7 +51984,6 @@ Vue.component('conciliaciones-edit', {
                 'errors': [],
                 'costos': [],
                 'id_costo': '',
-                'token': '',
                 'usuario': '',
                 'clave': ''
             },
@@ -52240,22 +52239,23 @@ Vue.component('conciliaciones-edit', {
 
         aprobar: function aprobar(e) {
             e.preventDefault();
+            var _this = this;
             $('#sesionSAO').modal('show');
         },
 
         getToken: function getToken(e) {
             var _this = this;
-            var url = 'http://172.20.73.168/api/auth';
+            $('#sesionSAO').modal('hide');
+            var url = 'http://localhost:8003/api/auth';
             $.ajax({
                 url: url,
                 type: 'POST',
                 success: function success(response) {
-                    _this.api.token = response;
-                    $('#sesionSAO').modal('hide');
+                    _this.api.token = response.token;
                     swal({
                         type: 'success',
                         title: '¡Hecho!',
-                        text: 'Sesion Iniciada Correctamente',
+                        text: 'Sesión Iniciada Correctamente',
                         showCancelButton: false,
                         confirmButtonText: 'OK',
                         closeOnConfirm: true
@@ -52264,29 +52264,74 @@ Vue.component('conciliaciones-edit', {
                     });
                 },
                 error: function error(_error3) {
-                    alert('Error al Iniciar Sesión  ' + _error3.toString());
+                    alert('Error al Iniciar Sesion  ' + _error3);
                 }
             });
         },
 
         getCostos: function getCostos(e) {
+            e.preventDefault();
             var _this = this;
-            var url = 'http://172.20.73.168/api/conciliacion/costos';
+            var url = 'http://localhost:8003/api/conciliacion/costos';
             $.ajax({
                 url: url,
                 type: 'GET',
-                data: {
-                    database_name: _this.api.database_name,
-                    id_obra: _this.api.id_obra,
-                    token: _this.api.token
-
+                headers: {
+                    database_name: 'SAO1814_PISTA_AEROPUERTO',
+                    id_obra: 1,
+                    Authorization: 'Bearer ' + _this.api.token
                 },
                 success: function success(response) {
                     _this.form.costos = response;
                     $('#tipo_gasto').modal('show');
                 },
                 error: function error(_error4) {
-                    alert('Error al Recuperar la Lista de Gastos' + _error4.responseText);
+                    alert('Sin Datos ' + _error4.responseText);
+                }
+            });
+        },
+
+        conciliar: function conciliar(e) {
+            e.preventDefault();
+            var _this = this;
+            var url = App.host + '/api/conciliar';
+            $.ajax({
+                url: url,
+                type: 'GET',
+                headers: {
+                    id_conciliacion: _this.conciliacion.id,
+                    id_costo: _this.form.id_costo
+                },
+                success: function success(response) {
+                    _this.enviarConciliacion(response);
+                }, error: function error(xhr, status, _error5) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al generar la Conciliación:\n' + err.message
+
+                    });
+                }
+            });
+        },
+
+        enviarConciliacion: function enviarConciliacion(data) {
+            var _this = this;
+            var url = 'http://localhost:8003/api/conciliacion';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    database_name: 'SAO1814_PISTA_AEROPUERTO',
+                    id_obra: 1,
+                    Authorization: 'Bearer ' + _this.api.token
+                },
+                data: data,
+                success: function success(response) {
+                    alert(response);
+                }, error: function error(_error6) {
+                    alert('Error : ' + _error6.responseText);
                 }
             });
         },
@@ -52294,6 +52339,7 @@ Vue.component('conciliaciones-edit', {
         aprobar1: function aprobar1(e) {
             e.preventDefault();
             var _this = this;
+            _this.aprobarmod(e);
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
             swal({
                 title: "¡Aprobar Conciliación!",
@@ -52326,11 +52372,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error5) {
+                    error: function error(_error7) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error5.responseText)
+                            text: App.errorsToString(_error7.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52364,11 +52410,11 @@ Vue.component('conciliaciones-edit', {
 
                     _this.fetchConciliacion();
                 },
-                error: function error(_error6) {
+                error: function error(_error8) {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error6.responseText)
+                        text: App.errorsToString(_error8.responseText)
                     });
                     _this.fetchConciliacion();
                 }
@@ -52441,7 +52487,7 @@ Vue.component('conciliaciones-edit', {
                         });
                     }
                 },
-                error: function error(_error7) {
+                error: function error(_error9) {
                     _this.guardando = false;
                     $('.ticket').val('');
                     $('.ticket').focus();
@@ -52449,7 +52495,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error7.responseText)
+                        text: App.errorsToString(_error9.responseText)
                     });
                 }
             });
@@ -52529,11 +52575,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error8) {
+                    error: function error(_error10) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error8.responseText)
+                            text: App.errorsToString(_error10.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52606,18 +52652,18 @@ Vue.component('conciliaciones-edit', {
                     _this.conciliacion.volumen_pagado = response.volumen_pagado;
                     _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
                 },
-                error: function error(_error9) {
-                    if (_error9.status == 422) {
+                error: function error(_error11) {
+                    if (_error11.status == 422) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error9.responseJSON)
+                            text: App.errorsToString(_error11.responseJSON)
                         });
-                    } else if (_error9.status == 500) {
+                    } else if (_error11.status == 500) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error9.responseText)
+                            text: App.errorsToString(_error11.responseText)
                         });
                         _this.fetchConciliacion();
                     }
