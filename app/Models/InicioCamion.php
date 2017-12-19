@@ -494,7 +494,7 @@ class InicioCamion extends Model
             $detalles = $this->conflicto->detalles;
             foreach($detalles as $detalle){
                 //if($detalle->viaje_neto->IdViajeNeto != $this->IdViajeNeto){
-                $codigos.= "<tr><td>".$detalle->viaje_neto->code. "</td><td>".$detalle->viaje_neto->fecha_origen->format("d-m-Y H:i:s")."</td></tr>";
+                $codigos.= "<tr><td>".$detalle->viaje_neto->code. "</td><td>".$detalle->viaje_neto->fecha_origen."</td></tr>";
                 // }
             }
             $codigos.="</table>";
