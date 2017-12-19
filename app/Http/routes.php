@@ -284,6 +284,7 @@ $api->version('v1', ['middleware' => 'cors'], function($api) {
     $api->post('registro_camiones/imagen', 'App\Http\Controllers\API\RegistroCamionesController@imagen_store');
 
     $api->get('conciliar', 'App\Http\Controllers\ApiController@conciliar');
+    $api->post('conciliar/estimacion', 'App\Http\Controllers\ApiController@registrarConciliacion');
 
 
     //Authenticate Routes

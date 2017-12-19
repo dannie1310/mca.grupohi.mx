@@ -52312,6 +52312,7 @@ Vue.component('conciliaciones-edit', {
                         text: 'Error al generar la Conciliación:\n' + err.message
 
                     });
+                    $('#tipo_gasto').modal('hide');
                 }
             });
         },
@@ -52329,15 +52330,51 @@ Vue.component('conciliaciones-edit', {
                 },
                 data: data,
                 success: function success(response) {
-                    alert(response);
-                }, error: function error(_error6) {
-                    alert('Error : ' + _error6.responseText);
+                    swal({
+                        type: 'success',
+                        title: '¡Hecho!',
+                        text: 'Conciliacion Registrada Correctamente con el No. de Folio :' + response.id_transaccion,
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        closeOnConfirm: true
+                    }, function () {
+                        _this.registrar_conciliacion(response.id_transaccion);
+                        $('#tipo_gasto').modal('hide');
+                    });
+                }, error: function error(xhr, status, _error6) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al generar la Conciliación:\n' + err.message
+
+                    });
+                    $('#tipo_gasto').modal('hide');
+                }
+            });
+        },
+
+        registrar_conciliacion: function registrar_conciliacion(estimacion) {
+            var _this = this;
+            var url = App.host + '/api/conciliar/estimacion';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    id_conciliacion: _this.conciliacion.id,
+                    id_estimacion: estimacion
+                },
+                success: function success(response) {
+                    alert('Estimación Registrada');
+                    _this.aprobar1(e);
+                },
+                error: function error(_error7) {
+                    alert('Error al Registrar Estiamción'.error.responseText);
                 }
             });
         },
 
         aprobar1: function aprobar1(e) {
-            e.preventDefault();
             var _this = this;
             _this.aprobarmod(e);
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
@@ -52372,11 +52409,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error7) {
+                    error: function error(_error8) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error7.responseText)
+                            text: App.errorsToString(_error8.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52410,11 +52447,11 @@ Vue.component('conciliaciones-edit', {
 
                     _this.fetchConciliacion();
                 },
-                error: function error(_error8) {
+                error: function error(_error9) {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error8.responseText)
+                        text: App.errorsToString(_error9.responseText)
                     });
                     _this.fetchConciliacion();
                 }
@@ -52487,7 +52524,7 @@ Vue.component('conciliaciones-edit', {
                         });
                     }
                 },
-                error: function error(_error9) {
+                error: function error(_error10) {
                     _this.guardando = false;
                     $('.ticket').val('');
                     $('.ticket').focus();
@@ -52495,7 +52532,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error9.responseText)
+                        text: App.errorsToString(_error10.responseText)
                     });
                 }
             });
@@ -52575,11 +52612,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error10) {
+                    error: function error(_error11) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error10.responseText)
+                            text: App.errorsToString(_error11.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52652,18 +52689,18 @@ Vue.component('conciliaciones-edit', {
                     _this.conciliacion.volumen_pagado = response.volumen_pagado;
                     _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
                 },
-                error: function error(_error11) {
-                    if (_error11.status == 422) {
+                error: function error(_error12) {
+                    if (_error12.status == 422) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error11.responseJSON)
+                            text: App.errorsToString(_error12.responseJSON)
                         });
-                    } else if (_error11.status == 500) {
+                    } else if (_error12.status == 500) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error11.responseText)
+                            text: App.errorsToString(_error12.responseText)
                         });
                         _this.fetchConciliacion();
                     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\EstimacionConciliacion;
 use App\Models\Conciliacion\ConciliacionDetalle;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -139,32 +140,8 @@ class ApiController extends Controller
 
     }
 
-    public function enviarConciliacion(array $dat){
-        $url = 'http://localhost:8003/api/conciliacion';
-        $data = $dat;
-
-// use key 'http' even if you send the request to https://...
-        $options = array(
-            'http' => array(
-                'header'  => "Content-type: application/form-data\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($data)
-            )
-        );
-        $context  = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        if ($result === FALSE) { /* Handle error */ dd('no Pandita'); }
-
-        var_dump($result);
-    }
-    function httpPost($url, $data)
-    {
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        dd( $response);
+    public function registrarConciliacion($id_estimacion, $id_conciliacion){
+        $est = EstimacionConciliacion::create(['id_estimacion' => $id_estimacion, 'id_conciliacion'=>$id_conciliacion]);
+        return $est->toArray();
     }
 }

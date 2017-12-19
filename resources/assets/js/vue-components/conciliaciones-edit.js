@@ -359,17 +359,53 @@ Vue.component('conciliaciones-edit', {
                 },
                 data: data,
                 success: function (response) {
-                    alert(response);
-                    $('#tipo_gasto').modal('hide');
-                }, error: function (error) {
-                    alert('Error : ' + error.responseText);
+                    swal({
+                            type: 'success',
+                            title: '¡Hecho!',
+                            text: 'Conciliacion Registrada Correctamente con el No. de Folio :' + response.id_transaccion,
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            closeOnConfirm: true
+                        },
+                        function () {
+                            _this.registrar_conciliacion(response.id_transaccion);
+                            $('#tipo_gasto').modal('hide');
+                        });
+                },error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al generar la Conciliación:\n' + err.message
+
+                    });
                     $('#tipo_gasto').modal('hide');
                 }
             });
         },
 
+        registrar_conciliacion: function (estimacion) {
+            var _this = this;
+            var url = App.host + '/api/conciliar/estimacion';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                data:{
+                    id_conciliacion: _this.conciliacion.id,
+                    id_estimacion: estimacion
+                },
+                success: function (response) {
+                    alert('Estimación Registrada');
+                    _this.aprobar1(e)
+
+                },
+                error: function (error) {
+                    alert('Error al Registrar Estiamción'. error.responseText);
+                }
+            });
+        },
+
         aprobar1: function(e) {
-            e.preventDefault();
             var _this = this;
             _this.aprobarmod(e);
                 var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
