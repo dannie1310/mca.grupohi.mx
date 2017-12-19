@@ -3,6 +3,7 @@
 namespace App\Models\ConflictosSuministros;
 
 use App\Models\InicioCamion;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class InicioSuministroPagable extends Model
@@ -26,6 +27,6 @@ class InicioSuministroPagable extends Model
         return $this->belongsTo(ConflictoSuministro::class, "idconflicto");
     }
     public function usuario_aprobo_pago(){
-        return $this->belongsTo(\App\User::class,"aprobo_pago");
+        return $this->belongsTo(User::class,"aprobo_pago");
     }
 }

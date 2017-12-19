@@ -311,7 +311,7 @@ Vue.component('conciliaciones-suministro-edit', {
             this.form.errors = [];
             this.guardando = true;
 
-            var url = App.host + '/conciliacion/suministro/' + conciliacion.idconciliacion + '/edit'
+            var url = $('.form_registrar').attr('action');
             var data = $('.form_registrar').serialize();
 
             $.ajax({
@@ -453,64 +453,6 @@ Vue.component('conciliaciones-suministro-edit', {
                 App.setErrorsOnForm(this.form, error.body);
 
             });
-        },
-
-        cambiar_cubicacion: function (detalle) {
-
-            var _this = this;
-            swal({
-                    title: "¡Cambiar Cubicación!",
-                    text: "Cubicación Actual : " + detalle.cubicacion_camion,
-                    type: "input",
-                    showCancelButton: true,
-                    closeOnConfirm: false,
-                    inputPlaceholder: "Nueva Cubicación.",
-                    confirmButtonText: "Si, Cambiar",
-                    cancelButtonText: "No",
-                    showLoaderOnConfirm: true
-                },
-                function(inputValue){
-                    if (inputValue === false) return false;
-                    if (inputValue === "") {
-                        swal.showInputError("¡Escriba la nueva Cubicación!");
-                        return false
-                    } if (! $.isNumeric(inputValue)) {
-                        swal.showInputError("¡Por favor introduzca sólo números!");
-                        return false;
-                    }
-                    $.ajax({
-                        url: App.host + '/viajes/' + detalle.id ,
-                        type : 'POST',
-                        data : {
-                            _method : 'PATCH',
-                            cubicacion : inputValue,
-                            tipo : 'cubicacion',
-                            id_conciliacion: _this.conciliacion.id
-                        },
-                        success: function(response) {
-                            if(response.status_code = 200) {
-                                _this.fetchConciliacion();
-                                swal({
-                                    type: 'success',
-                                    title: '¡Hecho!',
-                                    text: 'Cubicacion cambiada correctamente',
-                                    showCancelButton: false,
-                                    confirmButtonText: '' +
-                                    'OK',
-                                    closeOnConfirm: true
-                                });
-                            }
-                        },
-                        error: function (error) {
-                            swal({
-                                type: 'error',
-                                title: '¡Error!',
-                                text: App.errorsToString(error.responseText)
-                            });
-                            _this.fetchConciliacion();
-                        }
-                    });
-                });
         },
 
         eliminar_detalle: function (idconciliacion_detalle) {

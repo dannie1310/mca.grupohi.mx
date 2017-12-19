@@ -51737,7 +51737,7 @@ Vue.component('conciliaciones-suministro-edit', {
             this.form.errors = [];
             this.guardando = true;
 
-            var url = App.host + '/conciliacion/suministro/' + conciliacion.idconciliacion + '/edit';
+            var url = $('.form_registrar').attr('action');
             var data = $('.form_registrar').serialize();
 
             $.ajax({
@@ -51879,62 +51879,6 @@ Vue.component('conciliaciones-suministro-edit', {
             });
         },
 
-        cambiar_cubicacion: function cambiar_cubicacion(detalle) {
-
-            var _this = this;
-            swal({
-                title: "¡Cambiar Cubicación!",
-                text: "Cubicación Actual : " + detalle.cubicacion_camion,
-                type: "input",
-                showCancelButton: true,
-                closeOnConfirm: false,
-                inputPlaceholder: "Nueva Cubicación.",
-                confirmButtonText: "Si, Cambiar",
-                cancelButtonText: "No",
-                showLoaderOnConfirm: true
-            }, function (inputValue) {
-                if (inputValue === false) return false;
-                if (inputValue === "") {
-                    swal.showInputError("¡Escriba la nueva Cubicación!");
-                    return false;
-                }if (!$.isNumeric(inputValue)) {
-                    swal.showInputError("¡Por favor introduzca sólo números!");
-                    return false;
-                }
-                $.ajax({
-                    url: App.host + '/viajes/' + detalle.id,
-                    type: 'POST',
-                    data: {
-                        _method: 'PATCH',
-                        cubicacion: inputValue,
-                        tipo: 'cubicacion',
-                        id_conciliacion: _this.conciliacion.id
-                    },
-                    success: function success(response) {
-                        if (response.status_code = 200) {
-                            _this.fetchConciliacion();
-                            swal({
-                                type: 'success',
-                                title: '¡Hecho!',
-                                text: 'Cubicacion cambiada correctamente',
-                                showCancelButton: false,
-                                confirmButtonText: '' + 'OK',
-                                closeOnConfirm: true
-                            });
-                        }
-                    },
-                    error: function error(_error6) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error6.responseText)
-                        });
-                        _this.fetchConciliacion();
-                    }
-                });
-            });
-        },
-
         eliminar_detalle: function eliminar_detalle(idconciliacion_detalle) {
             var _this = this;
             var url = App.host + '/conciliacion/suministro/' + this.conciliacion.id + '/detalles/' + idconciliacion_detalle;
@@ -52000,18 +51944,18 @@ Vue.component('conciliaciones-suministro-edit', {
                     _this.conciliacion.volumen_pagado = response.volumen_pagado;
                     _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
                 },
-                error: function error(_error7) {
-                    if (_error7.status == 422) {
+                error: function error(_error6) {
+                    if (_error6.status == 422) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error7.responseJSON)
+                            text: App.errorsToString(_error6.responseJSON)
                         });
-                    } else if (_error7.status == 500) {
+                    } else if (_error6.status == 500) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error7.responseText)
+                            text: App.errorsToString(_error6.responseText)
                         });
                         _this.fetchConciliacion();
                     }

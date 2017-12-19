@@ -40,12 +40,7 @@
                             <input type="text" name="folio" class="form-control">
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="importe_pagado">Importe Pagado*: </label>
-                            <input type="text" name="importe_pagado" class="form-control">
-                        </div>
-                    </div>
+
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="volumen_pagado">Volumen Pagado*: </label>

@@ -9,14 +9,14 @@ class InicioViajeTransformer extends AbstractTransformer
 {
 
     public function transformModel(Model $viaje) {
-        dd("aqui");
         $output = [
-            'id'                => $viaje->IdInicioViaje,
-            'timestamp_llegada' => $viaje->FechaSalida.' ('.$viaje->HoraSalida.')',
-            'cubicacion_camion' => $viaje->CubicacionCamion,
+            'id'                => $viaje->IdInicioViajes,
+            'timestamp_llegada' => $viaje->Fecha,
+            'cubicacion_camion' => $viaje->volumen,
+            'folioMina'         => $viaje->folioMina,
+            'folioSeg'          => $viaje->folioSeguimiento,
             'camion'            => $viaje->camion->Economico,
             'material'          => $viaje->material->Descripcion,
-            'importe'           => number_format($viaje->Importe, 2, '.', ','),
             'code'              => $viaje->code,
             'estatus'           => 0
         ];

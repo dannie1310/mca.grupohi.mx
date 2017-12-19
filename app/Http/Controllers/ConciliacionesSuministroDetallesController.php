@@ -7,6 +7,8 @@ use App\Models\ConciliacionSuministro\ConciliacionSuministro;
 use App\Models\ConciliacionSuministro\ConciliacionSuministroDetalle;
 use App\Models\Transformers\ConciliacionSuministroTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -128,7 +130,7 @@ class ConciliacionesSuministroDetallesController extends Controller
                 throw new \Exception("No se puede cancelar el viaje ya que el estado actual de la conciliación es " . $conciliacion->estado_str);
             }
 
-            DB::connection('sca')->table('conciliacion_detalle_cancelacion')->insertGetId([
+            DB::connection('sca')->table('conciliacion_suministro_detalle_cancelacion')->insertGetId([
                 'idconciliaciondetalle'  => $id_detalle,
                 'motivo'                 => $request->get('motivo'),
                 'fecha_hora_cancelacion' => Carbon::now()->toDateTimeString(),

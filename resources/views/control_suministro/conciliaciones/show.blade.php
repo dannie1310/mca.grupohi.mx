@@ -30,12 +30,6 @@
                             @endif
                             <strong>Volúmen Pagado: </strong>{{ $conciliacion->volumen_pagado_f }} m<sup>3</sup><br>
                         @endif
-                        @if($conciliacion->fecha_conciliacion->format("Ymd")<=20170409)
-                            @if($conciliacion->ImportePagado>$conciliacion->importe)
-                                <span class="label label-danger pull-right">Importe pagado mayor a importe conciliado</span>
-                            @endif
-                            <strong>Importe Pagado: </strong>$ {{ $conciliacion->importe_pagado_f }}<br>
-                        @endif
                         <hr>
                         <strong>Rango de Fechas: </strong>{{ $conciliacion->rango }}<br>
                         <strong>Empresa: </strong>{{ $conciliacion->empresa->razonSocial }}<br>
@@ -44,7 +38,6 @@
                         <strong>Número de Viajes: </strong>{{ count($conciliacion->conciliacionSuministroDetalles->where('estado', 1)) }}<br>
                         <hr>
                         <strong>Volúmen Conciliado: </strong>{{ $conciliacion->volumen_f }} m<sup>3</sup><br>
-                        <strong>Importe Conciliado: </strong>$ {{ $conciliacion->importe_f }}<br>
                     </div>
                 </div>
             </div>
@@ -54,7 +47,6 @@
                         DETALLES DE VIAJES MANUALES
                     </div>
                     <div class="panel-body">
-                        <strong>Importe de viajes manuales: </strong>$ {{ $conciliacion->importe_viajes_manuales_f . ' (' . $conciliacion->porcentaje_importe_viajes_manuales . ' %)'  }} <br>
                         <strong>Volúmen de viajes manuales: </strong>{{ $conciliacion->volumen_viajes_manuales_f }}  m<sup>3</sup>  ( {{ $conciliacion->porcentaje_volumen_viajes_manuales}} %)<br>
                     </div>
                 </div>
@@ -113,7 +105,6 @@
                                     <th style="text-align: center">Fecha y Hora de Llegada</th>
                                     <th style="text-align: center">Material</th>
                                     <th style="text-align: center">Cubicación</th>
-                                    <th style="text-align: center">Importe</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -125,7 +116,6 @@
                                         <td>{{ $viaje->FechaLlegada.' ('.$viaje->HoraLlegada.')' }}</td>
                                         <td>{{ $viaje->material->Descripcion }}</td>
                                         <td style="text-align: right">{{ $viaje->CubicacionCamion }} m<sup>3</sup></td>
-                                        <td style="text-align: right">$ {{ number_format($viaje->Importe, 2, '.', ',') }}</td>
                                     </tr>
                                 @endforeach
                                 <tr>
@@ -133,7 +123,6 @@
                                         <strong>TOTAL VIAJES MANUALES</strong>
                                     </td>
                                     <td style="text-align: right"><strong>{{ $conciliacion->volumen_viajes_manuales_f }} m<sup>3</sup></strong></td>
-                                    <td style="text-align: right"><strong>$ {{ $conciliacion->importe_viajes_manuales_f }}</strong></td>
                                 </tr>
                                 @endif
 
@@ -152,7 +141,6 @@
                                         <th style="text-align: center">Fecha y Hora de Llegada</th>
                                         <th style="text-align: center">Material</th>
                                         <th style="text-align: center">Cubicación</th>
-                                        <th style="text-align: center">Importe</th>
                                     </tr>
                                     @foreach($conciliacion->viajes_moviles() as $viaje)
                                         <tr>
@@ -162,7 +150,6 @@
                                             <td>{{ $viaje->FechaLlegada.' ('.$viaje->HoraLlegada.')' }}</td>
                                             <td>{{ $viaje->material->Descripcion }}</td>
                                             <td style="text-align: right">{{ $viaje->CubicacionCamion }} m<sup>3</sup></td>
-                                            <td style="text-align: right">$ {{ number_format($viaje->Importe, 2, '.', ',') }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -170,14 +157,12 @@
                                             <strong>TOTAL VIAJES MÓVILES</strong>
                                         </td>
                                         <td style="text-align: right"><strong>{{ $conciliacion->volumen_viajes_moviles_f }} m<sup>3</sup></strong></td>
-                                        <td style="text-align: right"><strong>$ {{ $conciliacion->importe_viajes_moviles_f }}</strong></td>
                                     </tr>
                                 @endif
                                 <tr><td colspan="7"></td> </tr>
                                 <tr>
                                     <td colspan="5"><strong>TOTAL</strong></td>
                                     <td style="text-align: right"><strong>{{ $conciliacion->volumen_f }} m<sup>3</sup></strong></td>
-                                    <td style="text-align: right"><strong>$ {{ $conciliacion->importe_f }}</strong></td>
                                 </tr>
                                 </tbody>
                         </table>
@@ -196,7 +181,6 @@
                                         <th style="text-align: center">Fecha y Hora de Llegada</th>
                                         <th style="text-align: center">Material</th>
                                         <th style="text-align: center">Cubicación</th>
-                                        <th style="text-align: center">Importe</th>
                                         <th style="text-align: center">Fecha Cancelación</th>
                                         <th style="text-align: center">Persona que Canceló</th>
                                         <th style="text-align: center">Motivo de Cancelación</th>
@@ -210,7 +194,6 @@
                                             <td>{{ $detalle->viaje_neto->FechaLlegada.' ('.$detalle->viaje_neto->HoraLlegada.')' }}</td>
                                             <td>{{ $detalle->viaje_neto->material }}</td>
                                             <td style="text-align: right">{{ $detalle->viaje_neto->CubicacionCamion }} m<sup>3</sup></td>
-                                            <td style="text-align: right">$ {{ number_format($detalle->viaje_neto->Importe, 2, '.', ',') }}</td>
                                             <td>{{ $detalle->cancelacion->timestamp_cancelacion }}</td>
                                             <td>{{ App\User::find($detalle->cancelacion->idcancelo)->present()->nombreCompleto }}</td>
                                             <td>{{ $detalle->cancelacion->motivo }}</td>

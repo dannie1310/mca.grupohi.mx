@@ -51,14 +51,10 @@ class ConciliacionSuministroTransformer extends AbstractTransformer
         $output = [
             'id' => $conciliacion->idconciliacion,
             'num_viajes' => $conciliacion->conciliacionSuministroDetalles->where('estado', '=', 1)->count(),
-            'importe' => $conciliacion->importe_f,
             'volumen' => $conciliacion->volumen_f,
-            'importe_sf' => $conciliacion->importe,
             'volumen_sf' => $conciliacion->volumen,
-            'importe_pagado' => $conciliacion->importe_pagado_f,
             'volumen_pagado' => $conciliacion->volumen_pagado_f,
             'es_historico' => ($conciliacion->es_historico) ? 1 : 0,
-            'importe_pagado_sf' => $conciliacion->ImportePagado,
             'volumen_pagado_sf' => $conciliacion->VolumenPagado,
 
             'detalles' => ConciliacionSuministroDetalleTransformer::transform(ConciliacionSuministroDetalle::where('idconciliacion', $conciliacion->idconciliacion)->get()),
@@ -75,11 +71,8 @@ class ConciliacionSuministroTransformer extends AbstractTransformer
             'fecha' => $conciliacion->fecha_conciliacion->format("d-m-Y"),
             'folio' => $conciliacion->Folio,
             'rango' => $conciliacion->rango,
-            'importe_viajes_manuales' => $conciliacion->importe_viajes_manuales_f,
             'volumen_viajes_manuales' => $conciliacion->volumen_viajes_manuales_f,
-            'porcentaje_importe_viajes_manuales' => $conciliacion->porcentaje_importe_viajes_manuales,
             'porcentaje_volumen_viajes_manuales' => $conciliacion->porcentaje_volumen_viajes_manuales,
-            'importe_viajes_moviles' => $conciliacion->importe_viajes_moviles_f,
             'volumen_viajes_moviles' => $conciliacion->volumen_viajes_moviles_f,
             'duplicados' => $duplicados
         ];

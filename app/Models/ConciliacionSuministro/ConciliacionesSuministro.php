@@ -48,7 +48,7 @@ class ConciliacionesSuministro
             }
         }
         $detalles = ConciliacionSuministroDetalleTransformer::transform(ConciliacionSuministroDetalle::where('idconciliacion', '=', $this->conciliacion->idconciliacion)->get());
-        $detalles_nc = ConciliacionSuministroDetalleNoConciliadoTransformer::transform(ConciliacionSumministroDetalleNoConciliado::where('idconciliacion', '=', $this->conciliacion->idconciliacion)->get());
+        $detalles_nc = ConciliacionSuministroDetalleNoConciliadoTransformer::transform(ConciliacionSuministroDetalleNoConciliado::where('idconciliacion', '=', $this->conciliacion->idconciliacion)->get());
 
         return [
             'status_code' => 201,
@@ -541,12 +541,12 @@ class ConciliacionesSuministro
             $viaje_pendiente_conciliar =  InicioViaje::porConciliar()->where('inicio_viajes.IdInicioViajes', '=', $viaje_neto->IdViaje)->first();
 
         }else if($viaje){
-            $viaje_neto = $viaje->viajeNeto;
+            $viaje_neto = $viaje->inicio_camion;
 
             $viaje_conflicto_pagable = $viaje_neto->conflicto_pagable;
-            $viaje_rechazado = $viaje->viajeNeto->viaje_rechazado;
+            $viaje_rechazado = $viaje->inicio_camion->viaje_rechazado;
             $viaje_validado = $viaje;
-            $viaje_pendiente_conciliar =  InicioViaje::porConciliar()->where('inicio_viajes.IdIncioViajes', '=', $viaje->IdViaje)->first();
+            $viaje_pendiente_conciliar =  InicioViaje::porConciliar()->where('inicio_viajes.IdInicioViajes', '=', $viaje->IdInicioViajes)->first();
             // dd($viaje_neto,$viaje_validado,$viaje_pendiente_conciliar);
         }
         $id_conciliacion = $this->conciliacion->idconciliacion;

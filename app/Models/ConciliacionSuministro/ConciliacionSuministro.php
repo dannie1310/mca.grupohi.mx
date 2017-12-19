@@ -564,11 +564,10 @@ class ConciliacionSuministro extends Model
         DB::connection('sca')->beginTransaction();
 
         try {
-            if ($this->estado != 0 && ($this->ImportePagado>0 || $this->VolumenPagado>0)) {
+            if ($this->estado != 0 && ($this->VolumenPagado>0)) {
                 throw new \Exception("No se puede cambiar el detalle de la conciliación, su estatus es: " . $this->estado_str);
             }
 
-            $this->ImportePagado = $importe_pagado;
             $this->VolumenPagado = $volumen_pagado;
             $this->save();
 

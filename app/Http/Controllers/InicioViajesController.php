@@ -26,7 +26,38 @@ class InicioViajesController extends Controller
      */
     public function index(Request $request)
     {
+        if($request->ajax()) {
+            if ($request->get('tipo') == 'conciliar') {
+                $this->validate($request, [
+                    'IdCamion' => 'exists:sca.camiones,IdCamion',
+                    'FechaInicial' => 'required|date_format:"Y-m-d"',
+                    'FechaFinal' => 'required|date_format:"Y-m-d"',
+                ]);
 
+                if ($request->has('IdCamion')) {
+                    $viajes = InicioViaje::porConciliar()
+                        ->where('IdCamion', '=', $request->get('IdCamion'))
+                        ->whereBetween('Fecha', [$request->get('FechaInicial'), $request->get('FechaFinal')])
+                        ->orderBy('IdCamion', 'ASC')
+                        ->orderBy('Fecha', 'ASC')
+                        ->get();
+                } else {
+                    $viajes = InicioViaje::porConciliar()
+                        ->whereBetween('Fecha', [$request->get('FechaInicial'), $request->get('FechaFinal')])
+                        ->orderBy('IdCamion', 'ASC')
+                        ->orderBy('Fecha', 'ASC')
+                        ->get();
+                }
+                $filter = $viajes->filter(function ($viaje) {
+                    return $viaje->disponible();
+                });
+                $data = InicioViajeTransformer::transform($filter);
+            }
+            return response()->json([
+                'status_code' => 200,
+                'data' => $data
+            ]);
+        }
     }
 
     /**

@@ -53,8 +53,6 @@
                 <th style="text-align: center">Número de Viajes</th>
                 <th style="text-align: center">Volumen Conciliado</th>
                 <th style="text-align: center">Volumen Pagado</th>
-                <th style="text-align: center">Importe Cociliado</th>
-                <th style="text-align: center">Importe Pagado</th>
                 <th style="text-align: center">Registró</th>
                 <th style="text-align: center">Revisó</th>
                 <th style="text-align: center">Aprobó</th>
@@ -99,27 +97,6 @@
 
                         @endif
                     </td>
-                    <td style="text-align: right">{{$conciliacion->importe_f}}</td>
-                    <td style="text-align: right">
-                        @if($conciliacion->importe_pagado_alert == "Pendiente")
-                            <h5>
-                 <span class="label label-warning">
-                     {{$conciliacion->importe_pagado_alert}}
-                 </span>
-                            </h5>
-                        @elseif(($conciliacion->ImportePagado-$conciliacion->importe)>0.1)
-                            <h5>
-                 <span class="label label-danger">
-                     {{$conciliacion->importe_pagado_alert}}
-                 </span>
-                            </h5>
-                        @else
-                            {{$conciliacion->importe_pagado_alert}}
-
-                        @endif
-
-                    </td>
-
                     <td>{{$conciliacion->registro }}<br>
                         {{$conciliacion->fecha_hora_registro}}
                     </td>

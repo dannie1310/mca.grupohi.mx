@@ -57,7 +57,6 @@ class InicioViaje extends Model
     public function inicio_camion() {
         return $this->belongsTo(InicioCamion::class, 'IdInicioCamion');
     }
-
     public function scopePorConciliar($query) {
         return $query->leftJoin('conciliacion_suministro_detalle', 'inicio_viajes.IdInicioViajes', '=', 'conciliacion_suministro_detalle.idviaje')
             ->where(function($query){
@@ -74,6 +73,7 @@ class InicioViaje extends Model
             });
     }
     public function disponible() {
+
         foreach ($this->conciliacionDetalles as $conciliacionDetalle) {
             if ($conciliacionDetalle->estado == 1) {
                 return false;
@@ -81,4 +81,6 @@ class InicioViaje extends Model
         }
         return true;
     }
+
+
 }

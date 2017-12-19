@@ -146,14 +146,11 @@
                                    <strong>Folio: </strong>@{{ conciliacion.folio }}<br>
                                    @if (Auth::user()->hasRole('conciliacion_historico'))
                                        <button v-if="conciliacion.estado == 0 && conciliacion.es_historico" data-toggle="modal" data-target="#detalles_conciliacion" class="pull-right btn btn-xs btn-primary"><i class="fa fa-edit"></i></button>
-                                       <button v-if="conciliacion.estado != 0 && !(conciliacion.volumen_pagado_sf >0) && !(conciliacion.importe_pagado_sf > 0)" data-toggle="modal" data-target="#detalles_conciliacion" class="pull-right btn btn-xs btn-primary"><i class="fa fa-edit"></i></button>
+                                       <button v-if="conciliacion.estado != 0 && !(conciliacion.volumen_pagado_sf >0)" data-toggle="modal" data-target="#detalles_conciliacion" class="pull-right btn btn-xs btn-primary"><i class="fa fa-edit"></i></button>
                                    @endif
                                    <span  v-if="conciliacion.es_historico==1">
                                    <span v-if="conciliacion.volumen_sf<conciliacion.volumen_pagado_sf" class="label label-danger pull-right">Volumen pagado mayor a volumen conciliado</span>
                                    <strong>Volúmen Pagado: </strong>@{{ conciliacion.volumen_pagado }} m<sup>3</sup><br>
-
-                                   <span v-if="conciliacion.importe_sf<conciliacion.importe_pagado_sf" class="label label-danger pull-right">Importe pagado mayor a importe conciliado</span>
-                                   <strong >Importe Pagado: </strong>$ @{{ conciliacion.importe_pagado }}<br>
                                    </span>
                                    <hr>
                                    <strong>Rango de Fechas: </strong>@{{ conciliacion.rango }}<br>
@@ -162,18 +159,6 @@
                                    <strong>Número de Viajes: </strong>@{{ conciliados ? conciliados.length : 0 }}<br>
                                    <hr>
                                    <strong>Volúmen Conciliado: </strong>@{{ conciliacion.volumen }} m<sup>3</sup><br>
-                                   <strong>Importe Conciliado: </strong>$ @{{ conciliacion.importe }}<br>
-                               </div>
-                           </div>
-                       </div>
-                       <div class="col-md-6">
-                           <div class="panel panel-default">
-                               <div class="panel panel-heading">
-                                   DETALLES DE VIAJES MANUALES
-                               </div>
-                               <div class="panel-body">
-                                   <strong>Importe de viajes manuales: </strong>$ @{{ conciliacion.importe_viajes_manuales }} (@{{ conciliacion.porcentaje_importe_viajes_manuales }}%)<br>
-                                   <strong>Volúmen de viajes manuales: </strong>@{{ conciliacion.volumen_viajes_manuales }} m<sup>3</sup> (@{{ conciliacion.porcentaje_volumen_viajes_manuales }}%)<br>
                                </div>
                            </div>
                        </div>
@@ -231,7 +216,6 @@
                                    <th style="text-align: center">Folio Mina</th>
                                    <th style="text-align: center">Folio Seguimiento</th>
                                    <th style="text-align: center">Volumen</th>
-                                   <th style="text-align: center">Importe</th>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                        <th style="text-align: center" v-if="conciliacion.estado == 0" style="width: 30px"></th>
                                    @endif
@@ -248,7 +232,6 @@
                                    <td>@{{ detalle.folioMina }}</td>
                                    <td>@{{ detalle.folioSeg }}</td>
                                    <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup> </td>
-                                   <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                        <td v-if="conciliacion.estado == 0">
                                            <button class="btn btn-xs btn-danger" @click="eliminar_detalle(detalle.idconciliacion_detalle)"><i class="fa fa-close"></i></button>
@@ -260,7 +243,6 @@
                                        <strong>TOTAL VIAJES MANUALES</strong>
                                    </td>
                                    <td style="text-align: right"><strong>@{{ conciliacion.volumen_viajes_manuales }} m<sup>3</sup></strong></td>
-                                   <td style="text-align: right"><strong>$ @{{ conciliacion.importe_viajes_manuales }}</strong></td>
                                </tr>
 
                                <!-- VIAJES MOVILES-->
@@ -279,7 +261,6 @@
                                    <th style="text-align: center">Folio Mina</th>
                                    <th style="text-align: center">Folio Seguimiento</th>
                                    <th style="text-align: center">Volumen</th>
-                                   <th style="text-align: center">Importe</th>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                        <th v-if="conciliacion.estado == 0" style="width: 30px"></th>
                                    @endif
@@ -293,7 +274,6 @@
                                    <td>@{{ detalle.folioMina }}</td>
                                    <td>@{{ detalle.folioSeg }}</td>
                                    <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup></td>
-                                   <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                        <td v-if="conciliacion.estado == 0">
                                            <button class="btn btn-xs btn-danger" @click="eliminar_detalle(detalle.idconciliacion_detalle)"><i class="fa fa-close"></i></button>
@@ -305,13 +285,11 @@
                                        <strong>TOTAL VIAJES MÓVILES</strong>
                                    </td>
                                    <td style="text-align: right"><strong>@{{ conciliacion.volumen_viajes_moviles }} m<sup>3</sup></strong></td>
-                                   <td style="text-align: right"><strong>$ @{{ conciliacion.importe_viajes_moviles }}</strong></td>
                                </tr>
                                <tr><td v-bind:colspan="conciliacion.estado == 0 ? '8' : '7'"></td> </tr>
                            <tr>
                                <td colspan="5"><strong>TOTAL</strong></td>
                                <td style="text-align: right"><strong>@{{ conciliacion.volumen }} m<sup>3</sup></strong></td>
-                               <td style="text-align: right"><strong>$ @{{ conciliacion.importe }}</strong></td>
                            </tr>
                            </tbody>
                        </table>
@@ -327,7 +305,6 @@
                                <th style="text-align: center">Folio Mina</th>
                                <th style="text-align: center">Folio Seguimiento</th>
                                <th style="text-align: center">Volumen</th>
-                               <th style="text-align: center">Importe</th>
                                <th style="text-align: center">Fecha Cancelación</th>
                                <th style="text-align: center">Persona que Canceló</th>
                                <th style="text-align: center">Motivo de Cancelación</th>
@@ -342,7 +319,6 @@
                                <td>@{{ detalle.folioMina }}</td>
                                <td>@{{ detalle.folioSeg }}</td>
                                <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup></td>
-                               <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                <td>@{{ detalle.cancelacion.timestamp }}</td>
                                <td>@{{ detalle.cancelacion.cancelo }}</td>
                                <td>@{{ detalle.cancelacion.motivo }}</td>
@@ -381,7 +357,7 @@
                            <h4 class="modal-title">Resultados de la Búsqueda</h4>
                        </div>
                        <div class="modal-body">
-                           {!! Form::open(['route' => ['conciliaciones.detalles.store', $conciliacion->idconciliacion], 'class' => 'form_registrar']) !!}
+                           {!! Form::open(['route' => ['conciliaciones.suministro.detalles.store', $conciliacion->idconciliacion], 'class' => 'form_registrar']) !!}
                            <span v-if="resultados.length">
                                <div class="table-responsive" style="max-height: 300px;">
                                    <input type="hidden" name="Tipo" value="2">
@@ -391,9 +367,10 @@
                                            <th>Agregar</th>
                                            <th>Fecha y Hora de Llegada</th>
                                            <th>Camión</th>
-                                           <th>Cubicación</th>
+                                           <th>Volumen</th>
                                            <th>Material</th>
-                                           <th>Importe</th>
+                                           <th>Folio Mina</th>
+                                           <th>Folio Seguimiento</th>
                                            <th>Ticket (Código)</th>
                                        </tr>
                                        </thead>
@@ -406,7 +383,8 @@
                                            <td>@{{ viaje.camion }}</td>
                                            <td style="text-align: right">@{{ viaje.cubicacion_camion }}</td>
                                            <td>@{{ viaje.material }}</td>
-                                           <td style="text-align: right">@{{ viaje.importe }}</td>
+                                           <td>@{{ viaje.folioMina }}</td>
+                                            <td>@{{ viaje.folioSeg }}</td>
                                            <td>@{{ viaje.code }}</td>
                                        </tr>
                                        </tbody>
@@ -435,12 +413,6 @@
                      {!! Form::open(['route' => ['conciliaciones.update', $conciliacion->idconciliacion], 'method' => 'patch', 'class' => 'form_update']) !!}
                      <input type="hidden" value="detalles" name="action">
                      <div class="row">
-                         <div class="col-md-6">
-                             <div class="form-group">
-                                 <label>Importe Pagado:</label>
-                                 <input type="text" class="form-control input-sm" name="importe_pagado" v-bind:value="conciliacion.importe_pagado_sf">
-                             </div>
-                         </div>
                          <div class="col-md-6">
                              <div class="form-group">
                                  <label>Volumen Pagado:</label>

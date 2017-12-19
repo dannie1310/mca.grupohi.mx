@@ -18,7 +18,6 @@ class ConciliacionSuministroDetalleTransformer extends AbstractTransformer
             'cubicacion_camion'      => $detalle->viaje_neto->volumen,
             'camion'                 => $detalle->viaje_neto->camion->Economico,
             'material'               => $detalle->viaje_neto->material->Descripcion,
-            'importe'                => ($detalle->viaje_neto->viaje)?number_format($detalle->viaje_neto->viaje->Importe, 2, '.', ','):0.00,
             'code'                   => $detalle->viaje_neto->code,
             'folioMina'              => $detalle->viaje_neto->folioMina,
             'folioSeg'               => $detalle->viaje_neto->folioSeguimiento,
