@@ -85,8 +85,6 @@ class ConciliacionesSuministroController extends Controller
             'fecha_conciliacion' => $request->get('fecha'),
             'idsindicato'        => $request->get('idsindicato'),
             'idempresa'          => $request->get('idempresa'),
-            'ImportePagado'      => $request->get('importe_pagado'),
-            'VolumenPagado'      => $request->get('volumen_pagado'),
             'fecha_inicial'      => Carbon::now()->toDateString(),
             'fecha_final'        => Carbon::now()->toDateString(),
             'estado'             => 0,
@@ -99,28 +97,6 @@ class ConciliacionesSuministroController extends Controller
             'status_code' => 200,
             'conciliacion' => $conciliacion
         ], 200);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Request $request, $id) {
-
-        if($request->ajax()) {
-            $conciliacion = ConciliacionSuministroTransformer::transform(ConciliacionSuministro::find($id));
-
-            return response()->json([
-                'status_code' => 200,
-                'conciliacion' => $conciliacion
-            ]);
-        }
-        $conciliacion = ConciliacionSuministro::find($id);
-
-        return view('control_suministro.conciliaciones.show')
-            ->withConciliacion($conciliacion);
     }
 
     /**
@@ -145,7 +121,36 @@ class ConciliacionesSuministroController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if($request->ajax()) {
+            $conciliacion = ConciliacionSuministro::findOrFail($id);
+
+            if($request->get('action') == 'cerrar') {
+                $conciliacion->cerrar($id);
+            } else if ($request->get('action') == 'aprobar') {
+                $conciliacion->aprobar();
+            } else if($request->get('action') == 'detalles') {
+
+                $this->validate($request, [
+                    'importe_pagado' => 'required|numeric',
+                    'volumen_pagado' => 'required|numeric'
+                ]);
+
+                $conciliacion->cambiar_detalles($request->get('importe_pagado'), $request->get('volumen_pagado'));
+
+                return response()->json([
+                    'status_code' => 200,
+                    'importe_pagado_sf' => $conciliacion->ImportePagado,
+                    'volumen_pagado_sf' => $conciliacion->VolumenPagado,
+                    'volumen_pagado' => $conciliacion->volumen_pagado_f,
+                    'importe_pagado' => $conciliacion->importe_pagado_f,
+                ]);
+            }
+
+            return response()->json([
+                'status_code' => 200,
+                'success' => true
+            ], 200);
+        }
     }
 
     /**
@@ -154,8 +159,31 @@ class ConciliacionesSuministroController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $conciliacion = ConciliacionSuministro::findOrFail($id);
+        $conciliacion->cancelar($request);
+
+        return response()->json([
+            'success' => true,
+            'status_code' => 200
+        ], 200);
+    }
+
+    public function show(Request $request, $id) {
+
+        if($request->ajax()) {
+            $conciliacion = ConciliacionSuministroTransformer::transform(ConciliacionSuministro::find($id));
+
+            return response()->json([
+                'status_code' => 200,
+                'conciliacion' => $conciliacion
+            ]);
+        }
+
+        $conciliacion = ConciliacionSuministro::find($id);
+
+        return view('control_suministro.conciliaciones.show')
+            ->withConciliacion($conciliacion);
     }
 }

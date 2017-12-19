@@ -61,6 +61,13 @@ class InicioCamion extends Model
     public function conflicto_entre_viajes(){
         return $this->hasMany(ConflictoSuministro::class, "idinicio_camion", "id");
     }
+    public function viaje() {
+        return $this->hasOne(InicioViaje::class, 'IdInicioCamion');
+    }
+
+    public function viaje_rechazado() {
+        return $this->hasOne(InicioViajesRechazados::class, 'IdInicio');
+    }
     public static function scopeReporte($query)
     {
 

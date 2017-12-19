@@ -17,16 +17,16 @@ class ConciliacionSuministroTransformer extends AbstractTransformer
             COUNT(idinicioviaje) AS num,
             conciliacion_detalle.idconciliacion_detalle,
             conciliacion_detalle.idinicioviaje,
-            viajesnetos.Code,
+            viajesnetos.code,
             GROUP_CONCAT(conciliacion.idconciliacion)
         FROM
-            ((prod_sca_pista_aeropuerto_2.conciliacion_suministro_detalle conciliacion_detalle
-            INNER JOIN prod_sca_pista_aeropuerto_2.inicio_camion viajesnetos ON (conciliacion_detalle.idinicioviaje = viajesnetos.id)
+            ((conciliacion_suministro_detalle conciliacion_detalle
+            INNER JOIN inicio_camion viajesnetos ON (conciliacion_detalle.idinicioviaje = viajesnetos.id)
                 AND (viajesnetos.id = conciliacion_detalle.idinicioviaje))
-            INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion_suministro conciliacion ON (conciliacion_detalle.idconciliacion = conciliacion.idconciliacion)
+            INNER JOIN conciliacion_suministro conciliacion ON (conciliacion_detalle.idconciliacion = conciliacion.idconciliacion)
                 AND (conciliacion.idconciliacion = conciliacion_detalle.idconciliacion))
                 INNER JOIN
-            prod_sca_pista_aeropuerto_2.inicio_viajes viajes ON (viajes.IdInicioCamion = viajesnetos.id)
+            inicio_viajes viajes ON (viajes.IdInicioCamion = viajesnetos.id)
         WHERE
             conciliacion_detalle.estado = 1
                 AND conciliacion.idconciliacion = '{$conciliacion->idconciliacion}'
@@ -42,7 +42,7 @@ class ConciliacionSuministroTransformer extends AbstractTransformer
         foreach ($datos as $d) {
             $duplicados[$i] = [
                 'numduplicado' => $d->num,
-                'codeduplicado' => $d->Code
+                'codeduplicado' => $d->code
             ];
             $i++;
 

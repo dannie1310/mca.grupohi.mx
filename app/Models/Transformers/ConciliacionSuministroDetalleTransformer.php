@@ -13,13 +13,15 @@ class ConciliacionSuministroDetalleTransformer extends AbstractTransformer
 
         $output = [
             'idconciliacion_detalle' => $detalle->idconciliacion_detalle,
-            'id'                     => ($detalle->viaje_neto->viaje)?$detalle->viaje_neto->viaje->IdViaje:0,
-            'timestamp_llegada'      => $detalle->viaje_neto->FechaLlegada.' ('.$detalle->viaje_neto->HoraLlegada.')',
-            'cubicacion_camion'      => $detalle->viaje_neto->CubicacionCamion,
+            'id'                     => ($detalle->viaje_neto->id),
+            'timestamp_llegada'      => $detalle->viaje_neto->fecha_origen,
+            'cubicacion_camion'      => $detalle->viaje_neto->volumen,
             'camion'                 => $detalle->viaje_neto->camion->Economico,
             'material'               => $detalle->viaje_neto->material->Descripcion,
             'importe'                => ($detalle->viaje_neto->viaje)?number_format($detalle->viaje_neto->viaje->Importe, 2, '.', ','):0.00,
-            'code'                   => $detalle->viaje_neto->Code,
+            'code'                   => $detalle->viaje_neto->code,
+            'folioMina'              => $detalle->viaje_neto->folioMina,
+            'folioSeg'               => $detalle->viaje_neto->folioSeguimiento,
             'estado'                 => $detalle->estado,
             'cancelacion'            => $detalle->estado == 1 ? [] : [
                 'motivo' => $detalle->cancelacion->motivo,

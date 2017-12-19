@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ConciliacionSuministro\ConciliacionSuministroDetalle;
+use App\Models\InicioCamion;
 
 class InicioViaje extends Model
 {
@@ -50,7 +52,10 @@ class InicioViaje extends Model
         return $this->belongsTo(Material::class, 'IdMaterial');
     }
     public function conciliacionDetalles() {
-        return $this->hasMany(ConciliacionSuministroDetalle::class, 'idviaje','IdInicioViaje');
+        return $this->hasMany(ConciliacionSuministroDetalle::class, 'idviaje','IdInicioViajes');
+    }
+    public function inicio_camion() {
+        return $this->belongsTo(InicioCamion::class, 'IdInicioCamion');
     }
 
     public function scopePorConciliar($query) {

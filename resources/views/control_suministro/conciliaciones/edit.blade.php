@@ -65,9 +65,7 @@
                                    {!! Form::select('Tipo', [
                                    '' => '--SELECCIONE--',
                                    '1' => 'BÚSQUEDA POR CÓDIGO',
-                                   '2' => 'BÚSQUEDA AVANZADA',
-                                   '3' => 'CARGAR EXCEL',
-                                   '4' => 'CARGA EXCEL COMPLETA'
+                                   '2' => 'BÚSQUEDA AVANZADA'
                                     ], '1', ['v-model' => 'tipo', 'class' => 'form-control']) !!}
 
                                </div>
@@ -80,8 +78,7 @@
                                    {!! Form::select('Tipo', [
                                    '' => '--SELECCIONE--',
                                    '1' => 'BÚSQUEDA POR CÓDIGO',
-                                   '2' => 'BÚSQUEDA AVANZADA',
-                                   '3' => 'CARGAR EXCEL',
+                                   '2' => 'BÚSQUEDA AVANZADA'
                                     ], '1', ['v-model' => 'tipo', 'class' => 'form-control']) !!}
 
                                </div>
@@ -106,14 +103,6 @@
                                    <div class="form-group">
                                        <label>CAMIÓN</label>
                                        {!! Form::select('IdCamion', $camiones, null, ['class' => 'form-control', 'placeholder' => '--SELECCIONE--']) !!}
-                                   </div>
-                               </div>
-                           </span>
-                           <span v-show="tipo == '3' || tipo== '4'">
-                               <div class="col-md-6">
-                                   <div class="form-group">
-                                       <label>CARGAR EXCEL (*)</label>
-                                       <input v-fileinput type="file" name="excel" class="file-loading">
                                    </div>
                                </div>
                            </span>
@@ -239,7 +228,9 @@
                                    <th style="text-align: center">Registró</th>
                                    <th style="text-align: center">Fecha y Hora de Llegada</th>
                                    <th style="text-align: center">Material</th>
-                                   <th style="text-align: center">Cubicación</th>
+                                   <th style="text-align: center">Folio Mina</th>
+                                   <th style="text-align: center">Folio Seguimiento</th>
+                                   <th style="text-align: center">Volumen</th>
                                    <th style="text-align: center">Importe</th>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                        <th style="text-align: center" v-if="conciliacion.estado == 0" style="width: 30px"></th>
@@ -254,6 +245,8 @@
                                    <td>@{{ detalle.registro }}</td>
                                    <td>@{{ detalle.timestamp_llegada }}</td>
                                    <td>@{{ detalle.material }}</td>
+                                   <td>@{{ detalle.folioMina }}</td>
+                                   <td>@{{ detalle.folioSeg }}</td>
                                    <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup> </td>
                                    <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
@@ -283,7 +276,9 @@
                                    <th style="text-align: center">Registró</th>
                                    <th style="text-align: center">Fecha y Hora de Llegada</th>
                                    <th style="text-align: center">Material</th>
-                                   <th style="text-align: center">Cubicación</th>
+                                   <th style="text-align: center">Folio Mina</th>
+                                   <th style="text-align: center">Folio Seguimiento</th>
+                                   <th style="text-align: center">Volumen</th>
                                    <th style="text-align: center">Importe</th>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
                                        <th v-if="conciliacion.estado == 0" style="width: 30px"></th>
@@ -295,6 +290,8 @@
                                    <td>@{{ detalle.registro }}</td>
                                    <td>@{{ detalle.timestamp_llegada }}</td>
                                    <td>@{{ detalle.material }}</td>
+                                   <td>@{{ detalle.folioMina }}</td>
+                                   <td>@{{ detalle.folioSeg }}</td>
                                    <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup></td>
                                    <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                    @if(Auth::user()->can(['eliminar-viaje-conciliacion']))
@@ -327,7 +324,9 @@
                                <th style="text-align: center">Ticket (Código)</th>
                                <th style="text-align: center">Fecha y Hora de Llegada</th>
                                <th style="text-align: center">Material</th>
-                               <th style="text-align: center">Cubicación</th>
+                               <th style="text-align: center">Folio Mina</th>
+                               <th style="text-align: center">Folio Seguimiento</th>
+                               <th style="text-align: center">Volumen</th>
                                <th style="text-align: center">Importe</th>
                                <th style="text-align: center">Fecha Cancelación</th>
                                <th style="text-align: center">Persona que Canceló</th>
@@ -340,6 +339,8 @@
                                <td>@{{ detalle.code }}</td>
                                <td>@{{ detalle.timestamp_llegada }}</td>
                                <td>@{{ detalle.material }}</td>
+                               <td>@{{ detalle.folioMina }}</td>
+                               <td>@{{ detalle.folioSeg }}</td>
                                <td style="text-align: right">@{{ detalle.cubicacion_camion }} m<sup>3</sup></td>
                                <td style="text-align: right">$ @{{ detalle.importe }}</td>
                                <td>@{{ detalle.cancelacion.timestamp }}</td>

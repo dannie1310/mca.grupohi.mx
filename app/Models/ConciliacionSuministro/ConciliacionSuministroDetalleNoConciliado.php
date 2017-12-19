@@ -45,7 +45,7 @@ class ConciliacionSuministroDetalleNoConciliado extends Model
         }else{
 
             $preexistente = $this->conciliacion->ConciliacionDetallesNoConciliados->where('idmotivo',$this->idmotivo)
-                ->where('Code', $this->Code)
+                ->where('Code', $this->code)
                 ->where('idinicioviaje', $this->idinicioviaje)
                 ->where('detalle', $this->detalle)
                 ->first();

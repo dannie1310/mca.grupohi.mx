@@ -56,46 +56,16 @@ class ConciliacionesSuministroDetallesController extends Controller
      */
     public function store(Request $request, $id)
     {
-        if($request->get('Tipo') == '3') {
-            $conciliacion = ConciliacionSuministro::find($id);
-
-            $output = (new ConciliacionesSuministro($conciliacion))->cargarExcel($request->file('excel'));
-            //return response()->json($output);
-
-            Flash::success('<li><strong>VIAJES SUMINISTRO CONCILIADOS: </strong>' . $output['registros'] . '</li><li>' . '<strong>VIAJES NO CONCILIADOS: </strong>' . $output['registros_nc'] . '</li>');
-            return redirect()->back();
-        }else if($request->get('Tipo') == '4') {
-            if (auth()->user()->hasRole('conciliacion_historico')) {
-                $conciliacion = ConciliacionSuministro::find($id);
-                $fecha_conciliacion = $conciliacion->fecha_conciliacion;
-                $fecha_minima = Carbon::createFromFormat('Y-m-d', '2017-04-09');
-                if (!($fecha_minima->format("Ymd") >= $fecha_conciliacion->format("Ymd"))) {
-                    Flash::error("Esta concilación no puede ser procesada con la opción: Carga Excel Completa");
-                    return redirect()->back();
-                } else {
-
-                    $output = (new ConciliacionesSuministro($conciliacion))->cargarExcelProcesoCompleto($request->file('excel'));
-                    Flash::success('<li><strong>VIAJES CONCILIADOS: </strong>' . $output['registros'] . '</li><li>' . '<strong>VIAJES NO CONCILIADOS: </strong>' . $output['registros_nc'] . '</li>');
-                    return redirect()->back();
-                }
-            } else {
-                Flash::error('¡LO SENTIMOS, NO CUENTAS CON LOS PERMISOS NECESARIOS PARA REALIZAR LA OPERACIÓN SELECCIONADA!');
-                return redirect()->back();
-            }
-        }
-
         if($request->ajax()) {
             if ($request->get('Tipo') == '1') {
                 try {
                     $conciliacion = ConciliacionSuministro::find($id);
                     $output = (new ConciliacionesSuministro($conciliacion))->procesaCodigo($request->get('code'));
                     return response()->json($output);
-
                 } catch (\Exception $e) {
                     throw $e;
                 }
             } else if ($request->get('Tipo') == '2') {
-
                 $conciliacion = ConciliacionSuministro::find($id);
                 $output = (new ConciliacionesSuministro($conciliacion))->procesaArregloIds($request->get('idviaje', []));
                 return response()->json($output);

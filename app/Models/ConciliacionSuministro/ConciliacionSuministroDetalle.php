@@ -2,7 +2,9 @@
 
 namespace App\Models\ConciliacionSuministro;
 
-use App\Reportes\InicioViajes;
+use App\Models\InicioCamion;
+use App\Models\InicioViaje;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class ConciliacionSuministroDetalle extends Model
@@ -23,7 +25,7 @@ class ConciliacionSuministroDetalle extends Model
     ];
 
     public function viaje() {
-        return $this->belongsTo(InicioViajes::class, 'idviaje');
+        return $this->belongsTo(InicioViaje::class, 'idviaje');
     }
 
     public function viaje_neto() {
@@ -54,11 +56,13 @@ class ConciliacionSuministroDetalle extends Model
     }
 
     private function removerNoConciliados(){
-        $v = InicioCamion::find($this->idviaje_neto);
-        $no_concilados_coincidentes = $this->conciliacion->ConciliacionSuministroDetallesNoConciliados
-            ->where('Code',$v->Code);
-        foreach($no_concilados_coincidentes as $ncc){
-            $ncc->delete();
+        $v = InicioCamion::find($this->idinicioviaje);
+        if($this->conciliacion->ConciliacionSuministroDetalleNoConciliado !=null) {
+            $no_concilados_coincidentes = $this->conciliacion->ConciliacionSuministroDetalleNoConciliado
+                ->where('Code', $v->code);
+            foreach ($no_concilados_coincidentes as $ncc) {
+                $ncc->delete();
+            }
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Models\ConciliacionSuministro;
 
-use App\Reportes\InicioViajes;
+use App\Models\InicioViajes;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Empresa;
 use App\User;
@@ -11,9 +11,11 @@ use App\Presenters\ModelPresenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use App\Models\ConciliacionSuministro\ConciliacionSuministroDetalle;
 use Carbon\Carbon;
 use PhpParser\Node\Stmt\Return_;
 use App\Models\ConciliacionSuministro\ConciliacionDetalleNoConciliado;
+
 
 class ConciliacionSuministro extends Model
 {
@@ -327,18 +329,18 @@ class ConciliacionSuministro extends Model
                    group_concat(conciliacion_suministro.fecha_conciliacion),
                    inicio_viajes.Importe,
                    inicio_viajes.IdInicioViaje
-              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_suministro_detalle conciliacion_detalle
-                      INNER JOIN prod_sca_pista_aeropuerto_2.inicio_camion viajesnetos
+              FROM ((conciliacion_suministro_detalle conciliacion_detalle
+                      INNER JOIN inicio_camion viajesnetos
                          ON     (conciliacion_detalle.idviaje_neto =
                                     viajesnetos.IdViajeNeto)
                             AND (viajesnetos.IdViajeNeto =
                                     conciliacion_detalle.idviaje_neto))
-                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion_suministro conciliacion
+                     INNER JOIN conciliacion_suministro conciliacion
                         ON     (conciliacion_detalle.idconciliacion =
                                    conciliacion.idconciliacion)
                            AND (conciliacion.idconciliacion =
                                 conciliacion_detalle.idconciliacion))
-                   INNER JOIN prod_sca_pista_aeropuerto_2.inicio_viajes viajes
+                   INNER JOIN inicio_viajes viajes
                       ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
              WHERE     (conciliacion.fecha_conciliacion >= '2017-07-01 00:00:00')
                    AND conciliacion_detalle.estado = 1
@@ -491,11 +493,11 @@ class ConciliacionSuministro extends Model
     {
         if ($this->viajes()->count()) {
             $result = DB::connection('sca')->select(DB::raw("
-                SELECT min(v.FechaLlegada) as fecha_inicial FROM conciliacion_suministro c 
+                SELECT min(v.Fecha) as fecha_inicial FROM conciliacion_suministro c 
                 join conciliacion_suministro_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
-                join inicio_viajes v on (cd.idviaje = v.IdViaje)
+                join inicio_viajes v on (cd.idviaje = v.IdInicioViajes)
                 where c.idconciliacion = {$this->idconciliacion} "))[0]->fecha_inicial;
-            return Carbon::createFromFormat('Y-m-d', $result)->format('d-m-Y');
+            return $result;
         } else {
             return "";
         }
@@ -505,11 +507,11 @@ class ConciliacionSuministro extends Model
     {
         if ($this->viajes()->count()) {
             $result = DB::connection('sca')->select(DB::raw("
-                SELECT max(v.FechaLlegada) as fecha_final FROM conciliacion_suministro c 
+                SELECT max(v.Fecha) as fecha_final FROM conciliacion_suministro c 
                 join conciliacion_suministro_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
-                join inicio_viajes v on (cd.idinicioviaje = v.IdInicioViaje)
+                join inicio_viajes v on (cd.idviaje = v.IdInicioViajes)
                 where c.idconciliacion = {$this->idconciliacion} "))[0]->fecha_final;
-            return Carbon::createFromFormat('Y-m-d', $result)->format('d-m-Y');
+            return $result;
         } else {
             return "";
         }
