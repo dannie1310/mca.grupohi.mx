@@ -2,7 +2,7 @@
 
 namespace App\Models\ConciliacionSuministro;
 
-use App\Models\InicioViajes;
+use App\Models\InicioViaje;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Empresa;
 use App\User;
@@ -321,32 +321,28 @@ class ConciliacionSuministro extends Model
                 throw new \Exception("No se puede cerrar la conciliación ya que su estado actual es " . $this->estado_str);
             }
 
-            $repetidos="SELECT count(idinicioviaje) AS CALCULATED_COLUMN1,
-                   conciliacion_suministro_detalle.idconciliacion_detalle,
-                   conciliacion_suministro_detalle.idinicioviaje,
-                   inicio_camion.Code,
-                   group_concat(conciliacion_suministro.idconciliacion),
-                   group_concat(conciliacion_suministro.fecha_conciliacion),
-                   inicio_viajes.Importe,
-                   inicio_viajes.IdInicioViaje
-              FROM ((conciliacion_suministro_detalle conciliacion_detalle
-                      INNER JOIN inicio_camion viajesnetos
-                         ON     (conciliacion_detalle.idviaje_neto =
-                                    viajesnetos.IdViajeNeto)
-                            AND (viajesnetos.IdViajeNeto =
-                                    conciliacion_detalle.idviaje_neto))
-                     INNER JOIN conciliacion_suministro conciliacion
-                        ON     (conciliacion_detalle.idconciliacion =
-                                   conciliacion.idconciliacion)
-                           AND (conciliacion.idconciliacion =
-                                conciliacion_detalle.idconciliacion))
-                   INNER JOIN inicio_viajes viajes
-                      ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
-             WHERE     (conciliacion.fecha_conciliacion >= '2017-07-01 00:00:00')
-                   AND conciliacion_detalle.estado = 1
-                   AND conciliacion.idconciliacion = '{$id}'
-            GROUP BY conciliacion_detalle.idinicioviaje, viajesnetos.Code
-            HAVING count(idinicioviaje) > 1";
+            $repetidos="SELECT 
+                                COUNT(idinicioviaje) AS CALCULATED_COLUMN1,
+                                conciliacion_suministro_detalle.idconciliacion_detalle,
+                                conciliacion_suministro_detalle.idinicioviaje,
+                                inicio_camion.code,
+                                GROUP_CONCAT(conciliacion_suministro.idconciliacion),
+                                GROUP_CONCAT(conciliacion_suministro.fecha_conciliacion),
+                                inicio_viajes.IdInicioViajes
+                            FROM
+                                ((conciliacion_suministro_detalle
+                                INNER JOIN inicio_camion ON (conciliacion_suministro_detalle.idinicioviaje = inicio_camion.id)
+                                    AND (inicio_camion.id = conciliacion_suministro_detalle.idinicioviaje))
+                                INNER JOIN conciliacion_suministro ON (conciliacion_suministro_detalle.idconciliacion = conciliacion_suministro.idconciliacion)
+                                    AND (conciliacion_suministro.idconciliacion = conciliacion_suministro_detalle.idconciliacion))
+                                    INNER JOIN
+                                inicio_viajes ON (inicio_viajes.IdInicioCamion = inicio_camion.id)
+                            WHERE
+                                (conciliacion_suministro.fecha_conciliacion>= '2017-07-01 00:00:00')
+                                    AND conciliacion_suministro_detalle.estado = 1
+                                    AND conciliacion_suministro.idconciliacion = '{$id}'
+                            GROUP BY conciliacion_suministro_detalle.idinicioviaje , inicio_camion.code
+                            HAVING COUNT(idinicioviaje) > 1";
 
             $r = DB::connection('sca')->select(DB::raw($repetidos));
 
@@ -358,7 +354,7 @@ class ConciliacionSuministro extends Model
             $this->save();
 
             foreach ($this->viajes() as $v) {
-                $viaje = InicioViajes::find($v->IdInicioViaje);
+                $viaje = InicioViaje::find($v->IdInicioViajes);
                 if($r!=null){
                     foreach ($r as $item){
                         if($v->code == $item->Code){

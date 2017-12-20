@@ -470,6 +470,11 @@ Breadcrumbs::register('conciliaciones.suministro.show', function($breadcrumbs, $
     $breadcrumbs->push($conciliacion->idconciliacion, route('conciliaciones.suministro.show', $conciliacion));
 });
 
+Breadcrumbs::register('conciliaciones.suministro.destroy', function($breadcrumbs, $conciliacion) {
+    $breadcrumbs->parent('conciliaciones.suministro.destroy');
+    $breadcrumbs->push($conciliacion->idconciliacion, route('conciliaciones.suministro.destroy', $conciliacion));
+});
+
 Breadcrumbs::register('conciliaciones.suministro.create', function($breadcrumbs) {
     $breadcrumbs->parent('conciliaciones.suministro.index');
     $breadcrumbs->push('NUEVA CONCILIACIÓN SUMINISTRO', route('conciliaciones.suministro.create'));

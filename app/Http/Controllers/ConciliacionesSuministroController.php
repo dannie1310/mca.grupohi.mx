@@ -161,6 +161,7 @@ class ConciliacionesSuministroController extends Controller
      */
     public function destroy(Request $request, $id)
     {
+dd('hko');
         $conciliacion = ConciliacionSuministro::findOrFail($id);
         $conciliacion->cancelar($request);
 

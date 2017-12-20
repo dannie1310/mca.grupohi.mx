@@ -22,21 +22,21 @@
                 @endif
                 <span v-if="conciliacion.estado == 0">
                     @if (Auth::user()->can(['cancelar-conciliacion']))
-                        <a href="{{ route('conciliaciones.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
+                        <a href="{{ route('conciliaciones.suministro.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
                     @endif
                     @if (Auth::user()->can(['cerrar-conciliacion']))
-                        <a href="{{ route('conciliaciones.update', $conciliacion->idconciliacion) }}" class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="cerrar"><i class="fa fa-check"></i> CERRAR</a>
+                        <a href="{{ route('conciliaciones.suministro.update', $conciliacion->idconciliacion) }}" class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="cerrar"><i class="fa fa-check"></i> CERRAR</a>
                     @endif
                 </span>
                 <span v-else-if="conciliacion.estado == 1">
                     @if (Auth::user()->can(['reabrir-conciliacion']))
-                        <a href="{{ route('conciliaciones.edit', [$conciliacion, 'action' => 'reabrir']) }}" class="btn btn-default btn-sm pull-right" style="margin-right: 5px" @click="reabrir"><i class="fa fa-undo"></i> RE-ABRIR</a>
+                        <a href="{{ route('conciliaciones.suministro.edit', [$conciliacion, 'action' => 'reabrir']) }}" class="btn btn-default btn-sm pull-right" style="margin-right: 5px" @click="reabrir"><i class="fa fa-undo"></i> RE-ABRIR</a>
                     @endif
                     @if (Auth::user()->can(['cancelar-conciliacion']))
-                        <a href="{{ route('conciliaciones.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
+                        <a href="{{ route('conciliaciones.suministro.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
                     @endif
                     @if (Auth::user()->can(['aprobar-conciliacion']))
-                        <a href="{{ route('conciliaciones.update', $conciliacion->idconciliacion) }}" class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="aprobar"><i class="fa fa-check"></i> APROBAR</a>
+                        <a href="{{ route('conciliaciones.suministro.update', $conciliacion->idconciliacion) }}" class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="aprobar"><i class="fa fa-check"></i> APROBAR</a>
                     @endif
                 </span>
                 <span v-else-if="conciliacion.estado == 2">
