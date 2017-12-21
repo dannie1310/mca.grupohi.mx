@@ -34,7 +34,6 @@ class ConciliacionesSuministroController extends Controller
     public function index(Request $request)
     {
         $conciliaciones = $this->buscar($request->get('buscar'), 15);
-
         return view('control_suministro.conciliaciones.index')
             ->withContador(1)
             ->withConciliaciones($conciliaciones);
@@ -161,7 +160,6 @@ class ConciliacionesSuministroController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-dd('hko');
         $conciliacion = ConciliacionSuministro::findOrFail($id);
         $conciliacion->cancelar($request);
 

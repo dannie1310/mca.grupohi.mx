@@ -52,7 +52,6 @@
                 <th style="text-align: center">Empresa</th>
                 <th style="text-align: center">Número de Viajes</th>
                 <th style="text-align: center">Volumen Conciliado</th>
-                <th style="text-align: center">Volumen Pagado</th>
                 <th style="text-align: center">Registró</th>
                 <th style="text-align: center">Revisó</th>
                 <th style="text-align: center">Aprobó</th>
@@ -78,25 +77,6 @@
                     <td>{{$conciliacion->empresa}}</td>
                     <td style="text-align: right">{{$conciliacion->conciliacionSuministroDetalles->where('estado', 1)->count()}}</td>
                     <td style="text-align: right">{{$conciliacion->volumen_f}}</td>
-
-                    <td style="text-align: right">
-                        @if($conciliacion->volumen_pagado_alert == "Pendiente")
-                            <h5>
-                 <span class="label label-warning">
-                     {{$conciliacion->volumen_pagado_alert}}
-                 </span>
-                            </h5>
-                        @elseif(($conciliacion->VolumenPagado-$conciliacion->volumen)>0.1)
-                            <h5>
-                 <span class="label label-danger">
-                     {{$conciliacion->volumen_pagado_alert}}
-                 </span>
-                            </h5>
-                        @else
-                            {{$conciliacion->volumen_pagado_alert}}
-
-                        @endif
-                    </td>
                     <td>{{$conciliacion->registro }}<br>
                         {{$conciliacion->fecha_hora_registro}}
                     </td>

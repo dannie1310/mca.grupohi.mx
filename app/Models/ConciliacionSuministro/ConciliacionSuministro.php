@@ -253,6 +253,19 @@ class ConciliacionSuministro extends Model
         return number_format($this->VolumenPagado, 2, ".",",");
     }
 
+    public function getVolumenViajesMovilesFAttribute() {
+        return number_format(($this->volumen - $this->volumen_viajes_manuales), 2, ".", ",");
+    }
+
+    public function getPorcentajeVolumenViajesManualesAttribute()
+    {
+        if ($this->volumen != 0) {
+            return round(($this->volumen_viajes_manuales * 100) / $this->volumen, 2);
+        } else {
+            return 0;
+        }
+    }
+
     public function usuario()
     {
         return $this->belongsTo(User::class, "IdRegistro");
@@ -534,23 +547,10 @@ class ConciliacionSuministro extends Model
         return number_format(($this->importe - $this->importe_viajes_manuales), 2, ".", ",");
     }
 
-    public function getVolumenViajesMovilesFAttribute() {
-        return number_format(($this->volumen - $this->volumen_viajes_manuales), 2, ".", ",");
-    }
-
     public function getPorcentajeImporteViajesManualesAttribute()
     {
         if ($this->importe != 0) {
             return round(($this->importe_viajes_manuales * 100) / $this->importe, 2);
-        } else {
-            return 0;
-        }
-    }
-
-    public function getPorcentajeVolumenViajesManualesAttribute()
-    {
-        if ($this->volumen != 0) {
-            return round(($this->volumen_viajes_manuales * 100) / $this->volumen, 2);
         } else {
             return 0;
         }
