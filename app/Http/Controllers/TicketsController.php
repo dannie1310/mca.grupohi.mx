@@ -6,6 +6,7 @@ use App\Facades\Context;
 use App\Models\Proyecto;
 use App\Models\ViajeNeto;
 use App\Reportes\ViajesNetos;
+use Faker\Provider\File;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\Request;
 use DB;
@@ -66,8 +67,7 @@ class TicketsController extends Controller
         $dat = $request->input('data');
 
         $desc = $this->desencripta($dat);
-
-
+//dd($desc);
         $exp = explode("|", $desc);
         if(count($exp)==13) {
 
@@ -149,10 +149,18 @@ class TicketsController extends Controller
                 $fechaL = $d->format("Y-m-d");
                 $horaL = $d->format("H:i:s");
 
-               // dd("INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].",5)");
+               $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].", );";
 
+                $archivo=fopen('C:\Users\LERDES1\Desktop\datos.txt',"a") or
+                die("No se pudo crear el archivo");
+                fputs($archivo,$insert);
+                fputs($archivo,"\n");
+                fputs($archivo,"--------------------");
+                fputs($archivo,"\n");
+                fclose($archivo);
+                return response()->json(['error' => 'Esté Ticket: OK.'], 400);
 
-                return response()->json([
+                /*return response()->json([
                     'proyecto' => $resp->descripcion,
                     'camion' => $camion,
                     'cubicacion' => $exp[11] . ' m3',
@@ -164,7 +172,7 @@ class TicketsController extends Controller
                     'ChInicio' => $ChInicio->nombre . ' ' . $ChInicio->apaterno . ' ' . $ChInicio->amaterno,
                     'ChCierre' => $ChCierre->nombre . ' ' . $ChCierre->apaterno . ' ' . $ChCierre->amaterno,
                     'barras' => $exp[8] . $exp[1]
-                ], 200);
+                ], 200);*/
 
             }else{
                return response()->json(['error' => 'Esté Ticket no pertenece al proyecto.'],400);
