@@ -67,9 +67,9 @@ class TicketsController extends Controller
         $dat = $request->input('data');
 
         $desc = $this->desencripta($dat);
-//dd($desc);
+
         $exp = explode("|", $desc);
-        if(count($exp)==13) {
+        if(count($exp)>13) {
 
             if (Context::getId() == $exp[0]) {
                 $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
@@ -149,7 +149,7 @@ class TicketsController extends Controller
                 $fechaL = $d->format("Y-m-d");
                 $horaL = $d->format("H:i:s");
 
-               $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].", );";
+               /*$insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].", );";
 
                 $archivo=fopen('C:\Users\LERDES1\Desktop\datos.txt',"a") or
                 die("No se pudo crear el archivo");
@@ -158,9 +158,9 @@ class TicketsController extends Controller
                 fputs($archivo,"--------------------");
                 fputs($archivo,"\n");
                 fclose($archivo);
-                return response()->json(['error' => 'Esté Ticket: OK.'], 400);
+                return response()->json(['error' => 'Esté Ticket: OK.'], 400);*/
 
-                /*return response()->json([
+                return response()->json([
                     'proyecto' => $resp->descripcion,
                     'camion' => $camion,
                     'cubicacion' => $exp[11] . ' m3',
@@ -172,7 +172,7 @@ class TicketsController extends Controller
                     'ChInicio' => $ChInicio->nombre . ' ' . $ChInicio->apaterno . ' ' . $ChInicio->amaterno,
                     'ChCierre' => $ChCierre->nombre . ' ' . $ChCierre->apaterno . ' ' . $ChCierre->amaterno,
                     'barras' => $exp[8] . $exp[1]
-                ], 200);*/
+                ], 200);
 
             }else{
                return response()->json(['error' => 'Esté Ticket no pertenece al proyecto.'],400);
@@ -193,10 +193,10 @@ class TicketsController extends Controller
 
         openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);
 
-        if($texto_desencriptado==""){
+        if($texto_desencriptado=="vacio"){
             $llave_privada = openssl_pkey_get_private("file://" . $this->deposito_claves . "SAO_privada2048.key", "sao01022013#");
             openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);
-            if($texto_desencriptado==""){
+            if($texto_desencriptado=="vacio"){
                 $llave_privada = openssl_pkey_get_private("file://" . $this->deposito_claves . "SAO_privada4096.key", "sao01022013#");
                 openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);
             }
