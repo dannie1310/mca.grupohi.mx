@@ -51446,7 +51446,13 @@ $(".etapas_destroy").off().on("click", function (event) {
 },{}],35:[function(require,module,exports){
 'use strict';
 
-$(function () {});
+$(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+});
 $('[data-submenu]').submenupicker();
 $('.fecha').datepicker({
     format: 'yyyy-mm-dd',
@@ -51999,6 +52005,8 @@ Vue.component('conciliaciones-edit', {
         };
     },
 
+    props: ['user'],
+
     directives: {
         datepicker: {
             inserted: function inserted(el) {
@@ -52228,7 +52236,7 @@ Vue.component('conciliaciones-edit', {
                             swal({
                                 type: 'error',
                                 title: '¡Error!',
-                                text: App.errorsToString(_error2.responseText)
+                                text: 'Panda ' + App.errorsToString(_error2.responseText)
                             });
                             _this.fetchConciliacion();
                         }
@@ -52250,21 +52258,21 @@ Vue.component('conciliaciones-edit', {
             $.ajax({
                 url: url,
                 type: 'POST',
+                headers: {
+                    usuario: _this.user.usuario,
+                    clave: _this.form.clave
+                },
                 success: function success(response) {
                     _this.api.token = response.token;
-                    swal({
-                        type: 'success',
-                        title: '¡Hecho!',
-                        text: 'Sesión Iniciada Correctamente',
-                        showCancelButton: false,
-                        confirmButtonText: 'OK',
-                        closeOnConfirm: true
-                    }, function () {
-                        _this.getCostos(e);
-                    });
+                    _this.getCostos(e);
                 },
                 error: function error(_error3) {
-                    alert('Error al Iniciar Sesion  ' + _error3);
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Iniciar Sesión :\n' + _error3.responseText()
+
+                    });
                 }
             });
         },
@@ -52286,7 +52294,12 @@ Vue.component('conciliaciones-edit', {
                     $('#tipo_gasto').modal('show');
                 },
                 error: function error(_error4) {
-                    alert('Sin Datos ' + _error4.responseText);
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Iniciar Sesión :\n' + _error4.toString()
+
+                    });
                 }
             });
         },
@@ -52316,7 +52329,6 @@ Vue.component('conciliaciones-edit', {
                 }
             });
         },
-
         enviarConciliacion: function enviarConciliacion(data) {
             var _this = this;
             var url = 'http://localhost:8003/api/conciliacion';
@@ -52333,7 +52345,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'success',
                         title: '¡Hecho!',
-                        text: 'Conciliacion Registrada Correctamente con el No. de Folio :' + response.id_transaccion,
+                        text: 'Conciliacion Registrada Correctamente \nNo. de Folio de Estimación : ' + response.id_transaccion,
                         showCancelButton: false,
                         confirmButtonText: 'OK',
                         closeOnConfirm: true
@@ -52365,59 +52377,46 @@ Vue.component('conciliaciones-edit', {
                     id_estimacion: estimacion
                 },
                 success: function success(response) {
-                    alert('Estimación Registrada');
-                    _this.aprobar1(e);
+                    _this.aprobar1();
                 },
                 error: function error(_error7) {
-                    alert('Error al Registrar Estiamción'.error.responseText);
+                    alert('Error al Registrar Estiamcion' + _error7.responseText);
                 }
             });
         },
 
-        aprobar1: function aprobar1(e) {
+        aprobar1: function aprobar1() {
             var _this = this;
-            _this.aprobarmod(e);
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
-            swal({
-                title: "¡Aprobar Conciliación!",
-                text: "¿Desea aprobar la conciliación?",
-                type: "info",
-                showCancelButton: true,
-                closeOnConfirm: false,
-                confirmButtonText: "Si, Aprobar",
-                cancelButtonText: "No",
-                showLoaderOnConfirm: true
-            }, function () {
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: {
-                        _method: 'PATCH',
-                        action: 'aprobar'
-                    },
-                    success: function success(response) {
-                        if (response.status_code = 200) {
-                            swal({
-                                type: 'success',
-                                title: '¡Hecho!',
-                                text: 'Conciliación aprobada correctamente',
-                                showCancelButton: false,
-                                confirmButtonText: 'OK',
-                                closeOnConfirm: true
-                            }, function () {
-                                _this.fetchConciliacion();
-                            });
-                        }
-                    },
-                    error: function error(_error8) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _method: 'PATCH',
+                    action: 'aprobar'
+                },
+                success: function success(response) {
+                    if (response.status_code = 200) {
                         swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(_error8.responseText)
+                            type: 'success',
+                            title: '¡Hecho!',
+                            text: 'Conciliación aprobada correctamente',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            closeOnConfirm: true
+                        }, function () {
+                            _this.fetchConciliacion();
                         });
-                        _this.fetchConciliacion();
                     }
-                });
+                },
+                error: function error(_error8) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(_error8.responseText)
+                    });
+                    _this.fetchConciliacion();
+                }
             });
         },
 

@@ -23,7 +23,7 @@ class ConciliacionDetalleTransformer extends AbstractTransformer
             'estado'                 => $detalle->estado,
             'cancelacion'            => $detalle->estado == 1 ? [] : [
                 'motivo' => $detalle->cancelacion->motivo,
-                'cancelo' => User::find($detalle->cancelacion->idcancelo)->present()->nombreCompleto,
+                'cancelo' => User::find($detalle->cancelacion->idcancelo) ?  User::find($detalle->cancelacion->idcancelo)->present()->nombreCompleto : '',
                 'timestamp' => $detalle->cancelacion->timestamp_cancelacion
             ],
             'registro' => $detalle->usuario_registro,

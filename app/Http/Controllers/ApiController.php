@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\EstimacionConciliacion;
-use App\Models\Conciliacion\ConciliacionDetalle;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use App\Models\Conciliacion\EstimacionConciliacion;
 use Dingo\Api\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mockery\Exception;
-use PhpSpec\Exception\Example\ErrorException;
 
 class ApiController extends Controller
 {
@@ -91,18 +87,20 @@ class ApiController extends Controller
 
     public function conciliar(Request $request){
 
-        $concil = DB::connection('sca')->select('select conciliacion.idconciliacion,viajes.IdMaterial, materiales.Descripcion,conciliacion.idempresa, empresas.RFC, 
-                                                        empresas.razonSocial, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, sum(viajes.volumen) as volumen, (viajes.Importe / viajes.Volumen) as precio_unitario 
-                                                        from conciliacion_detalle 
-                              join conciliacion using (idconciliacion) 
-                              join viajes using (idviaje) 
-                              join materiales using (idmaterial)
-                              join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
-                              left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
-                              where conciliacion.idconciliacion = '.$request->header('id-conciliacion').' and tiros_conceptos.fin_vigencia is null
-                              group by materiales.IdMaterial, precio_unitario, viajes.IdTiro;');
+        $concil = DB::connection('sca')->select('SELECT conciliacion.idconciliacion,viajes.IdMaterial, materiales.Descripcion,conciliacion.idempresa, empresas.RFC, viajes.CubicacionCamion as cubicacion, sum(viajes.Volumen / viajes.CubicacionCamion) as pu,
+            empresas.razonSocial, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, sum(viajes.volumen) as volumen, sum(viajes.CubicacionCamion) as m_cubicos , format((viajes.Importe / viajes.Volumen), 4) as precio_unitario 
+            from conciliacion_detalle 
+            join conciliacion using (idconciliacion) 
+            join viajes using (idviaje) 
+            join materiales using (idmaterial)
+            join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
+            left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
+            where conciliacion.idconciliacion = '.$request->header('id-conciliacion').' and tiros_conceptos.fin_vigencia is null
+            group by materiales.IdMaterial, tiros_conceptos.id_concepto, precio_unitario;');
 
-
+        if(!$concil){
+            throw new Exception("No hay datos a Concialiar");
+        }
 
         $partidas_conciliacion = [];
         foreach ($concil as $key => $partida){
@@ -117,11 +115,11 @@ class ApiController extends Controller
                 $idCosto = $request->header('id-costo');
             }
             $partidas_conciliacion[$key]= [
-                'tarifa' => $partida->precio_unitario * 50,
+                'tarifa' => $partida->importe / $partida->m_cubicos,
                 'material' => $partida->Descripcion,
                 'id_material' => $partida->IdMaterial,
                 'id_concepto' => $partida->id_concepto,
-                'volumen' => $partida->volumen
+                'volumen' => $partida->m_cubicos
             ];
         }
         $req = new Request();
@@ -135,13 +133,12 @@ class ApiController extends Controller
         ]);
 
 
-        //dd($req->all());
         return $req->all();
 
     }
 
-    public function registrarConciliacion($id_estimacion, $id_conciliacion){
-        $est = EstimacionConciliacion::create(['id_estimacion' => $id_estimacion, 'id_conciliacion'=>$id_conciliacion]);
+    public function registrarConciliacion(Request $request){
+        $est = EstimacionConciliacion::create(['id_estimacion' => $request->id_estimacion, 'id_conciliacion'=>$request->id_conciliacion]);
         return $est->toArray();
     }
 }

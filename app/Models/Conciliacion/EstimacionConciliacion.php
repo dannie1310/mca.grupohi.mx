@@ -1,7 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Models\Conciliacion;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class EstimacionConciliacion extends Model

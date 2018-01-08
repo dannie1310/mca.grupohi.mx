@@ -27,6 +27,10 @@ Vue.component('conciliaciones-edit', {
         }
     },
 
+    props:[
+        'user'
+    ],
+
     directives: {
         datepicker: {
             inserted: function (el) {
@@ -255,7 +259,7 @@ Vue.component('conciliaciones-edit', {
                                 swal({
                                     type: 'error',
                                     title: '¡Error!',
-                                    text: App.errorsToString(error.responseText)
+                                    text: 'Panda '+App.errorsToString(error.responseText)
                                 });
                                 _this.fetchConciliacion();
                             }
@@ -278,22 +282,22 @@ Vue.component('conciliaciones-edit', {
             $.ajax({
                 url:url,
                 type: 'POST',
+                headers:{
+                    usuario: _this.user.usuario,
+                    clave: _this.form.clave
+                },
                 success: function (response) {
                    _this.api.token = response.token;
-                    swal({
-                            type: 'success',
-                            title: '¡Hecho!',
-                            text: 'Sesión Iniciada Correctamente',
-                            showCancelButton: false,
-                            confirmButtonText: 'OK',
-                            closeOnConfirm: true
-                        },
-                        function () {
-                        _this.getCostos(e);
-                        });
+                   _this.getCostos(e);
+
                 },
                 error: function (error) {
-                    alert('Error al Iniciar Sesion  '+error);
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Iniciar Sesión :\n' + error.responseText()
+
+                    });
                 }
             })
         },
@@ -315,7 +319,12 @@ Vue.component('conciliaciones-edit', {
                     $('#tipo_gasto').modal('show');
                 },
                 error: function (error) {
-                    alert('Sin Datos ' + error.responseText);
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Iniciar Sesión :\n' + error.toString()
+
+                    });
                 }
             });
         },
@@ -345,7 +354,6 @@ Vue.component('conciliaciones-edit', {
                 }
             });
         },
-
         enviarConciliacion: function (data) {
             var _this = this;
             var url = 'http://localhost:8003/api/conciliacion';
@@ -362,11 +370,12 @@ Vue.component('conciliaciones-edit', {
                     swal({
                             type: 'success',
                             title: '¡Hecho!',
-                            text: 'Conciliacion Registrada Correctamente con el No. de Folio :' + response.id_transaccion,
-                            showCancelButton: false,
-                            confirmButtonText: 'OK',
-                            closeOnConfirm: true
+                        text: 'Conciliacion Registrada Correctamente \nNo. de Folio de Estimación : ' + response.id_transaccion,
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        closeOnConfirm: true
                         },
+
                         function () {
                             _this.registrar_conciliacion(response.id_transaccion);
                             $('#tipo_gasto').modal('hide');
@@ -395,41 +404,28 @@ Vue.component('conciliaciones-edit', {
                     id_estimacion: estimacion
                 },
                 success: function (response) {
-                    alert('Estimación Registrada');
-                    _this.aprobar1(e)
+                    _this.aprobar1()
 
                 },
                 error: function (error) {
-                    alert('Error al Registrar Estiamción'. error.responseText);
+                    alert('Error al Registrar Estiamcion'+ error.responseText);
                 }
             });
         },
 
-        aprobar1: function(e) {
+        aprobar1: function() {
             var _this = this;
-            _this.aprobarmod(e);
                 var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
-            swal({
-                title: "¡Aprobar Conciliación!",
-                text: "¿Desea aprobar la conciliación?",
-                type: "info",
-                showCancelButton: true,
-                closeOnConfirm: false,
-                confirmButtonText: "Si, Aprobar",
-                cancelButtonText: "No",
-                showLoaderOnConfirm: true
-            },
-            function(){
-                $.ajax({
-                    url: url,
-                    type : 'POST',
-                    data : {
-                        _method : 'PATCH',
-                        action : 'aprobar'
-                    },
-                    success: function(response) {
-                        if(response.status_code = 200) {
-                            swal({
+            $.ajax({
+                url: url,
+                type : 'POST',
+                data : {
+                    _method : 'PATCH',
+                    action : 'aprobar'
+                },
+                success: function(response) {
+                    if(response.status_code = 200) {
+                        swal({
                                 type: 'success',
                                 title: '¡Hecho!',
                                 text: 'Conciliación aprobada correctamente',
@@ -440,17 +436,16 @@ Vue.component('conciliaciones-edit', {
                             function () {
                                 _this.fetchConciliacion();
                             });
-                        }
-                    },
-                    error: function (error) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(error.responseText)
-                        });
-                        _this.fetchConciliacion();
                     }
-                });
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.responseText)
+                    });
+                    _this.fetchConciliacion();
+                }
             });
         },
 

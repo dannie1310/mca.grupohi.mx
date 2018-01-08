@@ -4,7 +4,9 @@
 @include('partials.errors')
 <div id="app">
     <global-errors></global-errors>
-    <conciliaciones-edit inline-template>
+    <conciliaciones-edit
+            :user="{{auth()->user()->toJson()}}"
+            inline-template>
         <section>
             <span v-if="fetching">
                 <div class="text-center"><i class="fa fa-spinner fa-pulse fa-2x"></i> <big>CARGANDO CONCILIACIÓN</big></div>
@@ -467,13 +469,13 @@
                                <h4 class="modal-title">SELECCIONE EL TIPO DE GASTO</h4>
                            </div>
                            <div class="modal-body">
-                               <div class="col-md-3">
-                                 <div class="form-group">
-                                     <label>Tipo de Gasto @{{ form.id_costo }}</label>
+                               <div class="form-group">
+                                 <div class="col-md-3">
+                                     <label>Tipo de Gasto</label>
                                  </div>
                                </div>
-                               <div class="col-md-9">
-                                 <div class="form-group">
+                               <div class="form-group">
+                                 <div class="col-md-9">
                                      <select class="form-control"  v-model="form.id_costo" id="costo_select" >
                                          <option value="">[--SELECCIONE--]</option>
                                          <option v-for="(costo, index) in form.costos" :value="costo.id_costo" style="text-anchor: @parent">@{{ costo.descripcion }}</option>
@@ -481,9 +483,12 @@
                                  </div>
                                </div>
                            </div>
+                           <br><br>
                            <div class="modal-footer">
+                               <div class="form-group">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                                 <button type="button" class="btn btn-primary" @click="conciliar" :disabled="form.id_costo== '' ">Conciliar</button>
+                               </div>
                            </div>
                        </div>
                    </div>
@@ -498,8 +503,6 @@
                                 <h4 class="modal-title">INICIO DE SESIÓN CONCILIACIÓN</h4>
                             </div>
                             <div class="modal-body">
-                                <label class="control-label"><b>Usuario</b></label>
-                                <input id="sesion_usuario" placeholder="USUARIO" type="text" required class="form-control" name="usuario_sao" v-model="form.usuario">
                                 <label class="control-label"><b>Contraseña</b></label>
                                 <input id="sesion_clave" placeholder="CONTRASEÑA" type="password" required class="form-control" name="clave_sao" v-model="form.clave">
                             </div>
