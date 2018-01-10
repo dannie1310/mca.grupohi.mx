@@ -21,6 +21,7 @@
                 <th>Tarifa KM Adicionales</th>
                 <th>Inicio de Vigencia</th>
                 <th>Fin de Vigencia</th>
+                <th>Tipo Tarifa</th>
                 <th>Registro</th>
                 <th>Fecha Hora Registro</th>
                 <th>Estado</th>
@@ -42,12 +43,24 @@
                 <td>{{ $tarifa->KMAdicional }}</td>
                 <td>{{ $tarifa->InicioVigencia->format("d-m-Y h:i:s") }}</td>
                 <td>{{ $tarifa->FinVigenciaTarifa }}</td>
+                @if($tarifa->idtarifas_tipo != null)
+                  @foreach($tipos as $tipo)
+                      @if($tipo->idtarifas_tipo == $tarifa->idtarifas_tipo)
+                        <td>{{ $tipo->nombre }}</td>
+                      @endif
+                  @endforeach
+                @else
+                        <td>NO ASIGNADO</td>
+                @endif
                 <td>{{ $tarifa->registro->present()->NombreCompleto }}</td>
                 <td>{{ $tarifa->Fecha_Hora_Registra->format("d-m-Y h:i:s") }}</td>
                 <td>{{ $tarifa->estatus_string }}</td>
                 <td>{{ $tarifa->user_desactivo }}</td>
                 <td>{{ $tarifa->motivo }}</td>
                 <td>
+                    @permission('editar-tarifas-material')
+                        <a href="{{ route('tarifas_material.edit', $tarifa) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
+                    @endpermission
                     @permission('desactivar-tarifas-material')
                     @if($tarifa->Estatus == 1)
                         <button title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_tarifa({{$tarifa->IdTarifa}})"><i class="fa fa-remove"></i></button>

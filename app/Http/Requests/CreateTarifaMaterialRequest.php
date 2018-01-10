@@ -27,14 +27,15 @@ class CreateTarifaMaterialRequest extends Request
             'IdMaterial' => 'required|numeric|exists:sca.materiales,IdMaterial',
             'PrimerKM' => 'required|numeric|min:0',
             'KMSubsecuente' => 'required|numeric|min:0',
-            'KMAdicional' => 'required|numeric|min:0'
+            'KMAdicional' => 'numeric|min:0',
+            'idtarifas_tipo' => 'required|numeric'
         ];
     }
     
     public function messages()
     {
         $messages = [
-            'IdMaterial.exists'   => 'No existe un Material con el Id: '. $this->IdMaterial,
+            'IdMaterial.exists'   => 'No existe un Material con el Id: '. $this->IdMaterial
         ];
 
         return $messages;

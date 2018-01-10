@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TarifasTipoMaterial;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -19,7 +20,8 @@ class TarifasMaterialController extends Controller
         $this->middleware('context');
         $this->middleware('permission:desactivar-tarifas-material', ['only' => ['destroy']]);
         $this->middleware('permission:crear-tarifas-material', ['only' => ['create', 'store']]);
-       
+        $this->middleware('permission:editar-tarifas-material', ['only' => ['create', 'store']]);
+
         parent::__construct();
     }
     
@@ -35,7 +37,8 @@ class TarifasMaterialController extends Controller
             return response()->json($material->tarifaMaterial->toArray());
         }
         return view('tarifas.material.index')
-                ->withTarifas(TarifaMaterial::all());
+                ->withTarifas(TarifaMaterial::all())
+                ->withTipos(TarifasTipoMaterial::all());
     }
 
     /**
@@ -44,7 +47,7 @@ class TarifasMaterialController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Requests\CreateTarifaPesoRequest $request)
+    public function store(Requests\CreateTarifaMaterialRequest $request)
     {
         $request->request->add([
             'Fecha_Hora_Registra' => Carbon::now()->toDateTimeString(),
@@ -108,6 +111,7 @@ class TarifasMaterialController extends Controller
                 $tsv->FinVigencia = $fin_vigencia;
                 $tsv->save();
             }
+
             TarifaMaterial::create($request->all());
 //             return view('tarifas.material.index')
 //            ->withTarifas(TarifaMaterial::all());
@@ -123,7 +127,7 @@ class TarifasMaterialController extends Controller
                 
         
 //        return response()->json(['success' => true,
-//            'updateUrl' => route('tarifas_material.update', $tarifa),
+//            'updateUrl' => route|('tarifas_material.update', $tarifa),
 //            'message' => '¡TARIFA REGISTRADA CORRECTAMENTE!']);
     }
 
@@ -134,25 +138,20 @@ class TarifasMaterialController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Requests\EditTarifaMaterialRequest $request, $id)
+    public function update(Request $request, $id)
     {
         $request->request->add([
             'Fecha_Hora_Registra' => Carbon::now()->toDateTimeString(),
             'Registra' => auth()->user()->idusuario,
+            'idtarifas_tipo' => $request->idtarifas_tipo
         ]);
-        
-        $tarifas = TarifaMaterial::where('IdMaterial', '=', $request->get('IdMaterial'))->get();
-        
-        foreach($tarifas as $tarifa_old) {
-            $tarifa_old->Estatus = 0;
-            $tarifa_old->save();
-        }
-        
-        $tarifa = TarifaMaterial::create($request->all());
-        
-        return response()->json(['success' => true,
-            'updateUrl' => route('tarifas_material.update', $tarifa),
-            'message' => '¡TARIFA ACTUALIZADA CORRECTAMENTE!']);
+
+        $tarifas = TarifaMaterial::find($id);
+        $tarifas->update($request->all());
+
+        Flash::success('¡TARIFA MATERIAL ACTUALIZADO CORRECTAMENTE!');
+        return redirect()->route('tarifas_material.index', $tarifas);
+
     }
 
     /**
@@ -180,7 +179,15 @@ class TarifasMaterialController extends Controller
     public function create()
     {
         $materiales = Material::orderBy("descripcion")->lists("Descripcion","IdMaterial");
+        $tipos = TarifasTipoMaterial::all()->lists("nombre","idtarifas_tipo");
         $fecha_actual = date("d-m-Y");
-        return view('tarifas.material.create')->withMateriales($materiales)->withFechaActual($fecha_actual);
+        return view('tarifas.material.create')->withMateriales($materiales)->withFechaActual($fecha_actual)->withTipos($tipos);
+    }
+
+    public function edit($id){
+        $tipos = TarifasTipoMaterial::all()->lists("nombre","idtarifas_tipo");
+        return view('tarifas.material.edit')
+            ->withTarifas(TarifaMaterial::find($id))
+            ->withTipos($tipos);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models\Tarifas;
 
+use App\Models\TarifasTipoMaterial;
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
 use App\User;
@@ -24,7 +25,8 @@ class TarifaMaterial extends Model
         'FinVigencia',
         'usuario_desactivo',
         'motivo',
-        'Estatus'
+        'Estatus',
+        'idtarifas_tipo'
     ];
     protected $dates = ["Fecha_Hora_Registra","InicioVigencia","FinVigencia"];
     protected $presenter = ModelPresenter::class;
@@ -51,5 +53,9 @@ class TarifaMaterial extends Model
 
     public function user_desactivo() {
         return $this->belongsTo(User::class, 'usuario_desactivo');
+    }
+
+    public function TipoTarifas() {
+        return $this->belongsTo(TarifasTipoMaterial::class, 'idtarifas_tipo');
     }
 }

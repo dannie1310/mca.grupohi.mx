@@ -27,7 +27,8 @@ class EditTarifaMaterialRequest extends Request
             'IdMaterial' => 'required|numeric|exists:sca.materiales,IdMaterial',
             'PrimerKM' => 'required|numeric|min:0',
             'KMSubsecuente' => 'required|numeric|min:0',
-            'KMAdicional' => 'required|numeric|min:0'
+            'KMAdicional' => 'required|numeric|min:0',
+             'idtarifas_tipo' => 'required|numeric'
         ];
     }
     
