@@ -124,11 +124,13 @@ class ApiController extends Controller
         }
         $req = new Request();
         $req->merge([
-            'id_conciliacion' => $idConciliacion,
-            'razon_social' => $razonSocial,
-            'rfc' => $rfc,
-            'tipo_empresa' => $tipoEmpresa,
-            'id_costo' => $idCosto,
+            'id_conciliacion'   => $idConciliacion,
+            'razon_social'      => $razonSocial,
+            'rfc'               => $rfc,
+            'tipo_empresa'      => $tipoEmpresa,
+            'id_costo'          => $idCosto,
+            'cumplimiento'      => $request->cumplimiento,
+            'vencimiento'       => $request->vencimiento,
             'partidas_conciliacion' => $partidas_conciliacion
         ]);
 

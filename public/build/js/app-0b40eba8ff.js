@@ -52005,7 +52005,7 @@ Vue.component('conciliaciones-edit', {
         };
     },
 
-    props: ['user'],
+    props: ['user', 'database_name', 'id_obra'],
 
     directives: {
         datepicker: {
@@ -52254,7 +52254,7 @@ Vue.component('conciliaciones-edit', {
         getToken: function getToken(e) {
             var _this = this;
             $('#sesionSAO').modal('hide');
-            var url = 'http://localhost:8003/api/auth';
+            var url = 'http://sao.grupohi.mx/api/auth';
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -52280,18 +52280,23 @@ Vue.component('conciliaciones-edit', {
         getCostos: function getCostos(e) {
             e.preventDefault();
             var _this = this;
-            var url = 'http://localhost:8003/api/conciliacion/costos';
+            var url = 'http://sao.grupohi.mx/api/conciliacion/costos';
             $.ajax({
                 url: url,
                 type: 'GET',
                 headers: {
-                    database_name: 'SAO1814_PISTA_AEROPUERTO',
-                    id_obra: 1,
-                    Authorization: 'Bearer ' + _this.api.token
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
+                    Authorization: 'Bearer ' + _this.api.token,
+                    rfc: _this.conciliacion.rfc
                 },
                 success: function success(response) {
-                    _this.form.costos = response;
-                    $('#tipo_gasto').modal('show');
+                    if (response.length === 0) {
+                        _this.conciliar(e);
+                    } else {
+                        _this.form.costos = response;
+                        $('#tipo_gasto').modal('show');
+                    }
                 },
                 error: function error(_error4) {
                     swal({
@@ -52315,6 +52320,10 @@ Vue.component('conciliaciones-edit', {
                     id_conciliacion: _this.conciliacion.id,
                     id_costo: _this.form.id_costo
                 },
+                data: {
+                    cumplimiento: _this.conciliacion.f_inicial,
+                    vencimiento: _this.conciliacion.f_final
+                },
                 success: function success(response) {
                     _this.enviarConciliacion(response);
                 }, error: function error(xhr, status, _error5) {
@@ -52331,13 +52340,13 @@ Vue.component('conciliaciones-edit', {
         },
         enviarConciliacion: function enviarConciliacion(data) {
             var _this = this;
-            var url = 'http://localhost:8003/api/conciliacion';
+            var url = 'http://sao.grupohi.mx/api/conciliacion';
             $.ajax({
                 url: url,
                 type: 'POST',
                 headers: {
-                    database_name: 'SAO1814_PISTA_AEROPUERTO',
-                    id_obra: 1,
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
                     Authorization: 'Bearer ' + _this.api.token
                 },
                 data: data,

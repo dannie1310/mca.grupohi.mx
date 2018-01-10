@@ -6,6 +6,8 @@
     <global-errors></global-errors>
     <conciliaciones-edit
             :user="{{auth()->user()->toJson()}}"
+            :database_name="'{{ trim(Context::getDatabaseNameCadeco()) }}'"
+            :id_obra="'{{ Context::getIdCadeco() }}'"
             inline-template>
         <section>
             <span v-if="fetching">
