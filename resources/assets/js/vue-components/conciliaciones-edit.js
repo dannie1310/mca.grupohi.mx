@@ -19,9 +19,7 @@ Vue.component('conciliaciones-edit', {
             'fetching'   : false,
             'fecha_cambio' : '',
             'api' : {
-                'token' : '',
-                'database_name': 'SAO1814_PISTA_AEROPUERTO',
-                'id_obra': 1
+                'token' : ''
             }
 
         }

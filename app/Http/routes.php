@@ -265,6 +265,8 @@ Route::group(['prefix' => 'csv'],function () {
 });
 
 Route::get('detalle_configuracion', 'DetalleAdministracionController@index')->name('detalle.configuracion');
+
+
 /*
  * API Routes
  */

@@ -9,6 +9,16 @@ use Mockery\Exception;
 
 class ApiController extends Controller
 {
+
+    /**
+     * ApiController constructor.
+     */
+    function __construct() {
+        $this->middleware('auth');
+        $this->middleware('context');
+
+        parent::__construct();
+    }
     /**
      * Display a listing of the resource.
      *
