@@ -51997,6 +51997,7 @@ Vue.component('conciliaciones-edit', {
             'fetching': false,
             'fecha_cambio': '',
             'api': {
+                'url_api': 'http://localhost:8003',
                 'token': ''
             }
 
@@ -52252,7 +52253,7 @@ Vue.component('conciliaciones-edit', {
         getToken: function getToken(e) {
             var _this = this;
             $('#sesionSAO').modal('hide');
-            var url = 'http://sao.grupohi.mx/api/auth';
+            var url = _this.api.url_api + '/api/auth';
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -52268,7 +52269,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Iniciar Sesión :\n' + _error3.responseText()
+                        text: 'Error al Iniciar Sesión :\n' + _error3
 
                     });
                 }
@@ -52278,14 +52279,16 @@ Vue.component('conciliaciones-edit', {
         getCostos: function getCostos(e) {
             e.preventDefault();
             var _this = this;
-            var url = 'http://sao.grupohi.mx/api/conciliacion/costos';
+            var url = _this.api.url_api + '/api/conciliacion/costos';
             $.ajax({
                 url: url,
                 type: 'GET',
                 headers: {
                     database_name: _this.database_name,
                     id_obra: _this.id_obra,
-                    Authorization: 'Bearer ' + _this.api.token,
+                    Authorization: 'Bearer ' + _this.api.token
+                },
+                data: {
                     rfc: _this.conciliacion.rfc
                 },
                 success: function success(response) {
@@ -52314,11 +52317,9 @@ Vue.component('conciliaciones-edit', {
             $.ajax({
                 url: url,
                 type: 'GET',
-                headers: {
-                    id_conciliacion: _this.conciliacion.id,
-                    id_costo: _this.form.id_costo
-                },
                 data: {
+                    id_conciliacion: _this.conciliacion.id,
+                    id_costo: _this.form.id_costo,
                     cumplimiento: _this.conciliacion.f_inicial,
                     vencimiento: _this.conciliacion.f_final
                 },
@@ -52338,7 +52339,7 @@ Vue.component('conciliaciones-edit', {
         },
         enviarConciliacion: function enviarConciliacion(data) {
             var _this = this;
-            var url = 'http://sao.grupohi.mx/api/conciliacion';
+            var url = _this.api.url_api + '/api/conciliacion';
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -52427,6 +52428,94 @@ Vue.component('conciliaciones-edit', {
             });
         },
 
+        sesion_estimacion: function sesion_estimacion(e) {
+            e.preventDefault();
+            $('#revertir_estimacion').modal('show');
+        },
+
+        token_revertir: function token_revertir() {
+            var _this = this;
+            $('#revertir_estimacion').modal('hide');
+            var url = _this.api.url_api + '/api/auth';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    usuario: _this.user.usuario,
+                    clave: _this.form.clave
+                },
+                success: function success(response) {
+                    _this.api.token = response.token;
+                    _this.revertir();
+                },
+                error: function error(_error9) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Iniciar Sesión :\n' + _error9
+
+                    });
+                }
+            });
+        },
+
+        revertir: function revertir() {
+            var _this = this;
+            var url = _this.api.url_api + '/api/conciliacion/' + _this.conciliacion.id;
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                headers: {
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
+                    Authorization: 'Bearer ' + _this.api.token
+                },
+                success: function success(response) {
+                    _this.conciliacion_revertir();
+                },
+                error: function error(_error10) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Revertir la Estimación de la Conciliación :\n' + _error10
+                    });
+                }
+            });
+        },
+        conciliacion_revertir: function conciliacion_revertir() {
+            var _this = this;
+            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _method: 'PATCH',
+                    action: 'revertir'
+                },
+                success: function success(response) {
+                    if (response.status_code = 200) {
+                        swal({
+                            type: 'success',
+                            title: '¡Hecho!',
+                            text: 'La Estimacion Generada de la Conciliacion ' + _this.conciliacion.id + ' se ha Revertido Exitosamente.',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            closeOnConfirm: true
+                        }, function () {
+                            _this.fetchConciliacion();
+                        });
+                    }
+                },
+                error: function error(_error11) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(_error11.responseText)
+                    });
+                    _this.fetchConciliacion();
+                }
+            });
+        },
         registrar: function registrar() {
             var _this = this;
             this.form.errors = [];
@@ -52453,11 +52542,11 @@ Vue.component('conciliaciones-edit', {
 
                     _this.fetchConciliacion();
                 },
-                error: function error(_error9) {
+                error: function error(_error12) {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error9.responseText)
+                        text: App.errorsToString(_error12.responseText)
                     });
                     _this.fetchConciliacion();
                 }
@@ -52530,7 +52619,7 @@ Vue.component('conciliaciones-edit', {
                         });
                     }
                 },
-                error: function error(_error10) {
+                error: function error(_error13) {
                     _this.guardando = false;
                     $('.ticket').val('');
                     $('.ticket').focus();
@@ -52538,7 +52627,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: App.errorsToString(_error10.responseText)
+                        text: App.errorsToString(_error13.responseText)
                     });
                 }
             });
@@ -52618,11 +52707,11 @@ Vue.component('conciliaciones-edit', {
                             });
                         }
                     },
-                    error: function error(_error11) {
+                    error: function error(_error14) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error11.responseText)
+                            text: App.errorsToString(_error14.responseText)
                         });
                         _this.fetchConciliacion();
                     }
@@ -52695,18 +52784,18 @@ Vue.component('conciliaciones-edit', {
                     _this.conciliacion.volumen_pagado = response.volumen_pagado;
                     _this.conciliacion.volumen_pagado_sf = response.volumen_pagado_sf;
                 },
-                error: function error(_error12) {
-                    if (_error12.status == 422) {
+                error: function error(_error15) {
+                    if (_error15.status == 422) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error12.responseJSON)
+                            text: App.errorsToString(_error15.responseJSON)
                         });
-                    } else if (_error12.status == 500) {
+                    } else if (_error15.status == 500) {
                         swal({
                             type: 'error',
                             title: '¡Error!',
-                            text: App.errorsToString(_error12.responseText)
+                            text: App.errorsToString(_error15.responseText)
                         });
                         _this.fetchConciliacion();
                     }

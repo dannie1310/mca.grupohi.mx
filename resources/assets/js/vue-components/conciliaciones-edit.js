@@ -19,6 +19,7 @@ Vue.component('conciliaciones-edit', {
             'fetching'   : false,
             'fecha_cambio' : '',
             'api' : {
+                'url_api': 'http://localhost:8003',
                 'token' : ''
             }
 
@@ -276,7 +277,7 @@ Vue.component('conciliaciones-edit', {
         getToken: function (e) {
             var _this = this;
             $('#sesionSAO').modal('hide');
-            var url = 'http://sao.grupohi.mx/api/auth';
+            var url = _this.api.url_api + '/api/auth';
             $.ajax({
                 url:url,
                 type: 'POST',
@@ -293,7 +294,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Iniciar Sesión :\n' + error.responseText()
+                        text: 'Error al Iniciar Sesión :\n' + error
 
                     });
                 }
@@ -303,14 +304,16 @@ Vue.component('conciliaciones-edit', {
         getCostos: function(e){
             e.preventDefault();
             var _this = this;
-            var url = 'http://sao.grupohi.mx/api/conciliacion/costos';
+            var url = _this.api.url_api + '/api/conciliacion/costos';
             $.ajax({
                 url: url,
                 type: 'GET',
                 headers:{
                     database_name: _this.database_name,
                     id_obra: _this.id_obra,
-                    Authorization: 'Bearer '+_this.api.token,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                data:{
                     rfc: _this.conciliacion.rfc
                 },
                 success: function (response) {
@@ -339,11 +342,9 @@ Vue.component('conciliaciones-edit', {
             $.ajax({
                 url: url,
                 type: 'GET',
-                headers:{
-                    id_conciliacion: _this.conciliacion.id,
-                    id_costo: _this.form.id_costo
-                },
                 data:{
+                    id_conciliacion: _this.conciliacion.id,
+                    id_costo: _this.form.id_costo,
                     cumplimiento: _this.conciliacion.f_inicial,
                     vencimiento: _this.conciliacion.f_final
                 },
@@ -363,7 +364,7 @@ Vue.component('conciliaciones-edit', {
         },
         enviarConciliacion: function (data) {
             var _this = this;
-            var url = 'http://sao.grupohi.mx/api/conciliacion';
+            var url = _this.api.url_api + '/api/conciliacion';
             $.ajax({
                 url:url,
                 type: 'POST',
@@ -456,6 +457,96 @@ Vue.component('conciliaciones-edit', {
             });
         },
 
+        sesion_estimacion: function (e) {
+            e.preventDefault();
+            $('#revertir_estimacion').modal('show');
+        },
+
+        token_revertir: function () {
+            var _this = this;
+            $('#revertir_estimacion').modal('hide');
+            var url = _this.api.url_api + '/api/auth';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                headers:{
+                    usuario: _this.user.usuario,
+                    clave: _this.form.clave
+                },
+                success: function (response) {
+                    _this.api.token = response.token;
+                    _this.revertir();
+
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Iniciar Sesión :\n' + error
+
+                    });
+                }
+            })
+        },
+
+        revertir: function () {
+            var _this = this;
+            var url = _this.api.url_api + '/api/conciliacion/' + _this.conciliacion.id;
+            $.ajax({
+                url:url,
+                type: 'DELETE',
+                headers:{
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                success: function (response) {
+                    _this.conciliacion_revertir();
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Revertir la Estimación de la Conciliación :\n' + error
+                    });
+                }
+            })
+        },
+        conciliacion_revertir: function() {
+            var _this = this;
+            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            $.ajax({
+                url: url,
+                type : 'POST',
+                data : {
+                    _method : 'PATCH',
+                    action : 'revertir'
+                },
+                success: function(response) {
+                    if(response.status_code = 200) {
+                        swal({
+                                type: 'success',
+                                title: '¡Hecho!',
+                                text: 'La Estimacion Generada de la Conciliacion ' + _this.conciliacion.id + ' se ha Revertido Exitosamente.',
+                                showCancelButton: false,
+                                confirmButtonText: 'OK',
+                                closeOnConfirm: true
+                            },
+                            function () {
+                                _this.fetchConciliacion();
+                            });
+                    }
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.responseText)
+                    });
+                    _this.fetchConciliacion();
+                }
+            });
+        },
         registrar: function() {
             var _this = this;
             this.form.errors = [];

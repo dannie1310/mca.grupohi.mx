@@ -105,7 +105,7 @@ class ApiController extends Controller
             join materiales using (idmaterial)
             join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
             left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
-            where conciliacion.idconciliacion = '.$request->header('id-conciliacion').' and tiros_conceptos.fin_vigencia is null
+            where conciliacion.idconciliacion = '.$request->id_conciliacion.' and tiros_conceptos.fin_vigencia is null
             group by materiales.IdMaterial, tiros_conceptos.id_concepto, precio_unitario;');
 
         if(!$concil){
@@ -122,7 +122,7 @@ class ApiController extends Controller
                 $razonSocial = $partida->razonSocial;
                 $rfc = $partida->RFC;
                 $tipoEmpresa = 1;
-                $idCosto = $request->header('id-costo');
+                $idCosto = $request->id_costo;
             }
             $partidas_conciliacion[$key]= [
                 'tarifa' => $partida->importe / $partida->m_cubicos,

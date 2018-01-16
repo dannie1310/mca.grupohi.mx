@@ -42,6 +42,7 @@
                     @if (Auth::user()->can(['aprobar-conciliacion']))
                     <a class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="aprobar"><i class="fa fa-check"></i> APROBAR</a>
                     @endif
+
                 </span>
                 <span v-else-if="conciliacion.estado == 2">
                     <?php
@@ -50,6 +51,9 @@
                    <a href="{{ route('conciliaciones.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
                    @endif
                     */?>
+                    @if (Auth::user()->can(['aprobar-conciliacion']))
+                        <a class="btn btn-danger btn-sm pull-right" style="margin-right: 5px" @click="sesion_estimacion"><i class="fa fa-close"></i> REVERTIR</a>
+                    @endif
                </span>
            </h1>
            {!! Breadcrumbs::render('conciliaciones.edit', $conciliacion) !!}
@@ -511,6 +515,24 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                                 <button type="button" class="btn btn-primary" @click="getToken">Iniciar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="modal fade" id="revertir_estimacion" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">INICIO DE SESIÓN CONCILIACIÓN</h4>
+                            </div>
+                            <div class="modal-body">
+                                <label class="control-label"><b>Contraseña</b></label>
+                                <input id="revertir_clave" placeholder="CONTRASEÑA" type="password" required class="form-control" name="clave_sao" v-model="form.clave">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-primary" @click="token_revertir">Iniciar</button>
                             </div>
                         </div>
                     </div>

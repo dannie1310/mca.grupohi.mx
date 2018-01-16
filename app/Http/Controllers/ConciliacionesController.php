@@ -158,7 +158,9 @@ class ConciliacionesController extends Controller
                 $conciliacion->cerrar($id);
             } else if ($request->get('action') == 'aprobar') {
                 $conciliacion->aprobar();
-            } else if($request->get('action') == 'detalles') {
+            } else if ($request->get('action') == 'revertir') {
+                $conciliacion->revertir_aprovacion();
+            }else if($request->get('action') == 'detalles') {
 
                 $this->validate($request, [
                     'importe_pagado' => 'required|numeric',
