@@ -69,7 +69,8 @@ class TicketsController extends Controller
         $desc = $this->desencripta($dat);
 
         $exp = explode("|", $desc);
-        if(count($exp)>13) {
+       // dd($desc);
+        if(count($exp)>=13) {
 
             if (Context::getId() == $exp[0]) {
                 $resp = DB::connection('sca')->table('sca_configuracion.proyectos')->select('base_datos', 'descripcion')->where('id_proyecto', $exp[0])->first();
@@ -149,7 +150,7 @@ class TicketsController extends Controller
                 $fechaL = $d->format("Y-m-d");
                 $horaL = $d->format("H:i:s");
 
-               /*$insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].", );";
+              /* $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].", );";
 
                 $archivo=fopen('C:\Users\LERDES1\Desktop\datos.txt',"a") or
                 die("No se pudo crear el archivo");
@@ -184,7 +185,7 @@ class TicketsController extends Controller
 
     function desencripta($txt_encriptado) {
 
-        $texto_desencriptado = 'vacio';
+        $texto_desencriptado = '';
 
         $texto_encriptado = base64_decode($txt_encriptado);
         //dd($txt_encriptado, $texto_encriptado, "file://" . $this->deposito_claves . "SAO_privada1024.key");
@@ -193,14 +194,15 @@ class TicketsController extends Controller
 
         openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);
 
-        if($texto_desencriptado=="vacio"){
+        if($texto_desencriptado==""){
             $llave_privada = openssl_pkey_get_private("file://" . $this->deposito_claves . "SAO_privada2048.key", "sao01022013#");
             openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);
-            if($texto_desencriptado=="vacio"){
+            if($texto_desencriptado==""){
                 $llave_privada = openssl_pkey_get_private("file://" . $this->deposito_claves . "SAO_privada4096.key", "sao01022013#");
                 openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);
             }
         }
+       // dd($texto_desencriptado);
 
         /*$llave_privada = openssl_pkey_get_private("file://" . $this->deposito_claves . "SAO_privada4096.key", "sao01022013#");
             openssl_private_decrypt($texto_encriptado, $texto_desencriptado, $llave_privada);*/
