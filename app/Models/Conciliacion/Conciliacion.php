@@ -448,6 +448,8 @@ class Conciliacion extends Model
         }
     }
 
+
+
     public function revertir_aprovacion(){
         DB::connection('sca')->beginTransaction();
 
@@ -456,7 +458,9 @@ class Conciliacion extends Model
             $this->save();
 
             $estimacion_conciliacion = EstimacionConciliacion::where('id_conciliacion', '=', $this->idconciliacion)->first();
-            $estimacion_conciliacion->delete();
+            if($estimacion_conciliacion) {
+                $estimacion_conciliacion->delete();
+            }
 
             DB::connection('sca')->commit();
         } catch (\Exception $e) {
@@ -479,6 +483,9 @@ class Conciliacion extends Model
         try {
             if ($this->estado == -1 || $this->estado == -2) {
                 throw new \Exception("Ésta conciliación ya ha sido cancelada anteriormente");
+            }
+            if ($this->estado == 2) {
+                throw new \Exception("Ésta conciliación ya ha sido aprobada");
             }
 
             $this->estado = $this->estado == 0 ? -1 : -2;

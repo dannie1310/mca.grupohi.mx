@@ -492,8 +492,11 @@
                            <br><br>
                            <div class="modal-footer">
                                <div class="form-group">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="conciliar" :disabled="form.id_costo== '' ">Conciliar</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+                                   <button class="btn btn-primary" type="button" @click="conciliar" :disabled="form.id_costo== '' ">
+                                        <span v-if="guardando"><i class="fa fa-spinner fa-spin"></i>Conciliando</span>
+                                        <span v-else>Conciliar</span>
+                                    </button>
                                </div>
                            </div>
                        </div>
@@ -513,8 +516,13 @@
                                 <input id="sesion_clave" placeholder="CONTRASEÑA" type="password" required class="form-control" name="clave_sao" v-model="form.clave">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="getToken">Iniciar</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+
+                                    <button class="btn btn-primary" type="button" @click="getToken">
+                                        <span v-if="guardando"><i class="fa fa-spinner fa-spin"></i></span>
+                                        <span v-else>Iniciar</span>
+                                    </button>
+
                             </div>
                         </div>
                     </div>
@@ -531,8 +539,11 @@
                                 <input id="revertir_clave" placeholder="CONTRASEÑA" type="password" required class="form-control" name="clave_sao" v-model="form.clave">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="token_revertir">Iniciar</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+                                <button class="btn btn-primary" type="button" @click="token_revertir">
+                                    <span v-if="guardando"><i class="fa fa-spinner fa-spin"></i></span>
+                                    <span v-else>Revertir</span>
+                                </button>
                             </div>
                         </div>
                     </div>

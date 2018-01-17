@@ -267,17 +267,15 @@ Vue.component('conciliaciones-edit', {
             }
         },
 
-        aprobar: function (e) {
-            e.preventDefault();
-            var _this = this;
+        aprobar: function () {
             $('#sesionSAO').modal('show');
-
         },
 
         getToken: function (e) {
             var _this = this;
-            $('#sesionSAO').modal('hide');
+
             var url = _this.api.url_api + '/api/auth';
+            this.guardando = true;
             $.ajax({
                 url:url,
                 type: 'POST',
@@ -286,16 +284,17 @@ Vue.component('conciliaciones-edit', {
                     clave: _this.form.clave
                 },
                 success: function (response) {
+                    _this.form.clave = "";
                    _this.api.token = response.token;
                    _this.getCostos(e);
-
                 },
                 error: function (error) {
+                    _this.form.clave = "";
+                    $('#sesionSAO').modal('hide');
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Iniciar Sesión :\n' + error
-
+                        text: 'No se Puede Iniciar Sesión '
                     });
                 }
             })
@@ -305,6 +304,7 @@ Vue.component('conciliaciones-edit', {
             e.preventDefault();
             var _this = this;
             var url = _this.api.url_api + '/api/conciliacion/costos';
+            this.guardando = true;
             $.ajax({
                 url: url,
                 type: 'GET',
@@ -320,17 +320,23 @@ Vue.component('conciliaciones-edit', {
                     if(response.length === 0){
                         _this.conciliar(e);
                     }else {
+                        $('#sesionSAO').modal('hide');
+                        _this.form.clave = "";
+                        _this.guardando = false;
                         _this.form.costos = response;
                         $('#tipo_gasto').modal('show');
                     }
                 },
                 error: function (error) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Iniciar Sesión :\n' + error.toString()
-
+                        text: 'No se Puede Recuperar los Costos '
                     });
+
                 }
             });
         },
@@ -339,6 +345,7 @@ Vue.component('conciliaciones-edit', {
             e.preventDefault();
             var _this = this;
             var url = App.host + '/api/conciliar';
+            this.guardando = true;
             $.ajax({
                 url: url,
                 type: 'GET',
@@ -349,21 +356,25 @@ Vue.component('conciliaciones-edit', {
                     vencimiento: _this.conciliacion.f_final
                 },
                 success: function (response) {
+                    _this.form.id_costo = "";
                     _this.enviarConciliacion(response);
                 },error: function(xhr, status, error) {
+                    _this.form.id_costo = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    $('#tipo_gasto').modal('hide');
                     var err = eval("(" + xhr.responseText + ")");
                     swal({
                         type: 'error',
                         title: '¡Error!',
                         text: 'Error al generar la Conciliación:\n' + err.message
-
                     });
-                    $('#tipo_gasto').modal('hide');
                 }
             });
         },
         enviarConciliacion: function (data) {
             var _this = this;
+            var mensaje = 'Error al generar la Conciliación ';
             var url = _this.api.url_api + '/api/conciliacion';
             $.ajax({
                 url:url,
@@ -375,6 +386,8 @@ Vue.component('conciliaciones-edit', {
                 },
                 data: data,
                 success: function (response) {
+                    _this.registrar_conciliacion(response.id_transaccion);
+                    _this.aprobar1();
                     swal({
                             type: 'success',
                             title: '¡Hecho!',
@@ -382,21 +395,25 @@ Vue.component('conciliaciones-edit', {
                         showCancelButton: false,
                         confirmButtonText: 'OK',
                         closeOnConfirm: true
-                        },
-
-                        function () {
-                            _this.registrar_conciliacion(response.id_transaccion);
-                            $('#tipo_gasto').modal('hide');
                         });
+                        _this.guardando = false;
+                        $('#sesionSAO').modal('hide');
+                        $('#tipo_gasto').modal('hide');
                 },error: function(xhr, status, error) {
-                    var err = eval("(" + xhr.responseText + ")");
+                    if(!xhr.statusText === 'error'){
+                        var err = eval("(" + xhr.responseText + ")");
+                        mensaje += ' : \n' + err;
+                    }
+
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al generar la Conciliación:\n' + err.message
-
+                        text: mensaje
+                    }, function () {
+                        _this.guardando = false;
+                        $('#sesionSAO').modal('hide');
+                        $('#tipo_gasto').modal('hide');
                     });
-                    $('#tipo_gasto').modal('hide');
                 }
             });
         },
@@ -412,11 +429,13 @@ Vue.component('conciliaciones-edit', {
                     id_estimacion: estimacion
                 },
                 success: function (response) {
-                    _this.aprobar1()
-
                 },
                 error: function (error) {
-                    alert('Error al Registrar Estiamcion'+ error.responseText);
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al generar la Estimación Generada\n'
+                    });
                 }
             });
         },
@@ -432,19 +451,7 @@ Vue.component('conciliaciones-edit', {
                     action : 'aprobar'
                 },
                 success: function(response) {
-                    if(response.status_code = 200) {
-                        swal({
-                                type: 'success',
-                                title: '¡Hecho!',
-                                text: 'Conciliación aprobada correctamente',
-                                showCancelButton: false,
-                                confirmButtonText: 'OK',
-                                closeOnConfirm: true
-                            },
-                            function () {
-                                _this.fetchConciliacion();
-                            });
-                    }
+                    _this.fetchConciliacion();
                 },
                 error: function (error) {
                     swal({
@@ -457,6 +464,32 @@ Vue.component('conciliaciones-edit', {
             });
         },
 
+        revertir_aprovacion:function () {
+            var _this = this;
+            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            $.ajax({
+                url: url,
+                type : 'POST',
+                data : {
+                    _method : 'PATCH',
+                    action : 'revertir'
+                },
+                success: function(response) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    $('#tipo_gasto').modal('hide');
+                },
+                error: function (error) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    $('#tipo_gasto').modal('hide');
+
+                }
+            });
+        },
+
         sesion_estimacion: function (e) {
             e.preventDefault();
             $('#revertir_estimacion').modal('show');
@@ -464,7 +497,7 @@ Vue.component('conciliaciones-edit', {
 
         token_revertir: function () {
             var _this = this;
-            $('#revertir_estimacion').modal('hide');
+            this.guardando = true;
             var url = _this.api.url_api + '/api/auth';
             $.ajax({
                 url:url,
@@ -474,15 +507,19 @@ Vue.component('conciliaciones-edit', {
                     clave: _this.form.clave
                 },
                 success: function (response) {
+                    _this.form.clave = "";
                     _this.api.token = response.token;
                     _this.revertir();
 
                 },
                 error: function (error) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#revertir_estimacion').modal('hide');
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Iniciar Sesión :\n' + error
+                        text: 'No se Puede Iniciar Sesión '
 
                     });
                 }
@@ -502,12 +539,15 @@ Vue.component('conciliaciones-edit', {
                 },
                 success: function (response) {
                     _this.conciliacion_revertir();
-                },
-                error: function (error) {
+                },error: function(xhr, status, error) {
+                    _this.guardando = false;
+                    $('#revertir_estimacion').modal('hide');
+                    var err = eval("(" + xhr.responseText + ")");
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Revertir la Estimación de la Conciliación :\n' + error
+                        text: 'Error al Revertir la Conciliación:\n' + err.message
+
                     });
                 }
             })
@@ -533,6 +573,8 @@ Vue.component('conciliaciones-edit', {
                                 closeOnConfirm: true
                             },
                             function () {
+                                _this.guardando = false;
+                                $('#revertir_estimacion').modal('hide');
                                 _this.fetchConciliacion();
                             });
                     }
@@ -543,6 +585,8 @@ Vue.component('conciliaciones-edit', {
                         title: '¡Error!',
                         text: App.errorsToString(error.responseText)
                     });
+                    _this.guardando = false;
+                    $('#revertir_estimacion').modal('hide');
                     _this.fetchConciliacion();
                 }
             });
