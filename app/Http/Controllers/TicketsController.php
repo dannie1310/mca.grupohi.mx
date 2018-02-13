@@ -69,7 +69,7 @@ class TicketsController extends Controller
         $desc = $this->desencripta($dat);
 
         $exp = explode("|", $desc);
-       // dd($desc);
+        //dd($desc);
         if(count($exp)>=13) {
 
             if (Context::getId() == $exp[0]) {
@@ -120,13 +120,13 @@ class TicketsController extends Controller
                     $tiro = "Sin Tiro";
                 }
                 //dd($exp[3]);
-                if ($exp[3] != '0' || $exp[3] != 'null') {
+                if ($exp[3] != 0 && $exp[3] != 'null') {
                     $t = DateTime::createFromFormat("ymdHis", $exp[3]);
                     $fechaSalida = $t->format("d/m/y H:i:s");
                 } else {
                     $fechaSalida = "Sin Fecha de Salida.";
                 }
-                if ($exp[5] != '0' || $exp[3] != 'null') {
+                if ($exp[5] != 0 && $exp[5] != 'null') {
                     $d = DateTime::createFromFormat("ymdHis", $exp[5]);
                     $fechaLlegada = $d->format("d/m/y H:i:s");
                 } else {
@@ -136,21 +136,35 @@ class TicketsController extends Controller
                 $ChInicio = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[10])->first();
                 if ($ChInicio == null) {
                     $ChInicio = "No se encontro en la base de datos";
+                }else{
+                    $ChInicio = $ChInicio->nombre . ' ' . $ChInicio->apaterno . ' ' . $ChInicio->amaterno;
                 }
                 $ChCierre = DB::connection('sca')->table($resp->base_datos . '.vw_usuarios_por_proyecto')->select('nombre', 'apaterno', 'amaterno')->where('id_usuario_intranet', $exp[7])->first();
                 if ($ChCierre == null) {
                     $ChCierre = "No se encontro en la base de datos";
+                }else{
+                    $ChCierre =$ChCierre->nombre . ' ' . $ChCierre->apaterno . ' ' . $ChCierre->amaterno;
                 }
 
-                $t = DateTime::createFromFormat("ymdHis", $exp[3]);
-                $fechaS = $t->format("Y-m-d");
-                $horaS = $t->format("H:i:s");
+                if($exp[3] != 0) {
+                    $t = DateTime::createFromFormat("ymdHis", $exp[3]);
+                    $fechaS = $t->format("Y-m-d");
+                    $horaS = $t->format("H:i:s");
+                }else{
+                    $fechaS = null;
+                    $horaS = null;
+                }
+                if($exp[5] != 0) {
+                    $d = DateTime::createFromFormat("ymdHis", $exp[5]);
+                    $fechaL = $d->format("Y-m-d");
+                    $horaL = $d->format("H:i:s");
+                }else{
+                    $fechaL = null;
+                    $horaL = null;
+                }
 
-                $d = DateTime::createFromFormat("ymdHis", $exp[5]);
-                $fechaL = $d->format("Y-m-d");
-                $horaL = $d->format("H:i:s");
 
-              /* $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."',".$exp[10].",".$exp[11].", );";
+               $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil, folioMina, folioSeguimiento, tipoViaje) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."','".$exp[10]."','".$exp[11]."', '".$exp[17]."','".$exp[14]."','".$exp[15]."','".$exp[13]."');";
 
                 $archivo=fopen('C:\Users\LERDES1\Desktop\datos.txt',"a") or
                 die("No se pudo crear el archivo");
@@ -159,7 +173,7 @@ class TicketsController extends Controller
                 fputs($archivo,"--------------------");
                 fputs($archivo,"\n");
                 fclose($archivo);
-                return response()->json(['error' => 'Esté Ticket: OK.'], 400);*/
+               // return response()->json(['error' => 'Esté Ticket: OK.'], 400);
 
                 return response()->json([
                     'proyecto' => $resp->descripcion,
@@ -170,9 +184,14 @@ class TicketsController extends Controller
                     'fechaSalida' => $fechaSalida,
                     'destino' => $tiro,
                     'fechaLlegada' => $fechaLlegada,
-                    'ChInicio' => $ChInicio->nombre . ' ' . $ChInicio->apaterno . ' ' . $ChInicio->amaterno,
-                    'ChCierre' => $ChCierre->nombre . ' ' . $ChCierre->apaterno . ' ' . $ChCierre->amaterno,
-                    'barras' => $exp[8] . $exp[1]
+                    'ChInicio' => $ChInicio,
+                    'ChCierre' => $ChCierre,
+                    'barras' => $exp[8] . $exp[1],
+                    'tipo_suministro' => $exp [13],
+                    'folio_mina' => $exp[14],
+                    'folio_seg' => $exp[15],
+                    'volumen' => $exp[16],
+                    'tipo_permiso' => $exp[17]
                 ], 200);
 
             }else{
