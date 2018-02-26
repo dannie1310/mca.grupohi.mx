@@ -129,6 +129,52 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Tipo Suministro: </label>
+                                <input class="form-control" readonly="true" :value="items.tipo_suministro" />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Tipo Suministro: </label>
+                                <input class="form-control" readonly="true" :value="items.folio_mina" />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Tipo Suministro: </label>
+                                <input class="form-control" readonly="true" :value="items.folio_seg" />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Tipo Suministro: </label>
+                                <input class="form-control" readonly="true" :value="items.volumen" />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Tipo Suministro: </label>
+                                <input class="form-control" readonly="true" :value="items.tipo_permiso" />
+
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
         </tickets-validar>

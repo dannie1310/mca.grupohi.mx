@@ -138,6 +138,51 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Tipo Suministro: </label>
+                    <input class="form-control" readonly="true" value="<?php echo $info->tipo_suministro ?>" />
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Tipo Suministro: </label>
+                    <input class="form-control" readonly="true" value="<?php echo $info->folio_mina ?>" />
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Tipo Suministro: </label>
+                    <input class="form-control" readonly="true" value="<?php echo $info->folio_seg ?>" />
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Tipo Suministro: </label>
+                    <input class="form-control" readonly="true" value="<?php echo $info->volumen ?>" />
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Tipo Suministro: </label>
+                    <input class="form-control" readonly="true" value="<?php echo $info->tipo_permiso ?>" />
+
+                </div>
+            </div>
+        </div>
 
 
 </body>
