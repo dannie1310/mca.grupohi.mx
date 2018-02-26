@@ -150,7 +150,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
-                    <label>Tipo Suministro: </label>
+                    <label>Folio Mina: </label>
                     <input class="form-control" readonly="true" value="<?php echo $info->folio_mina ?>" />
 
                 </div>
@@ -159,7 +159,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
-                    <label>Tipo Suministro: </label>
+                    <label>Folio Seguimiento: </label>
                     <input class="form-control" readonly="true" value="<?php echo $info->folio_seg ?>" />
 
                 </div>
@@ -168,7 +168,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
-                    <label>Tipo Suministro: </label>
+                    <label>Volumen: </label>
                     <input class="form-control" readonly="true" value="<?php echo $info->volumen ?>" />
 
                 </div>
@@ -177,7 +177,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
-                    <label>Tipo Suministro: </label>
+                    <label>Tipo Permiso: </label>
                     <input class="form-control" readonly="true" value="<?php echo $info->tipo_permiso ?>" />
 
                 </div>
