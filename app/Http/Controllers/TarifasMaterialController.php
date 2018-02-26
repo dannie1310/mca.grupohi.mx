@@ -20,7 +20,7 @@ class TarifasMaterialController extends Controller
         $this->middleware('context');
         $this->middleware('permission:desactivar-tarifas-material', ['only' => ['destroy']]);
         $this->middleware('permission:crear-tarifas-material', ['only' => ['create', 'store']]);
-        $this->middleware('permission:editar-tarifas-material', ['only' => ['create', 'store']]);
+        $this->middleware('permission:editar-tarifas-material', ['only' => ['edit', 'store']]);
 
         parent::__construct();
     }
