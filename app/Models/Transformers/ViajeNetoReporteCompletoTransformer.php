@@ -197,9 +197,7 @@ FROM
         conflictos_entre_viajes conflictos_entre_viajes) Subquery ON (DATE_FORMAT(timestamp, '%Y-%m-%d') = Subquery.maximo)
     GROUP BY conflictos_entre_viajes.id) AS cev ON (cev.id = cevd.idconflicto)
       WHERE
-          v.Estatus " . $estatus  . "
-      AND
-      CAST(CONCAT(v.FechaLlegada,
+       CAST(CONCAT(v.FechaLlegada,
                     ' ',
                     v.HoraLlegada)
             AS DATETIME) between '{$timestamp_inicial}' and '{$timestamp_final}'
