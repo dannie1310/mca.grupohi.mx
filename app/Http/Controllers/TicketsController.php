@@ -163,6 +163,19 @@ class TicketsController extends Controller
                     $horaL = null;
                 }
 
+                if(count($exp)>13){
+                    $tipo_sum = $exp[13];
+                    $folioM=$exp[14];
+                    $folioS=$exp[15];
+                    $vol=$exp[16];
+                    $tipo_p = $exp[17];
+                }else{
+                    $tipo_sum = "No encontrado";
+                    $folioM="No encontrado";
+                    $folioS="No encontrado";
+                    $vol="No encontrado";
+                    $tipo_p = "No encontrado";
+                }
 
             /*   $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil, folioMina, folioSeguimiento, tipoViaje) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."','".$exp[10]."','".$exp[11]."', '".$exp[17]."','".$exp[14]."','".$exp[15]."','".$exp[13]."');";
 
@@ -187,11 +200,11 @@ class TicketsController extends Controller
                     'ChInicio' => $ChInicio,
                     'ChCierre' => $ChCierre,
                     'barras' => $exp[8] . $exp[1],
-                    'tipo_suministro' => $exp [13],
-                    'folio_mina' => $exp[14],
-                    'folio_seg' => $exp[15],
-                    'volumen' => $exp[16],
-                    'tipo_permiso' => $exp[17]
+                    'tipo_suministro' => $tipo_sum,
+                    'folio_mina' => $folioM,
+                    'folio_seg' => $folioS,
+                    'volumen' => $vol,
+                    'tipo_permiso' => $tipo_p
                 ], 200);
 
             }else{
