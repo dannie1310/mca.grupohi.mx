@@ -31,6 +31,14 @@ class InicioViajeReporteTransformer extends AbstractTransformer
                 m.Descripcion as material,
                 o.Descripcion as origen,
                 p.name as perfil,
+                i.folioMina,
+                i.folioSeguimiento,
+                i.code,
+                i.tipo,
+                case when i.tipo = 1 then 'Origen (Mina)' else 'Entrada' end as tipo_viaje,
+                i.deductiva,
+                i.idMotivo_deductiva,
+                dm.motivo,
                 case 
                 when (hour(i.fecha_origen) >= '07:00:00' and hour(i.fecha_origen) < '19:00:00')  then 'Primer Turno'
                 else 'Segundo Turno'
@@ -41,6 +49,7 @@ class InicioViajeReporteTransformer extends AbstractTransformer
                 inner join origenes o on o.IdOrigen = i.idorigen
                 left join usuario u on u.idusuario = i.idusuario
                 left join configuracion_perfiles_cat as p on p.id = i.idperfil
+                left join deductivas_motivos as dm on dm.id = i.idMotivo_deductiva
                 where i.fecha_origen between '{$timestamp_inicial}' and '{$timestamp_final}'
                 group by i.id
                 order by fechaorigen,  camion";
