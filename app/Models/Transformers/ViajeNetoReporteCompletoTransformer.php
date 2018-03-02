@@ -112,7 +112,16 @@ class ViajeNetoReporteCompletoTransformer extends AbstractTransformer
         WHEN 1 THEN 'Cerrada'
         WHEN 2 THEN 'Aprobada'
         ELSE 'Cancelada'
-    END AS estado_string
+    END AS estado_string,
+      v.folioMina,
+    v.folioSeguimiento,
+    CASE
+        WHEN
+            v.tipoViaje = 1
+        THEN
+            'Origen (Mina)'
+        ELSE 'Entrada'
+    END AS tipo_viaje
 FROM
     viajesnetos AS v
         JOIN
