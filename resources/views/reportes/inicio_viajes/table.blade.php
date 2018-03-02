@@ -38,6 +38,12 @@
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Checador</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Perfil</font></div></td>
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Turno</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Mina</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Seguimiento</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Ticket</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Deductiva</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Motivo Deductiva</font></div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Tipo de Viaje</font></div></td>
 
 
                     </tr>
@@ -54,6 +60,21 @@
                             <td width="5"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->usuario; ?></font></div></td>
                             <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->perfil; ?></font></div></td>
                             <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->turno; ?></font></div></td>
+                            <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->folioMina; ?></font></div></td>
+                            <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->folioSeguimiento; ?></font></div></td>
+                            @if($item->tipo==0)
+                                <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">No Aplica</font></div></td>
+                            @else
+                                <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->code; ?></font></div></td>
+                            @endif
+                            @if($item->deductiva == 0)
+                                <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">0</font></div></td>
+                                <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">No aplica</font></div></td>
+                            @else
+                                <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->deductiva; ?></font></div></td>
+                                <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->motivo; ?></font></div></td>
+                            @endif
+                            <td width="10"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->tipo_viaje; ?></font></div></td>
                         </tr>
                     @endforeach
                     @else

@@ -113,7 +113,16 @@ class ViajeNetoReporteAuditoriaTransformer extends AbstractTransformer
             usuario3.amaterno) AS valido,
             viajes.Creo as idvalido,
     viajes.FechaCarga as fecha_valido,
-    viajes.HoraCarga as hora_valido
+    viajes.HoraCarga as hora_valido,
+     v.folioMina,
+    v.folioSeguimiento,
+    CASE
+        WHEN
+            v.tipoViaje = 1
+        THEN
+            'Origen (Mina)'
+        ELSE 'Entrada'
+    END AS tipo_viaje
 FROM
     viajesnetos AS v
         JOIN
