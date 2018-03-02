@@ -18,44 +18,30 @@
             </tr>
             </thead>
             <tbody>
-           {{-- @foreach($tarifas as $tarifa)
-                @if($tarifa->FinVigenciaTarifa == 'VIGENTE')
-                    <tr style="background-color: azure">
-                @else
-                    <tr>
-                        @endif
-                        <td>{{ $tarifa->material->Descripcion }}{!! Form::hidden('IdMaterial', $tarifa->material->IdMaterial) !!}</td>
-                        <td>{{ $tarifa->PrimerKM }}</td>
-                        <td>{{ $tarifa->KMSubsecuente }}</td>
-                        <td>{{ $tarifa->KMAdicional }}</td>
-                        <td>{{ $tarifa->InicioVigencia->format("d-m-Y h:i:s") }}</td>
-                        <td>{{ $tarifa->FinVigenciaTarifa }}</td>
-                        @if($tarifa->idtarifas_tipo != null)
-                            @foreach($tipos as $tipo)
-                                @if($tipo->idtarifas_tipo == $tarifa->idtarifas_tipo)
-                                    <td>{{ $tipo->nombre }}</td>
-                                @endif
-                            @endforeach
-                        @else
-                            <td>NO ASIGNADO</td>
-                        @endif
-                        <td>{{ $tarifa->registro->present()->NombreCompleto }}</td>
-                        <td>{{ $tarifa->Fecha_Hora_Registra->format("d-m-Y h:i:s") }}</td>
-                        <td>{{ $tarifa->estatus_string }}</td>
-                        <td>{{ $tarifa->user_desactivo }}</td>
-                        <td>{{ $tarifa->motivo }}</td>
-                        <td>
-                            @permission('editar-tarifas-material')
-                            <a href="{{ route('tarifas_material.edit', $tarifa) }}" title="Editar" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-                            @endpermission
-                            @permission('desactivar-tarifas-material')
-                            @if($tarifa->Estatus == 1)
-                                <button title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_tarifa({{$tarifa->IdTarifa}})"><i class="fa fa-remove"></i></button>
-                            @endif
-                            @endpermission
-                        </td>
-                    </tr>
-                    @endforeach--}}
+                 <tr>
+                     <td>No validados y No conciliados</td>
+                     <td>{{ $no_validados }}</td>
+                     @if($no_validados > 0)
+                        <td>110</td>
+                     @else
+                        <td>NO ASIGNADO</td>
+                     @endif
+                     <td>
+                     <a href="{{ route('tarifas_material.edit', 1) }}" title="Editar" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a>
+                     </td>
+                 </tr>
+                 <tr>
+                     <td>Validados y No conciliados</td>
+                     <td>{{ $validados }}</td>
+                     @if($validados > 0)
+                         <td>110</td>
+                     @else
+                         <td>NO ASIGNADO</td>
+                     @endif
+                     <td>
+                         <a href="{{ route('tarifas_material.edit', 1) }}" title="Editar" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a>
+                     </td>
+                 </tr>
             </tbody>
         </table>
     </div>
