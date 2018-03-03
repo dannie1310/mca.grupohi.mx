@@ -22,24 +22,24 @@
                      <td>No validados y No conciliados</td>
                      <td>{{ $no_validados }}</td>
                      @if($no_validados > 0)
-                        <td>110</td>
+                         <td> <button type="button" class="btn btn-danger">Warning</button></td>
                      @else
-                        <td>NO ASIGNADO</td>
+                         <td> <button type="button" class="btn btn-success">Warning</button></td>
                      @endif
                      <td>
-                     <a href="{{ route('tarifas_material.edit', 1) }}" title="Editar" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a>
+                     <a href="{{ route('tablero-detalle.show',1) }}" title="Detalle" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a>
                      </td>
                  </tr>
                  <tr>
                      <td>Validados y No conciliados</td>
                      <td>{{ $validados }}</td>
                      @if($validados > 0)
-                         <td>110</td>
+                         <td> <button type="button" class="btn btn-danger">Warning</button></td>
                      @else
-                         <td>NO ASIGNADO</td>
+                         <td> <button type="button" class="btn btn-success"> </button></td>
                      @endif
                      <td>
-                         <a href="{{ route('tarifas_material.edit', 1) }}" title="Editar" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a>
+                         <a href="{{ route('tablero-detalle.show',2) }}" title="Detalle" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a>
                      </td>
                  </tr>
             </tbody>

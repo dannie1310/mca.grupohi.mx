@@ -266,6 +266,7 @@ Route::group(['prefix' => 'csv'],function () {
 Route::get('detalle_configuracion', 'DetalleAdministracionController@index')->name('detalle.configuracion');
 
 Route::resource('tablero-control', 'TableroControlController');
+Route::get('tablero-detalle/{id}', 'TableroControlController@show')->name("tablero-detalle.show");
 
 /*
  * API Routes

@@ -68,6 +68,22 @@ class TableroControlController extends Controller
     public function show($id)
     {
         //
+        //dd($id);
+        if($id == 1){ //no validados y no conciliados
+            $novalidados = DB::connection("sca")->table("viajesnetos as v")
+                ->select('v.IdCamion', 'c.Economico as economico', 'v.idorigen', 'o.Descripcion as origen', 'v.FechaSalida as fs', 'v.HoraSalida as hs', 'v.CubicacionCamion as cubicacion', 'v.IdTiro',
+                        't.Descripcion as tiro', 'v.FechaLlegada as fl', 'v.HoraLlegada as hl', 'v.IdMaterial', 'm.Descripcion as material', 'v.Code as code', 'v.folioMina as foliomina', 'v.folioSeguimiento as folioseg')
+                ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+                ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
+                ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
+                ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
+                ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
+                ->whereBetween("v.FechaLlegada",["2017-12-21","2017-12-28"])
+                ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado");
+
+            return view('tablero-control.detalle_no_validado')->withDatos($novalidados->paginate(50));
+        }
+
     }
 
     /**
