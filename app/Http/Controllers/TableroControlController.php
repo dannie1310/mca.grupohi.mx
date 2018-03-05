@@ -9,6 +9,13 @@ use App\Http\Controllers\Controller;
 
 class TableroControlController extends Controller
 {
+    function __construct() {
+        $this->middleware('auth');
+        $this->middleware('context');
+
+        parent::__construct();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,12 +31,12 @@ class TableroControlController extends Controller
         // Viajes no validados y no conciliados.
         $novalidados = DB::connection("sca")->table("viajesnetos as v")
             ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
-            ->whereBetween("v.FechaLlegada",["2017-12-21","2017-12-28"])
+            ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])
             ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
         // Viajes validados y no conciliados.
         $validados = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
-            ->whereBetween("v.FechaLlegada",["2017-12-21","2017-12-28"])->whereIn("v.Estatus",array('1','21'))
+            ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])->whereIn("v.Estatus",array('1','21'))
             ->whereNotNull("vr.IdViaje")
             ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
 
@@ -65,10 +72,12 @@ class TableroControlController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
-        //dd($id);
+        $fecha = date('Y-m-d');
+        $inicioFecha = strtotime('-7 day', strtotime($fecha));
+        $inicioFecha = date('Y-m-d', $inicioFecha);
+        $busqueda = $request->get('buscar');
         if($id == 1){ //no validados y no conciliados
             $novalidados = DB::connection("sca")->table("viajesnetos as v")
                 ->select('v.IdCamion', 'c.Economico as economico', 'v.idorigen', 'o.Descripcion as origen', 'v.FechaSalida as fs', 'v.HoraSalida as hs', 'v.CubicacionCamion as cubicacion', 'v.IdTiro',
@@ -78,10 +87,24 @@ class TableroControlController extends Controller
                 ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
                 ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
                 ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
-                ->whereBetween("v.FechaLlegada",["2017-12-21","2017-12-28"])
-                ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado");
+                ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])
+                ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->get();
 
-            return view('tablero-control.detalle_no_validado')->withDatos($novalidados->paginate(50));
+            return view('tablero-control.detalle_no_validado')->withTipo(1)->withFechaI($inicioFecha)->withFechaF($fecha)->withDatos($novalidados);
+        }else if ($id == 2){
+            $validados = DB::connection("sca")->table("viajesnetos as v")
+                ->select('v.IdCamion', 'c.Economico as economico', 'v.idorigen', 'o.Descripcion as origen', 'v.FechaSalida as fs', 'v.HoraSalida as hs', 'v.CubicacionCamion as cubicacion', 'v.IdTiro',
+                    't.Descripcion as tiro', 'v.FechaLlegada as fl', 'v.HoraLlegada as hl', 'v.IdMaterial', 'm.Descripcion as material', 'v.Code as code', 'v.folioMina as foliomina', 'v.folioSeguimiento as folioseg')
+                ->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+                ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
+                ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
+                ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
+                ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
+                ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
+                ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])->whereIn("v.Estatus",array('1','21'))
+                ->whereNotNull("vr.IdViaje")
+                ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->get();
+            return view('tablero-control.detalle_no_validado')->withTipo(2)->withFechaI($inicioFecha)->withFechaF($fecha)->withDatos($validados);
         }
 
     }

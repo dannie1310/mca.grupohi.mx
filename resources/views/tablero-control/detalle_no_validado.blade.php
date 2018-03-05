@@ -1,9 +1,15 @@
 @extends('layout')
 
 @section('content')
-    <h1>VIAJES NO VALIDADOS Y NO CONCILIADOS</h1>
+    @if($tipo == 1)
+        <h1>VIAJES NO VALIDADOS Y NO CONCILIADOS</h1>
+    @elseif($tipo == 2)
+        <h1>VIAJES VALIDADOS Y NO CONCILIADOS</h1>
+    @endif
+
+    <h5>Rango de fecha: {{$fecha_i}} - {{$fecha_f}}</h5>
     <hr>
-    @include('partials.search-form')
+
     <div class="table-responsive">
         <table class="table table-hover table-bordered small">
             <thead>
@@ -34,19 +40,10 @@
                     <td>{{ $d->code }}</td>
                     <td>{{ $d->foliomina }}</td>
                     <td>{{ $d->folioseg }}</td>
-
                 </tr>
             @endforeach
             </tbody>
         </table>
-        <div class="text-center">
-            {!! $camiones->appends(['buscar' => $busqueda])->render() !!}
-        </div>
-
-        <form id="eliminar_camion" method="POST">
-            {{ csrf_field() }}
-            <input type="hidden" name="_method" value="delete">
-            <input type="hidden" name="motivo" value/>
-        </form>
+        <h4>Total: {{ count($datos) }}</h4>
     </div>
 @stop
