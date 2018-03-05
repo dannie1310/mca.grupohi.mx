@@ -18,7 +18,7 @@
             </thead>
             <tbody>
                  <tr>
-                     <td>No validados y No conciliados</td>
+                     <td>Viajes: No validados y No conciliados</td>
                      <td>{{ $no_validados }}</td>
                      @if($no_validados > 0)
                          <td><button type="button" class="btn btn-danger btn-circle"></button></td>
@@ -30,7 +30,7 @@
                      </td>
                  </tr>
                  <tr>
-                     <td>Validados y No conciliados</td>
+                     <td>Viajes: Validados y No conciliados</td>
                      <td>{{ $validados }}</td>
                      @if($validados > 0)
                          <td> <button type="button" class="btn btn-danger btn-circle"></button></td>
