@@ -33,6 +33,12 @@ class TableroControlController extends Controller
             ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])
             ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
+
+        $novalidados_total = DB::connection("sca")->table("viajesnetos as v")
+            ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+            ->whereRaw("v.FechaLlegada < '".$inicioFecha."'")
+            ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
+
         // Viajes validados y no conciliados.
         $validados = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
@@ -40,9 +46,18 @@ class TableroControlController extends Controller
             ->whereNotNull("vr.IdViaje")
             ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
 
+        $validados_total = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+            ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
+            ->whereRaw("v.FechaLlegada < '".$inicioFecha."'")
+            ->whereIn("v.Estatus",array('1','21'))
+            ->whereNotNull("vr.IdViaje")
+            ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
-                ->withValidados($validados);
+                ->withNoValidadosTotal($novalidados_total)
+                ->withValidados($validados)
+                ->withValidadosTotal($validados_total);
     }
 
     /**
@@ -80,31 +95,35 @@ class TableroControlController extends Controller
         $busqueda = $request->get('buscar');
         if($id == 1){ //no validados y no conciliados
             $novalidados = DB::connection("sca")->table("viajesnetos as v")
-                ->select('v.IdCamion', 'c.Economico as economico', 'v.idorigen', 'o.Descripcion as origen', 'v.FechaSalida as fs', 'v.HoraSalida as hs', 'v.CubicacionCamion as cubicacion', 'v.IdTiro',
-                        't.Descripcion as tiro', 'v.FechaLlegada as fl', 'v.HoraLlegada as hl', 'v.IdMaterial', 'm.Descripcion as material', 'v.Code as code', 'v.folioMina as foliomina', 'v.folioSeguimiento as folioseg')
+                ->selectRaw("v.IdCamion, c.Economico AS economico, v.idorigen, o.Descripcion AS origen, v.FechaSalida AS fs, v.HoraSalida AS hs,
+                    v.CubicacionCamion AS cubicacion, v.IdTiro, t.Descripcion AS tiro, v.FechaLlegada AS fl, v.HoraLlegada AS hl, v.IdMaterial,
+                    m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$inicioFecha."','0','1') AS alerta")
                 ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
                 ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
                 ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
                 ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
                 ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
-                ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])
-                ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->get();
+                ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")
+                ->orderBy("v.FechaLlegada","desc");
 
-            return view('tablero-control.detalle_no_validado')->withTipo(1)->withFechaI($inicioFecha)->withFechaF($fecha)->withDatos($novalidados);
+            return view('tablero-control.detalle_no_validado')->withTipo(1)->withFechaF($fecha)->withDatos($novalidados->paginate(100))->withBusqueda($busqueda);
+
         }else if ($id == 2){
             $validados = DB::connection("sca")->table("viajesnetos as v")
-                ->select('v.IdCamion', 'c.Economico as economico', 'v.idorigen', 'o.Descripcion as origen', 'v.FechaSalida as fs', 'v.HoraSalida as hs', 'v.CubicacionCamion as cubicacion', 'v.IdTiro',
-                    't.Descripcion as tiro', 'v.FechaLlegada as fl', 'v.HoraLlegada as hl', 'v.IdMaterial', 'm.Descripcion as material', 'v.Code as code', 'v.folioMina as foliomina', 'v.folioSeguimiento as folioseg')
+                ->selectRaw("v.IdCamion, c.Economico AS economico, v.idorigen, o.Descripcion AS origen, v.FechaSalida AS fs, v.HoraSalida AS hs,
+                    v.CubicacionCamion AS cubicacion, v.IdTiro, t.Descripcion AS tiro, v.FechaLlegada AS fl, v.HoraLlegada AS hl, v.IdMaterial,
+                    m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$inicioFecha."','0','1') AS alerta")
                 ->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
                 ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
                 ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
                 ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
                 ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
                 ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
-                ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])->whereIn("v.Estatus",array('1','21'))
+                ->whereIn("v.Estatus",array('1','21'))
                 ->whereNotNull("vr.IdViaje")
-                ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->get();
-            return view('tablero-control.detalle_no_validado')->withTipo(2)->withFechaI($inicioFecha)->withFechaF($fecha)->withDatos($validados);
+                ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")
+                ->orderBy("v.FechaLlegada","desc");
+            return view('tablero-control.detalle_no_validado')->withTipo(2)->withFechaF($fecha)->withDatos($validados->paginate(100))->withBusqueda($busqueda);
         }
 
     }
