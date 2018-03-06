@@ -12,6 +12,7 @@ class TableroControlController extends Controller
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
+        $this->middleware('permission:tablero-control', ['only' => ['index', 'show']]);
 
         parent::__construct();
     }
