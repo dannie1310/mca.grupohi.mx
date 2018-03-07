@@ -54,11 +54,35 @@ class TableroControlController extends Controller
             ->whereNotNull("vr.IdViaje")
             ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
 
+        //usuario con diferentes imei
+        $usuarios_imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+            ->whereNotNull("id_checador")
+            ->groupBy("id_checador")->havingRaw("count('id_checador')>1")->count();
+
+        //un IMEI con diferentes usuarios
+        $imei_usuario = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+            ->whereNotNull("imei")
+            ->groupBy("imei")->havingRaw("count('imei')>1")->count();
+
+        //impresora con diferente imei
+        $impresora_imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+            ->whereNotNull("id_impresora")
+            ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->count();
+
+        //imei con diferente impresora
+        $imei_impresora = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+            ->whereNotNull("imei")
+            ->groupBy("imei")->havingRaw("count('imei')>1")->count();
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
                 ->withValidados($validados)
-                ->withValidadosTotal($validados_total);
+                ->withValidadosTotal($validados_total)
+                ->withUsuarioImei($usuarios_imei)
+                ->withImeiUsuario($imei_usuario)
+                ->withImpresoraImei($impresora_imei)
+                ->withImeiImpresora($imei_impresora);
     }
 
     /**
@@ -125,6 +149,21 @@ class TableroControlController extends Controller
                 ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")
                 ->orderBy("v.FechaLlegada","desc");
             return view('tablero-control.detalle_no_validado')->withTipo(2)->withFechaF($fecha)->withDatos($validados->paginate(100))->withBusqueda($busqueda);
+        }else if($id == 3){
+            //usuario con diferentes imei
+            $usuario = DB::connection("sca")->table("telefonos")->selectRaw("id_checador")
+                    ->where("estatus","=","1")
+                    ->whereNotNull("id_checador")
+                    ->groupBy("id_checador")->havingRaw("count('id_checador')>1")->get();
+
+            foreach ($usuario as $u) {
+                $dat[]=[ DB::connection("sca")->table("telefonos")
+                    ->join("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
+                    ->where("telefonos.estatus", "=", "1")
+                    ->where("telefonos.id_checador", "=",$u->id_checador)->get()
+                ];
+            }
+            return view('tablero-control.telefonos_detalle')->withTipo(3)->withFechaF($fecha)->withTelefono($dat);
         }
 
     }
