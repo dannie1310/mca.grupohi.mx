@@ -86,7 +86,9 @@
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Estatus</font> </div></td>
 
                         <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Ticket</font> </div></td>
-
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Mina</font> </div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Seguimiento</font> </div></td>
+                        <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Tipo de Viaje</font> </div></td>
                             <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Folio Conciliaci&oacute;n</font> </div></td>
                             <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Fecha Conciliaci&oacute;n</font> </div></td>
                             <td bgcolor="969696"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px; font-weight:bold ">Estado Conciliaci&oacute;n</font> </div></td>
@@ -157,7 +159,9 @@
                                     <td width="80"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->Estatus; ?></font></div></td>
 
                                 <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;">'<?php echo $item->code; ?></font></div></td>
-
+                                <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->folioMina; ?></font></div></td>
+                                <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->folioSeguimiento; ?></font></div></td>
+                                <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->tipo_viaje; ?></font></div></td>
                                     <td width="20"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->idconciliacion; ?></font></div></td>
                                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->fecha_conciliacion; ?></font></div></td>
                                     <td width="50"><div align="center"><font color="#000000" face="Trebuchet MS" style="font-size:10px;"><?php echo $item->estado_string; ?></font></div></td>

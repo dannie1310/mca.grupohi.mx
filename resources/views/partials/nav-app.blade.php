@@ -249,6 +249,16 @@
           </ul>
       </li>
   @endif
+  @if(Auth::user()->can(['tablero-control']))
+      <li class="dropdown">
+          <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
+              Auditoria<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu">
+              <li><a href="{{ route('tablero-control.index') }}">Tablero de Control</a></li>
+          </ul>
+      </li>
+  @endif
   @if(Auth::user()->hasRole(['administrador-permisos','auditoria','administrador-sistema'])|| Auth::user()->can(['auditoria-resumen-configuracion','permisos_cierre_x_periodo']))
 
       <li class="dropdown">
@@ -270,7 +280,6 @@
           </ul>
       </li>
   @endif
-
 @else
   <li><a href="{{ route('proyectos') }}">Proyectos</a></li>
 @endif

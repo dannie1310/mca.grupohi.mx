@@ -97,16 +97,17 @@ class ApiController extends Controller
 
     public function conciliar(Request $request){
 
-        $concil = DB::connection('sca')->select('SELECT conciliacion.idconciliacion,viajes.IdMaterial, materiales.Descripcion,conciliacion.idempresa, empresas.RFC, viajes.CubicacionCamion as cubicacion, sum(viajes.Volumen / viajes.CubicacionCamion) as pu,
-            empresas.razonSocial, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, sum(viajes.volumen) as volumen, sum(viajes.CubicacionCamion) as m_cubicos , format((viajes.Importe / viajes.Volumen), 4) as precio_unitario 
-            from conciliacion_detalle 
-            join conciliacion using (idconciliacion) 
-            join viajes using (idviaje) 
-            join materiales using (idmaterial)
-            join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
-            left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
-            where conciliacion.idconciliacion = '.$request->id_conciliacion.' and tiros_conceptos.fin_vigencia is null
-            group by materiales.IdMaterial, tiros_conceptos.id_concepto, precio_unitario;');
+        $concil = DB::connection('sca')->select('SELECT conciliacion.idconciliacion,viajes.IdMaterial, materiales.Descripcion,conciliacion.idempresa, empresas.RFC, viajes.CubicacionCamion as cubicacion, 
+                                                      sum(viajes.Volumen / viajes.CubicacionCamion) as pu, empresas.razonSocial, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, 
+                                                      sum(viajes.volumen) as volumen, sum(viajes.CubicacionCamion) as m_cubicos , format((viajes.Importe / viajes.Volumen), 4) as precio_unitario 
+                                                      from conciliacion_detalle 
+                                                    join conciliacion using (idconciliacion) 
+                                                    join viajes using (idviaje) 
+                                                    join materiales using (idmaterial)
+                                                    join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
+                                                    left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
+                                                    where conciliacion.idconciliacion = '.$request->id_conciliacion.' and tiros_conceptos.fin_vigencia is null
+                                                    group by materiales.IdMaterial, tiros_conceptos.id_concepto, precio_unitario;');
 
         if(!$concil){
             throw new Exception("No hay datos a Concialiar");
