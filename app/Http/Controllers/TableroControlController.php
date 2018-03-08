@@ -157,13 +157,101 @@ class TableroControlController extends Controller
                     ->groupBy("id_checador")->havingRaw("count('id_checador')>1")->get();
 
             foreach ($usuario as $u) {
-                $dat[]=[ DB::connection("sca")->table("telefonos")
+                $datos = DB::connection("sca")->table("telefonos")
                     ->join("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
                     ->where("telefonos.estatus", "=", "1")
-                    ->where("telefonos.id_checador", "=",$u->id_checador)->get()
-                ];
+                    ->where("telefonos.id_checador", "=",$u->id_checador)->get();
+                foreach ($datos as $r) {
+                    $dat[] = [
+                        'id' => $r->id,
+                        'imei' => $r->imei,
+                        'usuario' => $r->id_checador,
+                        'nombre' => $r->nombre." ".$r->apaterno." ".$r->amaterno,
+                        'marca' => $r->marca,
+                        'modelo' => $r->modelo,
+                        'linea' => $r->linea
+                     ];
+                }
             }
-            return view('tablero-control.telefonos_detalle')->withTipo(3)->withFechaF($fecha)->withTelefono($dat);
+             return view('tablero-control.telefonos_detalle')->withTipo(3)->withFechaF($fecha)->withTelefono($dat);
+        }else if($id == 4){
+            $imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+                ->whereNotNull("imei")
+                ->groupBy("imei")->havingRaw("count('imei')>1")->get();
+            foreach ($imei as $u) {
+                $datos = DB::connection("sca")->table("telefonos")
+                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
+                    ->where("estatus","=","1")
+                    ->where("imei", "=", $u->imei)->get();
+
+                foreach ($datos as $r) {
+                    $dat[] = [
+                        'id' => $r->id,
+                        'imei' => $r->imei,
+                        'usuario' => $r->id_checador,
+                        'nombre' => $r->nombre." ".$r->apaterno." ".$r->amaterno,
+                        'marca' => $r->marca,
+                        'modelo' => $r->modelo,
+                        'linea' => $r->linea
+                    ];
+                }
+            }
+            return view('tablero-control.telefonos_detalle')->withTipo(4)->withFechaF($fecha)->withTelefono($dat);
+        }else if($id == 5){
+            $imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+                ->whereNotNull("imei")
+                ->groupBy("imei")->havingRaw("count('imei')>1")->get();
+
+            foreach ($imei as $u) {
+                $datos = DB::connection("sca")->table("telefonos")
+                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
+                    ->leftjoin("impresoras", "impresoras.id","=", "telefonos.id_impresora")
+                    ->where("telefonos.estatus","=","1")
+                    ->where("imei", "=", $u->imei)->get();
+
+                foreach ($datos as $r) {
+                    $dat[] = [
+                        'id' => $r->id,
+                        'imei' => $r->imei,
+                        'usuario' => $r->id_checador,
+                        'nombre' => $r->nombre." ".$r->apaterno." ".$r->amaterno,
+                        'marca' => $r->marca,
+                        'modelo' => $r->modelo,
+                        'linea' => $r->linea,
+                        'impresora' => $r->id_impresora,
+                        'mac' => $r->mac
+                    ];
+                }
+            }
+            return view('tablero-control.telefonos_detalle')->withTipo(5)->withFechaF($fecha)->withTelefono($dat);
+        }
+        else if($id == 6){
+            $impresora = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+                ->whereNotNull("id_impresora")
+                ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->get();
+
+            foreach ($impresora as $u) {
+                $datos = DB::connection("sca")->table("telefonos")
+                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
+                    ->leftjoin("impresoras", "impresoras.id","=", "telefonos.id_impresora")
+                    ->where("telefonos.estatus","=","1")
+                    ->where("id_impresora", "=", $u->id_impresora)->get();
+
+                foreach ($datos as $r) {
+                    $dat[] = [
+                        'id' => $r->id,
+                        'imei' => $r->imei,
+                        'usuario' => $r->id_checador,
+                        'nombre' => $r->nombre." ".$r->apaterno." ".$r->amaterno,
+                        'marca' => $r->marca,
+                        'modelo' => $r->modelo,
+                        'linea' => $r->linea,
+                        'impresora' => $r->id_impresora,
+                        'mac' => $r->mac
+                    ];
+                }
+            }
+            return view('tablero-control.telefonos_detalle')->withTipo(6)->withFechaF($fecha)->withTelefono($dat);
         }
 
     }

@@ -31,6 +31,7 @@
 
             @foreach($datos as $d)
                <tr>
+
                     <td>{{ $d->economico }}</td>
                     <td>{{ $d->origen }}</td>
                     <td>{{ $d->material }}</td>
