@@ -55,24 +55,38 @@ class TableroControlController extends Controller
             ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
 
         //usuario con diferentes imei
-        $usuarios_imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+        $usuarios_imei = DB::connection("sca")->table("telefonos")
+            ->selectRaw("count('id_checador') as total")
+            ->where("estatus","=","1")
             ->whereNotNull("id_checador")
-            ->groupBy("id_checador")->havingRaw("count('id_checador')>1")->count();
+            ->groupBy("id_checador")->havingRaw("count('id_checador')>1")->get();
+        $usuarios_imei =$this->sumar($usuarios_imei);
 
         //un IMEI con diferentes usuarios
-        $imei_usuario = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
+        $imei_usuario = DB::connection("sca")->table("telefonos")
+            ->selectRaw("count('imei') as total")
+            ->where("estatus","=","1")
             ->whereNotNull("imei")
-            ->groupBy("imei")->havingRaw("count('imei')>1")->count();
-
-        //impresora con diferente imei
-        $impresora_imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
-            ->whereNotNull("id_impresora")
-            ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->count();
+            ->groupBy("imei")->havingRaw("count('imei')>1")->get();
+        $imei_usuario = $this->sumar($imei_usuario);
 
         //imei con diferente impresora
-        $imei_impresora = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
-            ->whereNotNull("imei")
-            ->groupBy("imei")->havingRaw("count('imei')>1")->count();
+        $imei_impresora = DB::connection("sca")->table("telefonos")
+            ->selectRaw("count('imei') as total")
+            ->where("estatus","=","1")
+            ->whereNotNull("id_impresora")
+            ->groupBy("imei")->havingRaw("count('imei')>1")->get();
+
+        $imei_impresora = $this->sumar($imei_impresora);
+
+        //impresora con diferente imei
+        $impresora_imei = DB::connection("sca")->table("telefonos")
+            ->selectRaw("count('id_impresora') as total")
+            ->where("estatus","=","1")
+            ->whereNotNull("id_impresora")
+            ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->get();
+        $impresora_imei = $this->sumar($impresora_imei);
+
 
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
@@ -157,10 +171,11 @@ class TableroControlController extends Controller
                     ->groupBy("id_checador")->havingRaw("count('id_checador')>1")->get();
 
             foreach ($usuario as $u) {
-                $datos = DB::connection("sca")->table("telefonos")
-                    ->join("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
-                    ->where("telefonos.estatus", "=", "1")
-                    ->where("telefonos.id_checador", "=",$u->id_checador)->get();
+                $datos = DB::connection("sca")->table("telefonos as t")
+                    ->selectRaw("t.id as id, t.imei as imei, t.id_checador,u.nombre, u.apaterno, u.amaterno, t.marca, t.modelo, t.linea, t.id_impresora")
+                    ->join("igh.usuario as u", "u.idusuario", "=","t.id_checador")
+                    ->where("t.estatus", "=", "1")
+                    ->where("t.id_checador", "=",$u->id_checador)->get();
                 foreach ($datos as $r) {
                     $dat[] = [
                         'id' => $r->id,
@@ -169,7 +184,9 @@ class TableroControlController extends Controller
                         'nombre' => $r->nombre." ".$r->apaterno." ".$r->amaterno,
                         'marca' => $r->marca,
                         'modelo' => $r->modelo,
-                        'linea' => $r->linea
+                        'linea' => $r->linea,
+                        'impresora' => $r->id_impresora,
+                        'mac' => ""
                      ];
                 }
             }
@@ -179,10 +196,11 @@ class TableroControlController extends Controller
                 ->whereNotNull("imei")
                 ->groupBy("imei")->havingRaw("count('imei')>1")->get();
             foreach ($imei as $u) {
-                $datos = DB::connection("sca")->table("telefonos")
-                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
-                    ->where("estatus","=","1")
-                    ->where("imei", "=", $u->imei)->get();
+                $datos = DB::connection("sca")->table("telefonos as t")
+                    ->selectRaw("t.id as id, t.imei as imei, t.id_checador,u.nombre, u.apaterno, u.amaterno, t.marca, t.modelo, t.linea, t.id_impresora")
+                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","t.id_checador")
+                    ->where("t.estatus","=","1")
+                    ->where("t.imei", "=", $u->imei)->get();
 
                 foreach ($datos as $r) {
                     $dat[] = [
@@ -192,22 +210,25 @@ class TableroControlController extends Controller
                         'nombre' => $r->nombre." ".$r->apaterno." ".$r->amaterno,
                         'marca' => $r->marca,
                         'modelo' => $r->modelo,
-                        'linea' => $r->linea
+                        'linea' => $r->linea,
+                        'impresora' => $r->id_impresora,
+                        'mac'=> ""
                     ];
                 }
             }
             return view('tablero-control.telefonos_detalle')->withTipo(4)->withFechaF($fecha)->withTelefono($dat);
         }else if($id == 5){
             $imei = DB::connection("sca")->table("telefonos")->where("estatus","=","1")
-                ->whereNotNull("imei")
+                ->whereNotNull("id_impresora")
                 ->groupBy("imei")->havingRaw("count('imei')>1")->get();
 
             foreach ($imei as $u) {
-                $datos = DB::connection("sca")->table("telefonos")
-                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
-                    ->leftjoin("impresoras", "impresoras.id","=", "telefonos.id_impresora")
-                    ->where("telefonos.estatus","=","1")
-                    ->where("imei", "=", $u->imei)->get();
+                $datos = DB::connection("sca")->table("telefonos as t")
+                    ->selectRaw("t.id as id, t.imei as imei, t.id_checador,u.nombre, u.apaterno, u.amaterno, t.marca, t.modelo, t.linea,t.id_impresora, i.mac")
+                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","t.id_checador")
+                    ->leftjoin("impresoras as i", "i.id","=", "t.id_impresora")
+                    ->where("t.estatus","=","1")
+                    ->where("t.imei", "=", $u->imei)->get();
 
                 foreach ($datos as $r) {
                     $dat[] = [
@@ -231,11 +252,12 @@ class TableroControlController extends Controller
                 ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->get();
 
             foreach ($impresora as $u) {
-                $datos = DB::connection("sca")->table("telefonos")
-                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","telefonos.id_checador")
-                    ->leftjoin("impresoras", "impresoras.id","=", "telefonos.id_impresora")
-                    ->where("telefonos.estatus","=","1")
-                    ->where("id_impresora", "=", $u->id_impresora)->get();
+                $datos = DB::connection("sca")->table("telefonos as t")
+                    ->selectRaw("t.id as id, t.imei as imei, t.id_checador,u.nombre, u.apaterno, u.amaterno, t.marca, t.modelo, t.linea, t.id_impresora, i.mac")
+                    ->leftjoin("igh.usuario as u", "u.idusuario", "=","t.id_checador")
+                    ->leftjoin("impresoras as i", "i.id","=", "t.id_impresora")
+                    ->where("t.estatus","=","1")
+                    ->where("t.id_impresora", "=", $u->id_impresora)->get();
 
                 foreach ($datos as $r) {
                     $dat[] = [
@@ -288,5 +310,16 @@ class TableroControlController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public  function sumar ($datos){
+        $suma = 0;
+        if($datos !="") {
+            foreach ($datos as $d) {
+                $suma = $suma + $d->total;
+            }
+        }
+        return $suma;
+
     }
 }

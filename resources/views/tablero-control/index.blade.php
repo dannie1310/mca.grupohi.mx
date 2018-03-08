@@ -47,8 +47,8 @@
                  </tr>
                  <tr>
                      <td>Usuarios con diferentes IMEI</td>
-                     <td><div align="center">{{number_format(($usuario_imei/2),0,".",",")  }}</div></td>
-                     @if(($usuario_imei/2) > 0)
+                     <td><div align="center">{{number_format($usuario_imei,0,".",",")  }}</div></td>
+                     @if($usuario_imei > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
                      @else
                          <td><div align="center"><button type="button" class="btn btn-success btn-circle"></button></div></td>
@@ -59,8 +59,8 @@
                  </tr>
                  <tr>
                      <td>IMEI con diferentes usuarios</td>
-                     <td><div align="center">{{number_format(($imei_usuario/2),0,".",",")  }}</div></td>
-                     @if(($imei_usuario/2) > 0)
+                     <td><div align="center">{{number_format($imei_usuario,0,".",",")  }}</div></td>
+                     @if($imei_usuario > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
                      @else
                          <td><div align="center"><button type="button" class="btn btn-success btn-circle"></button></div></td>
@@ -71,8 +71,8 @@
                  </tr>
                  <tr>
                      <td>IMEI con diferentes impresora</td>
-                     <td><div align="center">{{number_format(($imei_impresora/2),0,".",",")  }}</div></td>
-                     @if(($imei_impresora/2) > 0)
+                     <td><div align="center">{{number_format($imei_impresora,0,".",",")  }}</div></td>
+                     @if($imei_impresora > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
                      @else
                          <td><div align="center"><button type="button" class="btn btn-success btn-circle"></button></div></td>
@@ -83,8 +83,8 @@
                  </tr>
                  <tr>
                      <td>Impresora con diferentes IMEI</td>
-                     <td><div align="center">{{number_format(($impresora_imei/2),0,".",",")  }}</div></td>
-                     @if(($impresora_imei/2) > 0)
+                     <td><div align="center">{{number_format($impresora_imei,0,".",",")  }}</div></td>
+                     @if($impresora_imei > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
                      @else
                          <td><div align="center"><button type="button" class="btn btn-success btn-circle"></button></div></td>

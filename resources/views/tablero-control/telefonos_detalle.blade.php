@@ -38,9 +38,9 @@
                     <td>{{$tipo["linea"]}}</td>
                     <td>{{$tipo["nombre"]}}</td>
                     @if($tipo["mac"]!="")
-                        <td>{{$tipo["id"]}} - {{$tipo["mac"]}}</td>
+                        <td>{{$tipo["impresora"]}} - {{$tipo["mac"]}}</td>
                     @else
-                        <td>{{$tipo["id"]}}</td>
+                        <td>{{$tipo["impresora"]}}</td>
                     @endif
                 </tr>
 
