@@ -15,7 +15,8 @@ class ConciliacionCancelacion extends Model
         'idconciliacion',
         'motivo',
         'fecha_hora_cancelacion',
-        'idcancelo'
+        'idcancelo',
+        'estado_rol_usuario'
     ];
 
     protected $dates = ['fecha_hora_cancelacion'];
