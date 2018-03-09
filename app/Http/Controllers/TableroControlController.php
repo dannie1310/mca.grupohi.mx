@@ -90,17 +90,7 @@ class TableroControlController extends Controller
 
         $cancela = DB::connection("sca")->table("conciliacion_cancelacion")
                     ->whereNotNull("estado_rol_usuario")
-                    ->where("estado_rol_usuario", "=", "0")->get();
-        $sum = 0;
-        foreach ($cancela as $c){
-            $usuario = DB::connection("sca")->table("sca_configuracion.role_user")
-                ->where("user_id","=",$c->idcancelo)
-                ->where("role_id", "=", "3")
-                ->where("id_proyecto","=",Context::getId())->get();
-            if($usuario == []){
-               $sum = $sum + 1;
-            }
-        }
+                    ->where("estado_rol_usuario", "=", "0")->count();
 
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
@@ -111,7 +101,7 @@ class TableroControlController extends Controller
                 ->withImeiUsuario($imei_usuario)
                 ->withImpresoraImei($impresora_imei)
                 ->withImeiImpresora($imei_impresora)
-                ->withConciliacionCancelar($sum);
+                ->withConciliacionCancelar($cancela);
     }
 
     /**
@@ -294,12 +284,6 @@ class TableroControlController extends Controller
                 ->whereNotNull("estado_rol_usuario")
                 ->where("estado_rol_usuario", "=", "0")->get();
             foreach ($cancela as $c){
-                $usuario = DB::connection("sca")->table("sca_configuracion.role_user")
-                    ->where("user_id","=",$c->idcancelo)
-                    ->where("role_id", "=", "3")
-                    ->where("id_proyecto","=",Context::getId())->get();
-
-                if($usuario == []){
                     $name = $this->nombre($c->idcancelo);
                     $datos[]=[
                         "id"=>$c->id,
@@ -309,7 +293,6 @@ class TableroControlController extends Controller
                         "idcancelo" => $c->idcancelo,
                         "nombre" => $name
                     ];
-                }
             }
             return view('tablero-control.conciliacion_detalle')->withTipo(7)->withFechaF($fecha)->withConciliacion($datos);
         }
