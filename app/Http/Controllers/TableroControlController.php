@@ -92,6 +92,14 @@ class TableroControlController extends Controller
                     ->whereNotNull("estado_rol_usuario")
                     ->where("estado_rol_usuario", "=", "0")->count();
 
+        $camion_manual = DB::connection("sca")->table("viajesnetos")
+            ->join("folios_vales_manuales", "Code", "=", "folio")
+            ->whereIn("Estatus", "['29','20','21']")
+            ->whereNotNull("Code")
+            ->groupBy("IdCamion")
+            ->havingRaw("count(IdCamion)>1");
+
+        dd($camion_manual);
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
