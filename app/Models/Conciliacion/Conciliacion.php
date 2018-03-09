@@ -15,6 +15,7 @@ use App\User;
 use Carbon\Carbon;
 use PhpParser\Node\Stmt\Return_;
 use App\Models\Conciliacion\ConciliacionDetalleNoConciliado;
+use App\Facades\Context;
 class Conciliacion extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -488,13 +489,23 @@ class Conciliacion extends Model
                 throw new \Exception("Ésta conciliación ya ha sido aprobada");
             }
 
+            $estado = $this->estado;
+            if($estado == 1){ // validación para visualizar datos en el tablero de control
+                $rol = DB::connection("sca")->table("sca_configuracion.role_user")
+                    ->where("user_id","=",auth()->user()->idusuario)
+                    ->where("role_id", "=", "3")
+                    ->where("id_proyecto","=",Context::getId())->count();
+            }else{
+                $rol = NULL;
+            }
             $this->estado = $this->estado == 0 ? -1 : -2;
 
             ConciliacionCancelacion::create([
                 'idconciliacion' => $this->idconciliacion,
                 'motivo' => $request->get('motivo'),
                 'fecha_hora_cancelacion' => Carbon::now(),
-                'idcancelo' => auth()->user()->idusuario
+                'idcancelo' => auth()->user()->idusuario,
+                'estado_rol_usuario' => $rol
             ]);
 
             foreach ($this->conciliacionDetalles as $detalle) {
