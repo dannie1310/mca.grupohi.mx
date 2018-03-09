@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Facades\Context;
 
 class TableroControlController extends Controller
 {
@@ -87,6 +88,17 @@ class TableroControlController extends Controller
             ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->get();
         $impresora_imei = $this->sumar($impresora_imei);
 
+        $cancela = DB::connection("sca")->table("conciliacion_cancelacion")->get();
+        $sum = 0;
+        foreach ($cancela as $c){
+            $usuario = DB::connection("sca")->table("sca_configuracion.role_user")
+                ->where("user_id","=",$c->idcancelo)
+                ->where("role_id", "=", "3")
+                ->where("id_proyecto","=",Context::getId())->get();
+            if($usuario == []){
+               $sum = $sum + 1;
+            }
+        }
 
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
@@ -96,7 +108,8 @@ class TableroControlController extends Controller
                 ->withUsuarioImei($usuarios_imei)
                 ->withImeiUsuario($imei_usuario)
                 ->withImpresoraImei($impresora_imei)
-                ->withImeiImpresora($imei_impresora);
+                ->withImeiImpresora($imei_impresora)
+                ->withConciliacionCancelar($sum);
     }
 
     /**
@@ -274,6 +287,27 @@ class TableroControlController extends Controller
                 }
             }
             return view('tablero-control.telefonos_detalle')->withTipo(6)->withFechaF($fecha)->withTelefono($dat);
+        }else if($id == 7){
+            $cancela = DB::connection("sca")->table("conciliacion_cancelacion")->get();
+            foreach ($cancela as $c){
+                $usuario = DB::connection("sca")->table("sca_configuracion.role_user")
+                    ->where("user_id","=",$c->idcancelo)
+                    ->where("role_id", "=", "3")
+                    ->where("id_proyecto","=",Context::getId())->get();
+
+                if($usuario == []){
+                    $name = $this->nombre($c->idcancelo);
+                    $datos[]=[
+                        "id"=>$c->id,
+                        "conciliacion" => $c->idconciliacion,
+                        "motivo" => $c->motivo,
+                        "fecha" => $c->fecha_hora_cancelacion,
+                        "idcancelo" => $c->idcancelo,
+                        "nombre" => $name
+                    ];
+                }
+            } //dd($datos);
+            return view('tablero-control.conciliacion_detalle')->withTipo(7)->withFechaF($fecha)->withConciliacion($datos);
         }
 
     }
@@ -321,5 +355,13 @@ class TableroControlController extends Controller
         }
         return $suma;
 
+    }
+    public function nombre ($idusuario){
+        $nom = DB::connection("sca")->table("igh.usuario")
+            ->where("idusuario", "=", $idusuario)->get();
+        foreach ($nom as $n) {
+            $nombre = $n->nombre . " " . $n->apaterno . " " . $n->amaterno;
+        }
+        return $nombre;
     }
 }
