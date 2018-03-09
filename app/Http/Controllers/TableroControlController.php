@@ -88,7 +88,9 @@ class TableroControlController extends Controller
             ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->get();
         $impresora_imei = $this->sumar($impresora_imei);
 
-        $cancela = DB::connection("sca")->table("conciliacion_cancelacion")->get();
+        $cancela = DB::connection("sca")->table("conciliacion_cancelacion")
+                    ->whereNotNull("estado_rol_usuario")
+                    ->where("estado_rol_usuario", "=", "0")->get();
         $sum = 0;
         foreach ($cancela as $c){
             $usuario = DB::connection("sca")->table("sca_configuracion.role_user")
@@ -288,7 +290,9 @@ class TableroControlController extends Controller
             }
             return view('tablero-control.telefonos_detalle')->withTipo(6)->withFechaF($fecha)->withTelefono($dat);
         }else if($id == 7){
-            $cancela = DB::connection("sca")->table("conciliacion_cancelacion")->get();
+            $cancela = DB::connection("sca")->table("conciliacion_cancelacion")
+                ->whereNotNull("estado_rol_usuario")
+                ->where("estado_rol_usuario", "=", "0")->get();
             foreach ($cancela as $c){
                 $usuario = DB::connection("sca")->table("sca_configuracion.role_user")
                     ->where("user_id","=",$c->idcancelo)
@@ -306,7 +310,7 @@ class TableroControlController extends Controller
                         "nombre" => $name
                     ];
                 }
-            } //dd($datos);
+            }
             return view('tablero-control.conciliacion_detalle')->withTipo(7)->withFechaF($fecha)->withConciliacion($datos);
         }
 
