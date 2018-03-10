@@ -141,8 +141,8 @@
                  </tr>
                  <tr>
                      <td>Viajes: Camiones con más de un Viaje Manual</td>
-                     <td><div align="center">{{number_format($conciliacion_cancelar,0,".",",")  }}</div></td>
-                     @if($conciliacion_cancelar > 0)
+                     <td><div align="center">{{number_format($camion_manual,0,".",",")  }}</div></td>
+                     @if($camion_manual > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
                          <td width="20"><div align="center">
                                  <a href="{{ route('tablero-detalle.show',8) }}" title="Detalle" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a></div>
