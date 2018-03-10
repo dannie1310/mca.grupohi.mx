@@ -19,7 +19,7 @@ Vue.component('conciliaciones-edit', {
             'fetching'   : false,
             'fecha_cambio' : '',
             'api' : {
-                'url_api': 'http://localhost:8003',
+                'url_api': 'http://sao.grupohi.mx',
                 'token' : ''
             }
 
@@ -291,6 +291,7 @@ Vue.component('conciliaciones-edit', {
                 error: function (error) {
                     _this.form.clave = "";
                     $('#sesionSAO').modal('hide');
+                    _this.guardando = false;
                     swal({
                         type: 'error',
                         title: '¡Error!',
@@ -434,7 +435,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al generar la Estimación Generada\n'
+                        text: 'Error al Registrar la Estimación Generada\n'
                     });
                 }
             });
@@ -543,15 +544,31 @@ Vue.component('conciliaciones-edit', {
                     _this.guardando = false;
                     $('#revertir_estimacion').modal('hide');
                     var err = eval("(" + xhr.responseText + ")");
+                    err = err.message + '';
+                    var res = err.split(":");
+
+                    var mensaje = '<table class="table table-striped">'
+                                +'<div class="form-group"><div class="row"><div class="col-md-12">'
+                                +'<label><h4>Error al Revertir la Conciliación</h4></label>'
+                                +'<label><h4>La Estimación tiene asociadas las siguientes transacciones</h4></label>'
+                                +'</div></div></div>'
+                                +'<thead><tr><th align="right">Tipo</th><th align="center">Folio</th></tr></thead>'
+                                +'<tbody>';
+                    for (var i = 0; i < res.length; i++) {
+                        mensaje += '<tr><td align="left">' + res[i] + '</td><td align="left">' + res[i+1] + '</td></tr>';
+                        i=i+1;
+                    }
+                    mensaje += '</tbody></table>';
                     swal({
+                        html:true,
                         type: 'error',
                         title: '¡Error!',
-                        text: 'Error al Revertir la Conciliación:\n' + err.message
-
+                        text: mensaje
                     });
                 }
             })
         },
+
         conciliacion_revertir: function() {
             var _this = this;
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
