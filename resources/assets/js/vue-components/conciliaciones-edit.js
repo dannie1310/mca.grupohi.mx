@@ -19,7 +19,7 @@ Vue.component('conciliaciones-edit', {
             'fetching'   : false,
             'fecha_cambio' : '',
             'api' : {
-                'url_api': 'http://localhost:8003',   /// 'http://localhost:8003'   ////'http://sao.grupohi.mx'
+                'url_api': 'http://sao.grupohi.mx',   /// 'http://localhost:8003'   ////'http://sao.grupohi.mx'
                 'token' : ''
             }
 
