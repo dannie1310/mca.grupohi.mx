@@ -26,8 +26,6 @@ Vue.component('conciliaciones-edit', {
         }
     },
 
-
-
     props:[
         'user', 'database_name', 'id_obra'
     ],
