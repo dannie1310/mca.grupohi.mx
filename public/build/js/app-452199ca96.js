@@ -51997,7 +51997,7 @@ Vue.component('conciliaciones-edit', {
             'fetching': false,
             'fecha_cambio': '',
             'api': {
-                'url_api': 'http://sao.grupohi.mx',
+                'url_api': 'http://localhost:8003', /// 'http://localhost:8003'   ////'http://sao.grupohi.mx'
                 'token': ''
             }
 
@@ -52368,7 +52368,7 @@ Vue.component('conciliaciones-edit', {
                     swal({
                         type: 'success',
                         title: '¡Hecho!',
-                        text: 'Conciliacion Registrada Correctamente \nNo. de Folio de Estimación : ' + response.id_transaccion,
+                        text: 'Conciliacion Registrada Correctamente \nNo. de Folio de Estimación : ' + response.numero_folio,
                         showCancelButton: false,
                         confirmButtonText: 'OK',
                         closeOnConfirm: true
@@ -52514,18 +52514,22 @@ Vue.component('conciliaciones-edit', {
                 success: function success(response) {
                     _this.conciliacion_revertir();
                 }, error: function error(xhr, status, _error11) {
+                    var mensaje = "";
                     _this.guardando = false;
                     $('#revertir_estimacion').modal('hide');
                     var err = eval("(" + xhr.responseText + ")");
                     err = err.message + '';
                     var res = err.split(":");
-
-                    var mensaje = '<table class="table table-striped">' + '<div class="form-group"><div class="row"><div class="col-md-12">' + '<label><h4>Error al Revertir la Conciliación</h4></label>' + '<label><h4>La Estimación tiene asociadas las siguientes transacciones</h4></label>' + '</div></div></div>' + '<thead><tr><th align="right">Tipo</th><th align="center">Folio</th></tr></thead>' + '<tbody>';
-                    for (var i = 0; i < res.length; i++) {
-                        mensaje += '<tr><td align="left">' + res[i] + '</td><td align="left">' + res[i + 1] + '</td></tr>';
-                        i = i + 1;
+                    if (res[0] == "1") {
+                        mensaje = "No se puede revertir la Conciliación porque la Estimación asociada con folio: " + res[1] + " a sido aprobada ";
+                    } else {
+                        mensaje = '<table class="table table-striped">' + '<div class="form-group"><div class="row"><div class="col-md-12">' + '<label><h4>Error al Revertir la Conciliación</h4></label>' + '<label><h4>La Estimación tiene asociadas las siguientes transacciones</h4></label>' + '</div></div></div>' + '<thead><tr><th align="right">Tipo</th><th align="center">Folio</th></tr></thead>' + '<tbody>';
+                        for (var i = 0; i < res.length; i++) {
+                            mensaje += '<tr><td align="left">' + res[i] + '</td><td align="left">' + res[i + 1] + '</td></tr>';
+                            i = i + 1;
+                        }
+                        mensaje += '</tbody></table>';
                     }
-                    mensaje += '</tbody></table>';
                     swal({
                         html: true,
                         type: 'error',
@@ -52535,7 +52539,6 @@ Vue.component('conciliaciones-edit', {
                 }
             });
         },
-
         conciliacion_revertir: function conciliacion_revertir() {
             var _this = this;
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
