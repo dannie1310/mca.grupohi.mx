@@ -217,4 +217,8 @@ class ConciliacionesController extends Controller
             ->withConciliacion($conciliacion);
     }
 
+    public function conciliacion_revertible(){
+
+    }
+
 }

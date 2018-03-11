@@ -52,7 +52,7 @@
                    @endif
                     */?>
                     @if (Auth::user()->can(['aprobar-conciliacion']))
-                        <a class="btn btn-danger btn-sm pull-right" style="margin-right: 5px" @click="sesion_estimacion"><i class="fa fa-close"></i> REVERTIR</a>
+                        <a class="btn btn-danger btn-sm pull-right" style="margin-right: 5px" @click="sesion_estimacion" v-show="conciliacion.revertible"><i class="fa fa-close"></i> REVERTIR</a>
                     @endif
                </span>
            </h1>

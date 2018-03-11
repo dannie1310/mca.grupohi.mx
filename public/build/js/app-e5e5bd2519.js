@@ -51976,6 +51976,8 @@ Vue.component('conciliaciones-create', {
 },{}],42:[function(require,module,exports){
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 Vue.component('conciliaciones-edit', {
     data: function data() {
         return {
@@ -52519,9 +52521,13 @@ Vue.component('conciliaciones-edit', {
                     $('#revertir_estimacion').modal('hide');
                     var err = eval("(" + xhr.responseText + ")");
                     err = err.message + '';
+                    console.log(err);
                     var res = err.split(":");
-                    if (res[0] == "1") {
+                    console.log(_typeof(res[0]), res[0]);
+                    if (res[0] === "1") {
                         mensaje = "No se puede revertir la Conciliación porque la Estimación asociada con folio: " + res[1] + " a sido aprobada ";
+                    } else if (res[0] === "2") {
+                        mensaje = res[1];
                     } else {
                         mensaje = '<table class="table table-striped">' + '<div class="form-group"><div class="row"><div class="col-md-12">' + '<label><h4>Error al Revertir la Conciliación</h4></label>' + '<label><h4>La Estimación tiene asociadas las siguientes transacciones</h4></label>' + '</div></div></div>' + '<thead><tr><th align="right">Tipo</th><th align="center">Folio</th></tr></thead>' + '<tbody>';
                         for (var i = 0; i < res.length; i++) {
@@ -52530,6 +52536,7 @@ Vue.component('conciliaciones-edit', {
                         }
                         mensaje += '</tbody></table>';
                     }
+
                     swal({
                         html: true,
                         type: 'error',
@@ -52866,7 +52873,9 @@ Vue.component('conciliaciones-edit', {
                     $('#detalles_conciliacion').modal('hide');
                 }
             });
-        }
+        },
+
+        verificar_revertible: function verificar_revertible() {}
     }
 });
 

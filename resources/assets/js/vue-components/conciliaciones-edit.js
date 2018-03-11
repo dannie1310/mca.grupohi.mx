@@ -546,10 +546,16 @@ Vue.component('conciliaciones-edit', {
                     $('#revertir_estimacion').modal('hide');
                     var err = eval("(" + xhr.responseText + ")");
                     err = err.message + '';
+                    console.log(err);
                     var res = err.split(":");
-                    if(res[0] == "1"){
+                    console.log(typeof res[0], res[0]);
+                    if (res[0] === "1") {
                         mensaje = "No se puede revertir la Conciliación porque la Estimación asociada con folio: " + res[1] + " a sido aprobada "
-                    }else {
+                    } else if(res[0] === "2") {
+                        mensaje = res[1];
+                    }
+                    else
+                    {
                         mensaje = '<table class="table table-striped">'
                             + '<div class="form-group"><div class="row"><div class="col-md-12">'
                             + '<label><h4>Error al Revertir la Conciliación</h4></label>'
@@ -563,13 +569,13 @@ Vue.component('conciliaciones-edit', {
                         }
                         mensaje += '</tbody></table>';
                     }
+
                     swal({
                         html: true,
                         type: 'error',
                         title: '¡Error!',
                         text: mensaje
                     });
-
                 }
             })
         },
@@ -906,6 +912,10 @@ Vue.component('conciliaciones-edit', {
                     $('#detalles_conciliacion').modal('hide');
                 }
             });
+        },
+        
+        verificar_revertible: function () {
+            
         }
     }
 });

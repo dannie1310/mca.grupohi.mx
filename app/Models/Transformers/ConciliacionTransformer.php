@@ -10,6 +10,7 @@ namespace App\Models\Transformers;
 
 
 use App\Models\Conciliacion\ConciliacionDetalle;
+use App\Models\Conciliacion\EstimacionConciliacion;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Themsaid\Transformers\AbstractTransformer;
@@ -92,7 +93,8 @@ class ConciliacionTransformer extends AbstractTransformer
             'porcentaje_volumen_viajes_manuales' => $conciliacion->porcentaje_volumen_viajes_manuales,
             'importe_viajes_moviles' => $conciliacion->importe_viajes_moviles_f,
             'volumen_viajes_moviles' => $conciliacion->volumen_viajes_moviles_f,
-            'duplicados' => $duplicados
+            'duplicados' => $duplicados,
+            'revertible' => EstimacionConciliacion::where('id_conciliacion', '=', $conciliacion->idconciliacion)->first()?true:false
         ];
 
         return $output;
