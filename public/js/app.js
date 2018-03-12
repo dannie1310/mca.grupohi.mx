@@ -52561,7 +52561,7 @@ Vue.component('conciliaciones-edit', {
                         swal({
                             type: 'success',
                             title: '¡Hecho!',
-                            text: 'La Estimacion Generada de la Conciliacion ' + _this.conciliacion.id + ' se ha Revertido Exitosamente.',
+                            text: 'La conciliación se ha revertido correctamente.',
                             showCancelButton: false,
                             confirmButtonText: 'OK',
                             closeOnConfirm: true
