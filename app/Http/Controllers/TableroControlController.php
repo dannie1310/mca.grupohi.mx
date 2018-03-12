@@ -102,6 +102,11 @@ class TableroControlController extends Controller
             ->havingRaw("count(IdCamion)>1")->get();
         $camion_manual = $this->sumar($camion_manual);
 
+        $validacion_conciliacion = DB::connection("sca")->table("conciliacion")
+            ->whereRaw("IdRegistro=IdCerro")
+            ->whereRaw("IdRegistro=IdAprobo")
+            ->whereRaw("IdCerro=IdAprobo")->count();
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
@@ -112,7 +117,8 @@ class TableroControlController extends Controller
                 ->withImpresoraImei($impresora_imei)
                 ->withImeiImpresora($imei_impresora)
                 ->withConciliacionCancelar($cancela)
-                ->withCamionManual($camion_manual);
+                ->withCamionManual($camion_manual)
+                ->withValidacionConciliacion($validacion_conciliacion);
     }
 
     /**
@@ -356,6 +362,26 @@ class TableroControlController extends Controller
                 }
             }
             return view('tablero-control.viajes_manual')->withTipo(8)->withFechaF($fecha)->withDatos($datos);
+
+        }else if($id == 9) {
+            $validacion_conciliacion = DB::connection("sca")->table("conciliacion")
+                ->whereRaw("IdRegistro=IdCerro")
+                ->whereRaw("IdRegistro=IdAprobo")
+                ->whereRaw("IdCerro=IdAprobo")->get();
+            foreach ($validacion_conciliacion as $c) {
+                $name = $this->nombre($c->IdRegistro);
+
+                $datos[] = [
+                    "id" => $c->idconciliacion,
+                    "conciliacion" => $c->idconciliacion,
+                    "motivo" => "",
+                    "fecha" => $c->fecha_conciliacion,
+                    "idcancelo" => $c->IdAprobo,
+                    "nombre" => $name,
+                    "estado" => $c->estado
+                ];
+            }
+            return view('tablero-control.conciliacion_detalle')->withTipo(9)->withFechaF($fecha)->withConciliacion($datos);
         }
 
     }
