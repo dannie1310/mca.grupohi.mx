@@ -124,7 +124,7 @@
 
                  </tr>
                  <tr>
-                     <td>Cancelación de Conciliación sin permiso de Gerente</td>
+                     <td>Conciliaciones: Cancelación sin permiso de Gerente</td>
                      <td><div align="center">{{number_format($conciliacion_cancelar,0,".",",")  }}</div></td>
                      @if($conciliacion_cancelar > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>

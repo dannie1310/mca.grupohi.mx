@@ -107,6 +107,8 @@ class TableroControlController extends Controller
             ->whereRaw("IdRegistro=IdAprobo")
             ->whereRaw("IdCerro=IdAprobo")->count();
 
+        $cubicacion = DB:: connection("sca");
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
