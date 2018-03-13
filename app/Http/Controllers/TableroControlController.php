@@ -92,6 +92,21 @@ class TableroControlController extends Controller
                     ->whereNotNull("estado_rol_usuario")
                     ->where("estado_rol_usuario", "=", "0")->count();
 
+        $camion_manual = DB::connection("sca")->table("viajesnetos")
+            ->selectRaw("count('IdCamion') as total")
+            ->join("folios_vales_manuales", "Code", "=", "folio")
+            ->whereIn("Estatus", array('29','20','21'))
+            ->whereNotNull("Code")
+            ->whereNotNull("id_viaje_neto")
+            ->groupBy("IdCamion")
+            ->havingRaw("count(IdCamion)>1")->get();
+        $camion_manual = $this->sumar($camion_manual);
+
+        $validacion_conciliacion = DB::connection("sca")->table("conciliacion")
+            ->whereRaw("IdRegistro=IdCerro")
+            ->whereRaw("IdRegistro=IdAprobo")
+            ->whereRaw("IdCerro=IdAprobo")->count();
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
@@ -101,7 +116,9 @@ class TableroControlController extends Controller
                 ->withImeiUsuario($imei_usuario)
                 ->withImpresoraImei($impresora_imei)
                 ->withImeiImpresora($imei_impresora)
-                ->withConciliacionCancelar($cancela);
+                ->withConciliacionCancelar($cancela)
+                ->withCamionManual($camion_manual)
+                ->withValidacionConciliacion($validacion_conciliacion);
     }
 
     /**
@@ -295,6 +312,76 @@ class TableroControlController extends Controller
                     ];
             }
             return view('tablero-control.conciliacion_detalle')->withTipo(7)->withFechaF($fecha)->withConciliacion($datos);
+        }
+        else if($id == 8){
+            $camion_manual = DB::connection("sca")->table("viajesnetos")
+                ->selectRaw("IdCamion")
+                ->join("folios_vales_manuales", "Code", "=", "folio")
+                ->whereIn("Estatus", array('29','20','21'))
+                ->whereNotNull("Code")
+                ->groupBy("IdCamion")
+                ->havingRaw("count(IdCamion)>1")->get();
+
+            foreach ($camion_manual as $c){
+                $viajes_manual = DB::connection("sca")->table("viajesnetos as a")
+                    ->selectRaw("a.IdViajeNeto, b.Economico AS economico, o.Descripcion AS origen, t.Descripcion AS tiro,
+                    m.Descripcion AS material, a.FechaSalida as fs, a.HoraSalida as hs, a.CubicacionCamion as cubicacion,
+                       a.FechaLlegada as fl, a.HoraLlegada as hl, a.folioMina as mina, a.folioSeguimiento as seguimiento, 
+                       a.Code, c.folio, c.id_viaje_neto as v, c.created_at as c,
+                       IF(a.estatus = 29, 'Cargado',IF(a.estatus = 20,'Pendiente Validar', 'Validado')) AS estatus")
+                    ->join("folios_vales_manuales as c", "a.Code", "=", "c.folio")
+                    ->join("camiones as b","a.IdCamion", "=", "b.IdCamion")
+                    ->join("origenes as o", "o.IdOrigen","=","a.IdOrigen")
+                    ->join("tiros as t","t.IdTiro", "=", "a.IdTiro")
+                    ->join("materiales as m","m.IdMaterial","=", "a.IdMaterial")
+                    ->whereIn("a.Estatus", array('29','20','21'))
+                    ->whereNotNull("a.Code")
+                    ->whereNotNull("c.id_viaje_neto")
+                    ->where("a.IdCamion", "=", $c->IdCamion)->get();
+
+                foreach ($viajes_manual as $v){
+                    $datos[]=[
+                        'origen'=>$v->origen,
+                        'economico' => $v->economico,
+                        'tiro' =>$v->tiro,
+                        'fl' =>$v->fl,
+                        'hl'=>$v->hl,
+                        'material' => $v->material,
+                        'fs'=>$v->fs,
+                        'hs'=>$v->hs,
+                        'cubicacion' => $v->cubicacion,
+                        'foliomina' =>$v->mina,
+                        'folioseg'=>$v->seguimiento,
+                        'estatus' => $v->estatus,
+                        'code' => $v->Code,
+                        'folio'=>$v->folio,
+                        'v'=>$v->v,
+                        'c'=> $v->c
+
+                    ];
+                }
+            }
+            return view('tablero-control.viajes_manual')->withTipo(8)->withFechaF($fecha)->withDatos($datos);
+
+        }else if($id == 9) {
+            $validacion_conciliacion = DB::connection("sca")->table("conciliacion")
+                ->whereRaw("IdRegistro=IdCerro")
+                ->whereRaw("IdRegistro=IdAprobo")
+                ->whereRaw("IdCerro=IdAprobo")->get();
+            foreach ($validacion_conciliacion as $c) {
+                $name = $this->nombre($c->IdRegistro);
+
+                $datos[] = [
+                    "id" => $c->idconciliacion,
+                    "conciliacion" => $c->idconciliacion,
+                    "motivo" => "",
+                    "fecha" => $c->fecha_conciliacion,
+                    "idcancelo" => $c->IdAprobo,
+                    "nombre" => $name,
+                    "estado" => $c->estado
+                ];
+            }
+            return view('tablero-control.conciliacion_detalle')->withTipo(9)->withFechaF($fecha)->withConciliacion($datos);
         }
 
     }
