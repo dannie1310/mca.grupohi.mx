@@ -107,7 +107,20 @@ class TableroControlController extends Controller
             ->whereRaw("IdRegistro=IdAprobo")
             ->whereRaw("IdCerro=IdAprobo")->count();
 
-        $cubicacion = DB:: connection("sca");
+        $cubicacion = DB:: connection("sca")->table("camiones as c")
+            ->selectRaw("DISTINCT c.idcamion, c.Economico, c.Placas, c.CubicacionParaPago as cubicacionPagoActual, c.CubicacionReal as cubicacionRealActual,
+                        h.CubicacionParaPago as cubicacionPago, h.CubicacionReal as cubicacionReal, h.created_at, h.updated_at, h.Estatus")
+            ->join("camiones_historicos_solicitudes as h", "c.IdCamion","=","h.IdCamion")
+            ->whereRaw("h.CubicacionParaPago != c.CubicacionParaPago")
+            ->whereRaw("h.CubicacionReal != c.CubicacionReal")
+            ->whereRaw("sc.FechaHoraAprobo != '0000-00-00 00:00:00'")
+            ->where("h.CubicacionReal", "!=", "0")
+            ->where("h.CubicacionParaPago", "!=", "0")
+            ->where("c.CubicacionReal", "!=", "0")
+            ->where("c.CubicacionParaPago", "!=", "0")
+            ->where("c.Estatus", "=", "1")
+            ->where("h.Estatus","=", "1")
+            ->orderBy("c.IdCamion")->count();
 
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
@@ -120,7 +133,8 @@ class TableroControlController extends Controller
                 ->withImeiImpresora($imei_impresora)
                 ->withConciliacionCancelar($cancela)
                 ->withCamionManual($camion_manual)
-                ->withValidacionConciliacion($validacion_conciliacion);
+                ->withValidacionConciliacion($validacion_conciliacion)
+                ->withCubicacion($cubicacion);
     }
 
     /**
@@ -384,6 +398,49 @@ class TableroControlController extends Controller
                 ];
             }
             return view('tablero-control.conciliacion_detalle')->withTipo(9)->withFechaF($fecha)->withConciliacion($datos);
+        }else if($id == 10){
+            $cubicacion_solicitudes = DB:: connection("sca")->table("camiones as c")
+                ->selectRaw("c.idcamion, c.Economico, c.Placas, c.CubicacionParaPago as cubicacionPagoActual,                          c.CubicacionReal as cubicacionRealActual,
+                            h.CubicacionParaPago as cubicacionPago, h.CubicacionReal as cubicacionReal,
+                            h.created_at, h.updated_at as FechaHoraAprobo")
+                ->join("camiones_historicos_solicitudes as h", "c.IdCamion","=","h.IdCamion")
+                ->where("h.CubicacionReal", "!=", "0")
+                ->where("h.CubicacionParaPago", "!=", "0")
+                ->where("c.CubicacionReal", "!=", "0")
+                ->where("c.CubicacionParaPago", "!=", "0")
+                ->where("c.Estatus", "=", "1")
+                ->where("h.Estatus","=", "1")
+                ->orderByRaw("c.IdCamion")->get();
+
+            $cubicacion = DB:: connection("sca")->table("camiones as c")
+                ->selectRaw("c.idcamion, c.Economico, c.Placas, c.CubicacionParaPago as cubicacionPagoActual,                          c.CubicacionReal as cubicacionRealActual,
+                            h.CubicacionParaPago as cubicacionPago, h.CubicacionReal as cubicacionReal,
+                            h.created_at, h.updated_at as FechaHoraAprobo")
+                ->join("camiones_historicos as h", "c.IdCamion","=","h.IdCamion")
+                ->where("h.CubicacionReal", "!=", "0")
+                ->where("h.CubicacionParaPago", "!=", "0")
+                ->where("c.CubicacionReal", "!=", "0")
+                ->where("c.CubicacionParaPago", "!=", "0")
+                ->where("c.Estatus", "=", "1")
+                ->where("h.Estatus","=", "1")
+                ->orderByRaw("c.IdCamion")->get();
+
+            foreach ($cubicacion_solicitudes as $c){
+                $datos [] =[
+                    'idcamion' => $c->idcamion,
+                    'economico' => $c->Economico,
+                    'placas' => $c->Placas,
+                    'cubicacionPagoActual' => $c->cubicacionPagoActual,
+                    'cubicacionRealActual' => $c->cubicacionRealActual,
+                    'cubicacionPago' => $c->cubicacionPago,
+                    'cubicacionReal' => $c->cubicacionReal,
+                    'fecha' => $c->FechaHoraAprobo
+                ];
+            }
+            $datos = $this->validar($datos);
+
+
+            return view('tablero-control.camiones_detalle')->withTipo(10)->withFechaF($fecha)->withDatos($cubicacion->paginate(100))->withBusqueda($busqueda);
         }
 
     }
@@ -439,5 +496,58 @@ class TableroControlController extends Controller
             $nombre = $n->nombre . " " . $n->apaterno . " " . $n->amaterno;
         }
         return $nombre;
+    }
+
+    public  function validar ($datos){
+        $nuevo =[];
+        foreach ($datos as $c){
+
+            if($nuevo == [ ]){
+                $nuevo [] =[
+                    'idcamion' => $c["idcamion"],
+                    'economico' => $c["economico"],
+                    'placas' => $c["placas"],
+                    'cubicacionPagoActual' => $c["cubicacionPagoActual"],
+                    'cubicacionRealActual' => $c["cubicacionRealActual"],
+                    'cubicacionPago' => $c["cubicacionPago"],
+                    'cubicacionReal' => $c["cubicacionReal"],
+                    'fecha' => $c["fecha"]
+                ];
+            }else{
+                foreach ($nuevo as $x) {
+                    if($c["idcamion"] == $x["idcamion"]) {
+                        if ($c["cubicacionPagoActual"] != $x["cubicacionPagoActual"] && $c["cubicacionRealActual"] != $x["cubicacionRealActual"] && $c["cubicacionPago"] != $x["cubicacionPago"] && $c["cubicacionReal"] != $x["cubicacionReal"]) {
+                            $nuevo [] =[
+                                'idcamion' => $c["idcamion"],
+                                'economico' => $c["economico"],
+                                'placas' => $c["placas"],
+                                'cubicacionPagoActual' => $c["cubicacionPagoActual"],
+                                'cubicacionRealActual' => $c["cubicacionRealActual"],
+                                'cubicacionPago' => $c["cubicacionPago"],
+                                'cubicacionReal' => $c["cubicacionReal"],
+                                'fecha' => $c["fecha"]
+                            ];
+                        }
+
+                    }else { dd($nuevo);
+                        $nuevo [] = [
+                            'idcamion' => $c["idcamion"],
+                            'economico' => $c["economico"],
+                            'placas' => $c["placas"],
+                            'cubicacionPagoActual' => $c["cubicacionPagoActual"],
+                            'cubicacionRealActual' => $c["cubicacionRealActual"],
+                            'cubicacionPago' => $c["cubicacionPago"],
+                            'cubicacionReal' => $c["cubicacionReal"],
+                            'fecha' => $c["fecha"]
+                        ];
+                    }
+
+               }
+
+            } dd($nuevo);
+        }
+
+
+
     }
 }
