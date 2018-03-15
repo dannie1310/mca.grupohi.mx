@@ -25,19 +25,16 @@
 
             @foreach($datos as $d)
                 <tr>
-                    <td>{{ $d->Economico }}</td>
-                    <td>{{ $d->Placas }}</td>
-                    <td><div align="right">{{ $d->cubicacionPagoActual }}</div></td>
-                    <td><div align="right">{{ $d->cubicacionRealActual }}</div></td>
-                    <td><div align="right">{{ $d->cubicacionPago}}</div></td>
-                    <td><div align="right">{{ $d->cubicacionReal }}</div></td>
-                    <td>{{ $d->FechaHoraAprobo }}</td>
+                    <td>{{ $d["economico"] }}</td>
+                    <td>{{ $d["placas"] }}</td>
+                    <td><div align="right">{{ $d["cubicacionPagoActual"] }}</div></td>
+                    <td><div align="right">{{ $d["cubicacionRealActual"] }}</div></td>
+                    <td><div align="right">{{ $d["cubicacionPago"]}}</div></td>
+                    <td><div align="right">{{ $d["cubicacionReal"] }}</div></td>
+                    <td>{{ $d["fecha"]}}</td>
                 </tr>
             @endforeach
             </tbody>
         </table>
-        <div class="text-center">
-            {!! $datos->appends(['buscar' => $busqueda])->render() !!}
-        </div>
     </div>
 @stop
