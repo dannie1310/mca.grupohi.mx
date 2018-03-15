@@ -184,6 +184,21 @@
                          </td>
                      @endif
                  </tr>
+                 <tr>
+                     <td>Tarifas: Distintas para un mismo material.</td>
+                     <td><div align="center">{{number_format($tarifas_m,0,".",",")  }}</div></td>
+                     @if($tarifas_m > 0)
+                         <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
+                         <td width="20"><div align="center">
+                                 <a href="{{ route('tablero-detalle.show',11) }}" title="Detalle" class="btn btn-xs btn-show"><i class="fa fa-eye"></i></a></div>
+                         </td>
+                     @else
+                         <td><div align="center"><button type="button" class="btn btn-success btn-circle"></button></div></td>
+                         <td width="20"><div align="center">
+                                 <i class="fa fa-eye-slash"></i></div>
+                         </td>
+                     @endif
+                 </tr>
             </tbody>
         </table>
     </div>

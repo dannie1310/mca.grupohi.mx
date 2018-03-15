@@ -121,6 +121,12 @@ class TableroControlController extends Controller
             ->where("h.Estatus","=", "1")
             ->orderBy("c.IdCamion")->count();
 
+        $tarifas_m = DB::connection("sca")->table("tarifas")
+            ->selectRaw("count(*) as total")
+            ->groupBy("IdMaterial")
+            ->havingRaw("count(*)>1")->get();
+        $tarifas_m = $this->sumar($tarifas_m);
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
@@ -133,7 +139,8 @@ class TableroControlController extends Controller
                 ->withConciliacionCancelar($cancela)
                 ->withCamionManual($camion_manual)
                 ->withValidacionConciliacion($validacion_conciliacion)
-                ->withCubicacion($cubicacion);
+                ->withCubicacion($cubicacion)
+                ->withTarifasM($tarifas_m);
     }
 
     /**
@@ -499,6 +506,17 @@ class TableroControlController extends Controller
                 }
             }
             return view('tablero-control.camiones_detalle')->withTipo(10)->withFechaF($fecha)->withDatos($datos);
+        }else if($id == 11){
+            $datos = DB::connection("sca")->select(DB::raw("SELECT a.IdTarifa, a.IdMaterial, b.descripcion,
+                  a.PrimerKM, a.KMSubsecuente, a.KMAdicional, a.Estatus, a.Fecha_Hora_Registra, a.Registra, 
+                  a.InicioVigencia, a.FinVigencia, a.created_at, a.updated_at, a.idtarifas_tipo,u.nombre,u.apaterno,u.amaterno
+                  FROM tarifas a
+                  inner join materiales b on a.idmaterial= b.idmaterial
+                  inner join igh.usuario u on u.idusuario = a.Registra
+                  where a.IdMaterial in (select IdMaterial from tarifas a
+                  group by IdMaterial having count(*) > 1) order by Descripcion"));
+
+            return view('tablero-control.tarifas')->withTipo(11)->withFechaF($fecha)->withTarifas($datos);
         }
     }
 
