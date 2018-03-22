@@ -127,6 +127,24 @@ class TableroControlController extends Controller
             ->havingRaw("count(*)>1")->get();
         $tarifas_m = $this->sumar($tarifas_m);
 
+        $camiones_viajes = DB::connection("sca")->table("viajesnetos")
+                        ->where("FechaLlegada", "=", "'".$fecha."'")
+                        ->whereBetween("HoraLlegada",['07:00:00','19:00:00'])
+                        ->groupBy("IdCamion")
+                        ->havingRaw("count(IdCamion)>3")
+                        ->orderBy("IdCamion")->count();
+
+        $ayer = strtotime('-1 day', strtotime($fecha));
+        $ayer = date('Y-m-d', $ayer);
+
+        $camiones_segundo_turno = DB::connection("sca")->table("viajesnetos")
+            ->whereRaw("(FechaLlegada = '".$ayer."'  and HoraLlegada between '19:00:00' and '23:59:59') or 
+                             (FechaLlegada = '".$fecha."' and HoraLlegada between '00:00:00' and '06:59:59')")
+            ->groupBy("IdCamion")
+            ->havingRaw("count(IdCamion)>3")
+            ->orderBy("IdCamion")->count();
+        $camiones_viajes = $camiones_viajes+$camiones_segundo_turno;
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
@@ -140,7 +158,8 @@ class TableroControlController extends Controller
                 ->withCamionManual($camion_manual)
                 ->withValidacionConciliacion($validacion_conciliacion)
                 ->withCubicacion($cubicacion)
-                ->withTarifasM($tarifas_m);
+                ->withTarifasM($tarifas_m)
+                ->withCamionesViajes($camiones_viajes);
     }
 
     /**
@@ -175,6 +194,8 @@ class TableroControlController extends Controller
         $fecha = date('Y-m-d');
         $inicioFecha = strtotime('-7 day', strtotime($fecha));
         $inicioFecha = date('Y-m-d', $inicioFecha);
+        $ayer = strtotime('-1 day', strtotime($fecha));
+        $ayer = date('Y-m-d', $ayer);
         $busqueda = $request->get('buscar');
         if($id == 1){ //no validados y no conciliados
             $novalidados = DB::connection("sca")->table("viajesnetos as v")
@@ -517,6 +538,50 @@ class TableroControlController extends Controller
                   group by IdMaterial having count(*) > 1) order by Descripcion"));
 
             return view('tablero-control.tarifas')->withTipo(11)->withFechaF($fecha)->withTarifas($datos);
+        }else if($id == 12){
+            $viajes_primer = [];
+            $viajes_segundo = [];
+            $camiones_primer_turno = DB::connection("sca")->select(DB::raw("SELECT count(IdCamion),IdCamion FROM viajesnetos
+                            where FechaLlegada = '".$fecha."' and HoraLlegada between '07:00:00' and '19:00:00' 
+                            group by IdCamion 
+                            having count(IdCamion) > 3
+                            order by IdCamion;"));
+            $camiones_segundo_turno = DB::connection("sca")->select(DB::raw("SELECT count(IdCamion),IdCamion FROM viajesnetos
+                            where (FechaLlegada = '".ayer."' and HoraLlegada between '19:00:00' and '23:59:59') or 
+                             (FechaLlegada = '".$fecha."' and HoraLlegada between '00:00:00' and '06:59:59')
+                            group by IdCamion 
+                            having count(IdCamion) > 3
+                            order by IdCamion;"));
+
+            foreach ($camiones_primer_turno as $a){
+                $viajes_primer = DB::connection("sca")->table("viajesnetos as a")
+                    ->selectRaw("a.IdViajeNeto, b.Economico AS economico, o.Descripcion AS origen, t.Descripcion AS tiro,
+                    m.Descripcion AS material, a.FechaSalida as fs, a.HoraSalida as hs, a.CubicacionCamion as cubicacion,
+                       a.FechaLlegada as fl, a.HoraLlegada as hl, a.folioMina as mina, a.folioSeguimiento as seguimiento,
+                       a.Code, IF(a.estatus = 29, 'Cargado',IF(a.estatus = 20,'Pendiente Validar', 'Validado')) AS estatus")
+                    ->join("camiones as b","a.IdCamion", "=", "b.IdCamion")
+                    ->join("origenes as o", "o.IdOrigen","=","a.IdOrigen")
+                    ->join("tiros as t","t.IdTiro", "=", "a.IdTiro")
+                    ->join("materiales as m","m.IdMaterial","=", "a.IdMaterial")
+                    ->where("a.FechaLlegada", "=", "'".$fecha."'")
+                    ->whereBetween("a.HoraLlegada",['07:00:00','19:00:00'])
+                    ->where("a.IdCamion", "=", $a->IdCamion)->get();
+            }
+            foreach ($camiones_segundo_turno as $c){
+                $viajes_segundo = DB::connection("sca")->table("viajesnetos as a")
+                    ->selectRaw("a.IdViajeNeto, b.Economico AS economico, o.Descripcion AS origen, t.Descripcion AS tiro,
+                    m.Descripcion AS material, a.FechaSalida as fs, a.HoraSalida as hs, a.CubicacionCamion as cubicacion,
+                       a.FechaLlegada as fl, a.HoraLlegada as hl, a.folioMina as mina, a.folioSeguimiento as seguimiento, 
+                       a.Code, IF(a.estatus = 29, 'Cargado',IF(a.estatus = 20,'Pendiente Validar', 'Validado')) AS estatus")
+                    ->join("camiones as b","a.IdCamion", "=", "b.IdCamion")
+                    ->join("origenes as o", "o.IdOrigen","=","a.IdOrigen")
+                    ->join("tiros as t","t.IdTiro", "=", "a.IdTiro")
+                    ->join("materiales as m","m.IdMaterial","=", "a.IdMaterial")
+                    ->whereRaw("(a.FechaLlegada = '".$ayer."' and a.HoraLlegada between '19:00:00' and '23:59:59')
+                           or (a.FechaLlegada =  '".$fecha."' and a.HoraLlegada between '00:00:00' and '06:59:59')")
+                    ->where("a.IdCamion", "=", $a->IdCamion)->get();
+            }
+            return view('tablero-control.camiones_detalle')->withTipo(12)->withFechaF($fecha)->withPrimerTurno($viajes_primer)->withSegundoTurno($viajes_segundo);
         }
     }
 
