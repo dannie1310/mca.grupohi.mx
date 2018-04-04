@@ -145,6 +145,8 @@ class TableroControlController extends Controller
             ->orderBy("IdCamion")->count();
         $camiones_viajes = $camiones_viajes+$camiones_segundo_turno;
 
+        $viajes_manual = DB::connection("sca")->table("viajesnetos");
+
         return view('tablero-control.index')
                 ->withNoValidados($novalidados)
                 ->withNoValidadosTotal($novalidados_total)
