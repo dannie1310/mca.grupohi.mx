@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -215,6 +216,7 @@ class CamionesController extends Controller
             $camion->motivo=$request->motivo;
             $camion->updated_at=date("Y-m-d H:i:s");
             $text = '¡CAMIÓN DESHABILITADO CORRECTAMENTE!';
+            $this->buscarTag($camion->IdCamion,0);
         } else {
             $camion->Estatus = 1;
             $camion->motivo=null;
@@ -222,9 +224,31 @@ class CamionesController extends Controller
             $camion->usuario_registro=auth()->user()->idusuario;
             $camion->created_at=date("Y-m-d H:i:s");
             $text = '¡CAMIÓN HABILITADO CORRECTAMENTE!';
+            $this->buscarTag($camion->IdCamion,1);
         }
         $camion->save();
         Flash::success($text);
         return redirect()->back();
+    }
+
+    public function buscarTag($idcamion, $estatus)
+    {
+
+        $tag = DB::connection("sca")->table("tags")
+            ->where("idcamion", "=", $idcamion)
+            ->orderBy("fecha_asignacion", "desc")
+            ->limit(1)->get();
+
+        DB::connection('sca')->beginTransaction();
+        try {
+            $tag_cam = Tag::find($tag[0]->uid);
+            $tag_cam->update([
+                'estado' => $estatus
+            ]);
+            DB::connection('sca')->commit();
+        } catch (\Exception $e) {
+            DB::connection('sca')->rollback();
+            throw $e;
+        }
     }
 }
