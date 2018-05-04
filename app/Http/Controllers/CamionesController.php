@@ -239,16 +239,18 @@ class CamionesController extends Controller
             ->orderBy("fecha_asignacion", "desc")
             ->limit(1)->get();
 
-        DB::connection('sca')->beginTransaction();
-        try {
-            $tag_cam = Tag::find($tag[0]->uid);
-            $tag_cam->update([
-                'estado' => $estatus
-            ]);
-            DB::connection('sca')->commit();
-        } catch (\Exception $e) {
-            DB::connection('sca')->rollback();
-            throw $e;
+        if($tag != []) {
+            DB::connection('sca')->beginTransaction();
+            try {
+                $tag_cam = Tag::find($tag[0]->uid);
+                $tag_cam->update([
+                    'estado' => $estatus
+                ]);
+                DB::connection('sca')->commit();
+            } catch (\Exception $e) {
+                DB::connection('sca')->rollback();
+                throw $e;
+            }
         }
     }
 }
