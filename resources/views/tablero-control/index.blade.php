@@ -218,7 +218,7 @@
                  </tr>
                  <tr>
                      <td>Viajes: Captura de viajes manuales por turno.</td>
-                     <td><div align="center">{{number_format($viajes_manual,0,".",",")  }}</div></td>
+                     <td><div align="center">{{number_format($camiones_viajes,0,".",",")  }}</div></td>
                      @if($camiones_viajes > 0)
                          <td><div align="center"> <button type="button" class="btn btn-danger btn-circle"></button></div></td>
                          <td width="20"><div align="center">

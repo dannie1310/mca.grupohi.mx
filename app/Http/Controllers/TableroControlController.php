@@ -127,23 +127,19 @@ class TableroControlController extends Controller
             ->havingRaw("count(*)>1")->get();
         $tarifas_m = $this->sumar($tarifas_m);
 
-        $camiones_viajes = DB::connection("sca")->table("viajesnetos")
-                        ->where("FechaLlegada", "=", "'".$fecha."'")
-                        ->whereBetween("HoraLlegada",['07:00:00','19:00:00'])
-                        ->groupBy("IdCamion")
-                        ->havingRaw("count(IdCamion)>3")
-                        ->orderBy("IdCamion")->count();
-
+        $camiones_viajes = DB::connection("sca")->select(DB::raw("select count(*) as suma from viajesnetos where FechaLlegada = '".$fecha."' and HoraLlegada between '07:00:00' and '19:00:00' group by IdCamion having count(IdCamion)>3 order by IdCamion asc"));
         $ayer = strtotime('-1 day', strtotime($fecha));
         $ayer = date('Y-m-d', $ayer);
-
-        $camiones_segundo_turno = DB::connection("sca")->table("viajesnetos")
-            ->whereRaw("(FechaLlegada = '".$ayer."'  and HoraLlegada between '19:00:00' and '23:59:59') or 
-                             (FechaLlegada = '".$fecha."' and HoraLlegada between '00:00:00' and '06:59:59')")
-            ->groupBy("IdCamion")
-            ->havingRaw("count(IdCamion)>3")
-            ->orderBy("IdCamion")->count();
-        $camiones_viajes = $camiones_viajes+$camiones_segundo_turno;
+        $camiones_segundo_turno = DB::connection("sca")->select(DB::raw("SELECT count(*) as suma,IdCamion FROM viajesnetos where (FechaLlegada = '".$ayer."' and HoraLlegada between '19:00:00' and '23:59:59') or (FechaLlegada = '".$fecha."' and HoraLlegada between '00:00:00' and '06:59:59') group by IdCamion having count(IdCamion) > 3 order by IdCamion;"));
+        foreach ($camiones_viajes as $c){
+            $camiones_viajes = $c->suma;
+        }
+        foreach ($camiones_segundo_turno as $c){
+            $camiones_viajes = $camiones_viajes+ $c->suma;
+        }
+        if($camiones_viajes == [ ]){
+            $camiones_viajes = 0;
+        }
 
         $viajes_manual = DB::connection("sca")->table("viajesnetos");
 
@@ -549,32 +545,37 @@ class TableroControlController extends Controller
                             having count(IdCamion) > 3
                             order by IdCamion;"));
             $camiones_segundo_turno = DB::connection("sca")->select(DB::raw("SELECT count(IdCamion),IdCamion FROM viajesnetos
-                            where (FechaLlegada = '".ayer."' and HoraLlegada between '19:00:00' and '23:59:59') or 
+                            where (FechaLlegada = '".$ayer."' and HoraLlegada between '19:00:00' and '23:59:59') or 
                              (FechaLlegada = '".$fecha."' and HoraLlegada between '00:00:00' and '06:59:59')
                             group by IdCamion 
                             having count(IdCamion) > 3
                             order by IdCamion;"));
 
             foreach ($camiones_primer_turno as $a){
-                $viajes_primer = DB::connection("sca")->table("viajesnetos as a")
-                    ->selectRaw("a.IdViajeNeto, b.Economico AS economico, o.Descripcion AS origen, t.Descripcion AS tiro,
-                    m.Descripcion AS material, a.FechaSalida as fs, a.HoraSalida as hs, a.CubicacionCamion as cubicacion,
-                       a.FechaLlegada as fl, a.HoraLlegada as hl, a.folioMina as mina, a.folioSeguimiento as seguimiento,
-                       a.Code, IF(a.estatus = 29, 'Cargado',IF(a.estatus = 20,'Pendiente Validar', 'Validado')) AS estatus")
-                    ->join("camiones as b","a.IdCamion", "=", "b.IdCamion")
-                    ->join("origenes as o", "o.IdOrigen","=","a.IdOrigen")
-                    ->join("tiros as t","t.IdTiro", "=", "a.IdTiro")
-                    ->join("materiales as m","m.IdMaterial","=", "a.IdMaterial")
-                    ->where("a.FechaLlegada", "=", "'".$fecha."'")
-                    ->whereBetween("a.HoraLlegada",['07:00:00','19:00:00'])
-                    ->where("a.IdCamion", "=", $a->IdCamion)->get();
+                $viajes_primer = DB::connection("sca")->select(DB::raw("select a.IdViajeNeto, b.Economico AS economico, o.Descripcion AS origen, t.Descripcion AS tiro,
+m.Descripcion AS material, a.FechaSalida as fs, a.HoraSalida as hs, a.CubicacionCamion as cubicacion,
+a.FechaLlegada as fl, a.HoraLlegada as hl, a.folioMina as mina, a.folioSeguimiento as seguimiento,
+a.Code, 
+IF(a.estatus = 29, 'Viaje Manual - Cargado',
+IF(a.estatus = 20, 'Viaje Manual - Pendiente Validar',
+IF(a.estatus = 0, 'Viaje - Pendiente por Validar',
+IF(a.estatus = 1, 'Viaje - Validado', 
+IF(a.estatus = 21, 'Validado',''))))) AS estatus from `viajesnetos` as `a`
+inner join `camiones` as `b` on `a`.`IdCamion` = `b`.`IdCamion`
+Inner join `origenes` as `o` on `o`.`IdOrigen` = `a`.`IdOrigen` 
+inner join `tiros` as `t` on `t`.`IdTiro` = `a`.`IdTiro` inner join `materiales` as `m` on `m`.`IdMaterial` = `a`.`IdMaterial`
+ where `a`.`FechaLlegada` = '".$fecha."' and `a`.`HoraLlegada` between '07:00:00' and '19:00:00' and `a`.`IdCamion` = '".$a->IdCamion."'"));
             }
             foreach ($camiones_segundo_turno as $c){
                 $viajes_segundo = DB::connection("sca")->table("viajesnetos as a")
                     ->selectRaw("a.IdViajeNeto, b.Economico AS economico, o.Descripcion AS origen, t.Descripcion AS tiro,
                     m.Descripcion AS material, a.FechaSalida as fs, a.HoraSalida as hs, a.CubicacionCamion as cubicacion,
                        a.FechaLlegada as fl, a.HoraLlegada as hl, a.folioMina as mina, a.folioSeguimiento as seguimiento, 
-                       a.Code, IF(a.estatus = 29, 'Cargado',IF(a.estatus = 20,'Pendiente Validar', 'Validado')) AS estatus")
+                       a.Code, IF(a.estatus = 29, 'Viaje Manual - Cargado',
+                        IF(a.estatus = 20, 'Viaje Manual - Pendiente Validar',
+                        IF(a.estatus = 0, 'Viaje - Pendiente por Validar',
+                        IF(a.estatus = 1, 'Viaje - Validado', 
+                        IF(a.estatus = 21, 'Validado',''))))) AS estatus")
                     ->join("camiones as b","a.IdCamion", "=", "b.IdCamion")
                     ->join("origenes as o", "o.IdOrigen","=","a.IdOrigen")
                     ->join("tiros as t","t.IdTiro", "=", "a.IdTiro")
