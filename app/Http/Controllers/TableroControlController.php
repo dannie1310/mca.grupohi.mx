@@ -31,10 +31,10 @@ class TableroControlController extends Controller
         //dd($inicioFecha);
 
         // Viajes no validados y no conciliados.
-        $novalidados = DB::connection("sca")->table("viajesnetos as v")
+        /*$novalidados = DB::connection("sca")->table("viajesnetos as v")
             ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
-            ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])
-            ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
+            ->whereBetween("v.FechaLlegada",["'".$inicioFecha."'","'".$fecha."'"])
+            ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();*/
 
         $novalidados_total = DB::connection("sca")->table("viajesnetos as v")
             ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
@@ -42,11 +42,11 @@ class TableroControlController extends Controller
             ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
 
         // Viajes validados y no conciliados.
-        $validados = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+        /*$validados = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
-            ->whereBetween("v.FechaLlegada",[$inicioFecha,$fecha])->whereIn("v.Estatus",array('1','21'))
+            ->whereBetween("v.FechaLlegada",["'".$inicioFecha."'","'".$fecha."'"])->whereIn("v.Estatus",array('1','21'))
             ->whereNotNull("vr.IdViaje")
-            ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
+            ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();*/
 
         $validados_total = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
@@ -88,10 +88,12 @@ class TableroControlController extends Controller
             ->groupBy("id_impresora")->havingRaw("count('id_impresora')>1")->get();
         $impresora_imei = $this->sumar($impresora_imei);
 
+        //Conciliaciones: cancelacion sin permiso de gerente
         $cancela = DB::connection("sca")->table("conciliacion_cancelacion")
                     ->whereNotNull("estado_rol_usuario")
                     ->where("estado_rol_usuario", "=", "0")->count();
 
+        //Viajes: camiones con mas de un viaje manual
         $camion_manual = DB::connection("sca")->table("viajesnetos")
             ->selectRaw("count('IdCamion') as total")
             ->join("folios_vales_manuales", "Code", "=", "folio")
@@ -102,11 +104,13 @@ class TableroControlController extends Controller
             ->havingRaw("count(IdCamion)>1")->get();
         $camion_manual = $this->sumar($camion_manual);
 
+        //Conciliaciones: creacion, revision y autorizacion con el mismo usuario.
         $validacion_conciliacion = DB::connection("sca")->table("conciliacion")
             ->whereRaw("IdRegistro=IdCerro")
             ->whereRaw("IdRegistro=IdAprobo")
             ->whereRaw("IdCerro=IdAprobo")->count();
 
+        //Camiones: Cambio de Cubicación. ----- No terminado
         $cubicacion = DB:: connection("sca")->table("camiones as c")
             ->selectRaw("DISTINCT c.idcamion, c.Economico, c.Placas, c.CubicacionParaPago as cubicacionPagoActual, c.CubicacionReal as cubicacionRealActual,
                         h.CubicacionParaPago as cubicacionPago, h.CubicacionReal as cubicacionReal, h.created_at, h.updated_at, h.Estatus")
@@ -121,12 +125,14 @@ class TableroControlController extends Controller
             ->where("h.Estatus","=", "1")
             ->orderBy("c.IdCamion")->count();
 
+        //Tarifas: Distintas para un mismo material.
         $tarifas_m = DB::connection("sca")->table("tarifas")
             ->selectRaw("count(*) as total")
             ->groupBy("IdMaterial")
             ->havingRaw("count(*)>1")->get();
         $tarifas_m = $this->sumar($tarifas_m);
 
+        //Camiones: mas de 3 viajes en un Turno.
         $camiones_viajes = DB::connection("sca")->select(DB::raw("select count(*) as suma from viajesnetos where FechaLlegada = '".$fecha."' and HoraLlegada between '07:00:00' and '19:00:00' group by IdCamion having count(IdCamion)>3 order by IdCamion asc"));
         $ayer = strtotime('-1 day', strtotime($fecha));
         $ayer = date('Y-m-d', $ayer);
@@ -140,24 +146,84 @@ class TableroControlController extends Controller
         if($camiones_viajes == [ ]){
             $camiones_viajes = 0;
         }
+        $sum = 0;
+        $placas_camion= DB::connection("sca")->select(
+            DB::raw("select Economico,Placas, count(Placas) as suma from camiones group by Placas having count(Placas) > 1")
+        );
+        foreach ($placas_camion as $i) {
+            $sum = $sum + 1;
+        }
 
-        $viajes_manual = DB::connection("sca")->table("viajesnetos");
-
+        $data [] = [
+            '0' => 'Viajes no validados y no conciliados.',
+            '1' => $novalidados_total,
+            '2' => 1
+                ];
+        $data [] = [
+            '0' =>'Viajes validados y no conciliados.',
+            '1'=> $validados_total,
+            '2' => 2
+            ];
+        $data [] = [
+            '0' => 'Usuarios con diferentes IMEI.',
+            '1' => $usuarios_imei,
+            '2' => 3
+            ];
+        $data [] = [
+            '0' => 'IMEI con diferentes usuarios.',
+            '1'=> $imei_usuario,
+            '2' => 4
+            ];
+        $data [] = [
+            '0' => 'Impresora con diferentes IMEI.',
+            '1' => $impresora_imei,
+            '2' => 6
+            ];
+        $data [] = [
+            '0' => 'IMEI con diferentes impresoras.',
+            '1' => $imei_impresora,
+            '2' => 5
+            ];
+        $data [] = [
+            '0' => 'Conciliaciones canceladas sin perfil de Gerente.',
+            '1' => $cancela,
+            '2' => 7
+            ];
+        $data [] = [
+            '0' => 'Camiones con más de un viaje manual.',
+            '1' => $camion_manual,
+            '2' => 8
+            ];
+        $data [] = [
+            '0' => 'Creación, revisión y autorización de conciliaciones con el mismo usuario.',
+            '1' => $validacion_conciliacion,
+            '2' => 9
+            ];
+        /*$data [] = [
+            '0' => 'Camiones: Cambio de Cubicación.',
+            '1' => $cubicacion,
+            '2' => 10
+            ]; // pendiente de finalizar
+        */
+        $data [] = [
+            '0' => 'Tarifas distintas para un mismo material.',
+            '1' => $tarifas_m,
+            '2' => 11
+            ];
+        $data [] = [
+            '0' => 'Camiones con más de 3 viajes en un turno.',
+            '1' => $camiones_viajes,
+            '2' => 12
+            ];
+        $data [] = [
+            '0' => 'Camiones con las mismas placas pero diferente económico.',
+            '1' => $sum,
+            '2' => 13
+            ];
+        $datos = $this->ordenar($data);
         return view('tablero-control.index')
-                ->withNoValidados($novalidados)
-                ->withNoValidadosTotal($novalidados_total)
-                ->withValidados($validados)
-                ->withValidadosTotal($validados_total)
-                ->withUsuarioImei($usuarios_imei)
-                ->withImeiUsuario($imei_usuario)
-                ->withImpresoraImei($impresora_imei)
-                ->withImeiImpresora($imei_impresora)
-                ->withConciliacionCancelar($cancela)
-                ->withCamionManual($camion_manual)
-                ->withValidacionConciliacion($validacion_conciliacion)
-                ->withCubicacion($cubicacion)
-                ->withTarifasM($tarifas_m)
-                ->withCamionesViajes($camiones_viajes);
+            ->withContador(1)
+            ->withDatos($datos);
     }
 
     /**
@@ -653,5 +719,26 @@ inner join `tiros` as `t` on `t`.`IdTiro` = `a`.`IdTiro` inner join `materiales`
             }
         }
         return $bandera;
+    }
+
+    public function ordenar($data){
+        $ceros = [];
+        $mayores = [];
+
+        foreach ($data as $i){
+            if($i[1] == 0){
+                $ceros [] = $i;
+            }
+            else{
+                $mayores [] = $i;
+            }
+        }
+        foreach ($mayores as $m){
+            $datos [] = $m;
+        }
+        foreach ($ceros as $c){
+            $datos [] = $c;
+        }
+        return $datos;
     }
 }
