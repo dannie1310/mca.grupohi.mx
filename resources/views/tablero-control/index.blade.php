@@ -5,7 +5,6 @@
     <div class='success'></div>
     <h1>TABLERO DE CONTROL</h1>
     <hr>
-
     <div class="table-responsive">
         <table class="table table-hover table-bordered">
             <thead>
@@ -36,7 +35,6 @@
                         @endif
                     </tr>
                 @endforeach
-
             </tbody>
         </table>
     </div>

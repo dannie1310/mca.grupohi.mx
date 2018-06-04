@@ -38,7 +38,7 @@ class TableroControlController extends Controller
 
         $novalidados_total = DB::connection("sca")->table("viajesnetos as v")
             ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
-            ->whereRaw("v.FechaLlegada < '".$inicioFecha."'")
+            ->whereRaw("v.FechaLlegada <= '".$inicioFecha."'")
             ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
 
         // Viajes validados y no conciliados.
@@ -260,21 +260,41 @@ class TableroControlController extends Controller
         $inicioFecha = date('Y-m-d', $inicioFecha);
         $ayer = strtotime('-1 day', strtotime($fecha));
         $ayer = date('Y-m-d', $ayer);
+        $dosSemanas = strtotime('-7 day', strtotime($inicioFecha));
+        $dosSemanas = date('Y-m-d', $dosSemanas);
+        $cuatroSemanas = strtotime('-28 day', strtotime($inicioFecha));
+        $cuatroSemanas = date('Y-m-d', $cuatroSemanas);
+        $tercermes = strtotime('-90 day', strtotime($cuatroSemanas));
+        $tercermes = date('Y-m-d', $tercermes);
+//dd($inicioFecha, $dosSemanas, $cuatroSemanas, $tercermes);
         $busqueda = $request->get('buscar');
-        if($id == 1){ //no validados y no conciliados
+        if($id == 1){ //no validados y no conciliados --- mayores a una semana
             $novalidados = DB::connection("sca")->table("viajesnetos as v")
                 ->selectRaw("v.IdCamion, c.Economico AS economico, v.idorigen, o.Descripcion AS origen, v.FechaSalida AS fs, v.HoraSalida AS hs,
                     v.CubicacionCamion AS cubicacion, v.IdTiro, t.Descripcion AS tiro, v.FechaLlegada AS fl, v.HoraLlegada AS hl, v.IdMaterial,
-                    m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$inicioFecha."','0','1') AS alerta")
+                    m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$dosSemanas."','0','1') AS alerta")
                 ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
                 ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
                 ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
                 ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
                 ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
                 ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")
+                ->whereRaw("v.FechaLlegada <= '".$inicioFecha."'")
                 ->orderBy("v.FechaLlegada","desc");
 
-            return view('tablero-control.detalle_no_validado')->withTipo(1)->withFechaF($fecha)->withDatos($novalidados->paginate(100))->withBusqueda($busqueda);
+            $semanas = DB::connection("sca")->select(
+                DB::raw("SELECT  count(*) as uno FROM viajesnetos AS v LEFT JOIN viajesrechazados AS vr ON vr.IdViajeNeto = v.IdViajeNeto
+                WHERE v.FechaLlegada BETWEEN '".$cuatroSemanas."' AND '".$inicioFecha."' AND v.Estatus IN (0 , 29, 20) AND vr.IdViajeRechazado IS NULL;"));
+
+            $tresMeses= DB::connection("sca")->select("SELECT count(*) as dos FROM viajesnetos AS v LEFT JOIN viajesrechazados AS vr ON vr.IdViajeNeto = v.IdViajeNeto 
+                WHERE v.FechaLlegada BETWEEN '".$tercermes."' AND '".$cuatroSemanas."' AND v.Estatus IN (0 , 29, 20)AND vr.IdViajeRechazado IS NULL;");
+
+            $cuatroMasMeses= DB::connection("sca")->table("viajesnetos as v")
+                ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+                ->whereRaw("v.FechaLlegada < '".$tercermes."'")
+                ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")->count();
+            //dd($semanas[0]->uno, $tresMeses[0]->dos, $cuatroMasMeses);
+            return view('tablero-control.detalle_no_validado')->withTipo(1)->withFechaF($fecha)->withSemanas($semanas[0]->uno)->withTresMeses($tresMeses[0]->dos)->withMas($cuatroMasMeses)->withDatos($novalidados->paginate(100))->withBusqueda($busqueda);
 
         }else if ($id == 2){
             $validados = DB::connection("sca")->table("viajesnetos as v")
@@ -651,6 +671,8 @@ inner join `tiros` as `t` on `t`.`IdTiro` = `a`.`IdTiro` inner join `materiales`
                     ->where("a.IdCamion", "=", $a->IdCamion)->get();
             }
             return view('tablero-control.camiones_detalle')->withTipo(12)->withFechaF($fecha)->withPrimerTurno($viajes_primer)->withSegundoTurno($viajes_segundo);
+        }else if($id == 13){
+
         }
     }
 

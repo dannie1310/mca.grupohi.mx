@@ -9,7 +9,31 @@
 
     <h5>Fecha:{{$fecha_f}}</h5>
     <hr>
-
+    <div CLASS="container">
+    <table align="right" border="1" >
+            <thead>
+                <tr>
+                    <th>&nbsp;Periodo&nbsp;</th>
+                    <th>&nbsp;Num. Viajes&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td align="left">&nbsp;2 a 4 semanas</td>
+                    <td align="right">{{ $semanas }}&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left">&nbsp;1 a 3 meses</td>
+                    <td align="right">{{ $tres_meses }}&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left">&nbsp;Mayor a 4 semanas&nbsp;</td>
+                    <td align="right">{{ $mas }}&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
     <div class="table-responsive">
         <table class="table table-hover table-bordered small">
             <thead>
