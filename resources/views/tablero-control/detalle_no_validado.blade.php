@@ -52,6 +52,7 @@
                 <th>Ticket</th>
                 <th>Folio Mina</th>
                 <th>Folio Seguimiento</th>
+                <th>Estatus</th>
                 <th>Alerta</th>
             </tr>
             </thead>
@@ -70,6 +71,7 @@
                     <td>{{ $d->code }}</td>
                     <td>{{ $d->foliomina }}</td>
                     <td>{{ $d->folioseg }}</td>
+                    <td>{{ $d->estatus }}</td>
                     @if($d->alerta!="")
                         @if($d->alerta == 0)
                            <td><div align="center"><button type="button" class="btn btn-warning btn-circle"></button></div></td>
