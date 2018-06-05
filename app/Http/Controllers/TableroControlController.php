@@ -277,10 +277,10 @@ class TableroControlController extends Controller
                     IF(v.estatus = 20, 'Viaje Manual - Pendiente de Validar',
                     IF(v.estatus = 0, 'Viaje - Pendiente por Validar',''))) AS estatus ")
                 ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
-                ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
-                ->join("origenes as o", "o.IdOrigen","=","v.IdOrigen")
-                ->join("tiros as t","t.IdTiro", "=", "v.IdTiro")
-                ->join("materiales as m","m.IdMaterial","=", "v.IdMaterial")
+                ->leftjoin("camiones as c", "c.IdCamion", "=", "v.IdCamion")
+                ->leftjoin("origenes as o", "o.IdOrigen","=","v.IdOrigen")
+                ->leftjoin("tiros as t","t.IdTiro", "=", "v.IdTiro")
+                ->leftjoin("materiales as m","m.IdMaterial","=", "v.IdMaterial")
                 ->whereIn("v.Estatus",array('0','29','20'))->whereNull("vr.IdViajeRechazado")
                 ->whereRaw("v.FechaLlegada <= '".$inicioFecha."'")
                 ->orderBy("v.FechaLlegada","desc");
