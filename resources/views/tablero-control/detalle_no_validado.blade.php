@@ -6,7 +6,6 @@
     @elseif($tipo == 2)
         <h1>VIAJES VALIDADOS Y NO CONCILIADOS</h1>
     @endif
-
     <h5>Fecha:{{$fecha_f}}</h5>
     <hr>
     <div CLASS="container">
@@ -32,6 +31,11 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <a  href="{{ route('XLStablero.NoValidados') }}" class="btn btn-primary btn-sm pull-left" style="margin-left: 5px"><i class="fa fa-file-excel-o"></i> DESCARGAR XLS</a>
+        </div>
     </div>
     <br>
     <div class="table-responsive">
