@@ -19,22 +19,26 @@
             <tbody>
                 <tr>
                     <td align="left">&nbsp;2 a 4 semanas</td>
-                    <td align="right">{{ $semanas }}&nbsp;</td>
+                    <td align="right">{{number_format($semanas,0,".",",")}} &nbsp;</td>
                 </tr>
                 <tr>
                     <td align="left">&nbsp;1 a 3 meses</td>
-                    <td align="right">{{ $tres_meses }}&nbsp;</td>
+                    <td align="right">{{number_format($tres_meses,0,".",",")}} &nbsp;</td>
                 </tr>
                 <tr>
                     <td align="left">&nbsp;Mayor a 4 semanas&nbsp;</td>
-                    <td align="right">{{ $mas }}&nbsp;</td>
+                    <td align="right">{{number_format($mas,0,".",",")}}&nbsp;</td>
                 </tr>
             </tbody>
         </table>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <a  href="{{ route('XLStablero.NoValidados') }}" class="btn btn-primary btn-sm pull-left" style="margin-left: 5px"><i class="fa fa-file-excel-o"></i> DESCARGAR XLS</a>
+            @if($tipo == 1)
+                <a  href="{{ route('XLStablero.NoValidados') }}" class="btn btn-primary btn-sm pull-left" style="margin-left: 5px"><i class="fa fa-file-excel-o"></i> DESCARGAR XLS</a>
+            @elseif($tipo == 2)
+                <a  href="{{ route('XLStablero.Validados') }}" class="btn btn-primary btn-sm pull-left" style="margin-left: 5px"><i class="fa fa-file-excel-o"></i> DESCARGAR XLS</a>
+            @endif
         </div>
     </div>
     <br>

@@ -145,10 +145,18 @@ Route::group(['prefix' => 'xls'], function () {
 
 // XLS Routes Tablero Control
 
-Route::group(['prefix' => 'XLStablero'], function (){
-    Route:get('NoValidados', [
+Route::group(/**
+ *
+ */
+    ['prefix' => 'XLStablero'], function (){
+    Route::get('NoValidados', [
         'as' => 'XLStablero.NoValidados',
         'uses' => 'XLSTableroController@novalidados'
+    ]);
+
+    Route::get('Validados', [
+        'as' => 'XLStablero.Validados',
+        'uses' => 'XLSTableroController@validados'
     ]);
 });
 

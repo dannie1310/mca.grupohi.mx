@@ -50,7 +50,7 @@ class TableroControlController extends Controller
 
         $validados_total = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
-            ->whereRaw("v.FechaLlegada < '".$inicioFecha."'")
+            ->whereRaw("v.FechaLlegada <= '".$inicioFecha."'")
             ->whereIn("v.Estatus",array('1','21'))
             ->whereNotNull("vr.IdViaje")
             ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
@@ -303,7 +303,12 @@ class TableroControlController extends Controller
             $validados = DB::connection("sca")->table("viajesnetos as v")
                 ->selectRaw("v.IdCamion, c.Economico AS economico, v.idorigen, o.Descripcion AS origen, v.FechaSalida AS fs, v.HoraSalida AS hs,
                     v.CubicacionCamion AS cubicacion, v.IdTiro, t.Descripcion AS tiro, v.FechaLlegada AS fl, v.HoraLlegada AS hl, v.IdMaterial,
-                    m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$inicioFecha."','0','1') AS alerta")
+                    m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$dosSemanas."','0','1') AS alerta,
+                    IF(v.estatus = 29, 'Viaje Manual - Cargado',
+                    IF(v.estatus = 20, 'Viaje Manual - Pendiente Validar',
+                    IF(v.estatus = 0, 'Viaje - Pendiente por Validar',
+                    IF(v.estatus = 1, 'Viaje - Validado', 
+                    IF(v.estatus = 21, 'Validado',''))))) AS estatus")
                 ->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
                 ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
                 ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
@@ -314,7 +319,22 @@ class TableroControlController extends Controller
                 ->whereNotNull("vr.IdViaje")
                 ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")
                 ->orderBy("v.FechaLlegada","desc");
-            return view('tablero-control.detalle_no_validado')->withTipo(2)->withFechaF($fecha)->withDatos($validados->paginate(100))->withBusqueda($busqueda);
+
+
+            $semanas = DB::connection("sca")->select("SELECT  COUNT(*) AS uno FROM viajesnetos AS v LEFT JOIN viajes AS vr ON vr.IdViajeNeto = v.IdViajeNeto LEFT JOIN conciliacion_detalle AS cd ON cd.idviaje_neto = v.IdViajeNeto 
+                      WHERE v.Estatus IN (1 , 21) AND vr.IdViaje IS NOT NULL AND v.FechaLlegada BETWEEN '".$cuatroSemanas."' AND '".$inicioFecha."' AND (cd.idconciliacion_detalle IS NULL OR cd.estado = -1);");
+
+            $tresMeses = DB::connection("sca")->select("SELECT  COUNT(*) AS dos FROM viajesnetos AS v LEFT JOIN viajes AS vr ON vr.IdViajeNeto = v.IdViajeNeto LEFT JOIN conciliacion_detalle AS cd ON cd.idviaje_neto = v.IdViajeNeto
+                         WHERE v.Estatus IN (1 , 21) AND vr.IdViaje IS NOT NULL AND v.FechaLlegada BETWEEN '".$tercermes."' AND '".$cuatroSemanas."' AND (cd.idconciliacion_detalle IS NULL OR cd.estado = -1); ");
+
+            $cuatroMasMeses = DB::connection("sca")->table("viajesnetos as v")->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
+                ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
+                ->whereIn("v.Estatus",array('1','21'))
+                ->whereNotNull("vr.IdViaje")
+                ->whereRaw("v.FechaLlegada <= '".$tercermes."'")
+                ->whereRaw("(cd.idconciliacion_detalle IS NULL or cd.estado = -1)")->count();
+
+            return view('tablero-control.detalle_no_validado')->withTipo(2)->withFechaF($fecha)->withSemanas($semanas[0]->uno)->withTresMeses($tresMeses[0]->dos)->withMas($cuatroMasMeses)->withDatos($validados->paginate(100))->withBusqueda($busqueda);
         }else if($id == 3){
             //usuario con diferentes imei
             $usuario = DB::connection("sca")->table("telefonos")->selectRaw("id_checador")
