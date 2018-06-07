@@ -36,7 +36,8 @@ class XLSTableroController extends Controller
                     m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$dosSemanas."','0','1') AS alerta,
                     IF(v.estatus = 29, 'Viaje Manual - Pendiente de Autorizar',
                     IF(v.estatus = 20, 'Viaje Manual - Pendiente de Validar',
-                    IF(v.estatus = 0, 'Viaje - Pendiente por Validar',''))) AS estatus ")
+                    IF(v.estatus = 0, 'Viaje - Pendiente por Validar',''))) AS estatus,
+                    IF(v.denegado = 1, 'DENEGADO', '') AS denegado")
             ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("camiones as c", "c.IdCamion", "=", "v.IdCamion")
             ->leftjoin("origenes as o", "o.IdOrigen","=","v.IdOrigen")
@@ -50,7 +51,7 @@ class XLSTableroController extends Controller
         Excel::create('Tablero_viajesnovalidados'.'_'.$now->format("Y-m-d")."__".$now->format("h:i:s"), function($excel) use($novalidados) {
             $excel->sheet('NoValidados', function($sheet) use($novalidados) {
                 $sheet->row(1, array(
-                    'Economico','Origen','Fecha Salida','Cubicacion','Destino','Fecha Llegada','Material','Ticket','Folio Mina', 'Folio Seguimiento','Alerta', 'Estatus'
+                    'Economico','Origen','Fecha Salida','Cubicacion','Destino','Fecha Llegada','Material','Ticket','Folio Mina', 'Folio Seguimiento','Alerta', 'Estatus','Estatus Viaje'
                 ));
                 $i = 2;
                 foreach($novalidados as $a){
@@ -66,7 +67,8 @@ class XLSTableroController extends Controller
                         $a->foliomina,
                         $a->folioseg,
                         $a->alerta,
-                        $a->estatus
+                        $a->estatus,
+                        $a->denegado
                     ));
                     $i++;
                 }
@@ -89,7 +91,8 @@ class XLSTableroController extends Controller
                     IF(v.estatus = 20, 'Viaje Manual - Pendiente Validar',
                     IF(v.estatus = 0, 'Viaje - Pendiente por Validar',
                     IF(v.estatus = 1, 'Viaje - Validado', 
-                    IF(v.estatus = 21, 'Validado',''))))) AS estatus")
+                    IF(v.estatus = 21, 'Validado',''))))) AS estatus,
+                    IF(v.denegado = 1, 'DENEGADO', '') AS denegado")
             ->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
             ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
             ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
@@ -105,7 +108,7 @@ class XLSTableroController extends Controller
         Excel::create('Tablero_viajesvalidados'.'_'.$now->format("Y-m-d")."__".$now->format("h:i:s"), function($excel) use($validados) {
             $excel->sheet('Validados', function($sheet) use($validados) {
                 $sheet->row(1, array(
-                    'Economico','Origen','Fecha Salida','Cubicacion','Destino','Fecha Llegada','Material','Ticket','Folio Mina', 'Folio Seguimiento','Alerta', 'Estatus'
+                    'Economico','Origen','Fecha Salida','Cubicacion','Destino','Fecha Llegada','Material','Ticket','Folio Mina', 'Folio Seguimiento','Alerta', 'Estatus','Estatus Viaje'
                 ));
                 $i = 2;
                 foreach($validados as $a){
@@ -121,7 +124,8 @@ class XLSTableroController extends Controller
                         $a->foliomina,
                         $a->folioseg,
                         $a->alerta,
-                        $a->estatus
+                        $a->estatus,
+                        $a->denegado
                     ));
                     $i++;
                 }

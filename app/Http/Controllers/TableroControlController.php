@@ -275,7 +275,8 @@ class TableroControlController extends Controller
                     m.Descripcion AS material, v.Code AS code, v.folioMina AS foliomina, v.folioSeguimiento AS folioseg, IF(v.FechaLlegada >= '".$dosSemanas."','0','1') AS alerta,
                     IF(v.estatus = 29, 'Viaje Manual - Pendiente de Autorizar',
                     IF(v.estatus = 20, 'Viaje Manual - Pendiente de Validar',
-                    IF(v.estatus = 0, 'Viaje - Pendiente por Validar',''))) AS estatus ")
+                    IF(v.estatus = 0, 'Viaje - Pendiente por Validar',''))) AS estatus,
+                    IF(v.denegado = 1, 'DENEGADO', '') AS denegado")
                 ->leftjoin("viajesrechazados as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
                 ->leftjoin("camiones as c", "c.IdCamion", "=", "v.IdCamion")
                 ->leftjoin("origenes as o", "o.IdOrigen","=","v.IdOrigen")
@@ -308,7 +309,8 @@ class TableroControlController extends Controller
                     IF(v.estatus = 20, 'Viaje Manual - Pendiente Validar',
                     IF(v.estatus = 0, 'Viaje - Pendiente por Validar',
                     IF(v.estatus = 1, 'Viaje - Validado', 
-                    IF(v.estatus = 21, 'Validado',''))))) AS estatus")
+                    IF(v.estatus = 21, 'Validado',''))))) AS estatus,
+                    IF(v.denegado = 1, 'DENEGADO', '') AS denegado")
                 ->leftjoin("viajes as vr","vr.IdViajeNeto", "=","v.IdViajeNeto")
                 ->leftjoin("conciliacion_detalle as cd","cd.idviaje_neto", "=","v.IdViajeNeto")
                 ->join("camiones as c", "c.IdCamion", "=", "v.IdCamion")
