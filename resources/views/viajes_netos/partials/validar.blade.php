@@ -91,7 +91,7 @@
                             <td>@{{ viaje.KMAdicional }}</td>
                             <td>@{{ viaje.Importe }}</td>
 
-                            <td v-if="viaje.cierre == 0">
+                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0">
                                 <span v-if='viaje.Valido'>
                                     <i class="fa fa-check" style="color: green" v-bind:title="viaje.Estado"></i>
                                 </span>
@@ -104,7 +104,7 @@
                                     <i class="fa fa-times" style="color: red"></i>
                                 </span>
                             </td>
-                            <td v-if="viaje.cierre == 0">
+                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0">
                                 <a id="show-modal" @click="showModal(viaje)">
                                     Validar     
                                 </a>
@@ -194,8 +194,11 @@
                                     </div>
                                 </modal-validar>
                             </td>
+                            <td v-else-if="viaje.denegado == 1 && viaje.cierre == 0">
+                                DENEGADO
+                            </td>
                             <td v-else>
-                               Periodo Cerrado
+                               PERIODO CERRADO
                             </td>
                             <td>
                                 <span v-if="viaje.Imagenes.length">

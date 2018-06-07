@@ -220,9 +220,7 @@ class ViajesNetosController extends Controller
                         ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
                         ->get();
 
-
                     foreach ($viajes as $viaje) {
-
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
                             'IdViajeNeto' => $viaje->IdViajeNeto,
@@ -252,7 +250,8 @@ class ViajesNetosController extends Controller
                             'TipoTarifa' => 'm',
                             'TipoFDA' => 'm',
                             'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
-                            'Imagenes' => $viaje->imagenes
+                            'Imagenes' => $viaje->imagenes,
+                            'denegado' => (String) $viaje->denegado,
                         ];
                     }
 
@@ -293,7 +292,8 @@ class ViajesNetosController extends Controller
                             'TipoTarifa' => 'm',
                             'TipoFDA' => 'm',
                             'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
-                            'Imagenes' => $viaje->imagenes
+                            'Imagenes' => $viaje->imagenes,
+                            'denegado' => (String) $viaje->denegado,
                         ];
                     }
                 }
