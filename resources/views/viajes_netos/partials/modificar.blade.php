@@ -81,7 +81,7 @@
                                 <td>@{{ viaje.Material }}</td>
                                 <td>@{{ viaje.Codigo }}</td>
 
-                                <td  v-if="viaje.cierres == 0">
+                                <td  v-if="viaje.cierres == 0 && viaje.denegado == 0">
                                     <a id="show-modal" @click="showModal(viaje)">
                                         Modificar
                                     </a>
@@ -164,7 +164,12 @@
                                         </div>
                                     </modal-modificar>
                                 </td>
-                                <td v-else>Periodo Cerrado</td>
+                                 <td v-else-if="viaje.cierres == 0 && viaje.denegado == 1">
+                                     DENEGADO
+                                 </td>
+                                <td v-else>
+                                    PERIODO CERRADO
+                                </td>
                             </tr>
                         </tbody>
                     </table>

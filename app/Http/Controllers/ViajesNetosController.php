@@ -80,7 +80,8 @@ class ViajesNetosController extends Controller
                             'Sindicato' => (String)$viaje->sindicato,
                             'Empresa' => (String)$viaje->empresa,
                             'Codigo' => $viaje->Code,
-                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
+                            'denegado' => $viaje->denegado
                         ];
                     }
                 } elseif ($request->tipo_busqueda == 'codigo') {
@@ -112,7 +113,8 @@ class ViajesNetosController extends Controller
                             'Sindicato' => (String)$viaje->sindicato,
                             'Empresa' => (String)$viaje->empresa,
                             'Codigo' => $viaje->Code,
-                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
+                            'denegado' => $viaje->denegado
                         ];
                     }
                 }
