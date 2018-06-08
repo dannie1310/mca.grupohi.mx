@@ -127,6 +127,7 @@ class ViajesNetosController extends Controller
                 $conflicto = \App\Models\Conflictos\ConflictoEntreViajes::find($id_conflicto);
                 $viaje = ViajeNeto::find($id_viaje);
                 $data["cierres"] = ViajeNeto::validandoCierre($viaje->FechaLlegada);
+                $data["denegado"] = $viaje->denegado;
                 $pagable = $viaje->conflicto_pagable;
                 $detalles = $conflicto->detalles;
                 if($pagable){
