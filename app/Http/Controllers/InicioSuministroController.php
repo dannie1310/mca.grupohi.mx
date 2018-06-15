@@ -191,6 +191,7 @@ class InicioSuministroController extends Controller
             }
             else if ($request->get('action') == 'validar') {
                 $data = [];
+               // dd("aqui7");
                 if($request->tipo_busqueda == 'fecha') {
                     $this->validate($request, [
                         'FechaInicial' => 'required|date_format:"Y-m-d"',
@@ -218,10 +219,12 @@ class InicioSuministroController extends Controller
                             'Estado' => $viaje->estado(),
                             'FolioMina' => $viaje->folioMina,
                             'FolioSeguimiento' => $viaje->folioSeguimiento,
-                            'Volumen'=>$viaje->volumen,
+                            'Volumen'=>$viaje->deductiva,
+                            'tipo' =>$viaje->tipo,
                             'cierre' => InicioCamion::validandoCierre($viaje->fecha_origen),
                         ];
                     }
+                  //  dd($data);
 
                 } else if($request->tipo_busqueda == 'codigo') {
                     $this->validate($request, [
@@ -262,7 +265,7 @@ class InicioSuministroController extends Controller
                     ]);
 
                     $fechas = $request->only(['FechaInicial', 'FechaFinal']);
-                    $query = DB::connection('sca')->table('inicio_camion')->select('inicio_camion.*,  camiones.CubicacionParaPago AS cubicacion')->whereNull('inicio_camion.id');
+                    $query = DB::connection('sca')->table('inicio_camion')->addSelect("inicio_camion.*")->whereNull('inicio_camion.id');
                     $query = InicioCamion::scopeReporte($query);
 
                     foreach($request->get('Tipo', []) as $tipo) {
@@ -307,6 +310,7 @@ class InicioSuministroController extends Controller
                             $query->union($q_cmd);
                         }
                         if($tipo == 'M_V') {
+                           // dd("aqui");
                             $q_mv = DB::connection('sca')->table('inicio_camion');
                             $q_mv = InicioCamion::scopeMovilesValidados($q_mv);
                             $q_mv = InicioCamion::scopeReporte($q_mv);
@@ -525,7 +529,6 @@ class InicioSuministroController extends Controller
         //
         if($request->get('action') == 'validar') {
             if(auth()->user()->can('validar-viajes')) {
-
                 return view('control_suministro.edit')
                    ->withCierre(CierrePeriodo::cierresPeriodos())
                     ->withAction('validar');

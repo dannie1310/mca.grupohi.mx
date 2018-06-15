@@ -213,7 +213,8 @@ class InicioCamion extends Model
                 $query
                     ->whereNull('inicio_viajes.IdInicioViajes')
                     ->whereNull('inicioviajesrechazados.IdInicioViajeRechazado')
-                    ->whereIn('inicio_camion.Estatus', [1, 10, 20, 30]);
+                    ->whereIn('inicio_camion.Estatus', [0, 10, 20, 30])
+                    ->where('tipo','=','1');
             });
     }
     public function scopeValidados($query) {
