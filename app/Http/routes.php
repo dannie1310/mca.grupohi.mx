@@ -359,3 +359,7 @@ Route::get('conceptos/jstree', 'ConceptoController@getRoot');
 Route::get('conceptos/{id}/jstree', 'ConceptoController@getNode');
 // Ruta para asignar concepto Cadeco a Tiros
 Route::post('tiros/asignar_concepto', 'TirosController@asignar_concepto');
+
+
+
+Route::get('denegar_viajes', 'DenegarViajesController@index')->name('denegar.viajes_cierreperiodo');

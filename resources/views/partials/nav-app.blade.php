@@ -280,6 +280,16 @@
           </ul>
       </li>
   @endif
+    @if(Auth::user()->hasRole(['denegar_viajes_periodo']))
+        <li class="dropdown">
+            <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
+                Denegar<span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="{{ route('denegar.viajes_cierreperiodo') }}">Denegar Viajes por Cierre de Periodo</a></li>
+            </ul>
+        </li>
+    @endif
 @else
   <li><a href="{{ route('proyectos') }}">Proyectos</a></li>
 @endif
