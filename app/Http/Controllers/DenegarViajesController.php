@@ -30,8 +30,8 @@ class DenegarViajesController extends Controller
 
         foreach ($viajes_conciliados_cancelados as $viaje){
             $confirmar = DB::connection("sca")->select(DB::raw("select c.idconciliacion, c.estado as estado_conci, cd.idviaje, cd.idviaje_neto, cd.estado as estado_viaje from conciliacion c 
-left join conciliacion_detalle cd on c.idconciliacion = cd.idconciliacion 
-where cd.idviaje_neto = ".$viaje->IdViajeNeto." and cd.estado > 0" ));
+                left join conciliacion_detalle cd on c.idconciliacion = cd.idconciliacion 
+                where cd.idviaje_neto = ".$viaje->IdViajeNeto." and cd.estado > 0" ));
             if ($confirmar == []) {
                 /*$datos []= [
                    'id' => $viaje->IdViajeNeto
@@ -56,6 +56,35 @@ where cd.idviaje_neto = ".$viaje->IdViajeNeto." and cd.estado > 0" ));
         }
 
         //viajes sin conciliaciones
+        $viajes_sin_conciliaciones = DB::connection("sca")->select(DB::raw("select * from viajesnetos vn 
+                                    left join conciliacion_detalle cd on vn.IdViajeNeto = cd.idviaje_neto
+                                    left join conciliacion c on c.idconciliacion = cd.idconciliacion
+                                    where year(vn.FechaLlegada) = 2018 and month(vn.FechaLlegada) = 03
+                                    and  c.idconciliacion is null;"));
+
+        //dd($viajes_sin_conciliaciones);
+        $se = "select * from  `prod_sca_pista_aeropuerto_2`.`viajesnetos`  WHERE `IdViajeNeto` in (";
+        $archivo=fopen('C:\Users\DBenitezc\Desktop\select_viajes_sin_conciliar.txt',"a") or
+        die("No se pudo crear el archivo");
+        fputs($archivo,$se);
+        fclose($archivo);
+
+        foreach ($viajes_sin_conciliaciones as $v) {
+            $update = "UPDATE `prod_sca_pista_aeropuerto_2`.`viajesnetos` SET  `denegado` = 1 WHERE `IdViajeNeto` = ".$v->IdViajeNeto.";";
+            $se = $v->IdViajeNeto.", ";
+            $archivo=fopen('C:\Users\DBenitezc\Desktop\viajes_sin_conciliar.txt',"a") or
+            die("No se pudo crear el archivo");
+            fputs($archivo,$update);
+            fputs($archivo,"\n");
+            fclose($archivo);
+            $archivo=fopen('C:\Users\DBenitezc\Desktop\select_viajes_sin_conciliar.txt',"a") or
+            die("No se pudo crear el archivo");
+            fputs($archivo,$se);
+            fclose($archivo);
+
+        }
+
+        dd("FIN");
     }
 
     /**
