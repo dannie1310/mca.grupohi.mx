@@ -5,6 +5,7 @@ namespace App\Models\Conciliacion;
 use App\Models\Empresa;
 use App\Models\Ruta;
 use App\Models\Sindicato;
+use App\Models\ValidacionCierrePeriodo;
 use App\Models\Viaje;
 use App\Presenters\ModelPresenter;
 use Illuminate\Database\Eloquent\Model;
@@ -489,6 +490,18 @@ class Conciliacion extends Model
                     'fecha_hora_cancelacion' => Carbon::now()->toDateTimeString(),
                     'idcancelo' => auth()->user()->idusuario
                 ]);
+                $buscar_viaje = DB::connection("sca")->select(DB::raw("select * from viajesnetos where IdViajeNeto = ".$detalle->idviaje_neto.";"));
+                /* Bloqueo de cierre de periodo
+                           1 : Cierre de periodo
+                           0 : Periodo abierto.
+                       */
+                $cierre = ValidacionCierrePeriodo::validandoCierreViajeDenegar($buscar_viaje[0]->FechaLlegada);
+
+                if($cierre == 1){
+                    if($buscar_viaje[0]->denegado == 0) {
+                        $save = DB::connection('sca')->table('viajesnetos')->where('IdViajeNeto', '=', $buscar_viaje[0]->IdViajeNeto)->update(['denegado' => 1]);
+                    }
+                }
 
                 $detalle->estado = -1;
                 $detalle->save();
