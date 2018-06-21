@@ -25,8 +25,14 @@ class DenegarViajesController extends Controller
         $viajes_conciliados_cancelados = DB::connection("sca")->select(DB::raw("select * from viajesnetos vn 
                                         left join conciliacion_detalle cd on vn.IdViajeNeto = cd.idviaje_neto
                                         left join conciliacion c on c.idconciliacion = cd.idconciliacion
-                                        where year(vn.FechaLlegada) = 2018 and month(vn.FechaLlegada) = 03
+                                        where year(vn.FechaLlegada) = 2018 and month(vn.FechaLlegada) = 01
                                         and cd.estado < 0;"));
+
+        $select = "select * from  `prod_sca_pista_aeropuerto_2`.`viajesnetos`  WHERE `IdViajeNeto` in (";
+        $archivo=fopen('C:\Users\DBenitezc\Desktop\select.txt',"a") or
+        die("No se pudo crear el archivo");
+        fputs($archivo,$select);
+        fclose($archivo);
 
         foreach ($viajes_conciliados_cancelados as $viaje){
             $confirmar = DB::connection("sca")->select(DB::raw("select c.idconciliacion, c.estado as estado_conci, cd.idviaje, cd.idviaje_neto, cd.estado as estado_viaje from conciliacion c 
@@ -37,7 +43,7 @@ class DenegarViajesController extends Controller
                    'id' => $viaje->IdViajeNeto
                 ];*/
                 $save = "UPDATE `prod_sca_pista_aeropuerto_2`.`viajesnetos` SET  `denegado` = 1 WHERE `IdViajeNeto` =".$viaje->IdViajeNeto.";";
-                $select = "select * from  `prod_sca_pista_aeropuerto_2`.`viajesnetos`  WHERE `IdViajeNeto` = ".$viaje->IdViajeNeto.";";
+                $select = $viaje->IdViajeNeto.", ";
 
                 $archivo=fopen('C:\Users\DBenitezc\Desktop\update.txt',"a") or
                 die("No se pudo crear el archivo");
@@ -48,7 +54,6 @@ class DenegarViajesController extends Controller
                 $archivo=fopen('C:\Users\DBenitezc\Desktop\select.txt',"a") or
                 die("No se pudo crear el archivo");
                 fputs($archivo,$select);
-                fputs($archivo,"\n");
                 fclose($archivo);
 
                 //$save = DB::connection('sca')->table('viajesnetos')->where('IdViajeNeto', '=',$viaje->IdViajeNeto)->update(['denegado' => 1]);
@@ -59,7 +64,7 @@ class DenegarViajesController extends Controller
         $viajes_sin_conciliaciones = DB::connection("sca")->select(DB::raw("select * from viajesnetos vn 
                                     left join conciliacion_detalle cd on vn.IdViajeNeto = cd.idviaje_neto
                                     left join conciliacion c on c.idconciliacion = cd.idconciliacion
-                                    where year(vn.FechaLlegada) = 2018 and month(vn.FechaLlegada) = 03
+                                    where year(vn.FechaLlegada) = 2018 and month(vn.FechaLlegada) = 01
                                     and  c.idconciliacion is null;"));
 
         //dd($viajes_sin_conciliaciones);
