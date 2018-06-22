@@ -10,6 +10,7 @@ namespace App\Models\Conciliacion;
 
 
 use App\Models\Camion;
+use App\Models\ValidacionCierrePeriodo;
 use App\Models\Viaje;
 use App\Models\ViajeNeto;
 use Carbon\Carbon;
@@ -1031,20 +1032,35 @@ class Conciliaciones
            // dd($viaje_neto,$viaje_validado,$viaje_pendiente_conciliar);
         }
         $id_conciliacion = $this->conciliacion->idconciliacion;
-        if($denegado == 1){
-                $detalle_no_conciliado = [
-                    'idconciliacion' => $id_conciliacion,
-                    'idviaje_neto'=>$viaje_neto->IdViajeNeto,
-                    'idmotivo'=>15,
-                    'detalle'=>"Viaje denegado por fecha, pasar a mesa de aclaraciones para revisión. ". $complemento_detalle,
-                    'detalle_alert'=>"Viaje denegado por fecha, pasar a mesa de aclaraciones para revisión.". $complemento_detalle,
-                    'timestamp'=>Carbon::now()->toDateTimeString(),
-                    'Code' => $viaje_neto->Code,
-                    'registro'=>auth()->user()->idusuario,
-                ];
-                $evaluacion["detalle"] = FALSE;
-                $evaluacion["detalle_nc"] = $detalle_no_conciliado;
-        }else {
+        $cierre = ValidacionCierrePeriodo::validandoCierreViaje($viaje_neto->FechaLlegada);
+        if($cierre == 1){
+            $detalle_no_conciliado = [
+                'idconciliacion' => $id_conciliacion,
+                'idviaje_neto'=>$viaje_neto->IdViajeNeto,
+                'idmotivo'=>16,
+                'detalle'=>"Viaje denegado por cierre de periodo, pasar a mesa de aclaraciones para revisión. ". $complemento_detalle,
+                'detalle_alert'=>"Viaje denegado por cierre de periodo, pasar a mesa de aclaraciones para revisión.". $complemento_detalle,
+                'timestamp'=>Carbon::now()->toDateTimeString(),
+                'Code' => $viaje_neto->Code,
+                'registro'=>auth()->user()->idusuario,
+            ];
+            $evaluacion["detalle"] = FALSE;
+            $evaluacion["detalle_nc"] = $detalle_no_conciliado;
+
+        } else if($denegado == 1){
+            $detalle_no_conciliado = [
+                'idconciliacion' => $id_conciliacion,
+                'idviaje_neto'=>$viaje_neto->IdViajeNeto,
+                'idmotivo'=>15,
+                'detalle'=>"Viaje denegado por fecha, pasar a mesa de aclaraciones para revisión. ". $complemento_detalle,
+                'detalle_alert'=>"Viaje denegado por fecha, pasar a mesa de aclaraciones para revisión.". $complemento_detalle,
+                'timestamp'=>Carbon::now()->toDateTimeString(),
+                'Code' => $viaje_neto->Code,
+                'registro'=>auth()->user()->idusuario,
+            ];
+            $evaluacion["detalle"] = FALSE;
+            $evaluacion["detalle_nc"] = $detalle_no_conciliado;
+        } else{
             if (!$viaje_neto) {
                 $detalle_no_conciliado = [
                     'idconciliacion' => $id_conciliacion,
