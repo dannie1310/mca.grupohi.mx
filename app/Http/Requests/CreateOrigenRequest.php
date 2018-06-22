@@ -26,6 +26,7 @@ class CreateOrigenRequest extends Request
         return [
             'IdTipoOrigen' => 'required|numeric|exists:sca.tiposorigenes,IdTipoOrigen',
             'Descripcion' => 'required|unique:sca.origenes,Descripcion',
+            'interno'      => 'required'
         ];
     }
     
@@ -34,6 +35,7 @@ class CreateOrigenRequest extends Request
         $messages = [
             'IdTipoOrigen.exists'   => 'No existe un Tipo de Origen con el Id: '. $this->IdTipoOrigen,
             'Descripcion.unique'    => 'Ya existe un origen con la siguiente descripción: ' . $this->Descripcion,
+            'interno.required'      => 'Debe seleccionar un tipo'
         ];
 
         return $messages;

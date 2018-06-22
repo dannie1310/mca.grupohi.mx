@@ -13,7 +13,7 @@ class Origen extends Model
     protected $connection = 'sca';
     protected $table = 'origenes';
     protected $primaryKey = 'IdOrigen';
-    protected $fillable = ['IdTipoOrigen', 'IdProyecto', 'Descripcion', 'FechaAlta', 'HoraAlta','usuario_registro','motivo','usuario_desactivo','Estatus'];
+    protected $fillable = ['IdTipoOrigen', 'IdProyecto', 'Descripcion', 'FechaAlta', 'HoraAlta','usuario_registro','motivo','usuario_desactivo','Estatus','interno'];
     protected $presenter = ModelPresenter::class;
 
     public function getCreatedAtAttribute($timestamp) {

@@ -19,6 +19,7 @@
         <th>Fecha y hora registro</th>
         <th>Registró</th>
         <th>Estatus</th>
+        <th>Tipo de origen</th>
         <th width="160px">Acciones</th>
       </tr>
     </thead>
@@ -33,6 +34,11 @@
           <td>{{$origen->created_at->format('d-M-Y h:i:s a')}}</td>
           <td>{{$origen->user_registro}}</td>
           <td>{{ $origen->present()->estatus }}</td>
+          @if($origen->interno == 0)
+                <td>EXTERNO</td>
+          @else
+                <td>INTERNO</td>
+          @endif
           <td>
 
             <a href="{{ route('origenes.show', $origen) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
