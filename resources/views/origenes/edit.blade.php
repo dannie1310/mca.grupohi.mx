@@ -27,6 +27,7 @@
             {!! Form::text('Descripcion', $origen->present()->Descripcion, ['class' => 'form-control', 'placeholder' => 'Descripción...', 'disabled' => 'disabled']) !!}
         </div>
     </div>
+    @if(Auth::user()->can(['modificar_tipo_origen']))
     <div class="form-group">
         {!! Form::label('Tipo', 'Tipo', ['class' => 'control-label col-sm-3']) !!}
         <div class="col-sm-9">
@@ -34,10 +35,25 @@
         </div>
 
     </div>
+    @else
+        <div class="form-group">
+            {!! Form::label('Tipo', 'Tipo', ['class' => 'control-label col-sm-3']) !!}
+            <div class="col-sm-9">
+                @if($origen->interno == 0)
+                    {!! Form::text('interno', 'EXTERNO', [ 'class' => 'form-control', 'disabled' => 'disabled']) !!}
+                @else
+                    {!! Form::text('interno', 'INTERNO', [ 'class' => 'form-control', 'disabled' => 'disabled']) !!}
+                @endif
+            </div>
+
+        </div>
+    @endif
 </div>
 <div class="form-group col-md-12" style="text-align: center; margin-top: 20px">
-    <a class="btn btn-info" href="{{ URL::previous() }}">Regresar</a>        
-    {!! Form::submit('Actualizar', ['class' => 'btn btn-primary']) !!}
+    <a class="btn btn-info" href="{{ URL::previous() }}">Regresar</a>
+    @if(Auth::user()->can(['modificar_tipo_origen']))
+        {!! Form::submit('Actualizar', ['class' => 'btn btn-primary']) !!}
+    @endif
 </div>
 {!! Form::close() !!}
 @stop

@@ -40,15 +40,17 @@
                 <td>INTERNO</td>
           @endif
           <td>
-            <a href="{{ route('origenes.edit', [$origen]) }}" class="btn btn-info btn-xs" title="Editar"><i class="fa fa-pencil"></i></a>
+            @if(Auth::user()->can(['modificar_tipo_origen','editar-origenes']))
+                <a href="{{ route('origenes.edit', [$origen]) }}" class="btn btn-info btn-xs" title="Editar"><i class="fa fa-pencil"></i></a>
+            @endif
             <a href="{{ route('origenes.show', $origen) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
             @permission('desactivar-origenes')
               @if($origen->Estatus == 1)
               <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_origen({{$origen->IdOrigen}})"><i class="fa fa-remove"></i></button>
-            @else
-              <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_origen({{$origen->IdOrigen}})"><i class="fa fa-check"></i></button>
-            @endif
-              @endpermission
+              @else
+                <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_origen({{$origen->IdOrigen}})"><i class="fa fa-check"></i></button>
+              @endif
+            @endpermission
           </td>
         </tr>
       @endforeach
