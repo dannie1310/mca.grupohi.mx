@@ -40,7 +40,7 @@
                 <td>INTERNO</td>
           @endif
           <td>
-
+            <a href="{{ route('origenes.edit', [$origen]) }}" class="btn btn-info btn-xs" title="Editar"><i class="fa fa-pencil"></i></a>
             <a href="{{ route('origenes.show', $origen) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
             @permission('desactivar-origenes')
               @if($origen->Estatus == 1)
@@ -73,7 +73,8 @@
           col_3: 'input',
           col_4: 'select',
           col_5: 'select',
-          col_6: 'none',
+          col_6: 'select',
+          col_7: 'none',
           base_path: App.tablefilterBasePath,
           auto_filter: true,
           paging: false,

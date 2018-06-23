@@ -23,17 +23,29 @@ class EditOrigenRequest extends Request
      */
     public function rules()
     {
-        return [
+        /*
+         *  return [
             'IdTipoOrigen' => 'required|numeric|exists:sca.tiposorigenes,IdTipoOrigen',
-            'Descripcion' => 'required|unique:sca.origenes,Descripcion,'.$this->route('origenes').',IdOrigen'
+            'Descripcion' => 'required|unique:sca.origenes,Descripcion,'.$this->route('origenes').',IdOrigen',
+            'interno'      => 'required'
+            ];
+         *
+         */
+        return [
+            'interno'      => 'required'
         ];
     }
     
     public function messages()
     {
-        $messages = [
+        /*
+         *   $messages = [
             'IdTipoOrigen.exists'   => 'No existe un Tipo con el Id: '. $this->IdTipoOrigen,
             'Descripcion.unique'    => 'Ya existe un origen con la siguiente descripción: ' . $this->Descripcion,
+            ];
+         */
+        $messages = [
+            'interno.required' => 'Seleccionar un tipo'
         ];
 
         return $messages;
