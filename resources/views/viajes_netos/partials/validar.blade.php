@@ -91,7 +91,7 @@
                             <td>@{{ viaje.KMAdicional }}</td>
                             <td>@{{ viaje.Importe }}</td>
 
-                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0">
+                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0 && viaje.tipo_origen == 0">
                                 <span v-if='viaje.Valido'>
                                     <i class="fa fa-check" style="color: green" v-bind:title="viaje.Estado"></i>
                                 </span>
@@ -100,11 +100,14 @@
                                 </span>
                             </td>
                             <td v-else>
-                                <span>
+                                <span v-if="viaje.tipo_origen == 1">
+                                    <i class="fa fa-exclamation-triangle" style="color: red" title="Viaje Identificado como Interno"></i>
+                                </span>
+                                <span v-else>
                                     <i class="fa fa-times" style="color: red"></i>
                                 </span>
                             </td>
-                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0">
+                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0 && viaje.tipo == 0">
                                 <a id="show-modal" @click="showModal(viaje)">
                                     Validar     
                                 </a>
@@ -194,8 +197,11 @@
                                     </div>
                                 </modal-validar>
                             </td>
-                            <td v-else-if="viaje.denegado == 1 && viaje.cierre == 0">
+                            <td v-else-if="viaje.denegado == 1 && viaje.cierre == 0 && viaje.tipo_origen == 0">
                                 DENEGADO
+                            </td>
+                            <td v-else-if="viaje.tipo_origen == 1">
+                                VIAJE INTERNO
                             </td>
                             <td v-else>
                                PERIODO CERRADO
