@@ -100,14 +100,14 @@
                                 </span>
                             </td>
                             <td v-else>
-                                <span v-if="viaje.tipo_origen == 1">
+                                <span v-if="viaje.tipo_origen == 1 && viaje.cierre == 0">
                                     <i class="fa fa-exclamation-triangle" style="color: red" title="Viaje Identificado como Interno"></i>
                                 </span>
                                 <span v-else>
                                     <i class="fa fa-times" style="color: red"></i>
                                 </span>
                             </td>
-                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0 && viaje.tipo == 0">
+                            <td v-if="viaje.cierre == 0 && viaje.denegado == 0 && viaje.tipo_origen == 0">
                                 <a id="show-modal" @click="showModal(viaje)">
                                     Validar     
                                 </a>
@@ -200,10 +200,10 @@
                             <td v-else-if="viaje.denegado == 1 && viaje.cierre == 0 && viaje.tipo_origen == 0">
                                 DENEGADO
                             </td>
-                            <td v-else-if="viaje.tipo_origen == 1">
+                            <td v-else-if="viaje.tipo_origen == 1 && viaje.cierre == 0">
                                 VIAJE INTERNO
                             </td>
-                            <td v-else>
+                            <td v-else-if="viaje.cierre == 1">
                                PERIODO CERRADO
                             </td>
                             <td>
