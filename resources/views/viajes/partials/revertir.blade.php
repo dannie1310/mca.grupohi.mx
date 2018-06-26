@@ -75,7 +75,7 @@
                             <td>@{{ viaje.Cubicacion  }}</td>
                             <td>@{{ viaje.Material }}</td>
                             <td>@{{ viaje.Codigo }}</td>
-                            <td v-if="viaje.CierrePeriodo == 0">
+                            <td v-if="viaje.CierrePeriodo == 0 && viaje.denegado == 0">
                                 <span v-if="viaje.Estatus != -1">
                                 <a href="#" @click="revertir(viaje)" style="text-decoration: underline">Revertir</a>
                                 </span>
@@ -83,6 +83,7 @@
                                     <p style="color: #ff0000;">Revertido</p>
                                 </span>
                             </td>
+                            <td v-else-if="viaje.CierrePeriodo == 0 && viaje.denegado == 1">DENEGADO </td>
                             <td v-else>Periodo Cerrado</td>
                         </tr>
                         </tbody>

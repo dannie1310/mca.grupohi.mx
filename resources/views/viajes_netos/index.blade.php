@@ -64,68 +64,69 @@
                 @else
                 <h3>BUSCAR VIAJES</h3>
                 {!! Form::open(['class' => 'form_buscar']) !!}
-                <input type="hidden" name="type" value>
-                <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="fecha" checked="checked">BUSCAR POR FECHA</label></h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>FECHA INICIAL (*)</label>
-                            <input type="text" name="FechaInicial" class="form-control" v-datepicker>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>FECHA FINAL (*)</label>
-                            <input type="text" name="FechaFinal" class="form-control" v-datepicker>
-                        </div>
-                    </div>
+        {{--<input type="hidden" name="type" value>
+        <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="fecha" checked="checked">BUSCAR POR FECHA</label></h4>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>FECHA INICIAL (*)</label>
+                    <input type="text" name="FechaInicial" class="form-control" v-datepicker>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>ESTADO DE LOS VIAJES (*)</label>
-                            <select name="Estado" class="form-control" v-model="form.estado">
-                                <option value>-- SELECCIONE -- </option>
-                                <option value="T">Todos</option>
-                                <option value="C">Conciliados</option>
-                                <option value="NC">No Conciliados</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>TIPO DE VIAJES (*)</label>
-                            <span v-if="form.estado == 'C'">
-                            <select id="tipo" name="Tipo[]" class="form-control" multiple="multiple" v-select2 :disabled="!form.estado">
-                                <optgroup label="CARGADOS MANUALMENTE">
-                                    <option value="CM_V">Manuales - Validados</option>
-                                </optgroup>
-                                <optgroup label="CARGADOS DESDE APLICACIÓN MÓVIL">
-                                    <option value="M_V">Móviles - Validados</option>
-                                </optgroup>
-                            </select>
-                            </span>
-                            <span v-else>
-                            <select id="tipo" name="Tipo[]" class="form-control" multiple="multiple" v-select2 :disabled="!form.estado">
-                                <optgroup label="CARGADOS MANUALMENTE">
-                                    <option value="CM_C">Manuales - Cargados</option>
-                                    <option value="CM_A">Manuales - Autorizados (Pend. Validar)</option>
-                                    <option value="CM_R">Manuales - Rechazados</option>
-                                    <option value="CM_V">Manuales - Validados</option>
-                                    <option value="CM_D">Manuales - Denegados</option>
-                                </optgroup>
-                                <optgroup label="CARGADOS DESDE APLICACIÓN MÓVIL">
-                                    <option value="M_V">Móviles - Validados</option>
-                                    <option value="M_A">Móviles - Pendientes de Validar</option>
-                                    <option value="M_D">Móviles - Denegados</option>
-                                </optgroup>
-                            </select>
-                            </span>
-                        </div>
-                    </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>FECHA FINAL (*)</label>
+                    <input type="text" name="FechaFinal" class="form-control" v-datepicker>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>ESTADO DE LOS VIAJES (*)</label>
+                    <select name="Estado" class="form-control" v-model="form.estado">
+                        <option value>-- SELECCIONE -- </option>
+                        <option value="T">Todos</option>
+                        <option value="C">Conciliados</option>
+                        <option value="NC">No Conciliados</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>TIPO DE VIAJES (*)</label>
+                    <span v-if="form.estado == 'C'">
+                    <select id="tipo" name="Tipo[]" class="form-control" multiple="multiple" v-select2 :disabled="!form.estado">
+                        <optgroup label="CARGADOS MANUALMENTE">
+                            <option value="CM_V">Manuales - Validados</option>
+                        </optgroup>
+                        <optgroup label="CARGADOS DESDE APLICACIÓN MÓVIL">
+                            <option value="M_V">Móviles - Validados</option>
+                        </optgroup>
+                    </select>
+                    </span>
+                    <span v-else>
+                    <select id="tipo" name="Tipo[]" class="form-control" multiple="multiple" v-select2 :disabled="!form.estado">
+                        <optgroup label="CARGADOS MANUALMENTE">
+                            <option value="CM_C">Manuales - Cargados</option>
+                            <option value="CM_A">Manuales - Autorizados (Pend. Validar)</option>
+                            <option value="CM_R">Manuales - Rechazados</option>
+                            <option value="CM_V">Manuales - Validados</option>
+                            <option value="CM_D">Manuales - Denegados</option>
+                        </optgroup>
+                        <optgroup label="CARGADOS DESDE APLICACIÓN MÓVIL">
+                            <option value="M_V">Móviles - Validados</option>
+                            <option value="M_A">Móviles - Pendientes de Validar</option>
+                            <option value="M_D">Móviles - Denegados</option>
+                        </optgroup>
+                    </select>
+                    </span>
+                </div>
+            </div>
 
                 </div>
-                    <h4><label style="cursor: pointer"><input type="radio" name="tipo_busqueda" value="codigo" > BUSCAR POR CÓDIGO</label></h4>
+                --}}
+                    <h4><label style="cursor: pointer" hidden><input type="radio" name="tipo_busqueda" value="codigo" checked="checked" hidden> BUSCAR POR CÓDIGO</label></h4>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -141,8 +142,8 @@
                         <span v-if="cargando"><i class="fa fa-spinner fa-spin"></i> Buscando</span>
                         <span v-else><i class="fa fa-search"></i> Buscar</span>
                     </button>
-                    <button class="btn  btn-info" @click="pdf"><i class="fa fa-file-pdf-o"></i> VER PDF</button>
-                    <button class="btn  btn-success" @click="excel"><i class="fa fa-file-excel-o"></i> EXCEL</button>
+                  {{--  <button class="btn  btn-info" @click="pdf"><i class="fa fa-file-pdf-o"></i> VER PDF</button>
+                    <button class="btn  btn-success" @click="excel"><i class="fa fa-file-excel-o"></i> EXCEL</button> --}}
                 </div>
                 <p class="small">Los campos <strong>(*)</strong> son obligatorios.</p>
                 {!! Form::close() !!}
@@ -309,13 +310,15 @@
                                   </table>
                                       </div>
                                   </div>
-                                  <div class="row" v-if="conflicto.cierres == 0" ><div class="col-md-12"><textarea name="motivo" class="form-control" placeholder="Ingrese el motivo para aprobar el pago."></textarea></div></div>
+                                  <div class="row" v-if="conflicto.cierres == 0 && conflicto.denegado == 0" ><div class="col-md-12"><textarea name="motivo" class="form-control" placeholder="Ingrese el motivo para aprobar el pago."></textarea></div></div>
+                                  <div class="row" v-else-if="conflicto.cierres == 0 && conflicto.denegado == 1" ><P>DENEGADO</P></div>
+                                    <div class="row"  v-else><P>PERIODO CERRADO</P></div>
                                   {!! Form::close() !!}
                               </div>
                               <div class="modal-footer">
                                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                                 @if (Auth::user()->can(['poner-viajes-conflicto-pagables']))
-                                     <button type="button" class="btn btn-success" @click="confirmarPonerPagable" v-if="conflicto.cierres == 0">Es Pagable</button>
+                                     <button type="button" class="btn btn-success" @click="confirmarPonerPagable" v-if="conflicto.cierres == 0 && conflicto.denegado == 0">Es Pagable</button>
                                  @endif
                             </div>
                             </div><!-- /.modal-content -->

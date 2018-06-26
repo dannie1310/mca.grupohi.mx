@@ -112,7 +112,16 @@ class ViajeNetoReporteCompletoTransformer extends AbstractTransformer
         WHEN 1 THEN 'Cerrada'
         WHEN 2 THEN 'Aprobada'
         ELSE 'Cancelada'
-    END AS estado_string
+    END AS estado_string,
+      v.folioMina,
+    v.folioSeguimiento,
+    CASE
+        WHEN
+            v.tipoViaje = 1
+        THEN
+            'Origen (Mina)'
+        ELSE 'Entrada'
+    END AS tipo_viaje
 FROM
     viajesnetos AS v
         JOIN
@@ -197,9 +206,7 @@ FROM
         conflictos_entre_viajes conflictos_entre_viajes) Subquery ON (DATE_FORMAT(timestamp, '%Y-%m-%d') = Subquery.maximo)
     GROUP BY conflictos_entre_viajes.id) AS cev ON (cev.id = cevd.idconflicto)
       WHERE
-          v.Estatus " . $estatus  . "
-      AND
-      CAST(CONCAT(v.FechaLlegada,
+       CAST(CONCAT(v.FechaLlegada,
                     ' ',
                     v.HoraLlegada)
             AS DATETIME) between '{$timestamp_inicial}' and '{$timestamp_final}'

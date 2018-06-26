@@ -1,5 +1,5 @@
 @extends('layout')
-
+gi
 @section('content')
     <h1>REPORTES</h1>
     {!! Breadcrumbs::render('reportes.viajes_netos.auditoria')  !!}

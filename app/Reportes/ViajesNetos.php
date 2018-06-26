@@ -53,11 +53,11 @@ class ViajesNetos
                 break;
         }
 
-        if($request->FechaFinal == 0) {
+        if($request->FechaFinal == 0) {//Reporte diario
             $this->data = ViajeNetoReporteTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
-        }elseif($this->tipo==1){
+        }elseif($this->tipo==1){ // Reporte Completo
             $this->data = ViajeNetoReporteCompletoTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
-        }elseif ($this->tipo==2){
+        }elseif ($this->tipo==2){ //Reporte Auditoria
             $this->data = ViajeNetoReporteAuditoriaTransformer::toArray($request, $this->horaInicial, $this->horaFinal, $this->estatus);
         }
     }

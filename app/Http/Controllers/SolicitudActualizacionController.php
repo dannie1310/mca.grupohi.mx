@@ -56,7 +56,7 @@ class SolicitudActualizacionController extends Controller
     public function buscar(Request $request){
         if($request->estatus != '') {
             $solicitudes = DB::connection('sca')->table('solicitud_actualizacion_camion as sol')
-                ->select('IdSolicitudactualizacion','sol.Economico', 'sol.Propietario', 'sol.CubicacionReal', 'sol.CubicacionParaPago', 'sol.FechaHoraRegistro', 'o.Nombre','sol.Estatus')
+                ->select('IdSolicitudActualizacion','sol.Economico', 'sol.Propietario', 'sol.CubicacionReal', 'sol.CubicacionParaPago', 'sol.FechaHoraRegistro', 'o.Nombre','sol.Estatus')
                 ->leftjoin('Operadores as o','o.IdOperador','=','sol.IdOperador'  )
                 ->whereBetween('FechaHoraRegistro',[$request->FechaInicial . ' 00:00:00',$request->FechaFinal . ' 23:59:59'])
                 ->where('sol.estatus','=',$request->estatus)

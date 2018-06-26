@@ -81,6 +81,42 @@ class OrigenesController extends Controller
                 ->withOrigen(Origen::findOrFail($id));
     }
 
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $origen= Origen::findOrFail($id);
+
+        return view('origenes.edit')
+            ->withOrigen(Origen::findOrFail($id))
+            ->withTipos(TipoOrigen::find($origen->IdTipoOrigen));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Requests\EditOrigenRequest $request, $id)
+    {
+        $origen = Origen::findOrFail($id);
+        $origen->update([
+            'interno'  => $request->interno,
+            'usuario_edito' => auth()->user()->idusuario
+        ]);
+
+        Flash::success('¡ORIGEN ACTUALIZADO CORRECTAMENTE!');
+        return redirect()->route('origenes.show', $origen);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      *

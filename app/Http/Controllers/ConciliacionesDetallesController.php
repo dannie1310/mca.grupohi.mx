@@ -7,6 +7,7 @@ use App\Models\Conciliacion\ConciliacionDetalle;
 use App\Models\Conciliacion\Conciliaciones;
 use App\Models\Transformers\ConciliacionDetalleTransformer;
 use App\Models\Transformers\ConciliacionTransformer;
+use App\Models\ValidacionCierrePeriodo;
 use App\Models\Viaje;
 use App\Models\ViajeNeto;
 use Carbon\Carbon;
@@ -183,6 +184,19 @@ class ConciliacionesDetallesController extends Controller
             if($detalle->estado != '-1'){
                  DB::connection('sca')->rollBack();
                 throw new \Exception("El detalle de la conciliación no pudo ser cancelado.");
+            }
+
+            $buscar_viaje = DB::connection("sca")->select(DB::raw("select * from viajesnetos where IdViajeNeto = ".$detalle->idviaje_neto.";"));
+            /* Bloqueo de cierre de periodo
+                       1 : Cierre de periodo
+                       0 : Periodo abierto.
+                   */
+            $cierre = ValidacionCierrePeriodo::validandoCierreViajeDenegar($buscar_viaje[0]->FechaLlegada);
+
+            if($cierre == 1){
+                if($buscar_viaje[0]->denegado == 0) {
+                    $save = DB::connection('sca')->table('viajesnetos')->where('IdViajeNeto', '=', $buscar_viaje[0]->IdViajeNeto)->update(['denegado' => 1]);
+                }
             }
 
             $conciliacion_transformer = ConciliacionTransformer::transform(Conciliacion::find($id_conciliacion));

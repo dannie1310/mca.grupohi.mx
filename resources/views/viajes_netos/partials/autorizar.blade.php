@@ -32,12 +32,12 @@
                     <td>{{ $viaje->Material }}</td>
                     <td>{{ $viaje->Registro }}</td>
                     <td>{{ $viaje->Observaciones }}</td>
-
                 @foreach($cierre as $item)
                         @if($item['mes'] == $fecha->month && $item['anio'] == $fecha->year)
                                 <?php $find++; ?>
                         @endif
                 @endforeach
+
                 @if($find !=0)
                     <td>
                         Periodo
@@ -46,12 +46,17 @@
                          Cerrado
                     </td>
                 @else
-                    <td>
-                        <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="20" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
-                    </td>
-                    <td>
-                        <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="22" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
-                    </td>
+                    @if($viaje->denegado == 1)
+                        <td>DENEGADO</td>
+                        <td>DENEGADO</td>
+                    @else
+                        <td>
+                            <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="20" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
+                        </td>
+                        <td>
+                            <input id="{{$viaje->IdViajeNeto}}" type="checkbox" value="22" name="Estatus[{{$viaje->IdViajeNeto}}]"/>
+                        </td>
+                    @endif
                 @endif
                 </tr>
             @endforeach

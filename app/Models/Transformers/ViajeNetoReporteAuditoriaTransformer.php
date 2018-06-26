@@ -16,7 +16,7 @@ class ViajeNetoReporteAuditoriaTransformer extends AbstractTransformer
     public static function toArray(Request $request, $horaInicial, $horaFinal, $estatus) {
         ini_set('memory_limit','2048M');
 
-        $timestamp_final = $request->get('FechaInicial') . ' ' . $horaFinal;
+        $timestamp_final = $request->get('FechaFinal') . ' ' . $horaFinal;
 
         $timestamp_inicial = $request->get('FechaInicial') . ' ' . $horaInicial;
 
@@ -113,7 +113,16 @@ class ViajeNetoReporteAuditoriaTransformer extends AbstractTransformer
             usuario3.amaterno) AS valido,
             viajes.Creo as idvalido,
     viajes.FechaCarga as fecha_valido,
-    viajes.HoraCarga as hora_valido
+    viajes.HoraCarga as hora_valido,
+     v.folioMina,
+    v.folioSeguimiento,
+    CASE
+        WHEN
+            v.tipoViaje = 1
+        THEN
+            'Origen (Mina)'
+        ELSE 'Entrada'
+    END AS tipo_viaje
 FROM
     viajesnetos AS v
         JOIN
@@ -157,7 +166,7 @@ FROM
     sindicatos AS sincon ON sincon.IdSindicato = conci.IdSindicato
         LEFT JOIN
     empresas AS empcon ON empcon.IdEmpresa = conci.IdEmpresa
-        INNER JOIN
+        LEFT JOIN
     viajes as viajes on viajes.IdViajeNeto=v.IdViajeNeto
         LEFT JOIN
     igh.usuario AS usuario1 ON usuario1.idusuario = v.CreoPrimerToque
@@ -195,6 +204,8 @@ FROM
         conflictos_entre_viajes conflictos_entre_viajes) Subquery ON (DATE_FORMAT(timestamp, '%Y-%m-%d') = Subquery.maximo)
     GROUP BY conflictos_entre_viajes.id) AS cev ON (cev.id = cevd.idconflicto)
       WHERE
+       v.Estatus " . $estatus  . "
+        and
       CAST(CONCAT(v.FechaLlegada,
                     ' ',
                     v.HoraLlegada)
@@ -202,7 +213,7 @@ FROM
       group by IdViajeNeto
       ORDER BY v.FechaLlegada, camion, v.HoraLlegada, idEstatus
       ";
-        // dd($SQL);
+       // dd($SQL);
         $r = collect(DB::connection('sca')->select(DB::raw($SQL)))->chunk(1000);
 
         DB::connection('sca')->disableQueryLog();

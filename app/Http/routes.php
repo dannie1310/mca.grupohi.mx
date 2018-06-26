@@ -143,6 +143,23 @@ Route::group(['prefix' => 'xls'], function () {
 
 });
 
+// XLS Routes Tablero Control
+
+Route::group(/**
+ *
+ */
+    ['prefix' => 'XLStablero'], function (){
+    Route::get('NoValidados', [
+        'as' => 'XLStablero.NoValidados',
+        'uses' => 'XLSTableroController@novalidados'
+    ]);
+
+    Route::get('Validados', [
+        'as' => 'XLStablero.Validados',
+        'uses' => 'XLSTableroController@validados'
+    ]);
+});
+
 //Reportes Routes
 Route::group(['prefix' => 'reportes'], function () {
     Route::get('viajes_netos/create', [
@@ -264,6 +281,10 @@ Route::group(['prefix' => 'csv'],function () {
 });
 
 Route::get('detalle_configuracion', 'DetalleAdministracionController@index')->name('detalle.configuracion');
+
+Route::resource('tablero-control', 'TableroControlController');
+Route::get('tablero-detalle/{id}', 'TableroControlController@show')->name("tablero-detalle.show");
+
 /*
  * API Routes
  */

@@ -5,6 +5,7 @@ namespace App\Models\Conciliacion;
 use App\Models\Empresa;
 use App\Models\Ruta;
 use App\Models\Sindicato;
+use App\Models\ValidacionCierrePeriodo;
 use App\Models\Viaje;
 use App\Presenters\ModelPresenter;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use PhpParser\Node\Stmt\Return_;
 use App\Models\Conciliacion\ConciliacionDetalleNoConciliado;
+use App\Facades\Context;
 class Conciliacion extends Model
 {
     use \Laracasts\Presenter\PresentableTrait;
@@ -461,13 +463,23 @@ class Conciliacion extends Model
                 throw new \Exception("Ésta conciliación ya ha sido cancelada anteriormente");
             }
 
+            $estado = $this->estado;
+            if($estado == 1){ // validación para visualizar datos en el tablero de control
+                $rol = DB::connection("sca")->table("sca_configuracion.role_user")
+                    ->where("user_id","=",auth()->user()->idusuario)
+                    ->where("role_id", "=", "3")
+                    ->where("id_proyecto","=",Context::getId())->count();
+            }else{
+                $rol = NULL;
+            }
             $this->estado = $this->estado == 0 ? -1 : -2;
 
             ConciliacionCancelacion::create([
                 'idconciliacion' => $this->idconciliacion,
                 'motivo' => $request->get('motivo'),
                 'fecha_hora_cancelacion' => Carbon::now(),
-                'idcancelo' => auth()->user()->idusuario
+                'idcancelo' => auth()->user()->idusuario,
+                'estado_rol_usuario' => $rol
             ]);
 
             foreach ($this->conciliacionDetalles as $detalle) {
@@ -478,6 +490,18 @@ class Conciliacion extends Model
                     'fecha_hora_cancelacion' => Carbon::now()->toDateTimeString(),
                     'idcancelo' => auth()->user()->idusuario
                 ]);
+                $buscar_viaje = DB::connection("sca")->select(DB::raw("select * from viajesnetos where IdViajeNeto = ".$detalle->idviaje_neto.";"));
+                /* Bloqueo de cierre de periodo
+                           1 : Cierre de periodo
+                           0 : Periodo abierto.
+                       */
+                $cierre = ValidacionCierrePeriodo::validandoCierreViajeDenegar($buscar_viaje[0]->FechaLlegada);
+
+                if($cierre == 1){
+                    if($buscar_viaje[0]->denegado == 0) {
+                        $save = DB::connection('sca')->table('viajesnetos')->where('IdViajeNeto', '=', $buscar_viaje[0]->IdViajeNeto)->update(['denegado' => 1]);
+                    }
+                }
 
                 $detalle->estado = -1;
                 $detalle->save();
