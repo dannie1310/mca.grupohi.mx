@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class ConciliacionesController extends Controller
 {
-    
+
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
         $this->middleware('permission:consultar-conciliacion', ['only' => ['index','edit']]);
-       
+
         parent::__construct();
     }
     
@@ -134,6 +134,7 @@ class ConciliacionesController extends Controller
             $code =$d->Code;
         }*/
             //dd(Conciliacion::findOrFail($id), Camion::lists('Economico', 'IdCamion') );
+        //dd(Conciliacion::findOrFail($id));
             return view('conciliaciones.edit')
                 ->withConciliacion(Conciliacion::findOrFail($id))
                 ->withCamiones(Camion::lists('Economico', 'IdCamion'));

@@ -27,7 +27,8 @@ class ConciliacionDetalleTransformer extends AbstractTransformer
                 'timestamp' => $detalle->cancelacion->timestamp_cancelacion
             ],
             'registro' => $detalle->usuario_registro,
-            'estatus_viaje' => $detalle->viaje_neto->Estatus
+            'estatus_viaje' => $detalle->viaje_neto->Estatus,
+            'id_tarifa' => $detalle->viaje_neto->viaje->tarifa->idtarifas_tipo
         ];
 
         return $output;

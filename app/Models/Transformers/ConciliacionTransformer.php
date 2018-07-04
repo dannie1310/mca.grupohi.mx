@@ -73,8 +73,10 @@ class ConciliacionTransformer extends AbstractTransformer
             'detalles'      => ConciliacionDetalleTransformer::transform(ConciliacionDetalle::where('idconciliacion', $conciliacion->idconciliacion)->get()),
             'detalles_nc'   => ConciliacionDetalleNoConciliadoTransformer::transform(ConciliacionDetalleNoConciliado::where('idconciliacion', $conciliacion->idconciliacion)->get()),
             'empresa'       => $conciliacion->empresa ? $conciliacion->empresa->razonSocial : '',
-            'rfc'           => $conciliacion->empresa ? $conciliacion->empresa->RFC : 'pandita',
+            'id_empresa'    => $conciliacion->empresa ? $conciliacion->empresa->IdEmpresa : '',
+            'rfc'           => $conciliacion->empresa ? $conciliacion->empresa->RFC : '',
             'sindicato'     => $conciliacion->sindicato ? $conciliacion->sindicato->NombreCorto : '',
+            'id_sindicato'  => $conciliacion->sindicato ? $conciliacion->sindicato->IdSindicato : '',
             'estado'        => $conciliacion->estado,
             'estado_str'    => $conciliacion->estado_str,
             'cancelacion'   => !$conciliacion->cancelacion ? [] : [

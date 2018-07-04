@@ -312,7 +312,7 @@ class Conciliacion extends Model
 
     public function cerrar($id)
     {
-        dd($id);
+
         DB::connection('sca')->beginTransaction();
 
         try {

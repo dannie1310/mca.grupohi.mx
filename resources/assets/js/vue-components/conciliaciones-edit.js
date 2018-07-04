@@ -19,7 +19,7 @@ Vue.component('conciliaciones-edit', {
             'fetching'   : false,
             'fecha_cambio' : '',
             'api' : {
-                'url_api': 'http://sao.grupohi.mx',   /// 'http://localhost:8003'   ////'http://sao.grupohi.mx'
+                'url_api': 'http://sao.grupohi.mx',   /// 'http://localhost:8000'   ////'http://sao.grupohi.mx'
                 'token' : ''
             }
 
@@ -124,8 +124,10 @@ Vue.component('conciliaciones-edit', {
             this.fetching = true;
             var _this = this;
             var url = $('#id_conciliacion').val();
+            console.log(url);
             this.$http.get(url).then(response => {
                 _this.conciliacion = response.body.conciliacion;
+                console.log(response.body.conciliacion);
                 this.fetching = false;
                 _this.fecha_cambio = _this.conciliacion.fecha;
             }, error => {
@@ -315,7 +317,10 @@ Vue.component('conciliaciones-edit', {
                     Authorization: 'Bearer '+_this.api.token
                 },
                 data:{
-                    rfc: _this.conciliacion.rfc
+                    rfc: _this.conciliacion.rfc,
+                    id_empresa: _this.conciliacion.id_empresa,
+                    id_sindicato: _this.conciliacion.id_sindicato,
+                    id_tarifa: _this.conciliacion.detalles[0].id_tarifa
                 },
                 success: function (response) {
                     if(response.length === 0){
@@ -354,7 +359,8 @@ Vue.component('conciliaciones-edit', {
                     id_conciliacion: _this.conciliacion.id,
                     id_costo: _this.form.id_costo,
                     cumplimiento: _this.conciliacion.f_inicial,
-                    vencimiento: _this.conciliacion.f_final
+                    vencimiento: _this.conciliacion.f_final,
+                    sindicato: _this.conciliacion.sindicato
                 },
                 success: function (response) {
                     _this.form.id_costo = "";
