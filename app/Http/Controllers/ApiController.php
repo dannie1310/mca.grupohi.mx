@@ -109,13 +109,14 @@ class ApiController extends Controller
 
 
         $concil = DB::connection('sca')->select('SELECT conciliacion.idconciliacion,viajes.IdMaterial, tarifas_tipo_material.nombre, materiales.Descripcion,conciliacion.idempresa, empresas.RFC, viajes.CubicacionCamion as cubicacion, tarifas.idtarifas_tipo,
-                    sum(viajes.Volumen / viajes.CubicacionCamion) as pu, empresas.razonSocial, conciliacion.idsindicato, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, 
+                    sum(viajes.Volumen / viajes.CubicacionCamion) as pu, empresas.razonSocial, conciliacion.idsindicato, sindicatos.Descripcion as sindicato, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, 
                     sum(viajes.volumen) as volumen, sum(viajes.CubicacionCamion) as m_cubicos , format((viajes.Importe / viajes.Volumen), 4) as precio_unitario 
                     from conciliacion_detalle 
                     join conciliacion using (idconciliacion) 
                     join viajes using (idviaje) 
                     join materiales using (idmaterial)
                     join tarifas using (IdTarifa)
+                    join sindicatos on (conciliacion.idsindicato = sindicatos.IdSindicato)
                     join tarifas_tipo_material on (tarifas.idtarifas_tipo = tarifas_tipo_material.idtarifas_tipo)
                     join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
                     left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
