@@ -90,12 +90,10 @@ class InicioCamion extends Model
                 "inicio_camion.id as id",
                 DB::raw("IF(inicio_camion.Aprobo is not null, CONCAT(user_autorizo.nombre, ' ', user_autorizo.apaterno, ' ', user_autorizo.amaterno), '') as autorizo"),
                 "camiones.Economico as camion", "inicio_camion.CubicacionCamion as cubicacion",
-                DB::raw("(CASE inicio_camion.Estatus when 1 then 'PENDIENTE DE VALIDAR'
-                    when 0 then  'NO VALIDADO (DENEGADO)'
-                    when 20 then 'PENDIENTE DE VALIDAR'
-                    when 21 then 'VALIDADO'
-                    when 22 then 'NO AUTORIZADO (RECHAZADO)'
-                    when 29 then 'CARGADO'
+                DB::raw("(CASE inicio_camion.Estatus when 0 then 'PENDIENTE DE VALIDAR'
+                    when 1 then 'VALIDADO'
+                    when 2 then  'NO VALIDADO (DENEGADO)'
+                    when 3 then 'NO AUTORIZADO (RECHAZADO)'
                     END) as estado"),
                 "materiales.Descripcion as material",
                 "origenes.Descripcion as origen",
@@ -289,29 +287,32 @@ class InicioCamion extends Model
                 DB::connection('sca')->table('inicio_viajes')->insert([
                     'IdInicioCamion'        => $this->id,
                     'FechaCarga' =>Carbon::now()->toDateTimeString(),
+                    'HoraCarga' =>Carbon::now()->toDateTimeString(),
                     'IdProyecto'    => 1,
                     'IdCamion'      => $this->idcamion,
                     'CubicacionCamion'  => $data["Cubicacion"],
                     'IdOrigen'        => $this->idorigen ,
-                    'Fecha' => $this->fecha_origen,
+                    'fecha_origen' => $this->fecha_origen,
                     'IdMaterial'      => $this->idmaterial,
-                    'IdChecador'    => auth()->user()->idusuario,
-                    'creo'        => $this->idusuario,
-                    'Estatus'    => 0,
+                    'IdChecador'    => $this->idusuario,
+                    'creo'        => auth()->user()->idusuario,
+                    'Estatus'    => 1,
                     'code'      => $this->code,
                     'uidTAG'=> $this->uidTAG,
                     'folioMina'        =>$data["FolioMina"],
                     'folioSeguimiento' => $data["FolioSeguimiento"],
                     'Volumen'    => $data["Volumen"],
                     'numImpresion'      => $this->numImpresion,
-                    'Registro'           => auth()->user()->idusuario
+                    'valido'           => auth()->user()->idusuario
                 ]);
 
-                $inicio_camion->estatus = 21; // Validado el viaje
+                $inicio_camion->estatus = 1; // Validado el viaje
                 $inicio_camion->Modifico = auth()->user()->idusuario;
-                /*$inicio_camion->folioMina = $data["FolioMina"];
-                $inicio_camion->folioSeguimiento = $data["FolioSeguimiento"];
-                $inicio_camion->volumen = $data["Volumen"];*/
+               /* $inicio_camion->folioMina = $data["FolioMina"];
+                $inicio_camion->folioSeguimiento = $data["FolioSeguimiento"];*/
+                $inicio_camion->volumen = $data["Volumen"];
+                $inicio_camion->Aprobo = auth()->user()->idusuario;
+                $inicio_camion->FechaHoraAprobacion = Carbon::now()->toDateTimeString();
 
                 $inicio_camion->save();
 
@@ -330,20 +331,21 @@ class InicioCamion extends Model
                  DB::connection('sca')->table('inicioviajesrechazados')->insert([
                      'IdInicio'        => $this->id,
                      'FechaRechazo' =>Carbon::now()->toDateTimeString(),
+                     'HoraRechazo' => Carbon::now()->toDateTimeString(),
                      'IdProyecto'    => 1,
                      'IdCamion'      => $this->idcamion,
                      'CubicacionCamion'  =>  $data["Cubicacion"],
                      'IdOrigen'        => $this->idorigen ,
-                     'Fecha' => $this->fecha_origen,
+                     'fecha_origen' => $this->fecha_origen,
                      'IdMaterial'      => $this->idmaterial,
                      'Rechazo'           => auth()->user()->idusuario,
                      'Creo'        => $this->idusuario,
-                     'Estatus'    => 0,
+                     'Estatus'    => 2,
                      'folioMina'        =>$data["FolioMina"],
                      'folioSeguimiento' => $data["FolioSeguimiento"],
                      'Volumen'    => $data["Volumen"],
                  ]);
-                $inicio_camion->estatus=0;
+                $inicio_camion->estatus=2;//No validado (REHAZADO)
                 $inicio_camion->Rechazo = auth()->user()->idusuario;
                 $inicio_camion->FechaHoraRechazo = Carbon::now()->toDateTimeString();
                 $inicio_camion->save();
@@ -521,10 +523,10 @@ class InicioCamion extends Model
 
     public function getEstadoAttribute() {
         switch ($this->estatus) {
-            case 1 :
+            case 0:
                 return "PENDIENTE DE VALIDAR";
                 break;
-            case 0:
+            case 1:
                 return "NO VALIDADO (DENEGADO)";
                 break;
             case 20:

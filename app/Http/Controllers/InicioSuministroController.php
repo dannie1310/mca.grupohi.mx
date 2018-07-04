@@ -566,14 +566,21 @@ class InicioSuministroController extends Controller
             $folioSeguimiento =$request['data']['FolioSeguimiento'];
             $folioMina =$request['data']['FolioMina'];
             $volumen =$request['data']['Volumen'];
+
             $viaje_neto = InicioCamion::findOrFail($request->get('IdViajeNeto'));
-            if($request['data']['Accion']== 1 && ($folioMina==null || $folioSeguimiento ==null || $volumen == 0)){
-                throw new \Exception('Ingregar el folio de mina, el de seguimiento y volumen');
+            if($request['data']['Accion']== 1 && ($folioMina==null)){
+                throw new \Exception('Ingresar el folio de mina');
             }
+            if($request['data']['Accion']== 1 && ($folioSeguimiento ==null)){
+                throw new \Exception('Ingresar el folio seguimiento');
+            }
+            if($request['data']['Accion']== 1 && ($volumen == 0)){
+                throw new \Exception('Ingresar un volumen diferente a 0');
+            }
+
             if($viaje_neto->CubicacionCamion != 0 && $cubicacionNva>$viaje_neto->CubicacionCamion){
                 throw new \Exception('La cubicación del camión no debe superar '.$viaje_neto->CubicacionCamion.' m3');
             }
-
             return response()->json($viaje_neto->validar($request));
         }else if($request->get('type') == 'modificar') {
 
