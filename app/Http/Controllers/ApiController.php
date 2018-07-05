@@ -120,11 +120,11 @@ class ApiController extends Controller
                     join tarifas_tipo_material on (tarifas.idtarifas_tipo = tarifas_tipo_material.idtarifas_tipo)
                     join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
                     left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
-                    where conciliacion.idconciliacion = '.$request->id_conciliacion.' and tiros_conceptos.fin_vigencia is null
+                    where conciliacion.idconciliacion = '.$request->id_conciliacion.' and conciliacion_detalle.estado = 1 and tiros_conceptos.fin_vigencia is null 
                     group by materiales.IdMaterial, tiros_conceptos.id_concepto, precio_unitario;');
 
         if(!$concil){
-            throw new Exception("No hay datos a Concialiar");
+            throw new Exception("No hay datos a concialiar");
         }
 
 
@@ -133,7 +133,7 @@ class ApiController extends Controller
         $idTipoTarifa = 0;
         foreach ($concil as $key => $partida){
             if($partida->id_concepto == null){
-                throw new Exception("La Conciliación Contiene Tiros Sin Concepto Asignado");
+                throw new Exception("La conciliación Contiene tiros sin concepto asignado");
             }
             if($key == 0){
                 $idConciliacion = $partida->idconciliacion;
@@ -147,7 +147,7 @@ class ApiController extends Controller
 
             }else{
                 if($idTipoTarifa != $partida->idtarifas_tipo)
-                    throw new Exception("la concilliación $request->id_conciliacion contiene mas de dos diferentes tipos de tarifa asignadas.");
+                    throw new Exception("La concilliación $request->id_conciliacion contiene mas de dos diferentes tipos de tarifa asignadas.");
             }
 
             $partidas_conciliacion[$key]= [
