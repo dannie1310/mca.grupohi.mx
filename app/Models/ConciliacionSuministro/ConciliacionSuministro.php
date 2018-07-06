@@ -502,7 +502,7 @@ class ConciliacionSuministro extends Model
     {
         if ($this->viajes()->count()) {
             $result = DB::connection('sca')->select(DB::raw("
-                SELECT min(v.Fecha) as fecha_inicial FROM conciliacion_suministro c 
+                SELECT min(v.fecha_origen) as fecha_inicial FROM conciliacion_suministro c 
                 join conciliacion_suministro_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
                 join inicio_viajes v on (cd.idviaje = v.IdInicioViajes)
                 where c.idconciliacion = {$this->idconciliacion} "))[0]->fecha_inicial;
@@ -516,7 +516,7 @@ class ConciliacionSuministro extends Model
     {
         if ($this->viajes()->count()) {
             $result = DB::connection('sca')->select(DB::raw("
-                SELECT max(v.Fecha) as fecha_final FROM conciliacion_suministro c 
+                SELECT max(v.fecha_origen) as fecha_final FROM conciliacion_suministro c 
                 join conciliacion_suministro_detalle cd on (c.idconciliacion = cd.idconciliacion and cd.estado = 1)
                 join inicio_viajes v on (cd.idviaje = v.IdInicioViajes)
                 where c.idconciliacion = {$this->idconciliacion} "))[0]->fecha_final;

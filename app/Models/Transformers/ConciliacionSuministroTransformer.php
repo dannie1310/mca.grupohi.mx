@@ -14,24 +14,24 @@ class ConciliacionSuministroTransformer extends AbstractTransformer
     public function transformModel(Model $conciliacion)
     {
         $duplicidad = "SELECT 
-            COUNT(idinicioviaje) AS num,
-            conciliacion_detalle.idconciliacion_detalle,
-            conciliacion_detalle.idinicioviaje,
-            viajesnetos.code,
-            GROUP_CONCAT(conciliacion.idconciliacion)
+            COUNT(ic.id) AS num,
+            cd.idconciliacion_detalle,
+            cd.idinicioviaje,
+            ic.code,
+            GROUP_CONCAT(c.idconciliacion)
         FROM
-            ((conciliacion_suministro_detalle conciliacion_detalle
-            INNER JOIN inicio_camion viajesnetos ON (conciliacion_detalle.idinicioviaje = viajesnetos.id)
-                AND (viajesnetos.id = conciliacion_detalle.idinicioviaje))
-            INNER JOIN conciliacion_suministro conciliacion ON (conciliacion_detalle.idconciliacion = conciliacion.idconciliacion)
-                AND (conciliacion.idconciliacion = conciliacion_detalle.idconciliacion))
+            ((conciliacion_suministro_detalle cd
+            INNER JOIN inicio_camion ic ON (cd.idinicioviaje = ic.id)
+                AND (ic.id = cd.idinicioviaje))
+            INNER JOIN conciliacion_suministro c ON (cd.idconciliacion = c.idconciliacion)
+                AND (c.idconciliacion = cd.idconciliacion))
                 INNER JOIN
-            inicio_viajes viajes ON (viajes.IdInicioCamion = viajesnetos.id)
+            inicio_viajes iv ON (iv.IdInicioCamion = ic.id)
         WHERE
-            conciliacion_detalle.estado = 1
-                AND conciliacion.idconciliacion = '{$conciliacion->idconciliacion}'
-        GROUP BY conciliacion_detalle.idinicioviaje , viajesnetos.Code
-        HAVING COUNT(idinicioviaje) > 1";
+            cd.estado = 1
+                AND c.idconciliacion = '{$conciliacion->idconciliacion}'
+        GROUP BY cd.idinicioviaje , ic.Code
+        HAVING COUNT(ic.id) > 1";
 
         $datos = DB::connection('sca')->select(DB::raw($duplicidad));
 
