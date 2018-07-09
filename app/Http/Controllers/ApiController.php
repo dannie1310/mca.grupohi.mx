@@ -108,20 +108,20 @@ class ApiController extends Controller
             throw new Exception("la concilliación $request->id_conciliacion contiene materiales sin tipo de tarifa asignada.");
 
 
-        $concil = DB::connection('sca')->select('SELECT conciliacion.idconciliacion,viajes.IdMaterial, tarifas_tipo_material.nombre, materiales.Descripcion,conciliacion.idempresa, empresas.RFC, viajes.CubicacionCamion as cubicacion, tarifas.idtarifas_tipo,
-                    sum(viajes.Volumen / viajes.CubicacionCamion) as pu, empresas.razonSocial, conciliacion.idsindicato, sindicatos.Descripcion as sindicato, viajes.IdTiro, tiros_conceptos.id_concepto, sum(Importe) as importe, 
-                    sum(viajes.volumen) as volumen, sum(viajes.CubicacionCamion) as m_cubicos , format((viajes.Importe / viajes.Volumen), 4) as precio_unitario 
-                    from conciliacion_detalle 
-                    join conciliacion using (idconciliacion) 
-                    join viajes using (idviaje) 
+        $concil = DB::connection('sca')->select('select conciliacion_detalle.idconciliacion, viajes.IdSindicato, viajes.IdEmpresa,  empresas.razonSocial, empresas.RFC, origenes.Descripcion as origen,
+                    materiales.Descripcion as material, tiros.Descripcion as destino, tarifas.idtarifas_tipo, tarifas_tipo_material.nombre as nombre_tarifa, tiros_conceptos.id_concepto,
+                    (viajes.Importe / viajes.CubicacionCamion) as pu , sum(viajes.CubicacionCamion) as m_cubicos , sum(viajes.volumen) as volumen , sum(Importe) as importe, viajes.IdMaterial
+                    from conciliacion_detalle
+                    join viajes using (idviaje)
+                    join origenes using (IdOrigen)
                     join materiales using (idmaterial)
+                    join tiros using( IdTiro)
                     join tarifas using (IdTarifa)
-                    join sindicatos on (conciliacion.idsindicato = sindicatos.IdSindicato)
                     join tarifas_tipo_material on (tarifas.idtarifas_tipo = tarifas_tipo_material.idtarifas_tipo)
-                    join empresas on (conciliacion.idempresa = empresas.IdEmpresa)
+                    join empresas on (viajes.IdEmpresa  = empresas.IdEmpresa)
                     left join tiros_conceptos on (tiros_conceptos.id_tiro = viajes.IdTiro)
-                    where conciliacion.idconciliacion = '.$request->id_conciliacion.' and conciliacion_detalle.estado = 1 and tiros_conceptos.fin_vigencia is null 
-                    group by materiales.IdMaterial, tiros_conceptos.id_concepto, precio_unitario;');
+                    where idconciliacion = '.$request->id_conciliacion.'
+                    group by tiros_conceptos.id_concepto, pu, viajes.IdMaterial;');
 
         if(!$concil){
             throw new Exception("No hay datos a concialiar");
@@ -139,11 +139,10 @@ class ApiController extends Controller
                 $idConciliacion = $partida->idconciliacion;
                 $razonSocial = $partida->razonSocial;
                 $rfc = $partida->RFC;
-                $tipoEmpresa = 1;
-                $idCosto = $request->id_costo;
                 $idTipoTarifa = $partida->idtarifas_tipo;
-                $idsindicato = $partida->idsindicato;
-                $id_empresa = $partida->idempresa;
+                $idsindicato = $partida->IdSindicato;
+                $id_empresa = $partida->IdEmpresa;
+                $tarifa_nombre = $partida->nombre_tarifa;
 
             }else{
                 if($idTipoTarifa != $partida->idtarifas_tipo)
@@ -152,7 +151,7 @@ class ApiController extends Controller
 
             $partidas_conciliacion[$key]= [
                 'tarifa' => $partida->importe / $partida->m_cubicos,
-                'material' => $partida->nombre . ' de '.  $partida->Descripcion,
+                'material' => $partida->origen . ' - '.  $partida->material . ' - '.  $partida->destino,
                 'id_material' => $partida->IdMaterial,
                 'id_concepto' => $partida->id_concepto,
                 'volumen' => $partida->m_cubicos
@@ -164,16 +163,16 @@ class ApiController extends Controller
             'id_empresa'        =>  $id_empresa,
             'razon_social'      => $razonSocial,
             'rfc'               => $rfc,
-            'tipo_empresa'      => $tipoEmpresa,
-            'id_costo'          => $idCosto,
+            'tipo_empresa'      => 1,
+            'id_costo'          => $request->id_costo,
             'cumplimiento'      => $request->cumplimiento,
             'vencimiento'       => $request->vencimiento,
             'id_sindicato'      => $idsindicato,
             'sindicato'         => $request->sindicato,
             'tipo_tarifa'       => $idTipoTarifa,
+            'nombre_tarifa'     => $tarifa_nombre,
             'partidas_conciliacion' => $partidas_conciliacion
         ]);
-
 
         return $req->all();
 
