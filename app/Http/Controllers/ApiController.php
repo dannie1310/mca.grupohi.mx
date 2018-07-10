@@ -151,7 +151,7 @@ class ApiController extends Controller
 
             $partidas_conciliacion[$key]= [
                 'tarifa' => $partida->importe / $partida->m_cubicos,
-                'material' => $partida->origen . ' - '.  $partida->material . ' - '.  $partida->destino,
+                'material' => $partida->material . ' - '.  $partida->destino,
                 'id_material' => $partida->IdMaterial,
                 'id_concepto' => $partida->id_concepto,
                 'volumen' => $partida->m_cubicos
