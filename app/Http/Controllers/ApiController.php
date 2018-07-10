@@ -109,7 +109,7 @@ class ApiController extends Controller
 
 
         $concil = DB::connection('sca')->select('select conciliacion_detalle.idconciliacion, viajes.IdSindicato, viajes.IdEmpresa,  empresas.razonSocial, empresas.RFC, origenes.Descripcion as origen,
-                materiales.Descripcion as material, tiros.Descripcion as destino, tarifas.idtarifas_tipo, tarifas_tipo_material.nombre as nombre_tarifa, tiros_conceptos.id_concepto,
+                materiales.Descripcion as material, tiros.Descripcion as destino, tarifas.idtarifas_tipo, tarifas_tipo_material.nombre as nombre_tarifa, tiros.IdTiro as tiro, tiros_conceptos.id_concepto,
                 (viajes.Importe / viajes.CubicacionCamion) as pu ,   sum(viajes.CubicacionCamion) as m_cubicos , sum(viajes.volumen) as volumen , sum(Importe) as importe, viajes.IdMaterial
                 from conciliacion_detalle
                 join viajes using (idviaje)
@@ -154,7 +154,8 @@ class ApiController extends Controller
                 'material' => $partida->material . ' - '.  $partida->destino,
                 'id_material' => $partida->IdMaterial,
                 'id_concepto' => $partida->id_concepto,
-                'volumen' => $partida->m_cubicos
+                'volumen' => $partida->m_cubicos,
+                'tiro'  => $partida->tiro
             ];
         }
         $req = new Request();
