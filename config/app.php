@@ -2,6 +2,7 @@
 
 return [
 
+    'sao_erp_uri' => env('SAO_ERP_URI', ''),
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode

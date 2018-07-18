@@ -5,6 +5,7 @@
 <div id="app">
     <global-errors></global-errors>
     <conciliaciones-edit
+            :API_URI="{{ config('app.sao_erp_uri') }}"
             :user="{{auth()->user()->toJson()}}"
             :database_name="'{{ trim(Context::getDatabaseNameCadeco()) }}'"
             :id_obra="'{{ Context::getIdCadeco() }}'"
