@@ -1,5 +1,4 @@
 Vue.component('conciliaciones-edit', {
-    props: ['API_URI'],
     data: function() {
         return {
             'tipo'         : '',
@@ -29,7 +28,7 @@ Vue.component('conciliaciones-edit', {
     },
 
     props:[
-        'user', 'database_name', 'id_obra'
+        'user', 'database_name', 'id_obra', 'API_URI'
     ],
 
     directives: {
