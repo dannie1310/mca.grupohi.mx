@@ -357,7 +357,7 @@ class Conciliacion extends Model
             GROUP BY conciliacion_detalle.idviaje_neto, viajesnetos.Code
             HAVING count(idviaje_neto) > 1";
 
-            dd($repetidos);
+            //dd($repetidos);
 
             $r = DB::connection('sca')->select(DB::raw($repetidos));
 
