@@ -8,3 +8,6 @@ Homestead.json
 /public/php_errors.log
 /storage/exports
 /nbproject/private
+/public/build/
+/public/css/
+/public/js/
