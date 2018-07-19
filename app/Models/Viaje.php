@@ -34,6 +34,10 @@ class Viaje extends Model
         return $this->belongsTo(Tiro::class, 'IdTiro');
     }
 
+    public function tarifa(){
+        return $this->belongsTo(Tarifas\TarifaMaterial::class, 'IdTarifa');
+    }
+
     public function scopePorConciliar($query) {
         return $query->leftJoin('conciliacion_detalle', 'viajes.IdViaje', '=', 'conciliacion_detalle.idviaje')
             ->where(function($query){

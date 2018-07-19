@@ -16,4 +16,10 @@
 	
 	RewriteCond %{HTTP:Authorization} ^(.*)
 	RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+	
+	RewriteCond %{HTTP:id_costo} ^(.*)
+	RewriteRule .* - [e=HTTP_ID_COSTO:%1]
+	
+	RewriteCond %{HTTP:id_conciliacion} ^(.*)
+	RewriteRule .* - [e=HTTP_ID_CONCILIACION:%1]
 </IfModule>

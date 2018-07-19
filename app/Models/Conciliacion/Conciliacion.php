@@ -313,6 +313,7 @@ class Conciliacion extends Model
 
     public function cerrar($id)
     {
+
         DB::connection('sca')->beginTransaction();
 
         try {
@@ -355,6 +356,8 @@ class Conciliacion extends Model
                    AND conciliacion.idconciliacion = '{$id}'
             GROUP BY conciliacion_detalle.idviaje_neto, viajesnetos.Code
             HAVING count(idviaje_neto) > 1";
+
+            dd($repetidos);
 
             $r = DB::connection('sca')->select(DB::raw($repetidos));
 
@@ -446,6 +449,27 @@ class Conciliacion extends Model
             throw $e;
         }
     }
+
+
+
+    public function revertir_aprovacion(){
+        DB::connection('sca')->beginTransaction();
+
+        try {
+            $this->estado = 1;
+            $this->save();
+
+            $estimacion_conciliacion = EstimacionConciliacion::where('id_conciliacion', '=', $this->idconciliacion)->first();
+            if($estimacion_conciliacion) {
+                $estimacion_conciliacion->delete();
+            }
+
+            DB::connection('sca')->commit();
+        } catch (\Exception $e) {
+            DB::connection('sca')->rollback();
+            throw $e;
+        }
+    }
     public function getEsHistoricoAttribute(){
         if($this->fecha_conciliacion->format("Ymd") <= Conciliacion::FECHA_HISTORICO){
             RETURN TRUE;
@@ -461,6 +485,9 @@ class Conciliacion extends Model
         try {
             if ($this->estado == -1 || $this->estado == -2) {
                 throw new \Exception("Ésta conciliación ya ha sido cancelada anteriormente");
+            }
+            if ($this->estado == 2) {
+                throw new \Exception("Ésta conciliación ya ha sido aprobada");
             }
 
             $estado = $this->estado;

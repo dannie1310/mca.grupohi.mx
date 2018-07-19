@@ -4,7 +4,12 @@
 @include('partials.errors')
 <div id="app">
     <global-errors></global-errors>
-    <conciliaciones-edit inline-template>
+    <conciliaciones-edit
+            :api_url="'{{ config('app.sao_erp_uri') }}'"
+            :user="{{auth()->user()->toJson()}}"
+            :database_name="'{{ trim(Context::getDatabaseNameCadeco()) }}'"
+            :id_obra="'{{ Context::getIdCadeco() }}'"
+            inline-template>
         <section>
             <span v-if="fetching">
                 <div class="text-center"><i class="fa fa-spinner fa-pulse fa-2x"></i> <big>CARGANDO CONCILIACIÓN</big></div>
@@ -36,8 +41,9 @@
                     <a href="{{ route('conciliaciones.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
                     @endif
                     @if (Auth::user()->can(['aprobar-conciliacion']))
-                    <a href="{{ route('conciliaciones.update', $conciliacion->idconciliacion) }}" class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="aprobar"><i class="fa fa-check"></i> APROBAR</a>
+                    <a class="btn btn-success btn-sm pull-right" style="margin-right: 5px" @click="aprobar"><i class="fa fa-check"></i> APROBAR</a>
                     @endif
+
                 </span>
                 <span v-else-if="conciliacion.estado == 2">
                     <?php
@@ -46,6 +52,9 @@
                    <a href="{{ route('conciliaciones.destroy', $conciliacion->idconciliacion) }}" class="btn btn-danger btn-sm pull-right" @click="cancelar($event)"><i class="fa fa-close"></i> CANCELAR</a>
                    @endif
                     */?>
+                    @if (Auth::user()->can(['aprobar-conciliacion']))
+                        <a class="btn btn-danger btn-sm pull-right" style="margin-right: 5px" @click="sesion_estimacion" v-show="conciliacion.revertible"><i class="fa fa-close"></i> REVERTIR</a>
+                    @endif
                </span>
            </h1>
            {!! Breadcrumbs::render('conciliaciones.edit', $conciliacion) !!}
@@ -371,93 +380,178 @@
                    </div>
                </div>
            </section>
-           <!-- MODAL RESULTADOS -->
-           <div class="modal fade" id="resultados" tabindex="-1" role="dialog">
-               <div class="modal-dialog modal-lg" role="document">
+               <!-- MODAL RESULTADOS -->
+               <div class="modal fade" id="resultados" tabindex="-1" role="dialog">
+                   <div class="modal-dialog modal-lg" role="document">
+                       <div class="modal-content">
+                           <div class="modal-header">
+                               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                               <h4 class="modal-title">Resultados de la Búsqueda</h4>
+                           </div>
+                           <div class="modal-body">
+                               {!! Form::open(['route' => ['conciliaciones.detalles.store', $conciliacion->idconciliacion], 'class' => 'form_registrar']) !!}
+                               <span v-if="resultados.length">
+                                   <div class="table-responsive" style="max-height: 300px;">
+                                       <input type="hidden" name="Tipo" value="2">
+                                       <table class="table table-hover">
+                                           <thead>
+                                           <tr>
+                                               <th>Agregar</th>
+                                               <th>Fecha y Hora de Llegada</th>
+                                               <th>Camión</th>
+                                               <th>Cubicación</th>
+                                               <th>Material</th>
+                                               <th>Importe</th>
+                                               <th>Ticket (Código)</th>
+                                           </tr>
+                                           </thead>
+                                           <tbody>
+                                           <tr v-for="viaje in resultados">
+                                               <td>
+                                                   <input type="checkbox" v-bind:name="'idviaje['+viaje.id+']'" v-bind:value="viaje.id">
+                                               </td>
+                                               <td>@{{ viaje.timestamp_llegada }}</td>
+                                               <td>@{{ viaje.camion }}</td>
+                                               <td style="text-align: right">@{{ viaje.cubicacion_camion }}</td>
+                                               <td>@{{ viaje.material }}</td>
+                                               <td style="text-align: right">@{{ viaje.importe }}</td>
+                                               <td>@{{ viaje.code }}</td>
+                                           </tr>
+                                           </tbody>
+                                       </table>
+                                       {!! Form::close() !!}
+                                   </div>
+                               </span>
+                           </div>
+                           <div class="modal-footer">
+                               <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                               <button type="button" class="btn btn-primary" @click="confirmarRegistro">Guardar Cambios</button>
+                           </div>
+                       </div><!-- /.modal-content -->
+                   </div><!-- /.modal-dialog -->
+               </div><!-- /.modal -->
+
+               <!-- Modal Editar Fecha y Folio -->
+               <div class="modal fade" id="detalles_conciliacion" tabindex="-1" role="dialog">
+                 <div class="modal-dialog" role="document">
                    <div class="modal-content">
-                       <div class="modal-header">
-                           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                           <h4 class="modal-title">Resultados de la Búsqueda</h4>
-                       </div>
-                       <div class="modal-body">
-                           {!! Form::open(['route' => ['conciliaciones.detalles.store', $conciliacion->idconciliacion], 'class' => 'form_registrar']) !!}
-                           <span v-if="resultados.length">
-                               <div class="table-responsive" style="max-height: 300px;">
-                                   <input type="hidden" name="Tipo" value="2">
-                                   <table class="table table-hover">
-                                       <thead>
-                                       <tr>
-                                           <th>Agregar</th>
-                                           <th>Fecha y Hora de Llegada</th>
-                                           <th>Camión</th>
-                                           <th>Cubicación</th>
-                                           <th>Material</th>
-                                           <th>Importe</th>
-                                           <th>Ticket (Código)</th>
-                                       </tr>
-                                       </thead>
-                                       <tbody>
-                                       <tr v-for="viaje in resultados">
-                                           <td>
-                                               <input type="checkbox" v-bind:name="'idviaje['+viaje.id+']'" v-bind:value="viaje.id">
-                                           </td>
-                                           <td>@{{ viaje.timestamp_llegada }}</td>
-                                           <td>@{{ viaje.camion }}</td>
-                                           <td style="text-align: right">@{{ viaje.cubicacion_camion }}</td>
-                                           <td>@{{ viaje.material }}</td>
-                                           <td style="text-align: right">@{{ viaje.importe }}</td>
-                                           <td>@{{ viaje.code }}</td>
-                                       </tr>
-                                       </tbody>
-                                   </table>
-                                   {!! Form::close() !!}
-                               </div>
-                           </span>
-                       </div>
-                       <div class="modal-footer">
-                           <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                           <button type="button" class="btn btn-primary" @click="confirmarRegistro">Guardar Cambios</button>
-                       </div>
-                   </div><!-- /.modal-content -->
-               </div><!-- /.modal-dialog -->
-           </div><!-- /.modal -->
-
-           <!-- Modal Editar Fecha y Folio -->
-           <div class="modal fade" id="detalles_conciliacion" tabindex="-1" role="dialog">
-             <div class="modal-dialog" role="document">
-               <div class="modal-content">
-                 <div class="modal-header">
-                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                   <h4 class="modal-title">EDITAR DETALLES DE LA CONCILIACIÓN</h4>
-                 </div>
-                 <div class="modal-body">
-                     {!! Form::open(['route' => ['conciliaciones.update', $conciliacion->idconciliacion], 'method' => 'patch', 'class' => 'form_update']) !!}
-                     <input type="hidden" value="detalles" name="action">
-                     <div class="row">
-                         <div class="col-md-6">
-                             <div class="form-group">
-                                 <label>Importe Pagado:</label>
-                                 <input type="text" class="form-control input-sm" name="importe_pagado" v-bind:value="conciliacion.importe_pagado_sf">
-                             </div>
-                         </div>
-                         <div class="col-md-6">
-                             <div class="form-group">
-                                 <label>Volumen Pagado:</label>
-                                 <input type="text"  class="form-control input-sm" name="volumen_pagado" v-bind:value="conciliacion.volumen_pagado_sf">
-                             </div>
-                         </div>
+                     <div class="modal-header">
+                       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                       <h4 class="modal-title">EDITAR DETALLES DE LA CONCILIACIÓN</h4>
                      </div>
-                     {!! Form::close() !!}
-                 </div>
-                 <div class="modal-footer">
-                   <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                   <button type="button" class="btn btn-primary" @click="modificar_detalles">Guardar Cambios</button>
-                 </div>
-               </div><!-- /.modal-content -->
-             </div><!-- /.modal-dialog -->
-           </div><!-- /.modal -->
+                     <div class="modal-body">
+                         {!! Form::open(['route' => ['conciliaciones.update', $conciliacion->idconciliacion], 'method' => 'patch', 'class' => 'form_update']) !!}
+                         <input type="hidden" value="detalles" name="action">
+                         <div class="row">
+                             <div class="col-md-6">
+                                 <div class="form-group">
+                                     <label>Importe Pagado:</label>
+                                     <input type="text" class="form-control input-sm" name="importe_pagado" v-bind:value="conciliacion.importe_pagado_sf">
+                                 </div>
+                             </div>
+                             <div class="col-md-6">
+                                 <div class="form-group">
+                                     <label>Volumen Pagado:</label>
+                                     <input type="text"  class="form-control input-sm" name="volumen_pagado" v-bind:value="conciliacion.volumen_pagado_sf">
+                                 </div>
+                             </div>
+                         </div>
+                         {!! Form::close() !!}
+                     </div>
+                     <div class="modal-footer">
+                       <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                       <button type="button" class="btn btn-primary" @click="modificar_detalles">Guardar Cambios</button>
+                     </div>
+                   </div><!-- /.modal-content -->
+                 </div><!-- /.modal-dialog -->
+               </div><!-- /.modal -->
 
-           </span>
+                <!-- Modal Tipo de Gasto -->
+               <div class="modal fade" id="tipo_gasto" tabindex="-1" role="dialog">
+                   <div class="modal-dialog" role="document">
+                       <div class="modal-content">
+
+                           <div class="modal-header">
+                               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                               <h4 class="modal-title">SELECCIONE EL TIPO DE GASTO</h4>
+                           </div>
+                           <div class="modal-body">
+                               <div class="form-group">
+                                 <div class="col-md-3">
+                                     <label>Tipo de Gasto</label>
+                                 </div>
+                               </div>
+                               <div class="form-group">
+                                 <div class="col-md-9">
+                                     <select class="form-control"  v-model="form.id_costo" id="costo_select" >
+                                         <option value="">[--SELECCIONE--]</option>
+                                         <option v-for="(costo, index) in form.costos" :value="costo.id_costo" style="text-anchor: @parent">@{{ costo.descripcion }}</option>
+                                     </select>
+                                 </div>
+                               </div>
+                           </div>
+                           <br><br>
+                           <div class="modal-footer">
+                               <div class="form-group">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+                                   <button class="btn btn-primary" type="button" @click="conciliar" :disabled="form.id_costo== '' ">
+                                        <span v-if="guardando"><i class="fa fa-spinner fa-spin"></i>Conciliando</span>
+                                        <span v-else>Conciliar</span>
+                                    </button>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+
+                <!-- Modal Inico de Sesión SAO -->
+                <div class="modal fade" id="sesionSAO" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">INICIO DE SESIÓN CONCILIACIÓN</h4>
+                            </div>
+                            <div class="modal-body">
+                                <label class="control-label"><b>Contraseña</b></label>
+                                <input id="sesion_clave" placeholder="CONTRASEÑA" type="password" required class="form-control" name="clave_sao" v-model="form.clave">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+
+                                    <button class="btn btn-primary" type="button" @click="getToken">
+                                        <span v-if="guardando"><i class="fa fa-spinner fa-spin"></i></span>
+                                        <span v-else>Iniciar</span>
+                                    </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="modal fade" id="revertir_estimacion" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">INICIO DE SESIÓN CONCILIACIÓN</h4>
+                            </div>
+                            <div class="modal-body">
+                                <label class="control-label"><b>Contraseña</b></label>
+                                <input id="revertir_clave" placeholder="CONTRASEÑA" type="password" required class="form-control" name="clave_sao" v-model="form.clave">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+                                <button class="btn btn-primary" type="button" @click="token_revertir">
+                                    <span v-if="guardando"><i class="fa fa-spinner fa-spin"></i></span>
+                                    <span v-else>Revertir</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </span>
+
        </section>
    </conciliaciones-edit>
 </div>

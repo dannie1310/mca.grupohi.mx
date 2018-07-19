@@ -57,6 +57,10 @@ class PDFConciliacion extends Rotation
         $this->title();
         $this->logo();
 
+        $this->SetFont('Arial','B',50);
+        $this->SetTextColor(255,192,203);
+        $this->RotatedText(35,190,'W a t e r m a r k   d e m o',45);
+
         //Obtener Posiciones despues de title y logo.
         $y_inicial = $this->getY();
         $x_inicial = $this->getX();
@@ -830,6 +834,12 @@ class PDFConciliacion extends Rotation
             $this->SetTextColor(204,204,204);
             $this->RotatedText(2,20,utf8_decode("PENDIENTE DE"),45);
             $this->RotatedText(7,20,utf8_decode("APROBACIÓN"),45);
+            $this->SetTextColor('0,0,0');
+        }else if(trim(Context::getDatabaseNameCadeco()) == 'SAO1814_DEV_PISTA_AEROPUERTO') {
+            $this->SetFont('Arial','',70);
+            $this->SetTextColor(204,204,204);
+            $this->RotatedText(4,20,utf8_decode("MUESTRA SIN"),45);
+            $this->RotatedText(9,20,utf8_decode("VALOR"),45);
             $this->SetTextColor('0,0,0');
         }
 

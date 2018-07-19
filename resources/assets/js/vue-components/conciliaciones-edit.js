@@ -1,4 +1,7 @@
 Vue.component('conciliaciones-edit', {
+    props:[
+        'user', 'database_name', 'id_obra', 'api_url'
+    ],
     data: function() {
         return {
             'tipo'         : '',
@@ -9,11 +12,21 @@ Vue.component('conciliaciones-edit', {
                 'detalles_nc' : []
             },
             'form' : {
-                'errors' : []
+                'errors' : [],
+                'costos' : [],
+                'id_costo' : '',
+                'usuario': '',
+                'clave': ''
             },
             'guardando'  : false,
             'fetching'   : false,
-            'fecha_cambio' : ''
+            'fecha_cambio' : '',
+            'api' : {
+                //'url_api': 'http://rel-sao.grupohi.mx' ,   /// 'http://localhost:8000'   ////'http://sao.grupohi.mx'     ////'http://rel-sao.grupohi.mx'
+                'url_api': this.api_url,
+                'token' : ''
+            }
+
         }
     },
 
@@ -111,8 +124,10 @@ Vue.component('conciliaciones-edit', {
             this.fetching = true;
             var _this = this;
             var url = $('#id_conciliacion').val();
+            console.log(url);
             this.$http.get(url).then(response => {
                 _this.conciliacion = response.body.conciliacion;
+                console.log(response.body.conciliacion);
                 this.fetching = false;
                 _this.fecha_cambio = _this.conciliacion.fecha;
             }, error => {
@@ -245,7 +260,7 @@ Vue.component('conciliaciones-edit', {
                                 swal({
                                     type: 'error',
                                     title: '¡Error!',
-                                    text: App.errorsToString(error.responseText)
+                                    text: 'Panda '+App.errorsToString(error.responseText)
                                 });
                                 _this.fetchConciliacion();
                             }
@@ -254,55 +269,361 @@ Vue.component('conciliaciones-edit', {
             }
         },
 
-        aprobar: function(e) {
+        aprobar: function () {
+            $('#sesionSAO').modal('show');
+        },
+
+        getToken: function (e) {
+            var _this = this;
+
+            var url = _this.api.url_api + '/api/auth';
+            this.guardando = true;
+            $.ajax({
+                url:url,
+                type: 'POST',
+                headers:{
+                    usuario: _this.user.usuario,
+                    clave: _this.form.clave
+                },
+                success: function (response) {
+                    _this.form.clave = "";
+                   _this.api.token = response.token;
+                   _this.getCostos(e);
+                },
+                error: function (error) {
+                    _this.form.clave = "";
+                    $('#sesionSAO').modal('hide');
+                    _this.guardando = false;
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'No se Puede Iniciar Sesión '
+                    });
+                }
+            })
+        },
+
+        getCostos: function(e){
             e.preventDefault();
             var _this = this;
+            var url = _this.api.url_api + '/api/conciliacion/costos';
+            this.guardando = true;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                headers:{
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                data:{
+                    rfc: _this.conciliacion.rfc,
+                    id_empresa: _this.conciliacion.id_empresa,
+                    id_sindicato: _this.conciliacion.id_sindicato,
+                    id_tarifa: _this.conciliacion.detalles[0].id_tarifa
+                },
+                success: function (response) {
+                    if(response.length === 0){
+                        _this.conciliar(e);
+                    }else {
+                        $('#sesionSAO').modal('hide');
+                        _this.form.clave = "";
+                        _this.guardando = false;
+                        _this.form.costos = response;
+                        $('#tipo_gasto').modal('show');
+                    }
+                },
+                error: function (error) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'No se Puede Recuperar los Costos '
+                    });
+
+                }
+            });
+        },
+
+        conciliar: function(e){
+            e.preventDefault();
+            var _this = this;
+            var url = App.host + '/api/conciliar';
+            this.guardando = true;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data:{
+                    id_conciliacion: _this.conciliacion.id,
+                    id_costo: _this.form.id_costo,
+                    cumplimiento: _this.conciliacion.f_inicial,
+                    vencimiento: _this.conciliacion.f_final,
+                    sindicato: _this.conciliacion.sindicato
+                },
+                success: function (response) {
+                    _this.form.id_costo = "";
+                    _this.enviarConciliacion(response);
+                },error: function(xhr, status, error) {
+                    _this.form.id_costo = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    $('#tipo_gasto').modal('hide');
+                    var err = eval("(" + xhr.responseText + ")");
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al generar la Conciliación:\n' + err.message
+                    });
+                }
+            });
+        },
+        enviarConciliacion: function (data) {
+            var _this = this;
+            var mensaje = 'Error al generar la Conciliación ';
+            var url = _this.api.url_api + '/api/conciliacion';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                headers:{
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                data: data,
+                success: function (response) {
+                    _this.registrar_conciliacion(response.id_transaccion);
+                    _this.aprobar1();
+                    swal({
+                            type: 'success',
+                            title: '¡Hecho!',
+                        text: 'Conciliacion Registrada Correctamente \nNo. de Folio de Estimación : ' + response.numero_folio,
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        closeOnConfirm: true
+                        });
+                        _this.guardando = false;
+                        $('#sesionSAO').modal('hide');
+                        $('#tipo_gasto').modal('hide');
+                },error: function(xhr, status, error) {
+                    if(!xhr.statusText === 'error'){
+                        var err = eval("(" + xhr.responseText + ")");
+                        mensaje += ' : \n' + err;
+                    }
+
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: mensaje
+                    }, function () {
+                        _this.guardando = false;
+                        $('#sesionSAO').modal('hide');
+                        $('#tipo_gasto').modal('hide');
+                    });
+                }
+            });
+        },
+
+        registrar_conciliacion: function (estimacion) {
+            var _this = this;
+            var url = App.host + '/api/conciliar/estimacion';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                data:{
+                    id_conciliacion: _this.conciliacion.id,
+                    id_estimacion: estimacion
+                },
+                success: function (response) {
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'Error al Registrar la Estimación Generada\n'
+                    });
+                }
+            });
+        },
+
+        aprobar1: function() {
+            var _this = this;
+                var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            $.ajax({
+                url: url,
+                type : 'POST',
+                data : {
+                    _method : 'PATCH',
+                    action : 'aprobar'
+                },
+                success: function(response) {
+                    _this.fetchConciliacion();
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.responseText)
+                    });
+                    _this.fetchConciliacion();
+                }
+            });
+        },
+
+        revertir_aprovacion:function () {
+            var _this = this;
             var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
-            swal({
-                title: "¡Aprobar Conciliación!",
-                text: "¿Desea aprobar la conciliación?",
-                type: "info",
-                showCancelButton: true,
-                closeOnConfirm: false,
-                confirmButtonText: "Si, Aprobar",
-                cancelButtonText: "No",
-                showLoaderOnConfirm: true
-            },
-            function(){
-                $.ajax({
-                    url: url,
-                    type : 'POST',
-                    data : {
-                        _method : 'PATCH',
-                        action : 'aprobar'
-                    },
-                    success: function(response) {
-                        if(response.status_code = 200) {
-                            swal({
+            $.ajax({
+                url: url,
+                type : 'POST',
+                data : {
+                    _method : 'PATCH',
+                    action : 'revertir'
+                },
+                success: function(response) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    $('#tipo_gasto').modal('hide');
+                },
+                error: function (error) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#sesionSAO').modal('hide');
+                    $('#tipo_gasto').modal('hide');
+
+                }
+            });
+        },
+
+        sesion_estimacion: function (e) {
+            e.preventDefault();
+            $('#revertir_estimacion').modal('show');
+        },
+
+        token_revertir: function () {
+            var _this = this;
+            this.guardando = true;
+            var url = _this.api.url_api + '/api/auth';
+            $.ajax({
+                url:url,
+                type: 'POST',
+                headers:{
+                    usuario: _this.user.usuario,
+                    clave: _this.form.clave
+                },
+                success: function (response) {
+                    _this.form.clave = "";
+                    _this.api.token = response.token;
+                    _this.revertir();
+
+                },
+                error: function (error) {
+                    _this.form.clave = "";
+                    _this.guardando = false;
+                    $('#revertir_estimacion').modal('hide');
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: 'No se Puede Iniciar Sesión '
+
+                    });
+                }
+            })
+        },
+
+        revertir: function () {
+            var _this = this;
+            var url = _this.api.url_api + '/api/conciliacion/' + _this.conciliacion.id;
+            $.ajax({
+                url:url,
+                type: 'DELETE',
+                headers:{
+                    database_name: _this.database_name,
+                    id_obra: _this.id_obra,
+                    Authorization: 'Bearer '+_this.api.token
+                },
+                success: function (response) {
+                    _this.conciliacion_revertir();
+                },error: function(xhr, status, error) {
+                    var mensaje = "";
+                    _this.guardando = false;
+                    $('#revertir_estimacion').modal('hide');
+                    var err = eval("(" + xhr.responseText + ")");
+                    err = err.message + '';
+                    console.log(err);
+                    var res = err.split(":");
+                    console.log(typeof res[0], res[0]);
+                    if (res[0] === "1") {
+                        mensaje = "No se puede revertir la Conciliación porque la Estimación asociada con folio: " + res[1] + " a sido aprobada "
+                    } else if(res[0] === "2") {
+                        mensaje = res[1];
+                    }
+                    else
+                    {
+                        mensaje = '<table class="table table-striped">'
+                            + '<div class="form-group"><div class="row"><div class="col-md-12">'
+                            + '<label><h4>Error al Revertir la Conciliación</h4></label>'
+                            + '<label><h4>La Estimación tiene asociadas las siguientes transacciones</h4></label>'
+                            + '</div></div></div>'
+                            + '<thead><tr><th align="right">Tipo</th><th align="center">Folio</th></tr></thead>'
+                            + '<tbody>';
+                        for (var i = 0; i < res.length; i++) {
+                            mensaje += '<tr><td align="left">' + res[i] + '</td><td align="left">' + res[i + 1] + '</td></tr>';
+                            i = i + 1;
+                        }
+                        mensaje += '</tbody></table>';
+                    }
+
+                    swal({
+                        html: true,
+                        type: 'error',
+                        title: '¡Error!',
+                        text: mensaje
+                    });
+                }
+            })
+        },
+        conciliacion_revertir: function() {
+            var _this = this;
+            var url = App.host + '/conciliaciones/' + _this.conciliacion.id;
+            $.ajax({
+                url: url,
+                type : 'POST',
+                data : {
+                    _method : 'PATCH',
+                    action : 'revertir'
+                },
+                success: function(response) {
+                    if(response.status_code = 200) {
+                        swal({
                                 type: 'success',
                                 title: '¡Hecho!',
-                                text: 'Conciliación aprobada correctamente',
+                                text: 'La conciliación se ha revertido correctamente.',
                                 showCancelButton: false,
                                 confirmButtonText: 'OK',
                                 closeOnConfirm: true
                             },
                             function () {
+                                _this.guardando = false;
+                                $('#revertir_estimacion').modal('hide');
                                 _this.fetchConciliacion();
                             });
-                        }
-                    },
-                    error: function (error) {
-                        swal({
-                            type: 'error',
-                            title: '¡Error!',
-                            text: App.errorsToString(error.responseText)
-                        });
-                        _this.fetchConciliacion();
                     }
-                });
+                },
+                error: function (error) {
+                    swal({
+                        type: 'error',
+                        title: '¡Error!',
+                        text: App.errorsToString(error.responseText)
+                    });
+                    _this.guardando = false;
+                    $('#revertir_estimacion').modal('hide');
+                    _this.fetchConciliacion();
+                }
             });
         },
-
         registrar: function() {
             var _this = this;
             this.form.errors = [];
@@ -597,6 +918,10 @@ Vue.component('conciliaciones-edit', {
                     $('#detalles_conciliacion').modal('hide');
                 }
             });
+        },
+        
+        verificar_revertible: function () {
+            
         }
     }
 });

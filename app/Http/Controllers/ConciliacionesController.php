@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class ConciliacionesController extends Controller
 {
-    
+
     function __construct() {
         $this->middleware('auth');
         $this->middleware('context');
         $this->middleware('permission:consultar-conciliacion', ['only' => ['index','edit']]);
-       
+
         parent::__construct();
     }
     
@@ -133,6 +133,8 @@ class ConciliacionesController extends Controller
             $num = $d->num;
             $code =$d->Code;
         }*/
+            //dd(Conciliacion::findOrFail($id), Camion::lists('Economico', 'IdCamion') );
+        //dd(Conciliacion::findOrFail($id));
             return view('conciliaciones.edit')
                 ->withConciliacion(Conciliacion::findOrFail($id))
                 ->withCamiones(Camion::lists('Economico', 'IdCamion'));
@@ -157,7 +159,9 @@ class ConciliacionesController extends Controller
                 $conciliacion->cerrar($id);
             } else if ($request->get('action') == 'aprobar') {
                 $conciliacion->aprobar();
-            } else if($request->get('action') == 'detalles') {
+            } else if ($request->get('action') == 'revertir') {
+                $conciliacion->revertir_aprovacion();
+            }else if($request->get('action') == 'detalles') {
 
                 $this->validate($request, [
                     'importe_pagado' => 'required|numeric',
@@ -213,4 +217,9 @@ class ConciliacionesController extends Controller
         return view('conciliaciones.show')
             ->withConciliacion($conciliacion);
     }
+
+    public function conciliacion_revertible(){
+
+    }
+
 }

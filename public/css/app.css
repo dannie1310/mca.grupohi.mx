@@ -6537,13 +6537,13 @@ button.close {
   src: local("Roboto BlackItalic"), local("Roboto-BlackItalic"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.woff2") format("woff2"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.woff") format("woff"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.ttf") format("truetype"), url("../fonts/roboto/Roboto/Roboto-BlackItalic.svg#Roboto") format("svg"); }
 
 /*!
- * bootstrap-fileinput v4.4.5
+ * bootstrap-fileinput v4.4.8
  * http://plugins.krajee.com/file-input
  *
  * Krajee default styling for bootstrap-fileinput.
  *
  * Author: Kartik Visweswaran
- * Copyright: 2014 - 2017, Kartik Visweswaran, Krajee.com
+ * Copyright: 2014 - 2018, Kartik Visweswaran, Krajee.com
  *
  * Licensed under the BSD 3-Clause
  * https://github.com/kartik-v/bootstrap-fileinput/blob/master/LICENSE.md
@@ -6665,7 +6665,6 @@ button.close {
   padding-left: 15px; }
 
 .file-caption-icon {
-  line-height: 1;
   left: 8px; }
 
 .file-error-message {
@@ -6902,16 +6901,6 @@ button.close {
 
 .file-zoom-fullscreen .modal-body {
   overflow-y: auto; }
-
-.btn-kv {
-  display: inline-block;
-  text-align: center;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  padding: 0;
-  font-size: 0.875rem;
-  border-radius: 0.2rem; }
 
 .floating-buttons {
   z-index: 3000; }
@@ -10375,25 +10364,5 @@ a:focus {
   outline-offset: -2px; }
 
 /*# sourceMappingURL=sass.css.map */
-
-.btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  padding: 10px 16px;
-  border-radius: 35px;
-  font-size: 24px;
-  line-height: 1.33;
-}
-
-.btn-circle {
-  width: 20px;
-  height: 20px;
-  padding: 6px 0px;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 12px;
-  line-height: 1.42857;
-}
-
 
 /*# sourceMappingURL=app.css.map */

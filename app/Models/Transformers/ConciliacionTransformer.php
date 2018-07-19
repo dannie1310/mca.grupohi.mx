@@ -10,6 +10,7 @@ namespace App\Models\Transformers;
 
 
 use App\Models\Conciliacion\ConciliacionDetalle;
+use App\Models\Conciliacion\EstimacionConciliacion;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Themsaid\Transformers\AbstractTransformer;
@@ -72,7 +73,10 @@ class ConciliacionTransformer extends AbstractTransformer
             'detalles'      => ConciliacionDetalleTransformer::transform(ConciliacionDetalle::where('idconciliacion', $conciliacion->idconciliacion)->get()),
             'detalles_nc'   => ConciliacionDetalleNoConciliadoTransformer::transform(ConciliacionDetalleNoConciliado::where('idconciliacion', $conciliacion->idconciliacion)->get()),
             'empresa'       => $conciliacion->empresa ? $conciliacion->empresa->razonSocial : '',
+            'id_empresa'    => $conciliacion->empresa ? $conciliacion->empresa->IdEmpresa : '',
+            'rfc'           => $conciliacion->empresa ? $conciliacion->empresa->RFC : '',
             'sindicato'     => $conciliacion->sindicato ? $conciliacion->sindicato->NombreCorto : '',
+            'id_sindicato'  => $conciliacion->sindicato ? $conciliacion->sindicato->IdSindicato : '',
             'estado'        => $conciliacion->estado,
             'estado_str'    => $conciliacion->estado_str,
             'cancelacion'   => !$conciliacion->cancelacion ? [] : [
@@ -83,13 +87,16 @@ class ConciliacionTransformer extends AbstractTransformer
             'fecha'     => $conciliacion->fecha_conciliacion->format("d-m-Y"),
             'folio'     => $conciliacion->Folio,
             'rango'     => $conciliacion->rango,
+            'f_inicial' => $conciliacion->fecha_inicial,
+            'f_final'   => $conciliacion->fecha_final,
             'importe_viajes_manuales' => $conciliacion->importe_viajes_manuales_f,
             'volumen_viajes_manuales' => $conciliacion->volumen_viajes_manuales_f,
             'porcentaje_importe_viajes_manuales' => $conciliacion->porcentaje_importe_viajes_manuales,
             'porcentaje_volumen_viajes_manuales' => $conciliacion->porcentaje_volumen_viajes_manuales,
             'importe_viajes_moviles' => $conciliacion->importe_viajes_moviles_f,
             'volumen_viajes_moviles' => $conciliacion->volumen_viajes_moviles_f,
-            'duplicados' => $duplicados
+            'duplicados' => $duplicados,
+            'revertible' => EstimacionConciliacion::where('id_conciliacion', '=', $conciliacion->idconciliacion)->first()?true:false
         ];
 
         return $output;
