@@ -75,8 +75,8 @@
                                    '' => '--SELECCIONE--',
                                    '1' => 'BÚSQUEDA POR CÓDIGO',
                                    '2' => 'BÚSQUEDA AVANZADA',
-                                   '3' => 'CARGAR EXCEL',
-                                   '4' => 'CARGA EXCEL COMPLETA'
+                                  /* '3' => 'CARGAR EXCEL',
+                                   '4' => 'CARGA EXCEL COMPLETA'*/
                                     ], '1', ['v-model' => 'tipo', 'class' => 'form-control']) !!}
 
                                </div>
@@ -90,7 +90,7 @@
                                    '' => '--SELECCIONE--',
                                    '1' => 'BÚSQUEDA POR CÓDIGO',
                                    '2' => 'BÚSQUEDA AVANZADA',
-                                   '3' => 'CARGAR EXCEL',
+                                  /* '3' => 'CARGAR EXCEL',*/
                                     ], '1', ['v-model' => 'tipo', 'class' => 'form-control']) !!}
 
                                </div>

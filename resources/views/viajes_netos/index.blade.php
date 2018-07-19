@@ -310,13 +310,15 @@
                                   </table>
                                       </div>
                                   </div>
-                                  <div class="row" v-if="conflicto.cierres == 0" ><div class="col-md-12"><textarea name="motivo" class="form-control" placeholder="Ingrese el motivo para aprobar el pago."></textarea></div></div>
+                                  <div class="row" v-if="conflicto.cierres == 0 && conflicto.denegado == 0" ><div class="col-md-12"><textarea name="motivo" class="form-control" placeholder="Ingrese el motivo para aprobar el pago."></textarea></div></div>
+                                  <div class="row" v-else-if="conflicto.cierres == 0 && conflicto.denegado == 1" ><P>DENEGADO</P></div>
+                                    <div class="row"  v-else><P>PERIODO CERRADO</P></div>
                                   {!! Form::close() !!}
                               </div>
                               <div class="modal-footer">
                                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                                 @if (Auth::user()->can(['poner-viajes-conflicto-pagables']))
-                                     <button type="button" class="btn btn-success" @click="confirmarPonerPagable" v-if="conflicto.cierres == 0">Es Pagable</button>
+                                     <button type="button" class="btn btn-success" @click="confirmarPonerPagable" v-if="conflicto.cierres == 0 && conflicto.denegado == 0">Es Pagable</button>
                                  @endif
                             </div>
                             </div><!-- /.modal-content -->

@@ -87,4 +87,42 @@ class ValidacionCierrePeriodo extends Model
 
         return $cierrescerrados;
     }
+
+    public static function validandoCierreViaje($FechaLlegada){
+        /* Bloqueo de cierre de periodo
+             1 : Cierre de periodo
+             0 : Periodo abierto.
+         */
+        $fecha = Carbon::createFromFormat('Y-m-d', $FechaLlegada);
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+        $validarUss=ValidacionCierrePeriodo::permiso_usuario(Auth::user()->idusuario,$fecha->month,$fecha->year);
+        if($cierres[0]->existe == 1) {//cierre periodo
+            if ($validarUss == NULL) {
+                //cierre periodo bloqueado para el usuario
+                $datos = 1;
+            }else {
+                //cierre periodo abierto para el usuario
+                $datos = 0;
+            }
+        }else{//periodo abierto
+            $datos = 0;
+        }
+        return $datos;
+    }
+
+    public static function validandoCierreViajeDenegar($FechaLlegada){
+        /* Bloqueo de cierre de periodo
+             1 : Cierre de periodo
+             0 : Periodo abierto.
+         */
+        $fecha = Carbon::createFromFormat('Y-m-d', $FechaLlegada);
+        $cierres = DB::connection('sca')->select(DB::raw("SELECT COUNT(*) as existe FROM cierres_periodo where mes = '{$fecha->month}' and anio = '{$fecha->year}'"));
+        $validarUss=ValidacionCierrePeriodo::permiso_usuario(Auth::user()->idusuario,$fecha->month,$fecha->year);
+        if($cierres[0]->existe == 1) {//cierre periodo
+            $datos = 1;
+        }else{//periodo abierto
+            $datos = 0;
+        }
+        return $datos;
+    }
 }

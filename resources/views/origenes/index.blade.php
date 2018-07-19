@@ -19,6 +19,7 @@
         <th>Fecha y hora registro</th>
         <th>Registró</th>
         <th>Estatus</th>
+        <th>Tipo de origen</th>
         <th width="160px">Acciones</th>
       </tr>
     </thead>
@@ -33,16 +34,23 @@
           <td>{{$origen->created_at->format('d-M-Y h:i:s a')}}</td>
           <td>{{$origen->user_registro}}</td>
           <td>{{ $origen->present()->estatus }}</td>
+          @if($origen->interno == 0)
+                <td>EXTERNO</td>
+          @else
+                <td>INTERNO</td>
+          @endif
           <td>
-
+            @if(Auth::user()->can(['modificar_tipo_origen','editar-origenes']))
+                <a href="{{ route('origenes.edit', [$origen]) }}" class="btn btn-info btn-xs" title="Editar"><i class="fa fa-pencil"></i></a>
+            @endif
             <a href="{{ route('origenes.show', $origen) }}" title="Ver" class="btn btn-xs btn-default"><i class="fa fa-eye"></i></a>
             @permission('desactivar-origenes')
               @if($origen->Estatus == 1)
               <button type="submit" title="Desactivar" class="btn btn-xs btn-danger" onclick="desactivar_origen({{$origen->IdOrigen}})"><i class="fa fa-remove"></i></button>
-            @else
-              <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_origen({{$origen->IdOrigen}})"><i class="fa fa-check"></i></button>
-            @endif
-              @endpermission
+              @else
+                <button type="submit" title="Activar" class="btn btn-xs btn-success" onclick="activar_origen({{$origen->IdOrigen}})"><i class="fa fa-check"></i></button>
+              @endif
+            @endpermission
           </td>
         </tr>
       @endforeach
@@ -67,7 +75,8 @@
           col_3: 'input',
           col_4: 'select',
           col_5: 'select',
-          col_6: 'none',
+          col_6: 'select',
+          col_7: 'none',
           base_path: App.tablefilterBasePath,
           auto_filter: true,
           paging: false,

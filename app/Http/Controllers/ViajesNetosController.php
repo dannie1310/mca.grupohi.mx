@@ -80,7 +80,8 @@ class ViajesNetosController extends Controller
                             'Sindicato' => (String)$viaje->sindicato,
                             'Empresa' => (String)$viaje->empresa,
                             'Codigo' => $viaje->Code,
-                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
+                            'denegado' => $viaje->denegado
                         ];
                     }
                 } elseif ($request->tipo_busqueda == 'codigo') {
@@ -112,7 +113,8 @@ class ViajesNetosController extends Controller
                             'Sindicato' => (String)$viaje->sindicato,
                             'Empresa' => (String)$viaje->empresa,
                             'Codigo' => $viaje->Code,
-                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada)
+                            'cierres' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
+                            'denegado' => $viaje->denegado
                         ];
                     }
                 }
@@ -125,6 +127,7 @@ class ViajesNetosController extends Controller
                 $conflicto = \App\Models\Conflictos\ConflictoEntreViajes::find($id_conflicto);
                 $viaje = ViajeNeto::find($id_viaje);
                 $data["cierres"] = ViajeNeto::validandoCierre($viaje->FechaLlegada);
+                $data["denegado"] = $viaje->denegado;
                 $pagable = $viaje->conflicto_pagable;
                 $detalles = $conflicto->detalles;
                 if($pagable){
@@ -219,9 +222,8 @@ class ViajesNetosController extends Controller
                     $viajes = ViajeNeto::porValidar()
                         ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
                         ->get();
-
-
                     foreach ($viajes as $viaje) {
+                        $tipo_origen = Origen::find($viaje->IdOrigen);
 
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
@@ -252,7 +254,9 @@ class ViajesNetosController extends Controller
                             'TipoTarifa' => 'm',
                             'TipoFDA' => 'm',
                             'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
-                            'Imagenes' => $viaje->imagenes
+                            'Imagenes' => $viaje->imagenes,
+                            'denegado' => (String) $viaje->denegado,
+                            'tipo_origen' => $tipo_origen->interno
                         ];
                     }
 
@@ -264,6 +268,7 @@ class ViajesNetosController extends Controller
                         ->where('viajesnetos.Code', '=', $request->Codigo)
                         ->get();
                     foreach($viajes as $viaje) {
+                        $tipo_origen = Origen::find($viaje->IdOrigen);
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
                             'IdViajeNeto' => $viaje->IdViajeNeto,
@@ -293,7 +298,9 @@ class ViajesNetosController extends Controller
                             'TipoTarifa' => 'm',
                             'TipoFDA' => 'm',
                             'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
-                            'Imagenes' => $viaje->imagenes
+                            'Imagenes' => $viaje->imagenes,
+                            'denegado' => (String) $viaje->denegado,
+                            'tipo_origen' => $tipo_origen->interno
                         ];
                     }
                 }

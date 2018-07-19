@@ -41,7 +41,8 @@ class ViajeNeto extends Model
         'CubicacionCamion',
         'IdEmpresa',
         'IdSindicato',
-        'IdMotivo'
+        'IdMotivo',
+        'denegado'
     ];
     protected $presenter = ModelPresenter::class;
     public $timestamps = false;

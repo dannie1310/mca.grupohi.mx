@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
 use Jenssegers\Date\Date;
@@ -13,7 +14,7 @@ class Origen extends Model
     protected $connection = 'sca';
     protected $table = 'origenes';
     protected $primaryKey = 'IdOrigen';
-    protected $fillable = ['IdTipoOrigen', 'IdProyecto', 'Descripcion', 'FechaAlta', 'HoraAlta','usuario_registro','motivo','usuario_desactivo','Estatus'];
+    protected $fillable = ['IdTipoOrigen', 'IdProyecto', 'Descripcion', 'FechaAlta', 'HoraAlta','usuario_registro','motivo','usuario_desactivo','Estatus','interno','usuario_edito'];
     protected $presenter = ModelPresenter::class;
 
     public function getCreatedAtAttribute($timestamp) {
@@ -38,7 +39,9 @@ class Origen extends Model
     public function user_registro(){
         return $this->belongsTo(\App\User::class, 'usuario_registro','idusuario');
     }
-
+    public function user_edito(){
+        return $this->belongsTo(User::class, 'usuario_edito', 'idusuario');
+    }
     public function usuario() {
         return $this->belongsToMany(\App\User::class, \App\Facades\Context::getDatabaseName().'.origen_x_usuario', 'idorigen', 'idusuario_intranet');
     }
