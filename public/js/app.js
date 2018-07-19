@@ -52782,6 +52782,7 @@ Vue.component('conciliaciones-create', {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 Vue.component('conciliaciones-edit', {
+    props: ['user', 'database_name', 'id_obra', 'api_url'],
     data: function data() {
         return {
             'tipo': '',
@@ -52802,14 +52803,13 @@ Vue.component('conciliaciones-edit', {
             'fetching': false,
             'fecha_cambio': '',
             'api': {
-                'url_api': 'http://rel-sao.grupohi.mx', /// 'http://localhost:8000'   ////'http://sao.grupohi.mx'     ////'http://rel-sao.grupohi.mx'
+                //'url_api': 'http://rel-sao.grupohi.mx' ,   /// 'http://localhost:8000'   ////'http://sao.grupohi.mx'     ////'http://rel-sao.grupohi.mx'
+                'url_api': this.api_url,
                 'token': ''
             }
 
         };
     },
-
-    props: ['user', 'database_name', 'id_obra'],
 
     directives: {
         datepicker: {

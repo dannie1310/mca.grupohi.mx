@@ -1,4 +1,7 @@
 Vue.component('conciliaciones-edit', {
+    props:[
+        'user', 'database_name', 'id_obra', 'api_url'
+    ],
     data: function() {
         return {
             'tipo'         : '',
@@ -19,16 +22,13 @@ Vue.component('conciliaciones-edit', {
             'fetching'   : false,
             'fecha_cambio' : '',
             'api' : {
-                'url_api': 'http://rel-sao.grupohi.mx' ,   /// 'http://localhost:8000'   ////'http://sao.grupohi.mx'     ////'http://rel-sao.grupohi.mx'
+                //'url_api': 'http://rel-sao.grupohi.mx' ,   /// 'http://localhost:8000'   ////'http://sao.grupohi.mx'     ////'http://rel-sao.grupohi.mx'
+                'url_api': this.api_url,
                 'token' : ''
             }
 
         }
     },
-
-    props:[
-        'user', 'database_name', 'id_obra'
-    ],
 
     directives: {
         datepicker: {
