@@ -2,7 +2,7 @@
 
 @section('content')
 <h1>{{ strtoupper(trans('strings.conciliaciones')) }}
-    @if(Auth::user()->can(['generar-conciliacion']))
+    @if(Auth::user()->can(['generar-conciliacion'])|| Auth::user()->can(['revertir-conciliaciones']))
     <a href="{{ route('conciliaciones.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> {{ trans('strings.new_conciliacion') }}</a>
     @endif
 </h1>
@@ -132,7 +132,7 @@
             <td>{{$conciliacion->estado_str}}</td>
            
             <td>
-                @if (Auth::user()->can(['generar-conciliacion', 'cerrar-conciliacion', 'aprobar-conciliacion', 'cancelar-conciliacion', 'abrir-conciliacion' ])) 
+                @if (Auth::user()->can(['generar-conciliacion', 'cerrar-conciliacion', 'aprobar-conciliacion', 'cancelar-conciliacion', 'abrir-conciliacion', 'revertir-conciliacion' ]))
                 <a href="{{route('conciliaciones.edit', $conciliacion)}}" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
                 @else
                  <button disabled class="btn btn-primary btn-xs "><span class="glyphicon glyphicon-pencil"></span></button>
