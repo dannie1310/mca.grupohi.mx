@@ -177,7 +177,7 @@ class TicketsController extends Controller
                     $tipo_p = "No encontrado";
                 }
 
-            /*   $insert = "INSERT INTO prod_sca_pista_aeropuerto_2.viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil, folioMina, folioSeguimiento, tipoViaje) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."','".$exp[10]."','".$exp[11]."', '".$exp[17]."','".$exp[14]."','".$exp[15]."','".$exp[13]."');";
+            /*   $insert = "INSERT INTO viajesnetos(IdArchivoCargado, FechaCarga, HoraCarga, IdProyecto, IdCamion, IdOrigen, FechaSalida, HoraSalida, IdTiro, FechaLlegada, HoraLlegada, IdMaterial, Creo,Code,uidTAG,imei, CreoPrimerToque, CubicacionCamion, IdPerfil, folioMina, folioSeguimiento, tipoViaje) VALUES(0,NOW(),NOW(),".$exp[0].",".$exp[1].",".$exp[2].",'".$fechaS."','".$horaS."',".$exp[4].",'".$fechaL."','".$horaL."',".$exp[6].",".$exp[7].",'".$exp[8].$exp[1]."','".$exp[9]."','".$exp[12]."','".$exp[10]."','".$exp[11]."', '".$exp[17]."','".$exp[14]."','".$exp[15]."','".$exp[13]."');";
 
                 $archivo=fopen('C:\Users\LERDES1\Desktop\datos.txt',"a") or
                 die("No se pudo crear el archivo");

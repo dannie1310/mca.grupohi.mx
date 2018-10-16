@@ -51,6 +51,7 @@
       || Auth::user()->can(['editar-tiros'])
       || Auth::user()->can(['consultar-camiones'])
       || Auth::user()->can(['consultar-centroscostos'])
+      || Auth::user()->can(['consultar-conciliacion'])
       || Auth::user()->can(['consultar-empresas'])
       || Auth::user()->can(['consultar-etapas'])
       || Auth::user()->can(['consultar-impresoras'])
