@@ -43,7 +43,7 @@ class InicioViajeReporteTransformer extends AbstractTransformer
                 when (hour(i.fecha_origen) >= '07:00:00' and hour(i.fecha_origen) < '19:00:00')  then 'Primer Turno'
                 else 'Segundo Turno'
                 end as turno
-                FROM prod_sca_pista_aeropuerto_2.inicio_camion i
+                FROM inicio_camion i
                 inner join camiones c on c.IdCamion = i.idcamion
                 inner join materiales m on m.IdMaterial = i.idmaterial
                 inner join origenes o on o.IdOrigen = i.idorigen

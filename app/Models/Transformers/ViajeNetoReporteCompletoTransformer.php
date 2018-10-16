@@ -186,7 +186,7 @@ FROM
         (((conflictos_entre_viajes_detalle conflictos_entre_viajes_detalle_1
     INNER JOIN conflictos_entre_viajes conflictos_entre_viajes ON (conflictos_entre_viajes_detalle_1.idconflicto = conflictos_entre_viajes.id))
     INNER JOIN conflictos_entre_viajes_detalle conflictos_entre_viajes_detalle ON (conflictos_entre_viajes_detalle.idconflicto = conflictos_entre_viajes.id))
-    INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos ON (conflictos_entre_viajes_detalle.idviaje_neto = viajesnetos.IdViajeNeto)
+    INNER JOIN viajesnetos viajesnetos ON (conflictos_entre_viajes_detalle.idviaje_neto = viajesnetos.IdViajeNeto)
         AND (conflictos_entre_viajes_detalle_1.idviaje_neto = viajesnetos.IdViajeNeto))
     INNER JOIN (SELECT 
         MAX(DATE_FORMAT(timestamp, '%Y-%m-%d')) AS maximo
