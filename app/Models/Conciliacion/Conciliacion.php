@@ -338,18 +338,18 @@ class Conciliacion extends Model
                    group_concat(conciliacion.fecha_conciliacion),
                    viajes.Importe,
                    viajes.IdViaje
-              FROM ((prod_sca_pista_aeropuerto_2.conciliacion_detalle conciliacion_detalle
-                      INNER JOIN prod_sca_pista_aeropuerto_2.viajesnetos viajesnetos
+              FROM ((conciliacion_detalle conciliacion_detalle
+                      INNER JOIN viajesnetos viajesnetos
                          ON     (conciliacion_detalle.idviaje_neto =
                                     viajesnetos.IdViajeNeto)
                             AND (viajesnetos.IdViajeNeto =
                                     conciliacion_detalle.idviaje_neto))
-                     INNER JOIN prod_sca_pista_aeropuerto_2.conciliacion conciliacion
+                     INNER JOIN conciliacion conciliacion
                         ON     (conciliacion_detalle.idconciliacion =
                                    conciliacion.idconciliacion)
                            AND (conciliacion.idconciliacion =
                                 conciliacion_detalle.idconciliacion))
-                   INNER JOIN prod_sca_pista_aeropuerto_2.viajes viajes
+                   INNER JOIN viajes viajes
                       ON (viajes.IdViajeNeto = viajesnetos.IdViajeNeto)
              WHERE     (conciliacion.fecha_conciliacion >= '2017-07-01 00:00:00')
                    AND conciliacion_detalle.estado = 1
