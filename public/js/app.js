@@ -37547,7 +37547,7 @@ if (typeof window !== 'undefined') {
 module.exports = exports['default'];
 },{"./modules/default-params":17,"./modules/handle-click":18,"./modules/handle-dom":19,"./modules/handle-key":20,"./modules/handle-swal-dom":21,"./modules/set-params":23,"./modules/utils":24}],26:[function(require,module,exports){
 (function (global){
-//     Underscore.js 1.9.1
+//     Underscore.js 1.9.0
 //     http://underscorejs.org
 //     (c) 2009-2018 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
@@ -37609,7 +37609,7 @@ module.exports = exports['default'];
   }
 
   // Current version.
-  _.VERSION = '1.9.1';
+  _.VERSION = '1.9.0';
 
   // Internal function that returns an efficient (for current engines) version
   // of the passed-in callback, to be repeatedly applied in other Underscore
@@ -37696,10 +37696,6 @@ module.exports = exports['default'];
       return obj == null ? void 0 : obj[key];
     };
   };
-
-  var has = function(obj, path) {
-    return obj != null && hasOwnProperty.call(obj, path);
-  }
 
   var deepGet = function(obj, path) {
     var length = path.length;
@@ -37998,7 +37994,7 @@ module.exports = exports['default'];
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
   _.groupBy = group(function(result, value, key) {
-    if (has(result, key)) result[key].push(value); else result[key] = [value];
+    if (_.has(result, key)) result[key].push(value); else result[key] = [value];
   });
 
   // Indexes the object's values by a criterion, similar to `groupBy`, but for
@@ -38011,7 +38007,7 @@ module.exports = exports['default'];
   // either a string attribute to count by, or a function that returns the
   // criterion.
   _.countBy = group(function(result, value, key) {
-    if (has(result, key)) result[key]++; else result[key] = 1;
+    if (_.has(result, key)) result[key]++; else result[key] = 1;
   });
 
   var reStrSymbol = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;
@@ -38046,7 +38042,7 @@ module.exports = exports['default'];
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
-    if (array == null || array.length < 1) return n == null ? void 0 : [];
+    if (array == null || array.length < 1) return void 0;
     if (n == null || guard) return array[0];
     return _.initial(array, array.length - n);
   };
@@ -38061,7 +38057,7 @@ module.exports = exports['default'];
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array.
   _.last = function(array, n, guard) {
-    if (array == null || array.length < 1) return n == null ? void 0 : [];
+    if (array == null || array.length < 1) return void 0;
     if (n == null || guard) return array[array.length - 1];
     return _.rest(array, Math.max(0, array.length - n));
   };
@@ -38364,7 +38360,7 @@ module.exports = exports['default'];
     var memoize = function(key) {
       var cache = memoize.cache;
       var address = '' + (hasher ? hasher.apply(this, arguments) : key);
-      if (!has(cache, address)) cache[address] = func.apply(this, arguments);
+      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
       return cache[address];
     };
     memoize.cache = {};
@@ -38531,7 +38527,7 @@ module.exports = exports['default'];
 
     // Constructor is a special case.
     var prop = 'constructor';
-    if (has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
+    if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
 
     while (nonEnumIdx--) {
       prop = nonEnumerableProps[nonEnumIdx];
@@ -38547,7 +38543,7 @@ module.exports = exports['default'];
     if (!_.isObject(obj)) return [];
     if (nativeKeys) return nativeKeys(obj);
     var keys = [];
-    for (var key in obj) if (has(obj, key)) keys.push(key);
+    for (var key in obj) if (_.has(obj, key)) keys.push(key);
     // Ahem, IE < 9.
     if (hasEnumBug) collectNonEnumProps(obj, keys);
     return keys;
@@ -38832,7 +38828,7 @@ module.exports = exports['default'];
       while (length--) {
         // Deep compare each member
         key = keys[length];
-        if (!(has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
+        if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
       }
     }
     // Remove the first object from the stack of traversed objects.
@@ -38882,7 +38878,7 @@ module.exports = exports['default'];
   // there isn't any inspectable "Arguments" type.
   if (!_.isArguments(arguments)) {
     _.isArguments = function(obj) {
-      return has(obj, 'callee');
+      return _.has(obj, 'callee');
     };
   }
 
@@ -38924,7 +38920,7 @@ module.exports = exports['default'];
   // on itself (in other words, not on a prototype).
   _.has = function(obj, path) {
     if (!_.isArray(path)) {
-      return has(obj, path);
+      return obj != null && hasOwnProperty.call(obj, path);
     }
     var length = path.length;
     for (var i = 0; i < length; i++) {
@@ -39243,7 +39239,7 @@ module.exports = exports['default'];
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],27:[function(require,module,exports){
 /*!
- * vue-resource v1.5.1
+ * vue-resource v1.5.0
  * https://github.com/pagekit/vue-resource
  * Released under the MIT License.
  */
@@ -40803,7 +40799,7 @@ module.exports = plugin;
 },{"got":7}],28:[function(require,module,exports){
 (function (global){
 /*!
- * Vue.js v2.5.16
+ * Vue.js v2.5.17
  * (c) 2014-2018 Evan You
  * Released under the MIT License.
  */
@@ -45879,7 +45875,7 @@ Object.defineProperty(Vue, 'FunctionalRenderContext', {
   value: FunctionalRenderContext
 });
 
-Vue.version = '2.5.16';
+Vue.version = '2.5.17';
 
 /*  */
 
