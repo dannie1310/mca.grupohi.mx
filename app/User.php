@@ -34,7 +34,7 @@ class User extends Model implements AuthenticatableContract,
     protected $table = 'igh.usuario';
     protected $primaryKey = 'idusuario';
     protected $fillable = ['usuario', 'nombre', 'correo', 'clave'];
-    protected $hidden = ['clave', 'remember_token'];
+    protected $hidden = ['clave', 'remember_token','session_id'];
     protected $presenter = UserPresenter::class;
     public $timestamps = false;
 
