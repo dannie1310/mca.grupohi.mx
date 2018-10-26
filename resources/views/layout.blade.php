@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{{ trans('strings.app_name') }}</title>
     <link rel="stylesheet" href="{{ asset(elixir('css/app.css')) }}">
+
     @include('scripts.globals')
 
 @yield('styles')
@@ -21,6 +22,7 @@
     <br>
     <script src="{{ asset('tablefilter/tablefilter.js')}}"></script>
     <script src="{{ asset(elixir("js/app.js")) }}"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase.js"></script>
     @yield('scripts')
   </body>
 </html>

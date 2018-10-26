@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\DB;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -67,4 +69,61 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);
     }
+
+    public function postLogin(Request $request)
+    {
+        $this->validate($request, [
+            'usuario' => 'required', 'clave' => 'required',
+        ]);
+
+        $throttles = $this->isUsingThrottlesLoginsTrait();
+
+        if ($throttles && $this->hasTooManyLoginAttempts($request)) {
+            return $this->sendLockoutResponse($request);
+        }
+
+        $credentials = $request->only('usuario', 'clave');
+
+        $user = DB::connection('sca')->select(DB::raw("select * from `igh`.`usuario` where `usuario` = '".$credentials["usuario"]."' and crc32(`clave` = '".$credentials["clave"]."')"));
+
+        if(auth()->attempt(['usuario' => $request->input('usuario'), 'clave' => $request->input('clave')])){
+            //dd("dentro");
+
+            $new_session_id = \Session::getId();
+
+            if($user[0]->session_id != ''){
+
+                $last_session = \Session::getHandler()->read($user[0]->session_id);
+
+                if($last_session){
+                    if(\Session::getHandler()->destroy($user[0]->session_id)){
+
+                    }
+                }
+            }
+
+            \DB::table('igh.usuario')->where('idusuario', $user[0]->idusuario)->update(['session_id' => $new_session_id]);
+
+            $user = auth()->user();
+        }
+
+        if (auth()->attempt($credentials, $request->has('remember_me'))) {
+            if ($throttles) {
+                $this->clearLoginAttempts($request);
+            }
+
+            return redirect($this->redirectPath());
+        }
+
+        if ($throttles) {
+            $this->incrementLoginAttempts($request);
+        }
+
+        return redirect($this->loginPath())
+            ->withInput($request->only('usuario', 'remember_me'))
+            ->withErrors([
+                'usuario' => $this->getFailedLoginMessage(),
+            ]);
+    }
+
 }
