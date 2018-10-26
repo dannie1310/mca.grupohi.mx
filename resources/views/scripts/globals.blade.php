@@ -60,3 +60,33 @@
         }
     }
 </script>
+<script src="https://www.gstatic.com/firebasejs/5.5.6/firebase.js"></script>
+<script type="text/javascript">
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBzJ-AQ26h0_Tjl6Lev93cdRpF-sYOILq4",
+        authDomain: "sistema-control-de-acarreos.firebaseapp.com",
+        databaseURL: "https://sistema-control-de-acarreos.firebaseio.com",
+        projectId: "sistema-control-de-acarreos",
+        storageBucket: "sistema-control-de-acarreos.appspot.com",
+        messagingSenderId: "258473960894"
+    };
+    firebase.initializeApp(config);
+    database = firebase.database();
+
+    if("{!! Auth::user() !!}") {
+        firebase.database().ref('/users/' + {!! Auth::check() ? Auth::id() : 'null' !!} + '/session_id').set("{!! (Session::getId())?Session::getId():'' !!}");
+    }
+
+    firebase.database().ref('/users/' + {!! Auth::check() ? Auth::id() : 'null' !!}).on('value', function(snapshot2) {
+        v = snapshot2.val();
+        if(snapshot2.val() != null) {
+            if (v.session_id != "{!! (Session::getId())?Session::getId():'' !!}") {
+                alert("¡Se tiene una sesión activa en otro dispositivo!.");
+                setTimeout(function(){
+                    window.location = '/auth/logout';
+                },1000,"JavaScript");
+            }
+        }
+    });
+</script>
