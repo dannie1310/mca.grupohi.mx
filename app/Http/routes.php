@@ -55,6 +55,7 @@ Route::get('camiones/{camiones}/cubicacion', 'CamionesController@getCubicacion')
     Route::resource('camiones', 'CamionesController');
     Route::resource('camion.imagenes', 'CamionImagenesController');
     Route::resource('tarifas_material', 'TarifasMaterialController');
+    Route::resource('tarifas_ruta_material', 'TarifasRutaMaterialController');
     Route::resource('tarifas_peso', 'TarifasPesoController');
     Route::resource('tarifas_tiporuta', 'TarifasTipoRutaController');
     Route::resource('operadores', 'OperadoresController');
@@ -272,6 +273,7 @@ Route::group(['prefix' => 'csv'],function () {
     Route::get('marcas', 'CSVController@marcas')->name('csv.marcas');
     Route::get('operadores', 'CSVController@operadores')->name('csv.operadores');
     Route::get('tarifas-material', 'CSVController@tarifas_material')->name('csv.tarifas-material');
+    Route::get('tarifas-ruta-material', 'CSVController@tarifas_ruta_material')->name('csv.tarifas-ruta-material');
     Route::get('tarifas-peso', 'CSVController@tarifas_peso')->name('csv.tarifas-peso');
     Route::get('configuracion-checadores', 'CSVController@configuracion_checadores')->name('csv.configuracion-checadores');
     Route::get('impresoras', 'CSVController@impresoras')->name('csv.impresoras');

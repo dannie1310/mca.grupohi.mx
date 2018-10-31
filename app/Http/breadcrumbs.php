@@ -168,6 +168,22 @@ Breadcrumbs::register('tarifas_material.show', function($breadcrumbs, $tarifa){
 });
 
 
+
+//Catalogos->Tarifas por Ruta y Material
+
+Breadcrumbs::register('tarifas_ruta_material.index', function($breadcrumbs){
+    $breadcrumbs->push('TARIFAS POR RUTA Y MATERIAL', route('tarifas_ruta_material.index'));
+});
+Breadcrumbs::register('tarifas_ruta_material.create', function($breadcrumbs){
+    $breadcrumbs->parent('tarifas_ruta_material.index');
+    $breadcrumbs->push('NUEVA TARIFA POR RUTA Y MATERIAL', route('tarifas_ruta_material.create'));
+});
+
+Breadcrumbs::register('tarifas_ruta_material.show', function($breadcrumbs, $tarifa){
+    $breadcrumbs->parent('tarifas_ruta_material.index');
+    $breadcrumbs->push(strtoupper($tarifa->IdTarifa), route('tarifas_ruta_material.show', $tarifa));
+});
+
 //Catalogos->Tarifas por Peso
 
 Breadcrumbs::register('tarifas_peso.index', function($breadcrumbs){

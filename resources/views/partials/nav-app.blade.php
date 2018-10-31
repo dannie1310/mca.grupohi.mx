@@ -21,6 +21,7 @@
       || Auth::user()->can(['crear-tarifas-material'])
       || Auth::user()->can(['crear-telefonos'])
       || Auth::user()->can(['crear-tiros'])
+      || Auth::user()->can(['crear-tarifa-ruta-material'])
       || Auth::user()->can(['desactivar-camiones'])
       || Auth::user()->can(['desactivar-centroscostos'])
       || Auth::user()->can(['desactivar-empresas'])
@@ -35,6 +36,7 @@
       || Auth::user()->can(['desactivar-tarifas-material'])
       || Auth::user()->can(['desactivar-telefonos'])
       || Auth::user()->can(['desactivar-tiros'])
+      || Auth::user()->can(['desactivar-tarifa-ruta-material'])
       || Auth::user()->can(['editar-camiones'])
       || Auth::user()->can(['editar-centroscostos'])
       || Auth::user()->can(['editar-empresas'])
@@ -63,7 +65,9 @@
       || Auth::user()->can(['consultar-sindicatos'])
       || Auth::user()->can(['consultar-tarifas-material'])
       || Auth::user()->can(['consultar-telefonos'])
-      || Auth::user()->can(['consultar-tiros']))
+      || Auth::user()->can(['consultar-tiros'])
+      || Auth::user()->can(['consultar-tarifas-ruta-material'])
+      || Auth::user()->can(['cancelar-tarifa-ruta-material']))
 
   <li class="dropdown">
     <a tabindex="0" href="#" class="dropdown-toggle" data-toggle="dropdown" data-submenu>
@@ -121,11 +125,14 @@
         @if(Auth::user()->can(['consultar-historico'])||   Auth::user()->can(['consultar-tiros'])|| Auth::user()->can(['crear-tiros'])|| Auth::user()->can(['desactivar-tiros'])|| Auth::user()->can(['editar-tiros']))
             <li><a href="{{ route('tiros.index') }}">Tiros</a></li>
         @endif
-        @if(Auth::user()->can(['consultar-historico'])||  Auth::user()->can(['consultar-tarifas-materialgit '])||  Auth::user()->can(['crear-tarifas-material'])|| Auth::user()->can(['desactivar-tarifas-material'])|| Auth::user()->can(['editar-tarifas-material']))
+        @if(Auth::user()->can(['consultar-historico'])||  Auth::user()->can(['consultar-tarifas-materialgit '])||  Auth::user()->can(['crear-tarifas-material'])|| Auth::user()->can(['desactivar-tarifas-material'])|| Auth::user()->can(['editar-tarifas-material'])|| Auth::user()->can(['crear-tarifa-ruta-material']) || Auth::user()->can(['desactivar-tarifa-ruta-material']) || Auth::user()->can(['cancelar-tarifa-ruta-material']) || Auth::user()->can(['descargar-excel-tarifa-ruta-material']) ||Auth::user()->can(['consultar-tarifas-ruta-material']))
             <li class="dropdown-submenu">
                 <a tabindex="0" class="dropdown-toggle" data-toggle="dropdown">Tarifas</a>
                 <ul class="dropdown-menu">
                     <li><a tabindex="-1" href="{{ route('tarifas_material.index') }}">Tarifas Por Material</a></li>
+                    @if(Auth::user()->can(['crear-tarifa-ruta-material']) || Auth::user()->can(['desactivar-tarifa-ruta-material']) || Auth::user()->can(['cancelar-tarifa-ruta-material']) || Auth::user()->can(['descargar-excel-tarifa-ruta-material']) ||Auth::user()->can(['consultar-tarifas-ruta-material']))
+                        <li><a tabindex="-1" href="{{ route('tarifas_ruta_material.index') }}">Tarifas Por Ruta + Material</a></li>
+                    @endif
                     <li><a tabindex="-1" href="{{ route('tarifas_peso.index') }}">Tarifas Por Peso</a></li>
                     <li><a tabindex="-1" href="{{ route('tarifas_tiporuta.index') }}">Tarifas Por Tipo De Ruta</a></li>
                 </ul>
