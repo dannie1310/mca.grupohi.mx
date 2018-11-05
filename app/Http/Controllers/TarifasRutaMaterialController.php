@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Material;
 use App\Models\Ruta;
 use App\Models\Tarifas\TarifaRutaMaterial;
 use App\Models\TipoTarifa;
@@ -50,6 +51,11 @@ class TarifasRutaMaterialController extends Controller
     public function create()
     {
         //
+        $materiales = Material::orderBy("descripcion")->lists("Descripcion","IdMaterial");
+        $rutas = Ruta::all();
+        $tipos = TipoTarifa::all()->lists("descripcion","id");
+        $fecha_actual = date("d-m-Y");
+        return view('tarifas.ruta+material.create')->withMateriales($materiales)->withRutas($rutas)->withFechaActual($fecha_actual)->withTipos($tipos);
     }
 
     /**
@@ -103,8 +109,22 @@ class TarifasRutaMaterialController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+
+    public function destroy(Request $request, $id)
     {
-        //
+        dd($request);
+        $tarifa = TarifaMaterial::find($id);
+        if($tarifa->Estatus == 1) {
+            $tarifa->update([
+                'Estatus'  => 0,
+                'usuario_desactivo' => auth()->user()->idusuario,
+                'motivo'  => $request->motivo
+            ]);
+            Flash::success('¡TARIFA DESACTIVADA CORRECTAMENTE!');
+        } else {
+            Flash::warning('¡LA TARIFA YA HA SIDO DESACTIVADA!');
+        }
+        return redirect()->back();
     }
+
 }

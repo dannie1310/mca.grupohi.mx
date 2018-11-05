@@ -50,6 +50,8 @@ return [
     'tarifas_material' => 'Tarifas por Material',
     'tarifas_peso' => 'Tarifas por Peso',
     'tarifas_tiporuta' => 'Tarifas por Tipo de Ruta',
+
+    'tarifas_ruta_material' => 'Tarifas por Ruta y Material',
     
     //Operadores
     'operadores' => 'Operadores',

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class='success'></div>
-    <h1>TARIFAS POR RUTA Y MATERIAL
+    <h1>{{ strtoupper(trans('strings.tarifas_ruta_material')) }}
         @permission('crear-tarifa-ruta-material')
             <a href="{{ route('tarifas_ruta_material.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Nueva Tarifa</a>
         @endpermission
@@ -88,6 +88,11 @@
         {{csrf_field()}}
         <input type="hidden" name="_method" value="delete"/>
     </form>
+    <form id='update' method="post">
+        <input type='hidden' name='motivo' value/>
+        {{csrf_field()}}
+        <input type="hidden" name="_method" value="update"/>
+    </form>
 @stop
 @section('scripts')
     <script>
@@ -97,23 +102,24 @@
             col_1: 'select',
             col_2: 'select',
             col_3: 'select',
-            col_4: 'none',
+            col_4: 'select',
             col_5: 'none',
             col_6: 'none',
-            col_7: 'input',
+            col_7: 'none',
             col_8: 'input',
-            col_9: 'select',
-            col_10: 'input',
+            col_9: 'input',
+            col_10: 'select',
             col_11: 'input',
-            col_12: 'select',
-            col_13: 'input',
+            col_12: 'input',
+            col_13: 'select',
             col_14: 'input',
-            col_15: 'none',
+            col_15: 'input',
+            col_16: 'none',
             base_path: App.tablefilterBasePath,
             auto_filter: true,
             paging: false,
             rows_counter: true,
-            rows_counter_text: 'Tarifas Ruta+Material: ',
+            rows_counter_text: 'Tarifas Ruta y Material: ',
             btn_reset: true,
             btn_reset_text: 'Limpiar',
             clear_filter_text: 'Limpiar',
@@ -131,7 +137,7 @@
 
             swal({
                     title: "¡Desactivar tarifa!",
-                    text: "¿Esta seguro de que deseas desactivar la tarifa?",
+                    text: "¿Esta seguro de que deseas desactivar la tarifa ruta por material?",
                     type: "input",
                     showCancelButton: true,
                     closeOnConfirm: false,
@@ -151,14 +157,14 @@
                     $("input[name=motivo]").val(inputValue);
                     form.submit();
                 });
-        },
+        };
         function cancelar_tarifa(id) {
-            var form = $('#delete');
+            var form = $('#update');
             var url=App.host +"/tarifas_ruta_material/"+id;
 
             swal({
                     title: "¡Cancelar la tarifa!",
-                    text: "¿Esta seguro de que deseas cancelar la tarifa?",
+                    text: "¿Esta seguro de que deseas cancelar la tarifa ruta por material?",
                     type: "input",
                     showCancelButton: true,
                     closeOnConfirm: false,
