@@ -2,7 +2,7 @@
 
 @section('content')
     <div class='success'></div>
-    <h1>{{ strtoupper(trans('strings.tarifas_ruta_material')) }}
+    <h1>TARIFAS POR RUTA Y MATERIAL
         @permission('crear-tarifa-ruta-material')
             <a href="{{ route('tarifas_ruta_material.create') }}" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Nueva Tarifa</a>
         @endpermission
@@ -12,13 +12,14 @@
     </h1>
     {!! Breadcrumbs::render('tarifas_ruta_material.index') !!}
     <hr>
-    <div class="errores"></div>
     <div class="table-responsive">
-        <table class="table table-hover table-bordered small">
+        <table class="table table-striped small"  id="index_tarifas_ruta_material" >
             <thead>
             <tr>
-                <th>Tarifa</th>
+                <th width="80px">Tarifa</th>
                 <th>Ruta</th>
+                <th>Origen</th>
+                <th>Destino</th>
                 <th>Material</th>
                 <th>Tarifa 1er. KM</th>
                 <th>Tarifa KM Subsecuentes</th>
@@ -30,10 +31,8 @@
                 <th>Fecha Hora Registro</th>
                 <th>Estado</th>
                 <th>Desactivó</th>
-                <th>Motivo de Desactivación</th>
                 <th>Canceló</th>
-                <th>Motivo de Cancelación</th>
-                <th>Acciones</th>
+                <th width="70px">Acciones</th>
             </tr>
             </thead>
             <tbody>
@@ -44,12 +43,14 @@
                     <tr>
                         @endif
                         <td>Tarifa {{ $tarifa->id }}</td>
-                        <td>{{ $tarifa->ruta->descripcion }}{!! Form::hidden('IdRuta', $tarifa->ruta->IdRuta) !!}</td>
+                        <td>{{ $tarifa->ruta->Clave }}{{$tarifa->ruta->IdRuta}}{!! Form::hidden('IdRuta', $tarifa->ruta->IdRuta) !!}</td>
+                        <td>{{ $tarifa->ruta->origen->Descripcion }}{!! Form::hidden('IdOrigen', $tarifa->ruta->origen->IdOrigen) !!}</td>
+                        <td>{{ $tarifa->ruta->tiro->Descripcion }}{!! Form::hidden('IdTiro', $tarifa->ruta->tiro->IdTiro) !!}</td>
                         <td>{{ $tarifa->material->Descripcion }}{!! Form::hidden('IdMaterial', $tarifa->material->IdMaterial) !!}</td>
                         <td>{{ $tarifa->primer_km }}</td>
                         <td>{{ $tarifa->km_subsecuentes }}</td>
                         <td>{{ $tarifa->km_adicionales}}</td>
-                        <td>{{ $tarifa->inicio_vigencia->format("d-m-Y h:i:s") }}</td>
+                        <td>{{ $tarifa->inicio_vigencia->format("Y/m/d h:i:s") }}</td>
                         <td>{{ $tarifa->fin_vigencia }}</td>
                         @if($tarifa->idtipo_tarifa != null)
                             @foreach($tipos as $tipo)
@@ -61,12 +62,10 @@
                             <td>NO ASIGNADO</td>
                         @endif
                         <td>{{ $tarifa->registro->present()->NombreCompleto }}</td>
-                        <td>{{ $tarifa->fecha_hora_registro->format("d-m-Y h:i:s") }}</td>
+                        <td>{{ $tarifa->fecha_hora_registro->format("Y/m/d h:i:s") }}</td>
                         <td>{{ $tarifa->estatus_string }}</td>
                         <td>{{ $tarifa->user_desactivo }}</td>
-                        <td>{{ $tarifa->motivo_desactivar }}</td>
                         <td>{{ $tarifa->user_cancelo }}</td>
-                        <td>{{ $tarifa->motivo_cancelar }}</td>
                         <td>
                             @permission('desactivar-tarifa-ruta-material')
                                 @if($tarifa->estatus == 1)
@@ -75,7 +74,7 @@
                             @endpermission
                             @permission('cancelar-tarifa-ruta-material')
                             @if($tarifa->estatus == 1 || $tarifa->estatus == 0)
-                                <button title="Cancelar" class="btn btn-xs btn-danger" onclick="cancelar_tarifa({{$tarifa->id}})"><i class="fa fa-remove"></i></button>
+                                <button title="Cancelar" class="btn btn-xs btn-black" onclick="cancelar_tarifa({{$tarifa->id}})"><i class="glyphicon glyphicon-trash"></i></button>
                             @endif
                             @endpermission
                         </td>
@@ -92,6 +91,40 @@
 @stop
 @section('scripts')
     <script>
+        var auth_config = {
+            auto_filter: true,
+            col_0: 'input',
+            col_1: 'select',
+            col_2: 'select',
+            col_3: 'select',
+            col_4: 'none',
+            col_5: 'none',
+            col_6: 'none',
+            col_7: 'input',
+            col_8: 'input',
+            col_9: 'select',
+            col_10: 'input',
+            col_11: 'input',
+            col_12: 'select',
+            col_13: 'input',
+            col_14: 'input',
+            col_15: 'none',
+            base_path: App.tablefilterBasePath,
+            auto_filter: true,
+            paging: false,
+            rows_counter: true,
+            rows_counter_text: 'Tarifas Ruta+Material: ',
+            btn_reset: true,
+            btn_reset_text: 'Limpiar',
+            clear_filter_text: 'Limpiar',
+            loader: true,
+            page_text: 'Pagina',
+            of_text: 'de',
+            help_instructions: false,
+            extensions: [{ name: 'sort' }]
+        };
+        var tf = new TableFilter('index_tarifas_ruta_material', auth_config);
+        tf.init();
         function desactivar_tarifa(id) {
             var form = $('#delete');
             var url=App.host +"/tarifas_ruta_material/"+id;
