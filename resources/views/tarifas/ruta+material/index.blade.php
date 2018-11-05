@@ -85,14 +85,11 @@
     </div>
     <form id='delete' method="post">
         <input type='hidden' name='motivo' value/>
+        <input type='hidden' name='tipo' value/>
         {{csrf_field()}}
         <input type="hidden" name="_method" value="delete"/>
     </form>
-    <form id='update' method="post">
-        <input type='hidden' name='motivo' value/>
-        {{csrf_field()}}
-        <input type="hidden" name="_method" value="update"/>
-    </form>
+
 @stop
 @section('scripts')
     <script>
@@ -155,16 +152,17 @@
                     }
                     form.attr("action", url);
                     $("input[name=motivo]").val(inputValue);
+                    $("input[name=tipo]").val("DESACTIVAR");
                     form.submit();
                 });
         };
         function cancelar_tarifa(id) {
-            var form = $('#update');
+            var form = $('#delete');
             var url=App.host +"/tarifas_ruta_material/"+id;
 
             swal({
                     title: "¡Cancelar la tarifa!",
-                    text: "¿Esta seguro de que deseas cancelar la tarifa ruta por material?",
+                    text: "¿Esta seguro de que deseas cancelar la tarifa ruta por material?, está no podrá usarse en ningún momento.",
                     type: "input",
                     showCancelButton: true,
                     closeOnConfirm: false,
@@ -182,6 +180,7 @@
                     }
                     form.attr("action", url);
                     $("input[name=motivo]").val(inputValue);
+                    $("input[name=tipo]").val("CANCELAR");
                     form.submit();
                 });
         }

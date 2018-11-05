@@ -67,6 +67,7 @@ class TarifasRutaMaterialController extends Controller
     public function store(Request $request)
     {
         //
+        dd("SAD");
     }
 
     /**
@@ -78,6 +79,7 @@ class TarifasRutaMaterialController extends Controller
     public function show($id)
     {
         //
+        dd("A!".$id);
     }
 
     /**
@@ -89,6 +91,7 @@ class TarifasRutaMaterialController extends Controller
     public function edit($id)
     {
         //
+        dd("AQU");
     }
 
     /**
@@ -101,6 +104,8 @@ class TarifasRutaMaterialController extends Controller
     public function update(Request $request, $id)
     {
         //
+
+        dd("AQUI"+$request+$id);
     }
 
     /**
@@ -112,7 +117,8 @@ class TarifasRutaMaterialController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        dd($request);
+        dd($request->tipo);
+
         $tarifa = TarifaMaterial::find($id);
         if($tarifa->Estatus == 1) {
             $tarifa->update([

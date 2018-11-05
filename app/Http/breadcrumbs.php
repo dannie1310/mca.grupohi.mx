@@ -178,12 +178,6 @@ Breadcrumbs::register('tarifas_ruta_material.create', function($breadcrumbs){
     $breadcrumbs->parent('tarifas_ruta_material.index');
     $breadcrumbs->push('NUEVA TARIFA POR RUTA Y MATERIAL', route('tarifas_ruta_material.create'));
 });
-
-Breadcrumbs::register('tarifas_material.update', function($breadcrumbs, $tarifa){
-    $breadcrumbs->parent('tarifas_material.index', $tarifa);
-    $breadcrumbs->push('CANCELAR TARIFA POR RUTA Y MATERIAL', route('tarifas_material.update', $tarifa));
-});
-
 Breadcrumbs::register('tarifas_ruta_material.show', function($breadcrumbs, $tarifa){
     $breadcrumbs->parent('tarifas_ruta_material.index');
     $breadcrumbs->push(strtoupper($tarifa->IdTarifa), route('tarifas_ruta_material.show', $tarifa));
