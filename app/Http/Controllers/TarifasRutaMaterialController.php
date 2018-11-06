@@ -6,6 +6,7 @@ use App\Models\Material;
 use App\Models\Ruta;
 use App\Models\Tarifas\TarifaRutaMaterial;
 use App\Models\TipoTarifa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -64,10 +65,19 @@ class TarifasRutaMaterialController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Requests\CreateTarifaRutaMaterialRequest $request)
     {
         //
-        dd("SAD");
+        $request->request->add([
+            'fecha_hora_registro' => Carbon::now()->toDateTimeString(),
+            'registra' => auth()->user()->idusuario,
+        ]);
+
+        TarifaRutaMaterial::create($request->all());
+
+        return redirect()->route('tarifas_ruta_material.index');
+
+
     }
 
     /**
