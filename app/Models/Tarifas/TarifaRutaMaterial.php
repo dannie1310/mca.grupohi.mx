@@ -48,6 +48,13 @@ class TarifaRutaMaterial extends Model
     }*/
 
     public function getEstatusStringAttribute() {
+        /*
+           * Estatus:
+           *      1 : activa - vigente para su uso en cualquier viaje.
+           *      2 : cancelada - Se cancela por error no podrá ser usada para ningún viaje.
+           *      0 : desactivada - Se puede utilizar esta tarifa para viajes que entran dentro del rango de fechas entre el inicio y el fin.
+        */
+
         if($this->estatus == 1){
             return 'ACTIVA';
         }

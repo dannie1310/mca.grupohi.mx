@@ -51,7 +51,14 @@
                         <td>{{ $tarifa->km_subsecuentes }}</td>
                         <td>{{ $tarifa->km_adicionales}}</td>
                         <td>{{ $tarifa->inicio_vigencia->format("Y/m/d h:i:s") }}</td>
-                        <td>{{ $tarifa->fin_vigencia }}</td>
+
+                        @if($tarifa->fin_vigencia != null)
+                            <td>{{ $tarifa->fin_vigencia->format("Y/m/d h:i:s") }}</td>
+                        @elseif($tarifa->estatus == 2)
+                            <td>CANCELADA</td>
+                        @else
+                            <td>VIGENTE</td>
+                        @endif
                         @if($tarifa->idtipo_tarifa != null)
                             @foreach($tipos as $tipo)
                                 @if($tipo->id == $tarifa->idtipo_tarifa)

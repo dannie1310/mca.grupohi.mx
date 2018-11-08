@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Laracasts\Flash\Flash;
 
 class TarifasRutaMaterialController extends Controller
 {
@@ -68,16 +70,18 @@ class TarifasRutaMaterialController extends Controller
     public function store(Requests\CreateTarifaRutaMaterialRequest $request)
     {
         //
-        $request->request->add([
-            'fecha_hora_registro' => Carbon::now()->toDateTimeString(),
+        DB::connection('sca')->table('tarifas_ruta_material')->insert([
+            'idtipo_tarifa' => $request->idtipo_tarifa,
+            'id_ruta' => $request->id_ruta,
+            'id_material' => $request->id_material,
+            'primer_km' => $request->primer_km,
+            'km_subsecuentes' => $request->km_subsecuente,
+            'km_adicionales' => $request->km_adicional,
             'registra' => auth()->user()->idusuario,
+            'fecha_hora_registro' => Carbon::now()->toDateTimeString(),
+            'inicio_vigencia' => $request->get('inicio_vigencia')." 00:00:00"
         ]);
-
-        TarifaRutaMaterial::create($request->all());
-
         return redirect()->route('tarifas_ruta_material.index');
-
-
     }
 
     /**
@@ -101,7 +105,6 @@ class TarifasRutaMaterialController extends Controller
     public function edit($id)
     {
         //
-        dd("AQU");
     }
 
     /**
@@ -114,8 +117,6 @@ class TarifasRutaMaterialController extends Controller
     public function update(Request $request, $id)
     {
         //
-
-        dd("AQUI"+$request+$id);
     }
 
     /**
@@ -127,18 +128,40 @@ class TarifasRutaMaterialController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        dd($request->tipo);
 
-        $tarifa = TarifaMaterial::find($id);
-        if($tarifa->Estatus == 1) {
-            $tarifa->update([
-                'Estatus'  => 0,
-                'usuario_desactivo' => auth()->user()->idusuario,
-                'motivo'  => $request->motivo
-            ]);
-            Flash::success('¡TARIFA DESACTIVADA CORRECTAMENTE!');
-        } else {
-            Flash::warning('¡LA TARIFA YA HA SIDO DESACTIVADA!');
+    /*
+     * Estatus:
+     *      1 : activa - vigente para su uso en cualquier viaje.
+     *      2 : cancelada - Se cancela por error no podrá ser usada para ningún viaje.
+     *      0 : desactivada - Se puede utilizar esta tarifa para viajes que entran dentro del rango de fechas entre el inicio y el fin.
+     */
+
+        $tarifa = TarifaRutaMaterial::find($id);
+
+        if($request->tipo == 'DESACTIVAR') {
+            if ($tarifa->estatus == 1) {
+                DB::connection("sca")->table('tarifas_ruta_material')
+                    ->where('id', $id)
+                    ->update(['estatus' => 0,
+                                'desactivo' => auth()->user()->idusuario,
+                                'motivo_desactivar' => $request->motivo,
+                                'fin_vigencia' => Carbon::now()->toDateTimeString()]);
+                Flash::success('¡TARIFA DESACTIVADA CORRECTAMENTE!');
+            } else {
+                Flash::warning('¡LA TARIFA YA HA SIDO DESACTIVADA!');
+            }
+        }else{
+            if ($tarifa->estatus != 2) {
+                $tarifa->update([
+                    'estatus' => 2,
+                    'cancelo' => auth()->user()->idusuario,
+                    'motivo_cancelar' => $request->motivo
+                ]);
+
+                Flash::success('¡TARIFA CANCELADA CORRECTAMENTE!');
+            } else {
+                Flash::warning('¡LA TARIFA YA HA SIDO CANCELADA!');
+            }
         }
         return redirect()->back();
     }
