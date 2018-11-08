@@ -54,8 +54,8 @@ class TarifasRutaMaterialController extends Controller
     public function create()
     {
         //
-        $materiales = Material::orderBy("descripcion")->lists("Descripcion","IdMaterial");
-        $rutas = Ruta::all();
+        $materiales = Material::where("Estatus", "=", "1")->orderBy("descripcion")->lists("Descripcion","IdMaterial");
+        $rutas = Ruta::where("Estatus", "=", "1")->get();
         $tipos = TipoTarifa::all()->lists("descripcion","id");
         $fecha_actual = date("d-m-Y");
         return view('tarifas.ruta+material.create')->withMateriales($materiales)->withRutas($rutas)->withFechaActual($fecha_actual)->withTipos($tipos);
