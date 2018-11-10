@@ -139,8 +139,17 @@
                                                     <label>Tipo Tarifa:</label>
                                                     <select v-model="form.data.TipoTarifa" class="form-control input-sm">
                                                         <option value="m">Material</option>
+                                                        <option value="rm">Ruta y Material</option>
                                                         <option value="r">Ruta</option>
                                                         <option value="p">Peso</option>
+                                                    </select>
+                                                </div>
+
+                                                 <div v-if="form.data.TipoTarifa== 'rm'" class="form-group">
+                                                    <label>Tarifa Ruta + Material:</label>
+                                                     <select v-model="form.data.idtarifa_ruta_material" class="form-control input-sm">
+                                                            <option value>--SELECCIONE--</option>
+                                                            <option v-for="item in viaje.tarifas_ruta_material" :key="item.id" :value="item.id">Tarifa @{{ item.id }}</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group">

@@ -56674,7 +56674,8 @@ Vue.component('viajes-validar', {
                     'TipoFDA': '',
                     'Tara': '',
                     'Bruto': '',
-                    'Cubicacion': ''
+                    'Cubicacion': '',
+                    'idtarifa_ruta_material': ''
                 },
                 'errors': []
             }

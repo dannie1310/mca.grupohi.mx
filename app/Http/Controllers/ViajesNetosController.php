@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CierrePeriodo;
 use App\Models\MotivoCargaManual;
+use App\Models\Tarifas\TarifaRutaMaterial;
 use App\Models\Transformers\ViajeNetoTransformer;
 use App\Models\ValidacionCierrePeriodo;
 use Illuminate\Http\Request;
@@ -224,6 +225,11 @@ class ViajesNetosController extends Controller
                         ->get();
                     foreach ($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
+                        $tarifas_ruta_material = TarifaRutaMaterial::join("rutas","rutas.IdRuta", "=", "id_ruta")
+                            ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
+                            ->where("rutas.IdTiro", "=", $viaje->IdTiro)
+                            ->where("id_material", "=", $viaje->IdMaterial)
+                            ->where("Estatus", "=", "1");
 
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
@@ -256,7 +262,8 @@ class ViajesNetosController extends Controller
                             'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
                             'Imagenes' => $viaje->imagenes,
                             'denegado' => (String) $viaje->denegado,
-                            'tipo_origen' => $tipo_origen->interno
+                            'tipo_origen' => $tipo_origen->interno,
+                            'tarifas_ruta_material' => $tarifas_ruta_material
                         ];
                     }
 
@@ -269,6 +276,20 @@ class ViajesNetosController extends Controller
                         ->get();
                     foreach($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
+                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*")->join("rutas","rutas.IdRuta", "=", "id_ruta")
+                            ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
+                            ->where("rutas.IdTiro", "=", $viaje->IdTiro)
+                            ->where("id_material", "=", $viaje->IdMaterial)
+                            ->where("tarifas_ruta_material.Estatus", "=", "1")->get();
+                        foreach ($tarifas_ruta_material as $item) {
+                            $tarifas [] = [
+                                'id' => $item->id,
+                                'primer_km' => $item->primer_km,
+                                'km_subsecuente' => $item->km_subsecuente,
+                                'km_adicionales' => $item->km_adicionales
+                            ];
+                        }
+
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,
                             'IdViajeNeto' => $viaje->IdViajeNeto,
@@ -300,7 +321,8 @@ class ViajesNetosController extends Controller
                             'cierre' => ViajeNeto::validandoCierre($viaje->FechaLlegada),
                             'Imagenes' => $viaje->imagenes,
                             'denegado' => (String) $viaje->denegado,
-                            'tipo_origen' => $tipo_origen->interno
+                            'tipo_origen' => $tipo_origen->interno,
+                            'tarifas_ruta_material' => $tarifas
                         ];
                     }
                 }
@@ -624,6 +646,7 @@ class ViajesNetosController extends Controller
      */
     public function edit(Request $request)
     {
+
         if($request->get('action') == 'validar') {
             if(auth()->user()->can('validar-viajes')) {
 
