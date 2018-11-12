@@ -225,11 +225,19 @@ class ViajesNetosController extends Controller
                         ->get();
                     foreach ($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
-                        $tarifas_ruta_material = TarifaRutaMaterial::join("rutas","rutas.IdRuta", "=", "id_ruta")
+                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*")->join("rutas","rutas.IdRuta", "=", "id_ruta")
                             ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
                             ->where("rutas.IdTiro", "=", $viaje->IdTiro)
                             ->where("id_material", "=", $viaje->IdMaterial)
-                            ->where("Estatus", "=", "1");
+                            ->where("tarifas_ruta_material.Estatus", "=", "1")->get();
+                        foreach ($tarifas_ruta_material as $item) {
+                            $tarifas [] = [
+                                'id' => $item->id,
+                                'primer_km' => $item->primer_km,
+                                'km_subsecuente' => $item->km_subsecuente,
+                                'km_adicionales' => $item->km_adicionales
+                            ];
+                        }
 
                         $data [] = [
                             'Accion' => $viaje->valido() ? 1 : 0,

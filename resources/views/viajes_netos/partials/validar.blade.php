@@ -137,7 +137,7 @@
                                                 <hr>
                                                 <div class="form-group">
                                                     <label>Tipo Tarifa:</label>
-                                                    <select v-model="form.data.TipoTarifa" class="form-control input-sm">
+                                                    <select v-model="form.data.TipoTarifa"  class="form-control input-sm">
                                                         <option value="m">Material</option>
                                                         <option value="rm">Ruta y Material</option>
                                                         <option value="r">Ruta</option>
@@ -149,9 +149,10 @@
                                                     <label>Tarifa Ruta + Material:</label>
                                                      <select v-model="form.data.idtarifa_ruta_material" class="form-control input-sm">
                                                             <option value>--SELECCIONE--</option>
-                                                            <option v-for="item in viaje.tarifas_ruta_material" :key="item.id" :value="item.id">Tarifa @{{ item.id }}</option>
+                                                         <option v-for="item in viaje.tarifas_ruta_material" :key="item.id" :value="item.id">Tarifa @{{ item.id }}<label v-model="form.data.tarifa_primer_km" :value="item.primer_km"> </label></option>
                                                     </select>
                                                 </div>
+                                                 <span>Selected: @{{ form.data.Cubicacion + form.data.Cubicacion}}</span>
                                                 <div class="form-group">
                                                     <label>Tipo FDA:</label>
                                                     <select v-model="form.data.TipoFDA" class="form-control input-sm">

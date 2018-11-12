@@ -20,13 +20,43 @@ Vue.component('viajes-validar', {
                     'Tara' : '',
                     'Bruto' : '',
                     'Cubicacion' : '',
-                    'idtarifa_ruta_material' : ''
+                    'idtarifa_ruta_material' : '',
+                    'importe' : '',
+                    'tarifa_primer_km' : '',
+                    'tarifa_km_subsecuente': '',
+                    'tarifa_km_adicional': '',
+                    'ruta_km_subsecuente': '',
+                    'ruta_km_adicional': '',
+                    'tarifas': []
                 },
                 'errors' : []
             },
         }
     },
-
+    watch: {
+        'form.data.TipoTarifa' : function (value) {
+            this.form.data.idtarifa_ruta_material = '';
+        },
+        'form.data.idtarifa_ruta_material': function (value) {
+            if(value != ''){
+                var tarifa = this.form.data.tarifas.find(function (t) {
+                    return t.id == value;
+                });
+                this.form.data.tarifa_primer_km = tarifa.primer_km;
+                this.form.data.tarifa_km_subsecuente = tarifa.km_subsecuente;
+                this.form.data.tarifa_km_adicional = tarifa.km_adicionales;
+            } else {
+                this.form.data.tarifa_primer_km = '';
+                this.form.data.tarifa_km_subsecuente = '';
+                this.form.data.tarifa_km_adicional = '';
+            }
+        }
+    },
+    computed: {
+        importe: function() {
+            return this.form.data.tarifa_primer_km;
+        }
+    },
     /*computed: {
         getViajesByCode: function() {
             var _this = this;
@@ -200,6 +230,7 @@ Vue.component('viajes-validar', {
             this.form.data.Tara = viaje.Tara;
             this.form.data.Bruto = viaje.Bruto;
             this.form.data.Cubicacion = viaje.Cubicacion;
+            this.form.data.tarifas = viaje.tarifas_ruta_material;
         }
     }
 });
