@@ -56816,7 +56816,9 @@ Vue.component('viajes-validar', {
                 swal('¡Error!', App.errorsToString(error.body), 'error');
             });
         },
-
+        formato: function formato(val) {
+            return numeral(val).format('0,0.00');
+        },
         validar: function validar(viaje) {
 
             var _this = this;

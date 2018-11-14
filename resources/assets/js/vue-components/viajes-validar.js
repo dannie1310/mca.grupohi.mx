@@ -178,7 +178,9 @@ Vue.component('viajes-validar', {
                 swal('¡Error!', App.errorsToString(error.body), 'error');
             });
         },
-
+        formato: function (val) {
+            return numeral(val).format('0,0.00');
+        },
         validar: function(viaje) {
 
             var _this = this;

@@ -129,8 +129,8 @@
                                                     <select v-model="form.data.TipoTarifa"  class="form-control input-sm">
                                                         <option value="m">Material</option>
                                                         <option value="rm">Ruta y Material</option>
-                                                        <option value="r">Ruta</option>
-                                                        <option value="p">Peso</option>
+                                                       {{-- <option value="r">Ruta</option>
+                                                        <option value="p">Peso</option>--}}
                                                     </select>
                                                 </div>
 
@@ -142,7 +142,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="form-group">
-                                                         <span>Importe: @{{ importe }}</span>
+                                                    <span>IMPORTE: $ @{{ formato(importe) }}</span>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Tipo FDA:</label>
