@@ -227,18 +227,28 @@ class ViajesNetosController extends Controller
                     foreach ($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
 
-                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*, rutas.PrimerKM as primer, rutas.KMSubsecuentes as subsecuentes, rutas.KMAdicionales as adicionales")
-                            ->join("rutas","rutas.IdRuta", "=", "id_ruta")
-                            ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
-                            ->where("rutas.IdTiro", "=", $viaje->IdTiro)
-                            ->where("id_material", "=", $viaje->IdMaterial)
-                            ->where("tarifas_ruta_material.Estatus", "=", "1")->get();
+                        $tarifas_ruta_material = DB::connection('sca')->select(DB::raw("SELECT 
+                                                    tarifas_ruta_material.*,
+                                                    rutas.PrimerKM AS primer,
+                                                    rutas.KMSubsecuentes AS subsecuentes,
+                                                    rutas.KMAdicionales AS adicionales
+                                                FROM
+                                                    tarifas_ruta_material
+                                                        INNER JOIN
+                                                    rutas ON rutas.IdRuta = id_ruta
+                                                WHERE
+                                                    rutas.IdOrigen = ".$viaje->IdOrigen."
+                                                        AND rutas.IdTiro = ".$viaje->IdTiro."
+                                                        AND id_material = ".$viaje->IdMaterial."
+                                                        AND tarifas_ruta_material.Estatus != 2
+                                                        AND tarifas_ruta_material.inicio_vigencia <= '".$viaje->FechaLlegada."'
+                                                        AND IFNULL(tarifas_ruta_material.fin_vigencia, NOW()) >= '".$viaje->FechaLlegada."'"));
 
                         foreach ($tarifas_ruta_material as $item) {
                             $tarifas [] = [
                                 'id' => $item->id,
                                 'primer_km' => $item->primer_km,
-                                'km_subsecuente' => $item->km_subsecuente,
+                                'km_subsecuente' => $item->km_subsecuentes,
                                 'km_adicionales' => $item->km_adicionales,
                                 'ruta_primer' => $item->primer,
                                 'ruta_subsecuente' => $item->subsecuentes,
@@ -247,7 +257,7 @@ class ViajesNetosController extends Controller
                         }
 
                         $data [] = [
-                            'Accion' => $viaje->valido() ? 1 : 0,
+                            'Accion' => $viaje->valido($tarifas) ? 1 : 0,
                             'IdViajeNeto' => $viaje->IdViajeNeto,
                             'FechaLlegada' => $viaje->FechaLlegada,
                             'Tiro' => (String)$viaje->tiro,
@@ -295,18 +305,28 @@ class ViajesNetosController extends Controller
                     foreach($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
 
-                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*, rutas.PrimerKM as primer, rutas.KMSubsecuentes as subsecuentes, rutas.KMAdicionales as adicionales")
-                            ->join("rutas","rutas.IdRuta", "=", "id_ruta")
-                            ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
-                            ->where("rutas.IdTiro", "=", $viaje->IdTiro)
-                            ->where("id_material", "=", $viaje->IdMaterial)
-                            ->where("tarifas_ruta_material.Estatus", "=", "1")->get();
+                        $tarifas_ruta_material = DB::connection('sca')->select(DB::raw("SELECT 
+                                                    tarifas_ruta_material.*,
+                                                    rutas.PrimerKM AS primer,
+                                                    rutas.KMSubsecuentes AS subsecuentes,
+                                                    rutas.KMAdicionales AS adicionales
+                                                FROM
+                                                    tarifas_ruta_material
+                                                        INNER JOIN
+                                                    rutas ON rutas.IdRuta = id_ruta
+                                                WHERE
+                                                    rutas.IdOrigen = ".$viaje->IdOrigen."
+                                                        AND rutas.IdTiro = ".$viaje->IdTiro."
+                                                        AND id_material = ".$viaje->IdMaterial."
+                                                        AND tarifas_ruta_material.Estatus != 2
+                                                        AND tarifas_ruta_material.inicio_vigencia <= '".$viaje->FechaLlegada."'
+                                                        AND IFNULL(tarifas_ruta_material.fin_vigencia, NOW()) >= '".$viaje->FechaLlegada."'"));
 
                         foreach ($tarifas_ruta_material as $item) {
                             $tarifas [] = [
                                 'id' => $item->id,
                                 'primer_km' => $item->primer_km,
-                                'km_subsecuente' => $item->km_subsecuente,
+                                'km_subsecuente' => $item->km_subsecuentes,
                                 'km_adicionales' => $item->km_adicionales,
                                 'ruta_primer' => $item->primer,
                                 'ruta_subsecuente' => $item->subsecuentes,
@@ -724,6 +744,7 @@ class ViajesNetosController extends Controller
     public function update(Request $request)
     {
         if($request->get('type') == 'validar') {
+            //dd($request['data']);
             $cubicacionNva=$request['data']['Cubicacion'];
             $viaje_neto = ViajeNeto::findOrFail($request->get('IdViajeNeto'));
 
@@ -733,6 +754,25 @@ class ViajesNetosController extends Controller
 
             if($request['data']['Accion']==0){
                 FolioValeManual::where('folio', '=', $viaje_neto->Code)->update(['id_viaje_neto' => NULL]);
+            }
+
+            if($request['data']['IdSindicato'] == ""){
+                throw new \Exception('Debe seleccionar un sindicato para validar dicho viaje');
+            }
+
+            if($request['data']['IdEmpresa'] == ""){
+                throw new \Exception('Debe seleccionar una empresa para validar dicho viaje');
+            }
+
+            if($request['data']['TipoTarifa'] == "" && ($request['data']['importe'] == "" || $request['data']['importe'] == 0)){
+                throw new \Exception('Debe seleccionar una tarifa para validar dicho viaje');
+            }
+            if($request['data']['TipoTarifa'] == "" || ($request['data']['importe'] == "" || $request['data']['importe'] == 0)){
+                if($request['data']['TipoTarifa'] == "m") {
+                    throw new \Exception('No existe una tarifa por material registrada para el viaje.');
+                }else{
+                    throw new \Exception('No existe una tarifa por ruta más material registrada para el viaje.');
+                }
             }
             return response()->json($viaje_neto->validar($request));
         } else if($request->path() == 'viajes_netos/autorizar') {

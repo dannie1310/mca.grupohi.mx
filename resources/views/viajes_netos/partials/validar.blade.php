@@ -133,7 +133,7 @@
                                                         <option value="p">Peso</option>--}}
                                                     </select>
                                                 </div>
-
+                                                <br>
                                                  <div v-if="form.data.TipoTarifa == 'rm'" class="form-group">
                                                     <label>Tarifa Ruta + Material:</label>
                                                      <select v-model="form.data.idtarifa_ruta_material" class="form-control input-sm">
@@ -142,7 +142,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <span>IMPORTE: $ @{{ formato(importe) }}</span>
+                                                    <label>IMPORTE: $ @{{ formato(importe) }}</label>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Tipo FDA:</label>
@@ -166,7 +166,8 @@
                                                     <input type="number" step="any" class="form-control input-sm" v-model="form.data.Bruto">
                                                 </div>
                                                 <hr>
-                                                <span v-if="viaje.Valido">
+                                                {{-- <span v-if="viaje.Valido"> --}}
+                                                <span>
                                                     <div >
                                                         <label><i class="fa fa-check" style="color: green"></i> Validar:</label>
                                                         <input type="radio" value="1" v-model="form.data.Accion">
@@ -176,7 +177,7 @@
                                                         <input type="radio" value="0" v-model="form.data.Accion">
                                                     </div>   
                                                 </span>
-                                                <span v-else>
+                                                {{--<span v-else>
                                                     <div >
                                                         <label><i class="fa fa-check" style="color: green"></i> Validar:</label>
                                                         <input type="radio" value="1" v-model="form.data.Accion" disabled="disabled">
@@ -185,7 +186,7 @@
                                                         <label><i class="fa fa-close" style="color: red"></i> Denegar:</label>
                                                         <input type="radio" value="0" v-model="form.data.Accion">
                                                     </div>   
-                                                </span>
+                                                </span>--}}
                                             </div>
                                         </div>
                                     </div>

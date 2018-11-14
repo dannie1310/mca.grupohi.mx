@@ -56723,10 +56723,11 @@ Vue.component('viajes-validar', {
     computed: {
         importe: function importe() {
             if (this.form.data.TipoTarifa == 'm') {
-                return this.form.data.primer * this.form.data.r_primer * this.form.data.Cubicacion + this.form.data.subsecuente * this.form.data.r_subsecuente * this.form.data.Cubicacion + this.form.data.adicional * this.form.data.r_adicional * this.form.data.Cubicacion;
+                this.form.data.importe = this.form.data.primer * this.form.data.r_primer * this.form.data.Cubicacion + this.form.data.subsecuente * this.form.data.r_subsecuente * this.form.data.Cubicacion + this.form.data.adicional * this.form.data.r_adicional * this.form.data.Cubicacion;
             } else {
-                return this.form.data.Cubicacion * this.form.data.tarifa_primer_km * this.form.data.ruta_primer + this.form.data.Cubicacion * this.form.data.tarifa_km_subsecuente * this.form.data.ruta_km_subsecuente + this.form.data.Cubicacion * this.form.data.tarifa_km_adicional * this.form.data.ruta_km_adicional;
+                this.form.data.importe = this.form.data.Cubicacion * this.form.data.tarifa_primer_km * this.form.data.ruta_primer + this.form.data.Cubicacion * this.form.data.tarifa_km_subsecuente * this.form.data.ruta_km_subsecuente + this.form.data.Cubicacion * this.form.data.tarifa_km_adicional * this.form.data.ruta_km_adicional;
             }
+            return this.form.data.importe;
         }
     },
     /*computed: {

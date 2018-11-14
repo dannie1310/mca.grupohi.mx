@@ -380,10 +380,15 @@ class ViajeNeto extends Model
             $min = $this->ruta->cronometria->TiempoMinimo;
             $tol = $this->ruta->cronometria->Tolerancia;
 
-            if(!isset($this->material) || count($this->tarifaMaterial) == 0 || $this->Estatus == 10 || ( $this->IdPerfil!=3 && $this->Estatus == 0 && ($this->getTiempo() == 0 || (($this->getTiempo() / 60) < ($min - $tol))))) {
+            if($this->tarifaMaterial["0"]["Estatus"] == 0){
                 return false;
-            } else {
-                return true;
+            }else{
+                if (!isset($this->material) || count($this->tarifaMaterial) == 0 || $this->Estatus == 10 || ($this->IdPerfil != 3 && $this->Estatus == 0 && ($this->getTiempo() == 0 || (($this->getTiempo() / 60) < ($min - $tol))))) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
         }
     }
