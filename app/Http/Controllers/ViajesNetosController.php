@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CierrePeriodo;
 use App\Models\MotivoCargaManual;
+use App\Models\Tarifas\TarifaMaterial;
 use App\Models\Tarifas\TarifaRutaMaterial;
 use App\Models\Transformers\ViajeNetoTransformer;
 use App\Models\ValidacionCierrePeriodo;
@@ -225,17 +226,23 @@ class ViajesNetosController extends Controller
                         ->get();
                     foreach ($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
-                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*")->join("rutas","rutas.IdRuta", "=", "id_ruta")
+
+                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*, rutas.PrimerKM as primer, rutas.KMSubsecuentes as subsecuentes, rutas.KMAdicionales as adicionales")
+                            ->join("rutas","rutas.IdRuta", "=", "id_ruta")
                             ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
                             ->where("rutas.IdTiro", "=", $viaje->IdTiro)
                             ->where("id_material", "=", $viaje->IdMaterial)
                             ->where("tarifas_ruta_material.Estatus", "=", "1")->get();
+
                         foreach ($tarifas_ruta_material as $item) {
                             $tarifas [] = [
                                 'id' => $item->id,
                                 'primer_km' => $item->primer_km,
                                 'km_subsecuente' => $item->km_subsecuente,
-                                'km_adicionales' => $item->km_adicionales
+                                'km_adicionales' => $item->km_adicionales,
+                                'ruta_primer' => $item->primer,
+                                'ruta_subsecuente' => $item->subsecuentes,
+                                'ruta_adicional' => $item->adicionales
                             ];
                         }
 
@@ -254,6 +261,9 @@ class ViajesNetosController extends Controller
                             'Material' => (String)$viaje->material,
                             'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
                             'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
+                            'primer' => isset($viaje->ruta) ? $viaje->ruta->present()->PrimerKm : "",
+                            'subsecuente' => isset($viaje->ruta) ? $viaje->ruta->present()->KmSubsecuentes : "",
+                            'adicional' =>isset($viaje->ruta) ? $viaje->ruta->present()->KmAdicionales : "",
                             'Code' => isset($viaje->Code) ? $viaje->Code : "",
                             'Valido' => $viaje->valido(),
                             'ShowModal' => false,
@@ -284,17 +294,23 @@ class ViajesNetosController extends Controller
                         ->get();
                     foreach($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
-                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*")->join("rutas","rutas.IdRuta", "=", "id_ruta")
+
+                        $tarifas_ruta_material = TarifaRutaMaterial::selectRaw("tarifas_ruta_material.*, rutas.PrimerKM as primer, rutas.KMSubsecuentes as subsecuentes, rutas.KMAdicionales as adicionales")
+                            ->join("rutas","rutas.IdRuta", "=", "id_ruta")
                             ->where("rutas.IdOrigen", "=", $viaje->IdOrigen)
                             ->where("rutas.IdTiro", "=", $viaje->IdTiro)
                             ->where("id_material", "=", $viaje->IdMaterial)
                             ->where("tarifas_ruta_material.Estatus", "=", "1")->get();
+
                         foreach ($tarifas_ruta_material as $item) {
                             $tarifas [] = [
                                 'id' => $item->id,
                                 'primer_km' => $item->primer_km,
                                 'km_subsecuente' => $item->km_subsecuente,
-                                'km_adicionales' => $item->km_adicionales
+                                'km_adicionales' => $item->km_adicionales,
+                                'ruta_primer' => $item->primer,
+                                'ruta_subsecuente' => $item->subsecuentes,
+                                'ruta_adicional' => $item->adicionales
                             ];
                         }
 
@@ -313,6 +329,9 @@ class ViajesNetosController extends Controller
                             'Material' => (String)$viaje->material,
                             'Tiempo' => Carbon::createFromTime(0, 0, 0)->addSeconds($viaje->getTiempo())->toTimeString(),
                             'Ruta' => isset($viaje->ruta) ? $viaje->ruta->present()->claveRuta : "",
+                            'primer' => isset($viaje->ruta) ? $viaje->ruta->present()->PrimerKm : "",
+                            'subsecuente' => isset($viaje->ruta) ? $viaje->ruta->present()->KmSubsecuentes : "",
+                            'adicional' =>isset($viaje->ruta) ? $viaje->ruta->present()->KmAdicionales : "",
                             'Code' => isset($viaje->Code) ? $viaje->Code : "",
                             'Valido' => $viaje->valido(),
                             'ShowModal' => false,

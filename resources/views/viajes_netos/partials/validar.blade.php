@@ -62,16 +62,9 @@
                             <th rowspan="2">Tiempo</th>
                             <th rowspan="2">Ruta</th>
                             <th rowspan="2">Distancia</th>
-                            <th colspan="3">Tarifa</th>
-                            <th rowspan="2">Importe</th>
                             <th rowspan="2">?</th>
                             <th rowspan="2">Validar</th>
                             <th rowspan="2"></th>
-                        </tr>
-                        <tr>
-                            <th>1er Km</th>
-                            <th>Km Sub.</th>
-                            <th>Km Adc.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,10 +79,6 @@
                             <td>@{{ viaje.Tiempo }}</td>
                             <td>@{{ viaje.Ruta }}</td>
                             <td>@{{ viaje.Distancia }}</td>
-                            <td>@{{ viaje.PrimerKM }}</td>
-                            <td>@{{ viaje.KMSubsecuente }}</td>
-                            <td>@{{ viaje.KMAdicional }}</td>
-                            <td>@{{ viaje.Importe }}</td>
 
                             <td v-if="viaje.cierre == 0 && viaje.denegado == 0 && viaje.tipo_origen == 0">
                                 <span v-if='viaje.Valido'>
@@ -145,14 +134,16 @@
                                                     </select>
                                                 </div>
 
-                                                 <div v-if="form.data.TipoTarifa== 'rm'" class="form-group">
+                                                 <div v-if="form.data.TipoTarifa == 'rm'" class="form-group">
                                                     <label>Tarifa Ruta + Material:</label>
                                                      <select v-model="form.data.idtarifa_ruta_material" class="form-control input-sm">
                                                             <option value>--SELECCIONE--</option>
                                                          <option v-for="item in viaje.tarifas_ruta_material" :key="item.id" :value="item.id">Tarifa @{{ item.id }}<label v-model="form.data.tarifa_primer_km" :value="item.primer_km"> </label></option>
                                                     </select>
                                                 </div>
-                                                 <span>Selected: @{{ form.data.Cubicacion + form.data.Cubicacion}}</span>
+                                                <div class="form-group">
+                                                         <span>Importe: @{{ importe }}</span>
+                                                </div>
                                                 <div class="form-group">
                                                     <label>Tipo FDA:</label>
                                                     <select v-model="form.data.TipoFDA" class="form-control input-sm">

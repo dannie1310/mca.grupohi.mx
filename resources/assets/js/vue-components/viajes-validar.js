@@ -19,12 +19,19 @@ Vue.component('viajes-validar', {
                     'TipoFDA' : '',
                     'Tara' : '',
                     'Bruto' : '',
+                    'primer' : '',
+                    'subsecuente' : '',
+                    'adicional' : '',
+                    'r_primer' : '',
+                    'r_subsecuente' : '',
+                    'r_adicional' : '',
                     'Cubicacion' : '',
                     'idtarifa_ruta_material' : '',
                     'importe' : '',
                     'tarifa_primer_km' : '',
                     'tarifa_km_subsecuente': '',
                     'tarifa_km_adicional': '',
+                    'ruta_primer' : '',
                     'ruta_km_subsecuente': '',
                     'ruta_km_adicional': '',
                     'tarifas': []
@@ -34,7 +41,7 @@ Vue.component('viajes-validar', {
         }
     },
     watch: {
-        'form.data.TipoTarifa' : function (value) {
+        'form.data.TipoTarifa' : function () {
             this.form.data.idtarifa_ruta_material = '';
         },
         'form.data.idtarifa_ruta_material': function (value) {
@@ -43,18 +50,32 @@ Vue.component('viajes-validar', {
                     return t.id == value;
                 });
                 this.form.data.tarifa_primer_km = tarifa.primer_km;
-                this.form.data.tarifa_km_subsecuente = tarifa.km_subsecuente;
+                this.form.data.tarifa_km_subsecuente = tarifa.km_subsecuentes;
                 this.form.data.tarifa_km_adicional = tarifa.km_adicionales;
+                this.form.data.ruta_primer = tarifa.primer;
+                this.form.data.ruta_km_subsecuente = tarifa.subsecuentes;
+                this.form.data.ruta_km_adicional = tarifa.adicionales;
             } else {
                 this.form.data.tarifa_primer_km = '';
                 this.form.data.tarifa_km_subsecuente = '';
                 this.form.data.tarifa_km_adicional = '';
+                this.form.data.ruta_primer = '';
+                this.form.data.ruta_km_adicional = '';
+                this.form.data.ruta_km_subsecuente = '';
             }
         }
     },
     computed: {
         importe: function() {
-            return this.form.data.tarifa_primer_km;
+            if(this.form.data.TipoTarifa == 'm'){
+                return ((this.form.data.primer * this.form.data.r_primer * this.form.data.Cubicacion) +
+                (this.form.data.subsecuente * this.form.data.r_subsecuente * this.form.data.Cubicacion) +
+                (this.form.data.adicional * this.form.data.r_adicional * this.form.data.Cubicacion));
+            }else {
+                return ((this.form.data.Cubicacion * this.form.data.tarifa_primer_km  * this.form.data.ruta_primer) +
+                (this.form.data.Cubicacion * this.form.data.tarifa_km_subsecuente * this.form.data.ruta_km_subsecuente) +
+                (this.form.data.Cubicacion * this.form.data.tarifa_km_adicional * this.form.data.ruta_km_adicional));
+            }
         }
     },
     /*computed: {
@@ -102,10 +123,6 @@ Vue.component('viajes-validar', {
                         'Tiempo',
                         'Ruta',
                         'Distancia',
-                        '1er Km',
-                        'Km Sub.',
-                        'Km Adc.',
-                        'Importe',
                         '?',
                         'Validar'
                     ],
@@ -115,10 +132,6 @@ Vue.component('viajes-validar', {
                     col_5: 'select',
                     col_6: 'select',
                     col_8: 'select',
-                    col_10: 'none',
-                    col_11: 'none',
-                    col_12: 'none',
-                    col_14: 'none',
                     col_15: 'none',
                     col_16: 'none',
                     
@@ -231,6 +244,13 @@ Vue.component('viajes-validar', {
             this.form.data.Bruto = viaje.Bruto;
             this.form.data.Cubicacion = viaje.Cubicacion;
             this.form.data.tarifas = viaje.tarifas_ruta_material;
+            this.form.data.primer = viaje.PrimerKM;
+            this.form.data.subsecuente = viaje.KMSubsecuente;
+            this.form.data.adicional = viaje.KMAdicional;
+            this.form.data.r_primer = viaje.primer;
+            this.form.data.r_adicional = viaje.adicional;
+            this.form.data.r_subsecuente = viaje.subsecuente;
+
         }
     }
 });
