@@ -6,6 +6,8 @@ use App\Models\Cortes\CorteCambio;
 use App\Models\Cortes\CorteDetalle;
 use App\User;
 use Auth;
+use Couchbase\Exception;
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use App\Presenters\ModelPresenter;
 use Illuminate\Support\Facades\DB;
@@ -412,14 +414,245 @@ class ViajeNeto extends Model
         }
     }
 
+
     public function validar($request) {
 
         $data = $request->get('data');
-
+        $error = "";
+        $id_tarifa = "";
+        $msg = "";
+        $tipo = "";
         DB::connection('sca')->beginTransaction();
         try {
+            /*
+            *    Cubicacion
+            */
+            if($data["Cubicacion"] == $this->CubicacionCamion){
+                $cubicacion = $this->CubicacionCamion;
+            }else{
+                $cubicacion = $data["Cubicacion"];
+            }
+
+            /*
+             *  Información viajes netos
+             */
+
+            $id_viaje_neto =$request->get("IdViajeNeto");
+            $viaje_neto = DB::connection('sca')->select(DB::raw("select *, concat(trim(FechaLlegada), ' ', trim(HoraLlegada)) as fecha
+                                                            FROM viajesnetos 
+                                                            where IdViajeNeto = ".$id_viaje_neto." "));
+
+            /*
+             * Validar existencia de dichos viajes - validado o rechazado.
+             */
+            $viaje = DB::connection('sca')->select(DB::raw("select * from viajes where IdViajeNeto = ".$id_viaje_neto." "));
+            if($viaje != []){
+                $error = 'error';
+                return ['message' => 'Este viaje ya fue validado con anterioridad.',
+                    'tipo' => 'info'];
+            }
+
+            $viaje_denegado = DB::connection('sca')->select(DB::raw("select * from viajesrechazados where IdViajeNeto = ".$id_viaje_neto." "));
+            if($viaje_denegado != []){
+                $error = 'error';
+                return ['message' => 'Este viaje ya fue rechazado con anterioridad.',
+                    'tipo' => 'info'];
+            }
+
+            if($error == "") {
+
+                /*
+                 * Validar viaje
+                 */
+                if ($data["Accion"] == "1") {
+                    /*
+          * Información de Rutas
+          */
+                    $rutas_activas = DB::connection('sca')->select(DB::raw("select count(*) as cantidad, rutas.* 
+                                                                    from rutas 
+                                                                    where IdOrigen = " . $viaje_neto["0"]->IdOrigen . " and IdTiro = " . $viaje_neto["0"]->IdTiro . " and
+                                                                    estatus=1"));
+
+                    if ($rutas_activas["0"]->cantidad == 1) {
+                        $ruta_volumen_primerKM = $rutas_activas["0"]->PrimerKm * $cubicacion;
+                        $ruta_volumen_kmsubsecuentes = $rutas_activas["0"]->KmSubsecuentes * $cubicacion;
+                        $ruta_volumen_kmadicionales = $rutas_activas["0"]->KmAdicionales * $cubicacion;
+                    } elseif ($rutas_activas["0"]->cantidad > 1) {
+                        $error = "Hay mas de una ruta activa para el origen y destino del viaje, favor de deshabilitar una";
+                    } elseif ($rutas_activas["0"]->cantidad == 0) {
+                        $error = "No cuenta con una ruta activa";
+                    }
+
+                    if ($ruta_volumen_primerKM != 0 && $ruta_volumen_kmsubsecuentes != 0) {
+                        $ruta_volumen = $ruta_volumen_primerKM + $ruta_volumen_kmsubsecuentes + $ruta_volumen_kmadicionales;
+                    } else {
+                        $error = "Error la tarifa no es valida";
+                    }
+
+                    $cronometria = DB::connection('sca')->select(DB::raw("select Idcronometria from cronometrias where IdRuta = " . $rutas_activas["0"]->IdRuta . " limit 1"));
+
+                    if ($cronometria["0"]->Idcronometria == 0) {
+                        $error = "La cronometria no es valida";
+                    }
+                    $ruta_volumen = $ruta_volumen_primerKM + $ruta_volumen_kmsubsecuentes + $ruta_volumen_kmadicionales;
+
+
+                    /*--------------------------------------------------------------------
+                     -- ---------------------------- Obtener Fda ---------------------------
+                     -- --------------------------------------------------------------------
+                     IF v_TipoFdA = 'bm' then
+                        SET @Fda = (select FactorAbundamiento from factorabundamiento_material where IdMaterial = @IdMaterial and IdBanco = v_IdOrigen and Estatus = 1 order by TimestampAlta desc limit 1 );
+                     else
+                       IF v_TipoFdA = 'm' then
+                         SET @Fda = (select FactorAbundamiento from factorabundamiento where IdMaterial = @IdMaterial and Estatus = 1 order by IdFactorAbundamiento desc limit 1 );
+                       END IF;
+                     end if;
+
+                     set @IdOrigen = ifnull((select IdOrigen from origenes where IdOrigen = v_IdOrigen and estatus = 1),0);
+                     IF @IdOrigen = 0 THEN
+                         SET Text_Error = "El origen no es valido";
+                         SET @ERRORI = 1;
+                     END IF;
+                    */
+
+
+                    /*
+                     * Calculo de importes
+                     */
+
+                    /******* Tarifa por material ******/
+
+                    if ($data["TipoTarifa"] == 'm') {
+                        $tarifa_material = DB::connection('sca')->select(DB::raw(" select IdTarifa, PrimerKM, KMSubsecuente, KMAdicional 
+					FROM tarifas
+					where idMaterial = " . $viaje_neto["0"]->IdMaterial . " and  InicioVigencia < '" . $viaje_neto["0"]->fecha . "' and IFNULL(FinVigencia,NOW()) > '" . $viaje_neto ["0"]->fecha . "' and estatus = 1"));
+                        $id_tarifa = $tarifa_material["0"]->IdTarifa;
+                        $t_primerkm = $tarifa_material["0"]->PrimerKm;
+                        $t_subsecuente = $tarifa_material["0"]->KMSubsecuente;
+                        $t_adicional = $tarifa_material["0"]->KMAdicional;
+                        $tarifa_importePrimerKM = $tarifa_material["0"]->PrimerKM * $cubicacion * $rutas_activas["0"]->PrimerKm;
+                        $tarifa_importeKMSubsecuentes = $tarifa_material["0"]->KMSubsecuente * $cubicacion * $rutas_activas["0"]->KmSubsecuentes;
+                        $tarifa_importeKMAdicionales = $tarifa_material["0"]->KMAdicional * $cubicacion * $rutas_activas["0"]->KmAdicionales;
+                    }
+                    /*
+                     * Tarifa por ruta y material
+                     */
+                    if ($data["TipoTarifa"] == 'rm') {
+                        $tarifa_ruta_material = DB::connection('sca')->select(DB::raw("SELECT * FROM tarifas_ruta_material WHERE id_ruta = " . $rutas_activas["0"]->IdRuta . "
+                                                        AND id_material = " . $viaje_neto["0"]->IdMaterial . "
+                                                        AND tarifas_ruta_material.Estatus != 2
+                                                        AND tarifas_ruta_material.inicio_vigencia <= '" . $viaje_neto["0"]->fecha . "'
+                                                        AND IFNULL(tarifas_ruta_material.fin_vigencia, NOW()) >= '" . $viaje_neto["0"]->fecha . "'
+                                                        AND id = " . $data["idtarifa_ruta_material"] . " "));
+                        $id_tarifa = $tarifa_ruta_material["0"]->id;
+                        $t_primerkm = $tarifa_ruta_material["0"]->primer_km;
+                        $t_subsecuente = $tarifa_ruta_material["0"]->km_subsecuentes;
+                        $t_adicional = $tarifa_ruta_material["0"]->km_adicionales;
+                        $tarifa_importePrimerKM = $tarifa_ruta_material["0"]->primer_km * $cubicacion * $rutas_activas["0"]->PrimerKm;
+                        $tarifa_importeKMSubsecuentes = $tarifa_ruta_material["0"]->km_subsecuentes * $cubicacion * $rutas_activas["0"]->KmSubsecuentes;
+                        $tarifa_importeKMAdicionales = $tarifa_ruta_material["0"]->km_adicionales * $cubicacion * $rutas_activas["0"]->KmAdicionales;
+                    }
+                    if ($tarifa_importePrimerKM == 0 && $tarifa_importeKMSubsecuentes == 0) {
+                        $error = "Error en la tarifa";
+                    } else {
+                        $tarifa_importe = $tarifa_importePrimerKM + $tarifa_importeKMSubsecuentes + $tarifa_importeKMAdicionales;
+                    }
+
+                    DB::connection('sca')
+                        ->table('viajes')
+                        ->insert([
+                            "IdTarifa" => $id_tarifa,
+                            "IdViajeNeto" => $id_viaje_neto,
+                            "FechaCarga" => Carbon::now()->toDateString(),
+                            "HoraCarga" => Carbon::now()->toDateTimeString(),
+                            "IdProyecto" => $viaje_neto["0"]->IdProyecto,
+                            "IdCamion" => $viaje_neto["0"]->IdCamion,
+                            "IdMaquinaria" => 0,
+                            "HorasEfectivas" => 0.00,
+                            "CubicacionCamion" => $cubicacion,
+                            "IdOrigen" => $viaje_neto["0"]->IdOrigen,
+                            "IdSindicato" => $data["IdSindicato"],
+                            "IdEmpresa" => $data["IdEmpresa"],
+                            "FechaSalida" => $viaje_neto["0"]->FechaSalida,
+                            "HoraSalida" => $viaje_neto["0"]->HoraSalida,
+                            "IdTiro" => $viaje_neto["0"]->IdTiro,
+                            "FechaLlegada" => $viaje_neto["0"]->FechaLlegada,
+                            "HoraLlegada" => $viaje_neto["0"]->HoraLlegada,
+                            "IdMaterial" => $viaje_neto["0"]->IdMaterial,
+                            "FactorAbundamiento" => 0.00,
+                            "IdChecador" => auth()->user()->idusuario,
+                            "Creo" => $viaje_neto["0"]->Creo,
+                            "TiempoViaje" =>$this->tiempoViaje($viaje_neto["0"]->FechaSalida." ".$viaje_neto["0"]->HoraSalida,$viaje_neto["0"]->FechaLlegada." ". $viaje_neto["0"]->HoraLlegada),
+                            "IdRuta" => $rutas_activas["0"]->IdRuta,
+                            "Distancia" => $rutas_activas["0"]->TotalKM,
+                            "TPrimerKM" => $t_primerkm,
+                            "TKMSubsecuente" => $t_subsecuente,
+                            "TKMAdicional" => $t_adicional,
+                            "VolumenPrimerKM" => $ruta_volumen_primerKM,
+                            "VolumenKMSubsecuentes" => $ruta_volumen_kmsubsecuentes,
+                            "VolumenKMAdicionales" => $ruta_volumen_kmadicionales,
+                            "Volumen" => $ruta_volumen,
+                            "ImportePrimerKM" => $tarifa_importePrimerKM,
+                            "ImporteKMSubsecuentes" => $tarifa_importeKMSubsecuentes,
+                            "ImporteKMAdicionales" => $tarifa_importeKMAdicionales,
+                            "Importe" => $tarifa_importe,
+                            "Observaciones" => $viaje_neto["0"]->Observaciones,
+                            "TipoTarifa" => $data["TipoTarifa"],
+                            "Estatus" => $viaje_neto["0"]->Estatus,
+                            "Code" => $viaje_neto["0"]->Code,
+                            "Tara" => $data["Tara"],
+                            "Bruto" => $data["Bruto"],
+                            "Peso" => $data["Tara"] - $data["Bruto"]
+                        ]);
+                }
+                if ($data["Accion"] == 0) {
+                    DB::connection('sca')
+                        ->table('viajesrechazados')
+                        ->insert([
+                                "IdViajeNeto" => $id_viaje_neto,
+                                "FechaRechazo" => Carbon::now()->toDateString(),
+                                "HoraRechazo" => Carbon::now()->toDateTimeString(),
+                                "IdProyecto" => $viaje_neto["0"]->IdProyecto,
+                                "IdCamion" => $viaje_neto["0"]->IdCamion,
+                                "IdMaquinaria" => 0,
+                                "HorasEfectivas" => '0.00',
+                                "CubicacionCamion" => $cubicacion,
+                                "IdOrigen" => $viaje_neto["0"]->IdOrigen,
+                                "FechaSalida" => $viaje_neto["0"]->FechaSalida,
+                                "HoraSalida" => $viaje_neto["0"]->HoraSalida,
+                                "IdTiro" => $viaje_neto["0"]->IdTiro,
+                                "FechaLlegada" => $viaje_neto["0"]->FechaLlegada,
+                                "HoraLlegada" => $viaje_neto["0"]->HoraLlegada,
+                                "IdMaterial" => $viaje_neto["0"]->IdMaterial,
+                                "FactorAbundamiento" => 0.00,
+                                "IdChecador" => auth()->user()->idusuario,
+                                "Creo" => $viaje_neto["0"]->Creo,
+                                "TiempoViaje" => $this->tiempoViaje($viaje_neto["0"]->FechaSalida." ".$viaje_neto["0"]->HoraSalida,$viaje_neto["0"]->FechaLlegada." ". $viaje_neto["0"]->HoraLlegada),
+                                "Estatus" => $viaje_neto["0"]->Estatus
+                        ]);
+                }
+                DB::connection('sca')->commit();
+                $viaje = DB::connection('sca')->select(DB::raw("select count(*) from viajes where IdViajeneto = " . $id_viaje_neto . " "));
+                $existe = DB::connection('sca')->select(DB::raw("select count(*) from viajesrechazados where IdViajeneto = " . $id_viaje_neto . " "));
+                if ($viaje != [] || $existe != []) {
+                    $msg = $data['Accion'] == 1 ? 'Viaje validado exitosamente' : 'Viaje Rechazado exitosamente';
+                    $tipo = $data['Accion'] == 1 ? 'success' : 'info';
+                }
+                return ['message' => $msg,
+                    'tipo' => $tipo];
+            }else{
+                $tipo = 'error';
+                return ['message' => $error,
+                    'tipo' => $tipo];
+            }
+        } catch (\Exception $e) {
+            DB::connection('sca')->rollback();
+            throw $e;
+        }
+       /* DB::connection('sca')->beginTransaction();
+        try {
             $statement ="call sca_sp_registra_viaje_fda_v2("
-                .$data["Accion"].","
+                .$data["Accion"].","<   q11q
                 .$this->IdViajeNeto.","
                 ."0".","
                 ."0".","
@@ -457,7 +690,29 @@ class ViajeNeto extends Model
             DB::connection('sca')->rollback();
             throw $e;
         }
+       */
     }
+    public function tiempoViaje($fechaInicial, $fechaFinal){
+
+        $fecha1 = new DateTime($fechaInicial);//fecha inicial
+        $fecha2 = new DateTime($fechaFinal);//fecha de cierre
+        $suma = 0;
+
+        $intervalo = $fecha1->diff($fecha2);
+
+        if($intervalo->format("%H") != "0"){
+            $suma = $suma + ($intervalo->format("%H")*60);
+        }
+        if($intervalo->format("%i") != "0"){
+            $suma = $suma + $intervalo->format("%i");
+        }
+        if($intervalo->format("%s") != "0"){
+            $suma = $suma + ($intervalo->format("%s")/60);
+        }
+
+        return round($suma, 2);
+    }
+
     public function poner_pagable($request){
         if(str_replace(" ", "", $request->get("motivo"))==""){
             throw new \Exception("Indique el motivo para permitir el pago del viaje en conflicto");

@@ -48,6 +48,7 @@ class ViajesNetosController extends Controller
     public function index(Request $request)
     {
         if($request->ajax()) {
+            $tarifas = "";
             if ($request->get('action') == 'modificar') {
 
                 $data = [];
@@ -755,23 +756,24 @@ class ViajesNetosController extends Controller
             if($request['data']['Accion']==0){
                 FolioValeManual::where('folio', '=', $viaje_neto->Code)->update(['id_viaje_neto' => NULL]);
             }
+            if($request['data']['Accion']==1) {
+                if ($request['data']['IdSindicato'] == "") {
+                    throw new \Exception('Debe seleccionar un sindicato para validar dicho viaje');
+                }
 
-            if($request['data']['IdSindicato'] == ""){
-                throw new \Exception('Debe seleccionar un sindicato para validar dicho viaje');
-            }
+                if ($request['data']['IdEmpresa'] == "") {
+                    throw new \Exception('Debe seleccionar una empresa para validar dicho viaje');
+                }
 
-            if($request['data']['IdEmpresa'] == ""){
-                throw new \Exception('Debe seleccionar una empresa para validar dicho viaje');
-            }
-
-            if($request['data']['TipoTarifa'] == "" && ($request['data']['importe'] == "" || $request['data']['importe'] == 0)){
-                throw new \Exception('Debe seleccionar una tarifa para validar dicho viaje');
-            }
-            if($request['data']['TipoTarifa'] == "" || ($request['data']['importe'] == "" || $request['data']['importe'] == 0)){
-                if($request['data']['TipoTarifa'] == "m") {
-                    throw new \Exception('No existe una tarifa por material registrada para el viaje.');
-                }else{
-                    throw new \Exception('No existe una tarifa por ruta más material registrada para el viaje.');
+                if ($request['data']['TipoTarifa'] == "" && ($request['data']['importe'] == "" || $request['data']['importe'] == 0)) {
+                    throw new \Exception('Debe seleccionar una tarifa para validar dicho viaje');
+                }
+                if ($request['data']['TipoTarifa'] == "" || ($request['data']['importe'] == "" || $request['data']['importe'] == 0)) {
+                    if ($request['data']['TipoTarifa'] == "m") {
+                        throw new \Exception('No existe una tarifa por material registrada para el viaje.');
+                    } else {
+                        throw new \Exception('No existe una tarifa por ruta más material registrada para el viaje.');
+                    }
                 }
             }
             return response()->json($viaje_neto->validar($request));
