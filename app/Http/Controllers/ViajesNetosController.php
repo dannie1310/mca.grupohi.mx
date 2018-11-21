@@ -225,9 +225,19 @@ class ViajesNetosController extends Controller
                     $viajes = ViajeNeto::porValidar()
                         ->whereBetween('viajesnetos.FechaLlegada', [$request->get('FechaInicial'), $request->get('FechaFinal')])
                         ->get();
+
                     foreach ($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
+                        /*
+                         * Tarifas por material....
+                         */
+                        $tarifas_material = DB::connection('sca')->select(DB::raw("
+                                                    SELECT * FROM tarifas WHERE IdMaterial = ".$viaje->IdMaterial." AND InicioVigencia <= '".$viaje->FechaLlegada."'
+                                                        AND IFNULL(FinVigencia, NOW()) >= '".$viaje->FechaLlegada."'"));
 
+                        /*
+                         * Tarifas por ruta mas material
+                         */
                         $tarifas_ruta_material = DB::connection('sca')->select(DB::raw("SELECT 
                                                     tarifas_ruta_material.*,
                                                     rutas.PrimerKM AS primer,
@@ -281,9 +291,9 @@ class ViajesNetosController extends Controller
                             'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
                             'Estado' => $viaje->estado(),
                             'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
-                            'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
-                            'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
-                            'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
+                            'PrimerKM' => ($tarifas_material) ? $tarifas_material["0"]->PrimerKM : 0,
+                            'KMSubsecuente' => ($tarifas_material) ?  $tarifas_material["0"]->KMSubsecuente : 0,
+                            'KMAdicional' => ($tarifas_material) ?  $tarifas_material["0"]->KMAdicional : 0,
                             'Tara' => 0,
                             'Bruto' => 0,
                             'TipoTarifa' => 'm',
@@ -306,6 +316,16 @@ class ViajesNetosController extends Controller
                     foreach($viajes as $viaje) {
                         $tipo_origen = Origen::find($viaje->IdOrigen);
 
+                        /*
+                         * Tarifas por material....
+                         */
+                        $tarifas_material = DB::connection('sca')->select(DB::raw("
+                                                    SELECT * FROM tarifas WHERE IdMaterial = ".$viaje->IdMaterial." AND InicioVigencia <= '".$viaje->FechaLlegada."'
+                                                        AND IFNULL(FinVigencia, NOW()) >= '".$viaje->FechaLlegada."'"));
+
+                        /*
+                         * Tarifas por ruta mas material
+                         */
                         $tarifas_ruta_material = DB::connection('sca')->select(DB::raw("SELECT 
                                                     tarifas_ruta_material.*,
                                                     rutas.PrimerKM AS primer,
@@ -359,9 +379,9 @@ class ViajesNetosController extends Controller
                             'Distancia' => $viaje->ruta ? $viaje->ruta->TotalKM : null,
                             'Estado' => $viaje->estado(),
                             'Importe' => $viaje->ruta ? $viaje->getImporte() : null,
-                            'PrimerKM' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->PrimerKM : 0,
-                            'KMSubsecuente' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMSubsecuente : 0,
-                            'KMAdicional' => ($viaje->material->tarifaMaterial) ? $viaje->material->tarifaMaterial->KMAdicional : 0,
+                            'PrimerKM' => ($tarifas_material) ? $tarifas_material["0"]->PrimerKM : 0,
+                            'KMSubsecuente' => ($tarifas_material) ?  $tarifas_material["0"]->KMSubsecuente : 0,
+                            'KMAdicional' => ($tarifas_material) ?  $tarifas_material["0"]->KMAdicional : 0,
                             'Tara' => 0,
                             'Bruto' => 0,
                             'TipoTarifa' => 'm',
@@ -372,6 +392,7 @@ class ViajesNetosController extends Controller
                             'tipo_origen' => $tipo_origen->interno,
                             'tarifas_ruta_material' => $tarifas
                         ];
+
                     }
                 }
             } else if ($request->get('action') == 'index') {

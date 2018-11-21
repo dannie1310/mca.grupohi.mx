@@ -427,9 +427,9 @@ class ViajeNeto extends Model
             /*
             *    Cubicacion
             */
-            if($data["Cubicacion"] == $this->CubicacionCamion){
+            if ($data["Cubicacion"] == $this->CubicacionCamion) {
                 $cubicacion = $this->CubicacionCamion;
-            }else{
+            } else {
                 $cubicacion = $data["Cubicacion"];
             }
 
@@ -437,29 +437,29 @@ class ViajeNeto extends Model
              *  Información viajes netos
              */
 
-            $id_viaje_neto =$request->get("IdViajeNeto");
+            $id_viaje_neto = $request->get("IdViajeNeto");
             $viaje_neto = DB::connection('sca')->select(DB::raw("select *, concat(trim(FechaLlegada), ' ', trim(HoraLlegada)) as fecha
                                                             FROM viajesnetos 
-                                                            where IdViajeNeto = ".$id_viaje_neto." "));
+                                                            where IdViajeNeto = " . $id_viaje_neto . " "));
 
             /*
              * Validar existencia de dichos viajes - validado o rechazado.
              */
-            $viaje = DB::connection('sca')->select(DB::raw("select * from viajes where IdViajeNeto = ".$id_viaje_neto." "));
-            if($viaje != []){
+            $viaje = DB::connection('sca')->select(DB::raw("select * from viajes where IdViajeNeto = " . $id_viaje_neto . " "));
+            if ($viaje != []) {
                 $error = 'error';
                 return ['message' => 'Este viaje ya fue validado con anterioridad.',
                     'tipo' => 'info'];
             }
 
-            $viaje_denegado = DB::connection('sca')->select(DB::raw("select * from viajesrechazados where IdViajeNeto = ".$id_viaje_neto." "));
-            if($viaje_denegado != []){
+            $viaje_denegado = DB::connection('sca')->select(DB::raw("select * from viajesrechazados where IdViajeNeto = " . $id_viaje_neto . " "));
+            if ($viaje_denegado != []) {
                 $error = 'error';
                 return ['message' => 'Este viaje ya fue rechazado con anterioridad.',
                     'tipo' => 'info'];
             }
 
-            if($error == "") {
+            if ($error == "") {
 
                 /*
                  * Validar viaje
@@ -479,20 +479,50 @@ class ViajeNeto extends Model
                         $ruta_volumen_kmadicionales = $rutas_activas["0"]->KmAdicionales * $cubicacion;
                     } elseif ($rutas_activas["0"]->cantidad > 1) {
                         $error = "Hay mas de una ruta activa para el origen y destino del viaje, favor de deshabilitar una";
+                        $tipo = 'error';
+                        return ['message' => $error,
+                            'tipo' => $tipo];
                     } elseif ($rutas_activas["0"]->cantidad == 0) {
                         $error = "No cuenta con una ruta activa";
+                        $tipo = 'error';
+                        return ['message' => $error,
+                            'tipo' => $tipo];
                     }
 
                     if ($ruta_volumen_primerKM != 0 && $ruta_volumen_kmsubsecuentes != 0) {
                         $ruta_volumen = $ruta_volumen_primerKM + $ruta_volumen_kmsubsecuentes + $ruta_volumen_kmadicionales;
                     } else {
                         $error = "Error la tarifa no es valida";
+                        $tipo = 'error';
+                        return ['message' => $error,
+                            'tipo' => $tipo];
                     }
+
+                    /*
+                     * Verificar la crnometria del viaje
+                     */
+                    $min = $this->ruta->cronometria->TiempoMinimo;
+                    $tol = $this->ruta->cronometria->Tolerancia;
 
                     $cronometria = DB::connection('sca')->select(DB::raw("select Idcronometria from cronometrias where IdRuta = " . $rutas_activas["0"]->IdRuta . " limit 1"));
 
+                    if ($this->getTiempo() == 0 && $this->Estatus == 0 && $this->IdPerfil != 3) {
+                        $error = "El viaje no puede ser registrado porque el tiempo del viaje es  0.00 min.";
+                        $tipo = 'error';
+                        return ['message' => $error,
+                            'tipo' => $tipo];
+                    }
+                    if ($this->IdPerfil != 3 && ($this->getTiempo() == 0 || (($this->getTiempo() / 60) < ($min - $tol)))) {
+                        $error = "El viaje no puede ser registrado porque no cumple con los tiempos de cronometría de la ruta";
+                        $tipo = 'error';
+                        return ['message' => $error,
+                            'tipo' => $tipo];
+                    }
                     if ($cronometria["0"]->Idcronometria == 0) {
                         $error = "La cronometria no es valida";
+                        $tipo = 'error';
+                        return ['message' => $error,
+                            'tipo' => $tipo];
                     }
                     $ruta_volumen = $ruta_volumen_primerKM + $ruta_volumen_kmsubsecuentes + $ruta_volumen_kmadicionales;
 
@@ -527,7 +557,7 @@ class ViajeNeto extends Model
 					FROM tarifas
 					where idMaterial = " . $viaje_neto["0"]->IdMaterial . " and  InicioVigencia < '" . $viaje_neto["0"]->fecha . "' and IFNULL(FinVigencia,NOW()) > '" . $viaje_neto ["0"]->fecha . "' and estatus = 1"));
                         $id_tarifa = $tarifa_material["0"]->IdTarifa;
-                        $t_primerkm = $tarifa_material["0"]->PrimerKm;
+                        $t_primerkm = $tarifa_material["0"]->PrimerKM;
                         $t_subsecuente = $tarifa_material["0"]->KMSubsecuente;
                         $t_adicional = $tarifa_material["0"]->KMAdicional;
                         $tarifa_importePrimerKM = $tarifa_material["0"]->PrimerKM * $cubicacion * $rutas_activas["0"]->PrimerKm;
@@ -557,7 +587,6 @@ class ViajeNeto extends Model
                     } else {
                         $tarifa_importe = $tarifa_importePrimerKM + $tarifa_importeKMSubsecuentes + $tarifa_importeKMAdicionales;
                     }
-
                     DB::connection('sca')
                         ->table('viajes')
                         ->insert([
@@ -582,7 +611,7 @@ class ViajeNeto extends Model
                             "FactorAbundamiento" => 0.00,
                             "IdChecador" => auth()->user()->idusuario,
                             "Creo" => $viaje_neto["0"]->Creo,
-                            "TiempoViaje" =>$this->tiempoViaje($viaje_neto["0"]->FechaSalida." ".$viaje_neto["0"]->HoraSalida,$viaje_neto["0"]->FechaLlegada." ". $viaje_neto["0"]->HoraLlegada),
+                            "TiempoViaje" => $this->tiempoViaje($viaje_neto["0"]->FechaSalida . " " . $viaje_neto["0"]->HoraSalida, $viaje_neto["0"]->FechaLlegada . " " . $viaje_neto["0"]->HoraLlegada),
                             "IdRuta" => $rutas_activas["0"]->IdRuta,
                             "Distancia" => $rutas_activas["0"]->TotalKM,
                             "TPrimerKM" => $t_primerkm,
@@ -596,7 +625,7 @@ class ViajeNeto extends Model
                             "ImporteKMSubsecuentes" => $tarifa_importeKMSubsecuentes,
                             "ImporteKMAdicionales" => $tarifa_importeKMAdicionales,
                             "Importe" => $tarifa_importe,
-                            "Observaciones" => $viaje_neto["0"]->Observaciones,
+                            "Observaciones" => $viaje_neto["0"]->Observaciones != '' ? $viaje_neto["0"]->Observaciones : NULL,
                             "TipoTarifa" => $data["TipoTarifa"],
                             "Estatus" => $viaje_neto["0"]->Estatus,
                             "Code" => $viaje_neto["0"]->Code,
@@ -609,26 +638,26 @@ class ViajeNeto extends Model
                     DB::connection('sca')
                         ->table('viajesrechazados')
                         ->insert([
-                                "IdViajeNeto" => $id_viaje_neto,
-                                "FechaRechazo" => Carbon::now()->toDateString(),
-                                "HoraRechazo" => Carbon::now()->toDateTimeString(),
-                                "IdProyecto" => $viaje_neto["0"]->IdProyecto,
-                                "IdCamion" => $viaje_neto["0"]->IdCamion,
-                                "IdMaquinaria" => 0,
-                                "HorasEfectivas" => '0.00',
-                                "CubicacionCamion" => $cubicacion,
-                                "IdOrigen" => $viaje_neto["0"]->IdOrigen,
-                                "FechaSalida" => $viaje_neto["0"]->FechaSalida,
-                                "HoraSalida" => $viaje_neto["0"]->HoraSalida,
-                                "IdTiro" => $viaje_neto["0"]->IdTiro,
-                                "FechaLlegada" => $viaje_neto["0"]->FechaLlegada,
-                                "HoraLlegada" => $viaje_neto["0"]->HoraLlegada,
-                                "IdMaterial" => $viaje_neto["0"]->IdMaterial,
-                                "FactorAbundamiento" => 0.00,
-                                "IdChecador" => auth()->user()->idusuario,
-                                "Creo" => $viaje_neto["0"]->Creo,
-                                "TiempoViaje" => $this->tiempoViaje($viaje_neto["0"]->FechaSalida." ".$viaje_neto["0"]->HoraSalida,$viaje_neto["0"]->FechaLlegada." ". $viaje_neto["0"]->HoraLlegada),
-                                "Estatus" => $viaje_neto["0"]->Estatus
+                            "IdViajeNeto" => $id_viaje_neto,
+                            "FechaRechazo" => Carbon::now()->toDateString(),
+                            "HoraRechazo" => Carbon::now()->toDateTimeString(),
+                            "IdProyecto" => $viaje_neto["0"]->IdProyecto,
+                            "IdCamion" => $viaje_neto["0"]->IdCamion,
+                            "IdMaquinaria" => 0,
+                            "HorasEfectivas" => '0.00',
+                            "CubicacionCamion" => $cubicacion,
+                            "IdOrigen" => $viaje_neto["0"]->IdOrigen,
+                            "FechaSalida" => $viaje_neto["0"]->FechaSalida,
+                            "HoraSalida" => $viaje_neto["0"]->HoraSalida,
+                            "IdTiro" => $viaje_neto["0"]->IdTiro,
+                            "FechaLlegada" => $viaje_neto["0"]->FechaLlegada,
+                            "HoraLlegada" => $viaje_neto["0"]->HoraLlegada,
+                            "IdMaterial" => $viaje_neto["0"]->IdMaterial,
+                            "FactorAbundamiento" => 0.00,
+                            "IdChecador" => auth()->user()->idusuario,
+                            "Creo" => $viaje_neto["0"]->Creo,
+                            "TiempoViaje" => $this->tiempoViaje($viaje_neto["0"]->FechaSalida . " " . $viaje_neto["0"]->HoraSalida, $viaje_neto["0"]->FechaLlegada . " " . $viaje_neto["0"]->HoraLlegada),
+                            "Estatus" => $viaje_neto["0"]->Estatus
                         ]);
                 }
                 DB::connection('sca')->commit();
@@ -638,14 +667,35 @@ class ViajeNeto extends Model
                     $msg = $data['Accion'] == 1 ? 'Viaje validado exitosamente' : 'Viaje Rechazado exitosamente';
                     $tipo = $data['Accion'] == 1 ? 'success' : 'info';
                 }
+                /*
+                 * Validar los datos a editar en el viaje neto...
+                 */
+                if ($data["Accion"] == 1 && $viaje != []) {
+                    $viajeneto = ViajeNeto::find($id_viaje_neto);
+                    $estado = $viaje_neto["0"]->Estatus;
+                    $uss = auth()->user()->idusuario;
+                    $viajeneto->update(['Estatus' => $estado+1,'Modifico' => $uss]);
+
+                    if ($this->CubicacionCamion != $cubicacion) {
+                        DB::connection('sca')
+                            ->table('cambio_cubicacion')
+                            ->insert([
+                                "IdViajeNeto" => $id_viaje_neto,
+                                "FechaRegistro" => Carbon::now()->toDateTimeString(),
+                                "VolumenViejo" => $this->CubicacionCamion,
+                                "VolumenNuevo" => $cubicacion
+                            ]);
+                    }
+                    DB::connection('sca')->commit();
+                }
                 return ['message' => $msg,
                     'tipo' => $tipo];
-            }else{
+            } else {
                 $tipo = 'error';
                 return ['message' => $error,
                     'tipo' => $tipo];
             }
-        } catch (\Exception $e) {
+        }catch (\Exception $e) {
             DB::connection('sca')->rollback();
             throw $e;
         }
