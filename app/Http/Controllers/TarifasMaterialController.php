@@ -53,16 +53,11 @@ class TarifasMaterialController extends Controller
             'Fecha_Hora_Registra' => Carbon::now()->toDateTimeString(),
             'Registra' => auth()->user()->idusuario,
         ]);
-        //dd($request->get('InicioVigencia'));
-        //dd($request->get('InicioVigencia'),Carbon::createFromFormat("Y-m-d h:i:s",$request->get('InicioVigencia')." 00:00:00"));
-        
-        //dd($fin_vigencia);
+
         $inicio_vigencia = Carbon::createFromFormat('Y-m-d h:i:s', $request->get('InicioVigencia')." 00:00:00");
-        
-        //dd($inicio_vigencia);
-        //$tarifas = TarifaMaterial::where("FinVigencia")->where('IdMaterial', '=', $request->get('IdMaterial'))->get();
+
         $tarifas = TarifaMaterial::where('IdMaterial', '=', $request->get('IdMaterial'))->where('Estatus', '=', '1')->orderBy("InicioVigencia")->get();
-        //dd($tarifas);
+
         $conflicto_vigencia = FALSE;
         $i = 0;
         $tarifa_old_sin_vigencia = array();
@@ -78,31 +73,24 @@ class TarifasMaterialController extends Controller
                 break;
             }
             if($tarifa_old->FinVigencia){
-                //dd($inicio_vigencia->format("Ymd"),$tarifa_old->FinVigencia->format("Ymd"),$inicio_vigencia->format("Ymd"),$tarifa_old->InicioVigencia->format("Ymd"));
                 if($inicio_vigencia->format("Ymd")<=$tarifa_old->FinVigencia->format("Ymd") && $inicio_vigencia->format("Ymd")>=$tarifa_old->InicioVigencia->format("Ymd")){
                     $conflicto_vigencia = TRUE;
-                    //dd("conflicto",$inicio_vigencia->format("Ymd"),$tarifa_old->FinVigencia);
                 }
-                   
             }else{
                 $tarifa_old_sin_vigencia[] = $tarifa_old;
             }
-//            if($i == 2)
-//            dd($inicio_vigencia->format("Ymd"),$tarifa_old->InicioVigencia->format("Ymd"),$tarifa_old->FinVigencia->format("Ymd"));
             $i++;
         }
-        //dd($conflicto_vigencia, $antes_primer_tarifa,$tarifa_old_sin_vigencia, $primer_tarifa );
+
         
         if($antes_primer_tarifa){
-          //  User::create(array_merge($request->all(), ['plan' => $plan]));
-            //dd($primer_tarifa->InicioVigencia->format("Y-m-d"));
+
             $fin_vigencia = Carbon::createFromFormat("Y-m-d h:i:s",$primer_tarifa->InicioVigencia->format("Y-m-d")." 00:00:00")->subSeconds(1);
             
             $otros_datos = ['FinVigencia' => $fin_vigencia->format("Y-m-d h:i:s")];
             $datos = array_merge($request->all(),$otros_datos);
             TarifaMaterial::create($datos);
-//             return view('tarifas.material.index')
-//            ->withTarifas(TarifaMaterial::all());
+
              return redirect()->route('tarifas_material.index');
             
         }else if(!$conflicto_vigencia){
@@ -113,22 +101,12 @@ class TarifasMaterialController extends Controller
             }
 
             TarifaMaterial::create($request->all());
-//             return view('tarifas.material.index')
-//            ->withTarifas(TarifaMaterial::all());
              return redirect()->route('tarifas_material.index');
             
         }else{
             Flash::error('Esta tarifa tiene un conflicto de vigencia.');
             return redirect()->route('tarifas_material.index');
-            //throw new \Exception("Esta tarifa tiene un conflicto de vigencia.");
         }
-        
-        
-                
-        
-//        return response()->json(['success' => true,
-//            'updateUrl' => route|('tarifas_material.update', $tarifa),
-//            'message' => '¡TARIFA REGISTRADA CORRECTAMENTE!']);
     }
 
     /**

@@ -38,15 +38,6 @@ class TarifaRutaMaterial extends Model
     {
         return $this->belongsTo(User::class, "registra");
     }
-
-   /* public function getFinVigenciaTarifaAttribute(){
-        if($this->FinVigencia){
-            return $this->FinVigencia->format("d-m-Y h:i:s");
-        }else{
-            return "VIGENTE";
-        }
-    }*/
-
     public function getEstatusStringAttribute() {
         /*
            * Estatus:

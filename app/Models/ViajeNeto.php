@@ -512,7 +512,7 @@ class ViajeNeto extends Model
                         return ['message' => $error,
                             'tipo' => $tipo];
                     }
-                    if ($this->IdPerfil != 3 && ($this->getTiempo() == 0 || (($this->getTiempo() / 60) < ($min - $tol)))) {
+                    if ($this->Estatus == 0 && $this->IdPerfil != 3 && ($this->getTiempo() == 0 || (($this->getTiempo() / 60) < ($min - $tol)))) {
                         $error = "El viaje no puede ser registrado porque no cumple con los tiempos de cronometría de la ruta";
                         $tipo = 'error';
                         return ['message' => $error,
