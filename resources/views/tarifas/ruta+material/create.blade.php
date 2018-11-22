@@ -16,7 +16,7 @@
                             <select class="form-control" name="id_ruta">
                                 <option selected ="selected" value>--SELECCIONE--</option>
                                 @foreach($rutas as $ruta)
-                                    <option value="{{$ruta->IdRuta}}">{{$ruta->Clave}}{{$ruta->IdRuta}} ({{$ruta->origen->Descripcion}} - {{$ruta->tiro->Descripcion}})</option>
+                                     <option value="{{$ruta->IdRuta}}">{{$ruta->Clave}}{{$ruta->IdRuta}} ({{$ruta->origen}} - {{$ruta->tiro}})</option>
                                 @endforeach
                             </select>
                     </form>
