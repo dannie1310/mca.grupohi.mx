@@ -18,6 +18,7 @@ use App\Models\Ruta;
 use App\Models\Sindicato;
 use App\Models\Tarifas\TarifaMaterial;
 use App\Models\Tarifas\TarifaPeso;
+use App\Models\Tarifas\TarifaRutaMaterial;
 use App\Models\Tiro;
 use App\Models\Impresora;
 use App\Models\Telefono;
@@ -334,6 +335,39 @@ class CSVController extends Controller
             ->get();
         $csv = new CSV($headers, $items);
         $csv->generate('tarifas_material');
+    }
+    public function tarifas_ruta_material(){
+        $headers = ["Tarifa", "Ruta", "Origen", "Destino","Material", "Primer KM", "KM Subsecuente", "KM Adicional", "Inicio de vigencia", "Fin de vigencia", "Tipo Tarifa", "Registro", "Fecha y Hora Registro", "Desactivo", "Motivo de Desactivacion", "Cancelo", "Motivo de cancelacion", "Estatus"];
+        $items = TarifaRutaMaterial::leftJoin("rutas", "rutas.IdRuta","=","tarifas_ruta_material.id_ruta")
+                    ->join("materiales", "materiales.IdMaterial", "=","tarifas_ruta_material.id_material")
+                    ->join("tipo_tarifa","tipo_tarifa.id", "=", "tarifas_ruta_material.idtipo_tarifa")
+                    ->join("origenes", "origenes.IdOrigen", "=", "rutas.IdOrigen")
+                    ->join("tiros", "tiros.IdTiro", "=", "rutas.IdTiro")
+                    ->leftJoin('igh.usuario', 'tarifas_ruta_material.registra', '=', 'igh.usuario.idusuario')
+                    ->leftJoin('igh.usuario as u_d', 'tarifas_ruta_material.desactivo', '=', 'u_d.idusuario')
+                    ->leftJoin('igh.usuario as u_c', 'tarifas_ruta_material.cancelo', '=', 'u_c.idusuario')
+                    ->select(
+                            "tarifas_ruta_material.id",
+                            DB::raw("CONCAT(rutas.Clave,'-',rutas.IdRuta)"),
+                            "origenes.Descripcion as origen",
+                            "tiros.Descripcion as tiro",
+                            "materiales.Descripcion as material",
+                            "tarifas_ruta_material.primer_km",
+                            "tarifas_ruta_material.km_subsecuentes",
+                            "tarifas_ruta_material.km_adicionales",
+                            "tarifas_ruta_material.inicio_vigencia",
+                            "tarifas_ruta_material.fin_vigencia",
+                            "tipo_tarifa.descripcion",
+                            DB::raw("CONCAT(igh.usuario.nombre, ' ', igh.usuario.apaterno, ' ', igh.usuario.amaterno)"),
+                            "tarifas_ruta_material.fecha_hora_registro",
+                            DB::raw("CONCAT(u_d.nombre, ' ', u_d.apaterno, ' ', u_d.amaterno)"),
+                            "motivo_desactivar",
+                            DB::raw("CONCAT(u_c.nombre, ' ', u_c.apaterno, ' ', u_c.amaterno)"),
+                            "motivo_cancelar",
+                            "tarifas_ruta_material.estatus")
+                        ->get();
+        $csv = new CSV($headers, $items);
+        $csv->generate('tarifas_ruta_material');
     }
 
     public function tarifas_peso()
