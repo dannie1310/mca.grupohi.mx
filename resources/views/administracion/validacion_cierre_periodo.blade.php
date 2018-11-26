@@ -101,7 +101,7 @@
                                    </thead>
                                     <tbody>
                                     <tr v-for="historico in historico">
-                                        <th>@{{ historico.nombre }}</th>
+                                        <th>@{{ historico.nombre }} @{{historico.apaterno}} @{{historico.amaterno}}</th>
                                         <th>@{{ historico.fecha_inicio }}</th>
                                         <th>@{{ historico.fecha_fin }}</th>
                                         <th>@{{ historico.mes }} @{{ historico.anio }}</th>

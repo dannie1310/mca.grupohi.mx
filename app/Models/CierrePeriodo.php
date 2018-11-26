@@ -19,7 +19,8 @@ class CierrePeriodo extends Model
 
     public static function cierres()
     {
-        $cierres = CierrePeriodo::orderBy('idcierre')->get();
+        $cierres = CierrePeriodo::orderBy('idcierre','desc')->get();
+        $extra [] = "";
 
         foreach ($cierres as $cierre) {
 

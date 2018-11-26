@@ -33,6 +33,7 @@ class ViajesNetosController extends Controller
         $this->middleware('auth');
         $this->middleware('context');
         $this->middleware('permission:ViajesNetosController', ['only' => ['permisos_store']]);
+        $this->middleware('permission:ingresar-viajes-manuales', ['only' => ['store']]);
 
 
         parent::__construct();

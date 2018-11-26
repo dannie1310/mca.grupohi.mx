@@ -61,11 +61,13 @@ class ValidacionCierrePeriodo extends Model
         return $cierres[0]->permiso;
     }
     public static function DatosPermisosUsuarios(){
-        $historial = DB::connection('sca')->select(DB::raw("SELECT distinct(vcp.id), vcp.fecha_inicio, vcp.fecha_fin, cp.idcierre, cp.mes, cp.anio,u.nombre, 
+        $historial = DB::connection('sca')->select(DB::raw("SELECT distinct(vcp.id), vcp.fecha_inicio, vcp.fecha_fin, cp.idcierre, cp.mes, cp.anio,u.nombre, u.apaterno, u.amaterno,
                                                             IF(now() < fecha_fin,1,0) AS estatus FROM validacion_x_cierre_periodo vcp
                                                             inner join cierres_periodo cp ON vcp.idcierre_periodo = cp.idcierre
-                                                            left join sca_configuracion.vw_usuarios u ON u.id_usuario = vcp.idusuario
-                                                            order by vcp.fecha_inicio"));
+                                                            left join igh.usuario u ON u.idusuario = vcp.idusuario
+                                                            order by vcp.fecha_inicio desc"));
+
+
 
         $extra = array();
         foreach ($historial as $h) {
@@ -74,6 +76,8 @@ class ValidacionCierrePeriodo extends Model
                 'mes' => CierrePeriodo::nombreMeses($h->mes),
                 'anio' => $h->anio,
                 'nombre' => $h->nombre,
+                'apaterno' => $h->apaterno,
+                'amaterno' => $h->amaterno,
                 'fecha_inicio' => $h->fecha_inicio,
                 'fecha_fin' => $h->fecha_fin,
                 'estatus' => $h->estatus
