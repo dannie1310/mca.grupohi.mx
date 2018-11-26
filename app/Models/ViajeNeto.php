@@ -228,7 +228,7 @@ class ViajeNeto extends Model
                     $s = ViajeNeto::validandoCierre($viaje['FechaLlegada']);
 
                     if ($s == 0) {
-                        $proyecto_local = ProyectoLocal::where('IdProyectoGlobal', '=', $request->session()->get('id'))->first();
+
                         $extra = [
                             'FechaCarga' => Carbon::now()->toDateString(),
                             'HoraCarga' => Carbon::now()->toTimeString(),
@@ -236,7 +236,7 @@ class ViajeNeto extends Model
                             'HoraLlegada' => $viaje['HoraLlegada'],
                             'FechaSalida' => $fecha_salida->toDateString(),
                             'HoraSalida' => $fecha_salida->toTimeString(),
-                            'IdProyecto' => $proyecto_local->IdProyecto,
+                            'IdProyecto' => $request->session()->get('id'),
                             'Creo' => auth()->user()->idusuario,
                             'Estatus' => 29,
                             'Code' => $viaje['Codigo'],
